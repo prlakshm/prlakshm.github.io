@@ -20,9 +20,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# setup packages
-package.json
-package-lock.json
+# setup 
 tsconfig.json
 tsconfig.node.json
 vite.config.ts
