@@ -5,7 +5,7 @@
     background-color: rgb(245, 245, 245);
 }
 
-.footer {
+.projects .footer {
     background-color: rgb(245, 245, 245);
 }
 
@@ -25,6 +25,10 @@
     padding: 1rem 0;
     margin-left: -6rem;
     background-color: linear-gradient(to bottom, transparent 0%, rgb(245, 245, 245) 100%); 
+}
+
+.project-cards a {
+    text-decoration: none;
 }
 
 .card {

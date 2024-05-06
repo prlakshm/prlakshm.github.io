@@ -4,20 +4,23 @@
         "color": "#FA9E9E",
         "skills": ["Prodia AI", "Photoshop", "Javascript/React"],
         "logline": "Using interaction and animation to enhance shopping UX ",
-        "image": "/projects/pbj-time.png"
+        "image": "/projects/pbj-time.png",
+        "link": "/pbj-time"
     },
     {
         "name": "Mi Fonda Storefront",
         "color": "#C5C5C5",
         "skills": ["Figma", "UI/UX Design"],
         "logline": "Redesigning storefront for a startup",
-        "image": "/projects/mi-fonda.png"
+        "image": "/projects/mi-fonda.png",
+        "link": "/mi-fonda"
     },
     {
         "name": "Artist's Corner PVD",
         "color": "#ADE1D5",
         "skills": ["MongoDB", "Algorithms", "Typescript/React"],
         "logline": "Helping students sell art and handmade goods",
-        "image": "/projects/artists-corner.png"
+        "image": "/projects/artists-corner.png",
+        "link": "/artists-corner"
     }
 ]

@@ -14,6 +14,7 @@ function Projects() {
                 project,
                 index 
               ) => (
+                <a href={project.link}>
                 <ProjectCard
                   key={index}
                   name={project.name}
@@ -21,7 +22,8 @@ function Projects() {
                   skills={project.skills}
                   logline={project.logline}
                   image={project.image}
-                /> // project card component
+                /> {/* project card component*/}
+                </a>
               )
             )}
         </div>
