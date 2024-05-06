@@ -8,11 +8,16 @@ function Home() {
         <h2>
           I’m a software engineer interested in full-stack development and
           AI-assisted design. <br />
-
           <div className="contact">
-          <img src="./icons/email-icon.png" alt="Email icon" />
-          <img src="./icons/github-icon.png" alt="Github icon" />
-          <img src="./icons/linkedin-icon.png" alt="Linkedin icon" />
+            <a href="mailto:pranavi_lakshminarayanan@brown.edu" target="_blank">
+              <img src="./icons/email-icon.png" alt="Email icon" />
+            </a>
+            <a href="https://github.com/prlakshm" target="_blank">
+              <img src="./icons/github-icon.png" alt="Github icon" />
+            </a>
+            <a href="https://www.linkedin.com/in/prlakshm" target="_blank">
+              <img src="./icons/linkedin-icon.png" alt="Linkedin icon" />
+            </a>
           </div>
         </h2>
       </div>

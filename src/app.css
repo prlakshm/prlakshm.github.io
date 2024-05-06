@@ -23,6 +23,9 @@ body {
 }
 
 .left {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     font-family: "Barlow", sans-serif;
     font-weight: 500;
     font-size: 1.1rem;
