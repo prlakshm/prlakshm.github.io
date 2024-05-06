@@ -9,7 +9,7 @@
     {
         "name": "Mi Fonda Storefront",
         "color": "#C5C5C5",
-        "skills": ["UI/UX Design", "Figma"],
+        "skills": ["Figma", "UI/UX Design"],
         "logline": "Redesigning storefront for a startup",
         "image": "/projects/mi-fonda.png"
     },
