@@ -35,11 +35,16 @@ h2 {
 
 .contact {
     margin-top: 1rem;
+    margin-left: -1rem;
 }
 
 .contact img {
     padding-right: 0.8rem;
     width: 2rem;
+}
+
+.contact a {
+    padding: 0 0 0 1rem;
 }
   
 .character {
