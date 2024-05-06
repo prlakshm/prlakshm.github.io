@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+.projects {
+    width: 98.9vw;
+    background-color: rgb(235, 235, 235);
+}
+
+.footer {
+    background-color: rgb(235, 235, 235);
+}
+
+.transition {
+    background: linear-gradient(to bottom, rgba(255,255,255,1),rgb(235, 235, 235)); /* Gradient from white to a slightly darker shade */
+}
+
+.grid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.project-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 2rem 0;
+    margin-left: -5rem;
+    background-color: linear-gradient(to bottom, transparent 0%, rgb(235, 235, 235) 100%); 
+}
+
+.card {
+    width: 35rem;
+    border-radius: 2rem;
+    box-shadow: 8px 8px 8px rgb(0 0 0 / 10%);
+    overflow: hidden;
+    margin: 0 0rem 3rem 5rem;
+}
+
+.preview-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1rem 0;
+}
+
+.preview-image img {
+    width: 25rem;
+}
+
+.info {
+    background-color: white;
+    padding: 2rem 0 1rem 0;
+}
+
+.all-skills {
+    display: flex;
+    flex-direction: row;
+    margin-left: 2rem;
+}
+
+.skill {
+    border-radius: 0.6rem;
+    border: 1px solid #C5C5C5;
+    margin-right: 0.6rem;
+}
+
+h3 {
+    font-family: "Barlow", sans-serif;
+    font-weight: 500;
+    font-size: 2.25rem;
+    margin: 1.5rem 1.25rem 0 1.9rem;
+}
+
+h4 {
+    font-family: "Barlow", sans-serif;
+    font-weight: 400;
+    font-size: 1.2rem;
+    margin: 0.7rem 2rem;
+}
+
+h5 {
+    font-family: "Barlow", sans-serif;
+    font-weight: 400;
+    font-size: 1.2rem;
+    margin: 0.25rem 0.6rem;
+}

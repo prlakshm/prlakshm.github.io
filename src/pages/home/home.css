@@ -12,11 +12,11 @@
     flex-direction: column;
     text-align: left;
     justify-content: center;
-    align-items: flex-end;
+    align-items: center;
     margin-top: -3rem;
+    margin-left: 5rem;
 
 }
-
 
 h1 {
     font-family: "Asap", sans-serif;
@@ -32,15 +32,24 @@ h2 {
     font-size: 1.5rem;
     width: 30rem;
 }
+
+.contact {
+    margin-top: 1rem;
+}
+
+.contact img {
+    padding-right: 0.8rem;
+    width: 2rem;
+}
   
 .character {
     display: flex;
     flex: 0;
     justify-content: flex-end;
     align-items: flex-end;
-    height: 82vh;
+    height: 84vh;
 }
   
 .character img {
-    width: 47rem;
+    width: 48rem;
 }

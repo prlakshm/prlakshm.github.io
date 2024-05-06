@@ -1,3 +1,4 @@
+import Pdf from "/docs/Pranavi_Resume_2024.pdf";
 import "../app.css";
 
 function Header() {
@@ -6,7 +7,7 @@ function Header() {
       <div className="left">
         <a href="/">
           <img
-            src="./home-icon.png"
+            src="./header/home-icon.png"
             alt="Home icon takes you back to landing page when clicked"
           />
         </a>
@@ -15,7 +16,13 @@ function Header() {
         <a href="/">Home</a>
         <a href="/projects">Projects</a>
         <a href="/about">About</a>
-        <a href="./Pranavi_Resume_2024.pdf">Resume</a>
+        <a
+          href={Pdf}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Resume
+        </a>
       </div>
     </div>
   );
