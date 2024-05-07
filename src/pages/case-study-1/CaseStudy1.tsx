@@ -96,8 +96,68 @@ function CaseStudy1() {
 
           <h2>Process</h2>
           <div className="process">
-                    <img src="/case-study-1/timeline.png" alt="Process timeline with design, AI generating images, photoshopping images,coding web app, and inserting animation as steps "/>
+            <div className="img-container">
+            <img
+              src="/case-study-1/timeline.png"
+              alt="Process timeline with design, AI generating images, photoshopping images,coding web app, and inserting animation as steps "
+            />
+            </div>
+            <h3>Design</h3>
+            <p>
+              Below is my final sketch for my web app. I based the visual design
+              off of a mock-website I made called{" "}
+              <a href="https://blueno-bakery.vercel.app/" target="_blank">
+                <span className="app-link bold">Blueno's Bakery</span>
+              </a>
+              !
+            </p>
+            <div className="img-container">
+              <img
+                src="/case-study-1/design-inspo.png"
+                alt="Final sketch and Blueno's Bakery website I used as inspiration for my web app"
+              />
+            </div>
+            
+            
+            <h3>AI Generating Images with Prodia + Editing Images with Photoshop</h3>
+            <p>
+              <span className="bold">Problem:</span> I needed my sandwitch ingrediant images to all be the same illustration aesthetic, but this was hard to find with stock photos.<br/>
+              <span className="bold">Solution:</span> I used Prodia AI, an online image generator, to generate images with the same style!
+            </p>
+            <p>
+            <span className="bold">Problem:</span> The AI sometimes generated images with gibberour of erranoues features. <br/>
+            <span className="bold">Solution:</span> Photoshop to the rescue!
+            </p>
+            <p>Below are my AI generated images before and after editing with Photoshop.</p>
+            <div className="img-container">
+            <img
+                src="/case-study-1/ai-ps-images.png"
+                alt="AI generated images before and after editing with Photoshop"
+                style={{margin:"2rem 0"}}
+              />
           </div>
+
+          <h3>Coding Web App</h3>
+          <p>While coding the web app, I implemented a cart aggregator as well as sort and filter functionality from the competitive analysis best features list. In the end, I had to <span className="bold">adjust colors to increase contrast and accessiblity</span>.</p>
+          <div className="img-container">
+            <img
+                src="/case-study-1/style-guide.png"
+                alt="AI generated images before and after editing with Photoshop"
+              />
+          </div>
+
+          <h3>Inserting Animation</h3>
+          <p>I added animation to show ingrediants "fall" on the sandwitch. This visual display entinces users to interact with the interface and keep shopping. The <span className="bold">challenge was to make the animation responsive</span> so that all the ingrediants line up on different screens.</p>
+          <div className="img-container">
+            <img
+                src="/case-study-1/style-guide.png"
+                alt="AI generated images before and after editing with Photoshop"
+              />
+          </div>
+          </div>
+
+          
+          <h2></h2>
         </div>
       </div>
 

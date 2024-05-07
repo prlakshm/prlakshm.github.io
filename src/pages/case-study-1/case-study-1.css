@@ -49,6 +49,13 @@
     font-size: 2.25rem;
 }
 
+.main h3 {
+    font-weight: 600;
+    font-size: 2rem;
+    color: #FA9E9E;
+    margin-left: -0.1rem;
+}
+
 .overview-info {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -109,10 +116,11 @@
     font-size: 1.25rem;
     color:#FA9E9E;
     text-decoration: underline;
+    padding: 0.25rem;
 }
 
 .overview a {
-    padding: 0.25rem;
+    padding: 0;
 }
 
 .research {
@@ -139,8 +147,43 @@
     width: 40vw;
 }
 
+
+
 .process img {
     width: 50vw;
+}
+
+p {
+    text-align: left;
+}
+
+
+.process p  {
+    width: 60vw;
+    font-size: 1.2rem;
+    font-weight: 400;
+    text-align: left;
+    margin-top: 2rem;
+}
+
+.process .app-link {
+    padding: 0 0.25rem;
+}
+
+.process a {
+    padding: 0;
+}
+
+.img-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.design img {
+    width: 60vw;
+    margin-bottom: 2rem;
 }
 
 
