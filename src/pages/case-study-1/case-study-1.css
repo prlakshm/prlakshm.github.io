@@ -81,6 +81,13 @@
     margin: 0.25rem 0.75rem;
 }
 
+.overview {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
 .overview p {
     width: 60vw;
     font-size: 1.2rem;
@@ -89,13 +96,30 @@
     margin-top: 2rem;
 }
 
+.overview img {
+    margin: 2rem 0;
+    width: 40vw;
+}
+
 .bold {
     font-weight: 700;
+}
+
+.app-link {
+    font-size: 1.25rem;
+    color:#FA9E9E;
+    text-decoration: underline;
+}
+
+.overview a {
+    padding: 0.25rem;
 }
 
 .research {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .research p {
@@ -111,8 +135,12 @@
 }
 
 
-
 .research img {
     width: 40vw;
-    margin-left: 8rem;
 }
+
+.process img {
+    width: 50vw;
+}
+
+

@@ -19,7 +19,7 @@ function CaseStudy1() {
           <h5>Takeaways</h5>
         </div>
         <div className="main">
-          <h2 style={{marginTop:"-0.75rem"}}>Overview</h2>
+          <h2 style={{ marginTop: "-0.75rem" }}>Overview</h2>
           <div className="overview-info">
             <div className="role">
               <h3>Role</h3>
@@ -45,31 +45,59 @@ function CaseStudy1() {
             </div>
           </div>
           <div className="overview">
-          <p>
-            Many e-commerce websites are static and serve only functionality
-            purposes of aggregating items in cart and checkout. I wanted to
-            explore different ways an online ordering platform can use
-            <span className="bold"> interaction and animation to engage users</span> in the purchase
-            experience.
-          </p>
+            <p>
+              Many e-commerce websites are static and serve only functionality
+              purposes of aggregating items in cart and checkout.{" "}
+              <a href="https://sandwitch-builder.vercel.app/" target="_blank">
+                <span className="app-link bold">PB&J Time</span>
+              </a>{" "}
+              is a gourmet sandwitch building app that explores different ways
+              an online ordering platform can use
+              <span className="bold">
+                {" "}
+                interaction and animation to engage users
+              </span>{" "}
+              in the purchasing experience.
+            </p>
+            <img
+              src="/case-study-1/pbj-time-overview.png"
+              alt="PB&J Time web app displayed on laptop"
+            />
           </div>
 
           <h2>Research</h2>
           <div className="research">
-            <p>To learn how to sucessfully build an online ordering platform, I researched popular companies. In a <span className="bold"> competetive analysis</span>, I examined
-                the pros and cons of their cart aggregators and shopping UX. 
+            <p>
+              To learn how to sucessfully build an online ordering platform, I
+              researched popular companies. In a{" "}
+              <span className="bold"> competetive analysis</span>, I examined
+              the pros and cons of their cart aggregators and shopping UX.
             </p>
-            <img src="/case-study-1/company-logos.png" alt="Amazon, Etsy, and Sephora logos for competitive analysis summary"/>
-            <p>Best features to include:
-            <ul>
-                <li>Sorting functionality (by price low to high, by name A to Z)</li>
-                <li>Filtering functionality (by category of item)</li>
+            <img
+              src="/case-study-1/company-logos.png"
+              alt="Amazon, Etsy, and Sephora logos for competitive analysis summary"
+            />
+            <p>
+              Best features to include:
+              <ul>
+                <li>
+                  Sorting functionality (sort items by price low to high, by
+                  name A to Z)
+                </li>
+                <li>Filtering functionality (filter items by category)</li>
                 <li>Reset option (to reset sort and filter)</li>
-                <li>One-click remove (can remove items from cart individually and all at once)</li>
-            </ul>
+                <li>
+                  One-click remove (can remove items from cart individually and
+                  all at once)
+                </li>
+              </ul>
             </p>
           </div>
-    
+
+          <h2>Process</h2>
+          <div className="process">
+                    <img src="/case-study-1/timeline.png" alt="Process timeline with design, AI generating images, photoshopping images,coding web app, and inserting animation as steps "/>
+          </div>
         </div>
       </div>
 
