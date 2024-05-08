@@ -152,14 +152,17 @@ p {
 
 
 .case-study-2 .research img {
-    width: 40vw;
+    margin: -1rem 0;
+    padding: 0;
+    width: 50vw;
 }
 
 
 
 .case-study-2 .process img {
-    width: 50vw;
+    width: 55vw;
 }
+
 
 .case-study-2 p {
     text-align: left;
@@ -182,11 +185,18 @@ p {
     padding: 0;
 }
 
-.case-study-2 .img-container, .video-container {
+.case-study-2 .img-container, .case-study-2 .video-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.case-study-2 .img-container p {
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    margin-top: 0.5rem;
+    text-align: center;
 }
 
 .case-study-2 video {
@@ -197,6 +207,10 @@ p {
 .case-study-2 .design img {
     width: 60vw;
     margin-bottom: 2rem;
+}
+
+.case-study-2 .takeaways {
+    margin-top: 2rem;
 }
 
 .case-study-2 .takeaways p  {

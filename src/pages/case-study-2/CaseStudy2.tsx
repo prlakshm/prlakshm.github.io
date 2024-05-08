@@ -76,32 +76,15 @@ function CaseStudy2() {
           <h2 id="research">Research</h2>
           <div className="research">
             <p>
-              To learn how to sucessfully build an online ordering platform, I
-              researched popular companies. In a{" "}
-              <span className="bold"> competetive analysis</span>, I examined
-              the pros and cons of their cart aggregators and shopping UX.
+              The CEO and CTO knew they wanted a fresh new look. They wanted to <span className="bold">gamify their storefront and make it more visually focused</span>, but weren't exactly sure how to do that.  
             </p>
+            <p>We drew inspiration from social media and other online ordering platforms: </p>
             <div className="img-container">
               <img
                 src="/case-study-2/company-logos.png"
-                alt="Amazon, Etsy, and Sephora logos for competitive analysis summary"
+                alt="Doordash, Grubhub, TikTok logos for inspiration"
               />
             </div>
-            <p>
-              Best features to include:
-              <ul>
-                <li>
-                  Sorting functionality (sort items by price low to high, by
-                  name A to Z)
-                </li>
-                <li>Filtering functionality (filter items by category)</li>
-                <li>Reset option (to reset sort and filter)</li>
-                <li>
-                  One-click remove (can remove items from cart individually and
-                  all at once)
-                </li>
-              </ul>
-            </p>
           </div>
 
           <h2 id="process">Process</h2>
@@ -112,24 +95,20 @@ function CaseStudy2() {
                 alt="Process timeline with design, AI generating images, photoshopping images,coding web app, and inserting animation as steps "
               />
             </div>
-            <h3>Design</h3>
+            <h3>Sketching</h3>
             <p>
-              Below is my final sketch for my web app. I based the visual design
-              off of a mock-website I made called{" "}
-              <a href="https://blueno-bakery.vercel.app/" target="_blank">
-                <span className="app-link bold">Blueno's Bakery</span>
-              </a>
-              !
+              Below are my sketches for mobile and desktop.
             </p>
-            <div className="img-container">
+            <div className="img-container" style={{marginLeft:"-1rem"}}>
               <img
-                src="/case-study-2/design-inspo.png"
-                alt="Final sketch and Blueno's Bakery website I used as inspiration for my web app"
+                src="/case-study-2/final-sketches.png"
+                alt="Sketches of mobile and desktop designs for Mi Fonda storefront"
               />
+              <p>Fig 1. Left: Mobile sketches; Right: Desktop Sketches</p>
             </div>
 
             <h3>
-              AI Generating Images with Prodia + Editing Images with Photoshop
+              Low-fi Wireframes + Feedback
             </h3>
             <p>
               <span className="bold">Problem:</span> I needed my sandwitch
@@ -156,7 +135,7 @@ function CaseStudy2() {
               />
             </div>
 
-            <h3>Coding Web App</h3>
+            <h3>Hi-Fi Prototypes + Feedback</h3>
             <p>
               While coding the web app, I implemented a cart aggregator as well
               as sort and filter functionality from the competitive analysis
@@ -173,7 +152,7 @@ function CaseStudy2() {
               />
             </div>
 
-            <h3>Inserting Animation</h3>
+            <h3>Presenting to Founders</h3>
             <p>
               Animations:
               <ul>
@@ -202,49 +181,21 @@ function CaseStudy2() {
 
           <h2 id="takeaways">Takeaways</h2>
           <div className="takeaways">
-            <h3>1. Accessibility</h3>
+            <h3>1. Iterative Design</h3>
             <p>
-              {" "}
-              Animation <span className="bold">
-                should be used sparingly
-              </span>{" "}
-              because they could distract users or not be accessibile. However,
-              when used thoughtfully, they can increase accessibility and serve
-              as an{" "}
-              <span className="bold">
-                additional way to notify users of updates to the system
-              </span>
-              .{" "}
+             Iterating through rounds of design and feedback <span className="bold">helps maximize client satisfaction</span>.
             </p>
+            <h3>2. Platform Inspiration</h3>
+            <p>Tip: When a client doesn't know what direction to take their design, <span className="bold">asking for platforms whose UI they admire</span> is a great place to start! We as designers can use these platforms to draw inspiration.</p>
+            <h3>3. Team Collaboration</h3>
             <p>
-              For example:
-              <ul>
-                <li>Item card tilting notifies users item was selected</li>
-                <li>
-                  Ingrediants "falling" on sandwitch notifies users item was
-                  added to order
-                </li>
-              </ul>
-            </p>
-            <h3>2. AI Generated Images</h3>
-            <p>
-              AI generating images for software development can{" "}
-              <span className="bold">save money and resources</span>. Though
-              they can be{" "}
-              <span className="bold">tedious to edit with Photoshop</span>,
-              their main benefit is creating images with consistent styles.
-              Overall, using AI generated images can help{" "}
-              <span className="bold">
-                create a unified visual identity for a website
-              </span>
-              .
+              Designing in a team <span className="bold">generates more innovative solutions</span> and introduces ideas I couldn't have thought of on my own.  It also creates a more <span className="bold">user-centered design</span>, because everyone offers a diverse perspective.
             </p>
           </div>
 
           <div className="thanks">
             <p>
-              If you've made it this far, thanks for coming along on this
-              journey! Now go and build your own sandwitch!
+              Thank you reading till the end! This project was especially grueling yet rewarding, so I appreciate it!
             </p>
           </div>
         </div>

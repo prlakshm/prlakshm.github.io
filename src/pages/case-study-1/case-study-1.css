@@ -197,6 +197,10 @@ video {
     margin-bottom: 2rem;
 }
 
+.takeaways {
+    margin-top: 2rem;
+}
+
 .takeaways p  {
     width: 60vw;
     font-size: 1.2rem;
