@@ -59,10 +59,12 @@ function CaseStudy1() {
               </span>{" "}
               in the purchasing experience.
             </p>
+            <div className="img-container">
             <img
               src="/case-study-1/pbj-time-overview.png"
               alt="PB&J Time web app displayed on laptop"
             />
+            </div>
           </div>
 
           <h2>Research</h2>
@@ -73,10 +75,12 @@ function CaseStudy1() {
               <span className="bold"> competetive analysis</span>, I examined
               the pros and cons of their cart aggregators and shopping UX.
             </p>
+            <div className="img-container">
             <img
               src="/case-study-1/company-logos.png"
               alt="Amazon, Etsy, and Sephora logos for competitive analysis summary"
             />
+            </div>
             <p>
               Best features to include:
               <ul>
@@ -97,10 +101,10 @@ function CaseStudy1() {
           <h2>Process</h2>
           <div className="process">
             <div className="img-container">
-            <img
-              src="/case-study-1/timeline.png"
-              alt="Process timeline with design, AI generating images, photoshopping images,coding web app, and inserting animation as steps "
-            />
+              <img
+                src="/case-study-1/timeline.png"
+                alt="Process timeline with design, AI generating images, photoshopping images,coding web app, and inserting animation as steps "
+              />
             </div>
             <h3>Design</h3>
             <p>
@@ -117,47 +121,106 @@ function CaseStudy1() {
                 alt="Final sketch and Blueno's Bakery website I used as inspiration for my web app"
               />
             </div>
-            
-            
-            <h3>AI Generating Images with Prodia + Editing Images with Photoshop</h3>
+
+            <h3>
+              AI Generating Images with Prodia + Editing Images with Photoshop
+            </h3>
             <p>
-              <span className="bold">Problem:</span> I needed my sandwitch ingrediant images to all be the same illustration aesthetic, but this was hard to find with stock photos.<br/>
-              <span className="bold">Solution:</span> I used Prodia AI, an online image generator, to generate images with the same style!
+              <span className="bold">Problem:</span> I needed my sandwitch
+              ingrediant images to all be the same illustration aesthetic, but
+              this was hard to find with stock photos.
+              <br />
+              <span className="bold">Solution:</span> I used Prodia AI, an
+              online image generator, to generate images with the same style!
             </p>
             <p>
-            <span className="bold">Problem:</span> The AI sometimes generated images with gibberour of erranoues features. <br/>
-            <span className="bold">Solution:</span> Photoshop to the rescue!
+              <span className="bold">Problem:</span> The AI sometimes generated
+              images with gibberour of erranoues features. <br />
+              <span className="bold">Solution:</span> Photoshop to the rescue!
             </p>
-            <p>Below are my AI generated images before and after editing with Photoshop.</p>
+            <p>
+              Below are my AI generated images before and after editing with
+              Photoshop.
+            </p>
             <div className="img-container">
-            <img
+              <img
                 src="/case-study-1/ai-ps-images.png"
                 alt="AI generated images before and after editing with Photoshop"
-                style={{margin:"2rem 0"}}
+                style={{ margin: "2rem 0" }}
               />
-          </div>
+            </div>
 
-          <h3>Coding Web App</h3>
-          <p>While coding the web app, I implemented a cart aggregator as well as sort and filter functionality from the competitive analysis best features list. In the end, I had to <span className="bold">adjust colors to increase contrast and accessiblity</span>.</p>
-          <div className="img-container">
-            <img
+            <h3>Coding Web App</h3>
+            <p>
+              While coding the web app, I implemented a cart aggregator as well
+              as sort and filter functionality from the competitive analysis
+              best features list. In the end, I had to{" "}
+              <span className="bold">
+                adjust colors to increase contrast and accessiblity
+              </span>
+              .
+            </p>
+            <div className="img-container">
+              <img
                 src="/case-study-1/style-guide.png"
                 alt="AI generated images before and after editing with Photoshop"
               />
+            </div>
+
+            <h3>Inserting Animation</h3>
+            <p>
+              Animations:
+              <ul>
+                <li>Item card tilts when hovered</li>
+                <li>Ingrediants "fall" on sandwitch when added to cart</li>
+              </ul>
+              These visual displays entince users to interact with the
+              interface and keep shopping. The{" "}
+              <span className="bold">
+                challenge was to make the animation responsive
+              </span>{" "}
+              so that all the ingrediants line up on different screens.
+            </p>
+            <div className="video-container">
+              <video
+                src="/case-study-1/responsive-screens.mp4"
+                typeof="video/mp4"
+                controls
+                autoPlay
+                muted
+              >
+                Your browser does not support the video tag.
+              </video>
+            </div>
           </div>
 
-          <h3>Inserting Animation</h3>
-          <p>I added animation to show ingrediants "fall" on the sandwitch. This visual display entinces users to interact with the interface and keep shopping. The <span className="bold">challenge was to make the animation responsive</span> so that all the ingrediants line up on different screens.</p>
-          <div className="img-container">
-            <img
-                src="/case-study-1/style-guide.png"
-                alt="AI generated images before and after editing with Photoshop"
-              />
-          </div>
+          <h2>Takeaways</h2>
+          <div className="takeaways">
+            <h3>1. Accessibility</h3>
+            <p>
+              {" "}
+              Animation <span className="bold">should be used sparingly</span> because they could distract
+              users or not be accessibile. However, when used thoughtfully, they
+              can increase accessibility and serve as an  <span className="bold">additional way to notify
+              users of updates to the system</span>. </p>
+              <p>For example:
+              <ul>
+                <li>Item card tilting notifies users item was selected</li>
+                <li>
+                  Ingrediants "falling" on sandwitch notifies users item was
+                  added to order
+                </li>
+              </ul>
+            </p>
+            <h3>2. AI Generated Images</h3>
+            <p>AI generating images for software development can <span className="bold">save money and resources</span>. Though they can be <span className="bold">tedious to edit with Photoshop</span>, their main benefit is creating images with consistent styles. 
+              Overall, using AI generated images can help <span className="bold">create a unified visual identity for a website</span>.
+            </p>
           </div>
 
-          
-          <h2></h2>
+          <div className="thanks">
+          <p>If you've made it this far, thanks for coming along on this journey! Now go and build your own sandwitch!</p>
+          </div>
         </div>
       </div>
 
