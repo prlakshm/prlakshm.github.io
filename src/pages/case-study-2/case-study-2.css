@@ -4,33 +4,33 @@ p {
     line-height: 2rem;
 }
 
-.case-study-1 {
+.case-study-2 {
     font-family: "Barlow", sans-serif;
     width: 98.9vw;
 }
 
-.case-study-1 .title-block {
+.case-study-2 .title-block {
     display: flex;
     justify-content: center;
     align-content: center;
-    background-color: #FA9E9E;
+    background-color: #C29DCC;
     width: 100%;
     margin: 3rem 0;
 }
 
-.case-study-1 .title-block img {
+.case-study-2 .title-block img {
     width: 45rem;
     padding: 0;
     margin: 0;
 }
 
-.case-study-1 .title-block h1 {
+.case-study-2 .title-block h1 {
     color: white;
-    padding: 6rem 0 6rem 6rem;
+    padding: 6rem 0 6rem 3rem;
     margin: 0;
 }
 
-.study {
+.case-study-2 .study {
     position: relative;
     display: flex;
     flex-direction: row;
@@ -38,13 +38,13 @@ p {
 }
 
 
-.quick-links {
+.case-study-2 .quick-links {
     position: sticky;
     top:0;
     margin-right: 12rem;
 }
 
-.quick-links h5 {
+.case-study-2 .quick-links h5 {
     color: #AEAEAE;
     text-decoration: underline;
     font-weight: 500;
@@ -52,62 +52,64 @@ p {
     line-height: 1rem;
 }
 
-.quick-links a {
+.case-study-2 .quick-links a {
     text-decoration: none;
 }
 
-.quick-links h5:hover {
-    color: #FA9E9E;
+.case-study-2 .quick-links h5:hover {
+    color: #C29DCC;
     text-decoration: underline;
 }
 
 
-.main h2 {
+.case-study-2 .main h2 {
     margin-top: 2rem;
     font-weight: 500;
     font-size: 2.25rem;
 }
 
-.main h3 {
+.case-study-2 .main h3 {
     font-weight: 600;
     font-size: 2rem;
-    color: #FA9E9E;
+    color: #C29DCC;
     margin-left: -0.1rem;
 }
 
-.overview-info {
+.case-study-2 .overview-info {
     display: grid;
     grid-template-columns: 1fr 1fr;
     margin-top: 1.5rem;
 }
 
-
-.overview-info h3 {
+.case-study-2 .overview-info h3 {
     font-size: 1.2rem;
     font-weight: 600;
     margin: 0;
 }
 
-.overview-info p {
+.case-study-2 .overview-info p {
     font-size: 1.2rem;
     font-weight: 400;
     text-align: left;
 }
 
+.case-study-2 .overview-info .team p {
+    width: 20rem;
+}
 
-.all-skills {
+.case-study-2 .all-skills {
     margin: 1rem 0;
 }
 
-.skill {
-    background-color: #FA9E9E;
+.case-study-2 .skill {
+    background-color: #C29DCC;
 }
 
-.skill p {
+.case-study-2 .skill p {
     margin: 0.25rem 0.75rem;
 }
 
-.overview p {
+.case-study-2 .overview p {
     width: 60vw;
     font-size: 1.2rem;
     font-weight: 400;
@@ -115,28 +117,28 @@ p {
     margin-top: 2rem;
 }
 
-.overview img {
+.case-study-2 .overview img {
     margin: 2rem 0;
     width: 40vw;
 }
 
-.bold {
+.case-study-2 .bold {
     font-weight: 700;
 }
 
-.app-link {
+.case-study-2 .app-link {
     font-size: 1.25rem;
-    color:#FA9E9E;
+    color:#C29DCC;
     text-decoration: underline;
     padding: 0.25rem;
 }
 
-.overview a {
+.case-study-2 .overview a {
     padding: 0;
 }
 
 
-.research p {
+.case-study-2 .research p {
     width: 60vw;
     font-size: 1.2rem;
     font-weight: 400;
@@ -144,27 +146,27 @@ p {
     margin-top: 0rem;
 }
 
-.research li {
+.case-study-2 .research li {
     padding-bottom: 0.5rem;
 }
 
 
-.research img {
+.case-study-2 .research img {
     width: 40vw;
 }
 
 
 
-.process img {
+.case-study-2 .process img {
     width: 50vw;
 }
 
-p {
+.case-study-2 p {
     text-align: left;
 }
 
 
-.process p  {
+.case-study-2 .process p  {
     width: 60vw;
     font-size: 1.2rem;
     font-weight: 400;
@@ -172,32 +174,32 @@ p {
     margin-top: 2rem;
 }
 
-.process .app-link {
+.case-study-2 .process .app-link {
     padding: 0 0.25rem;
 }
 
-.process a {
+.case-study-2 .process a {
     padding: 0;
 }
 
-.img-container, .video-container {
+.case-study-2 .img-container, .video-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
-video {
+.case-study-2 video {
     width: 55vw;
     margin: 2rem 0;
 }
 
-.design img {
+.case-study-2 .design img {
     width: 60vw;
     margin-bottom: 2rem;
 }
 
-.takeaways p  {
+.case-study-2 .takeaways p  {
     width: 60vw;
     font-size: 1.2rem;
     font-weight: 400;
@@ -205,7 +207,7 @@ video {
     margin-top: 2rem;
 }
 
-.thanks p  {
+.case-study-2 .thanks p  {
     width: 60vw;
     font-size: 1.2rem;
     font-weight: 400;

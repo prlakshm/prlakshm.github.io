@@ -1,14 +1,14 @@
 import Footer from "../../components/Footer";
-import "./case-study-1.css";
+import "./case-study-2.css";
 
-function CaseStudy1() {
+function CaseStudy2() {
 
   return (
-    <div className="case-study-1">
+    <div className="case-study-2">
       <div className="title-block">
-        <h1>PB&J Time</h1>
+        <h1>Mi Fonda Storefront</h1>
         <img
-          src="/case-study-1/skew-carousel.png"
+          src="/case-study-2/skew-carousel.png"
           alt="Examples of sandwitch item cards from web app"
         />
       </div>
@@ -35,46 +35,40 @@ function CaseStudy1() {
           <div className="overview-info">
             <div className="role">
               <h3>Role</h3>
-              <p>Frontend Engineer</p>
+              <p>Designer</p>
             </div>
             <div className="timeline">
               <h3>Timeline</h3>
-              <p>April 2024</p>
+              <p>May 2024</p>
+            </div>
+            <div className="team">
+            <h3>Team</h3>
+              <p >Jackie Cohen, Anna Wang, Brooke Wangenheim (All Designers)</p>
             </div>
             <div className="skills">
               <h3>Skills</h3>
               <div className="all-skills">
-                <div className="skill">
-                  <p>Prodia AI</p>
+              <div className="skill">
+                  <p>Figma</p>
                 </div>
                 <div className="skill">
-                  <p>Photoshop</p>
-                </div>
-                <div className="skill">
-                  <p>Javascript/React</p>
+                  <p>UI/UX Design</p>
                 </div>
               </div>
             </div>
           </div>
           <div className="overview">
             <p>
-              Many e-commerce websites are static and serve only functionality
-              purposes of aggregating items in cart and checkout.{" "}
-              <a href="https://sandwitch-builder.vercel.app/" target="_blank">
-                <span className="app-link bold">PB&J Time</span>
-              </a>{" "}
-              is a gourmet sandwitch building app that explores different ways
-              an online ordering platform can use
-              <span className="bold">
-                {" "}
-                interaction and animation to engage users
-              </span>{" "}
-              in the purchasing experience.
+            <a href="https://mifonda.io/" target="_blank">
+                <span className="app-link bold">Mi Fonda</span>
+              </a> is a <span className="bold">tech startup/all-in-one platform</span> that helps restaurants manage and market their online presence. They consolidate ordering apps through partnerships with UberEats, GrubHub, DoorDash, etc. 
+              to decrease third-party fees and increase profit. 
             </p>
+            <p>Our team's job was to <span className="bold">redesign the storefront page for mobile and desktop</span> to attract the next generation of users. And who better to do this than a group of Gen Zers?</p>
             <div className="img-container">
               <img
-                src="/case-study-1/pbj-time-overview.png"
-                alt="PB&J Time web app displayed on laptop"
+                src="/case-study-2/mi-fonda-overview.png"
+                alt="Mi Fonda Storefront designs displayed on phones"
               />
             </div>
           </div>
@@ -89,7 +83,7 @@ function CaseStudy1() {
             </p>
             <div className="img-container">
               <img
-                src="/case-study-1/company-logos.png"
+                src="/case-study-2/company-logos.png"
                 alt="Amazon, Etsy, and Sephora logos for competitive analysis summary"
               />
             </div>
@@ -114,7 +108,7 @@ function CaseStudy1() {
           <div className="process">
             <div className="img-container">
               <img
-                src="/case-study-1/timeline.png"
+                src="/case-study-2/timeline.png"
                 alt="Process timeline with design, AI generating images, photoshopping images,coding web app, and inserting animation as steps "
               />
             </div>
@@ -129,7 +123,7 @@ function CaseStudy1() {
             </p>
             <div className="img-container">
               <img
-                src="/case-study-1/design-inspo.png"
+                src="/case-study-2/design-inspo.png"
                 alt="Final sketch and Blueno's Bakery website I used as inspiration for my web app"
               />
             </div>
@@ -156,7 +150,7 @@ function CaseStudy1() {
             </p>
             <div className="img-container">
               <img
-                src="/case-study-1/ai-ps-images.png"
+                src="/case-study-2/ai-ps-images.png"
                 alt="AI generated images before and after editing with Photoshop"
                 style={{ margin: "2rem 0" }}
               />
@@ -174,7 +168,7 @@ function CaseStudy1() {
             </p>
             <div className="img-container">
               <img
-                src="/case-study-1/style-guide.png"
+                src="/case-study-2/style-guide.png"
                 alt="AI generated images before and after editing with Photoshop"
               />
             </div>
@@ -195,7 +189,7 @@ function CaseStudy1() {
             </p>
             <div className="video-container">
               <video
-                src="/case-study-1/responsive-screens.mp4"
+                src="/case-study-2/responsive-screens.mp4"
                 typeof="video/mp4"
                 controls
                 autoPlay
@@ -261,4 +255,4 @@ function CaseStudy1() {
   );
 }
 
-export default CaseStudy1;
+export default CaseStudy2;

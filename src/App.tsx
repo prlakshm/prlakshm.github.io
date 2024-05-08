@@ -3,6 +3,7 @@ import Header from "./components/Header";
 import Home from "./pages/home/Home";
 import Projects from "./pages/projects/Projects";
 import CaseStudy1 from "./pages/case-study-1/CaseStudy1";
+import CaseStudy2 from "./pages/case-study-2/CaseStudy2";
 
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/pbj-time" element={<CaseStudy1 />} />
+        <Route path="/mi-fonda" element={<CaseStudy2 />} />
 
       </Routes>
     </Router>
