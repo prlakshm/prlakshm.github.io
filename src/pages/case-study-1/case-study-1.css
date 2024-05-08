@@ -31,20 +31,36 @@ p {
 }
 
 .study {
+    position: relative;
     display: flex;
     flex-direction: row;
     margin: 3.5rem 5rem;
 }
 
+
 .quick-links {
+    position: sticky;
+    top:0;
     margin-right: 12rem;
 }
 
 .quick-links h5 {
     color: #AEAEAE;
+    text-decoration: underline;
     font-weight: 500;
     font-size: 1.2rem;
+    line-height: 1rem;
 }
+
+.quick-links a {
+    text-decoration: none;
+}
+
+.quick-links h5:hover {
+    color: #FA9E9E;
+    text-decoration: underline;
+}
+
 
 .main h2 {
     margin-top: 2rem;

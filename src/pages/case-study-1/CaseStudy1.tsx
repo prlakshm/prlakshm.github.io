@@ -2,6 +2,7 @@ import Footer from "../../components/Footer";
 import "./case-study-1.css";
 
 function CaseStudy1() {
+
   return (
     <div className="case-study-1">
       <div className="title-block">
@@ -12,14 +13,25 @@ function CaseStudy1() {
         />
       </div>
       <div className="study">
+        <div className="sticky-quick-links">
         <div className="quick-links">
-          <h5>Overview</h5>
-          <h5>Research</h5>
-          <h5>Process</h5>
-          <h5>Takeaways</h5>
+          <a href="#overview">
+            <h5>Overview</h5>
+          </a>
+          <a href="#research">
+            <h5>Research</h5>
+          </a>
+          <a href="#process">
+            <h5>Process</h5>
+          </a>
+          <a href="#takeaways">
+            <h5>Takeaways</h5>
+          </a>
         </div>
+        </div>
+
         <div className="main">
-          <h2 style={{ marginTop: "-0.75rem" }}>Overview</h2>
+          <h2 id="overview" style={{ marginTop: "-0.75rem" }}>Overview</h2>
           <div className="overview-info">
             <div className="role">
               <h3>Role</h3>
@@ -60,14 +72,14 @@ function CaseStudy1() {
               in the purchasing experience.
             </p>
             <div className="img-container">
-            <img
-              src="/case-study-1/pbj-time-overview.png"
-              alt="PB&J Time web app displayed on laptop"
-            />
+              <img
+                src="/case-study-1/pbj-time-overview.png"
+                alt="PB&J Time web app displayed on laptop"
+              />
             </div>
           </div>
 
-          <h2>Research</h2>
+          <h2 id="research">Research</h2>
           <div className="research">
             <p>
               To learn how to sucessfully build an online ordering platform, I
@@ -76,10 +88,10 @@ function CaseStudy1() {
               the pros and cons of their cart aggregators and shopping UX.
             </p>
             <div className="img-container">
-            <img
-              src="/case-study-1/company-logos.png"
-              alt="Amazon, Etsy, and Sephora logos for competitive analysis summary"
-            />
+              <img
+                src="/case-study-1/company-logos.png"
+                alt="Amazon, Etsy, and Sephora logos for competitive analysis summary"
+              />
             </div>
             <p>
               Best features to include:
@@ -98,7 +110,7 @@ function CaseStudy1() {
             </p>
           </div>
 
-          <h2>Process</h2>
+          <h2 id="process">Process</h2>
           <div className="process">
             <div className="img-container">
               <img
@@ -174,8 +186,8 @@ function CaseStudy1() {
                 <li>Item card tilts when hovered</li>
                 <li>Ingrediants "fall" on sandwitch when added to cart</li>
               </ul>
-              These visual displays entince users to interact with the
-              interface and keep shopping. The{" "}
+              These visual displays entince users to interact with the interface
+              and keep shopping. The{" "}
               <span className="bold">
                 challenge was to make the animation responsive
               </span>{" "}
@@ -194,16 +206,24 @@ function CaseStudy1() {
             </div>
           </div>
 
-          <h2>Takeaways</h2>
+          <h2 id="takeaways">Takeaways</h2>
           <div className="takeaways">
             <h3>1. Accessibility</h3>
             <p>
               {" "}
-              Animation <span className="bold">should be used sparingly</span> because they could distract
-              users or not be accessibile. However, when used thoughtfully, they
-              can increase accessibility and serve as an  <span className="bold">additional way to notify
-              users of updates to the system</span>. </p>
-              <p>For example:
+              Animation <span className="bold">
+                should be used sparingly
+              </span>{" "}
+              because they could distract users or not be accessibile. However,
+              when used thoughtfully, they can increase accessibility and serve
+              as an{" "}
+              <span className="bold">
+                additional way to notify users of updates to the system
+              </span>
+              .{" "}
+            </p>
+            <p>
+              For example:
               <ul>
                 <li>Item card tilting notifies users item was selected</li>
                 <li>
@@ -213,13 +233,25 @@ function CaseStudy1() {
               </ul>
             </p>
             <h3>2. AI Generated Images</h3>
-            <p>AI generating images for software development can <span className="bold">save money and resources</span>. Though they can be <span className="bold">tedious to edit with Photoshop</span>, their main benefit is creating images with consistent styles. 
-              Overall, using AI generated images can help <span className="bold">create a unified visual identity for a website</span>.
+            <p>
+              AI generating images for software development can{" "}
+              <span className="bold">save money and resources</span>. Though
+              they can be{" "}
+              <span className="bold">tedious to edit with Photoshop</span>,
+              their main benefit is creating images with consistent styles.
+              Overall, using AI generated images can help{" "}
+              <span className="bold">
+                create a unified visual identity for a website
+              </span>
+              .
             </p>
           </div>
 
           <div className="thanks">
-          <p>If you've made it this far, thanks for coming along on this journey! Now go and build your own sandwitch!</p>
+            <p>
+              If you've made it this far, thanks for coming along on this
+              journey! Now go and build your own sandwitch!
+            </p>
           </div>
         </div>
       </div>
