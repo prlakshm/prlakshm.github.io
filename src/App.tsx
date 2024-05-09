@@ -4,6 +4,7 @@ import Home from "./pages/home/Home";
 import Projects from "./pages/projects/Projects";
 import CaseStudy1 from "./pages/case-study-1/CaseStudy1";
 import CaseStudy2 from "./pages/case-study-2/CaseStudy2";
+import About from "./pages/about/About";
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Route path="/pbj-time" element={<CaseStudy1 />} />
         <Route path="/mi-fonda" element={<CaseStudy2 />} />
 
+        <Route path="/about" element={<About />} />
       </Routes>
     </Router>
   );
