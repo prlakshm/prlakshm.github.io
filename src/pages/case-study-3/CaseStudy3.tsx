@@ -36,48 +36,52 @@ function CaseStudy2() {
           <div className="overview-info">
             <div className="role">
               <h3>Role</h3>
-              <p>Designer</p>
+              <p>PM, Fullstack Engineer</p>
             </div>
             <div className="timeline">
               <h3>Timeline</h3>
-              <p>May 2024</p>
+              <p>Dec 2023 - Jan 2024</p>
             </div>
             <div className="team">
               <h3>Team</h3>
-              <p>Jackie Cohen, Anna Wang, Brooke Wangenheim (All Designers)</p>
+              <p>
+                Jeffrey Tao, Dorinda Kyeremateng, Marissa Tam (Designers and
+                Frontend Engineers)
+              </p>
             </div>
             <div className="skills">
               <h3>Skills</h3>
               <div className="all-skills">
                 <div className="skill">
-                  <p>Figma</p>
+                  <p>MongoDB</p>
                 </div>
                 <div className="skill">
-                  <p>UI/UX Design</p>
+                  <p>Algorithms</p>
+                </div>
+                <div className="skill">
+                  <p>Typescript/React</p>
                 </div>
               </div>
             </div>
           </div>
           <div className="overview">
             <p>
-              <a href="https://mifonda.io/" target="_blank">
-                <span className="app-link bold">Mi Fonda</span>
+              At Brown, students sell their art at seasonal markets and fairs.
+              Some students post listings on their Instagram, but these can get
+              buried in people's feeds.
+              <a
+                href="https://artistscornerpvd.github.io/about"
+                target="_blank"
+              >
+                <span className="app-link bold">Artist's Corner PVD</span>
               </a>{" "}
-              is a{" "}
-              <span className="bold">tech startup/all-in-one platform</span>{" "}
-              that helps restaurants manage and market their online presence.
-              They consolidate ordering apps through partnerships with UberEats,
-              GrubHub, DoorDash, etc. to decrease third-party fees and increase
-              profit.
+              is a digital platform for Brown and RISD students to <span className="bold">sell their crafts and handmade goods</span>.
             </p>
+
             <p>
-              Our team's job was to{" "}
-              <span className="bold">
-                redesign the storefront page for mobile and desktop
-              </span>{" "}
-              to attract the next generation of users. And who better to do this
-              than a group of Gen Zers?
+              We created Artist's Corner as a way to <span className="bold">connect student artists and art lovers</span>, and to <span className="bold">create a sense of community</span> within the art scene in PVD.
             </p>
+
             <div className="img-container">
               <img
                 src="/case-study-3/mi-fonda-overview.png"
@@ -141,7 +145,11 @@ function CaseStudy2() {
             </div>
 
             <h3>Low-fi Wireframes + Feedback</h3>
-            <p> I worked on desktop low-fidelity wireframes for my team. I also created Looms after each iteration for feedback from the founders.</p>
+            <p>
+              {" "}
+              I worked on desktop low-fidelity wireframes for my team. I also
+              created Looms after each iteration for feedback from the founders.
+            </p>
             <div className="img-container">
               <img
                 src="/case-study-3/design-1.png"
@@ -156,8 +164,11 @@ function CaseStudy2() {
               />
             </div>
 
-            <h3 style={{marginTop:"4rem"}}>Hi-Fi Prototypes + Feedback</h3>
-            <p>For high-fidelity prototypes, I switched over to mobile. Again, I created the Loom for our team to receive feedback.</p>
+            <h3 style={{ marginTop: "4rem" }}>Hi-Fi Prototypes + Feedback</h3>
+            <p>
+              For high-fidelity prototypes, I switched over to mobile. Again, I
+              created the Loom for our team to receive feedback.
+            </p>
             <div className="video-container">
               <video
                 src="/case-study-3/design-3.mp4"
@@ -171,7 +182,7 @@ function CaseStudy2() {
             </div>
             <br />
             <br />
-            <div className="video-container" style={{marginTop:"-3.5rem"}}>
+            <div className="video-container" style={{ marginTop: "-3.5rem" }}>
               <video
                 src="/case-study-3/design-4.mp4"
                 typeof="video/mp4"
@@ -183,7 +194,7 @@ function CaseStudy2() {
               </video>
             </div>
 
-            <h3 style={{marginTop:"4rem"}}>Presenting to Founders</h3>
+            <h3 style={{ marginTop: "4rem" }}>Presenting to Founders</h3>
             <p>
               After countless emails and Loom interactions, we got to meet the
               company CEO and CTO and present our high-fidelity prototypes via

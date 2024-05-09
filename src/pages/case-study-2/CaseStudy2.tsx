@@ -44,7 +44,7 @@ function CaseStudy2() {
             </div>
             <div className="team">
               <h3>Team</h3>
-              <p>Jackie Cohen, Anna Wang, Brooke Wangenheim (All Designers)</p>
+              <p>Jackie Cohen, Anna Wang, Brooke Wangenheim (Designers)</p>
             </div>
             <div className="skills">
               <h3>Skills</h3>
