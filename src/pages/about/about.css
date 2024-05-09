@@ -10,7 +10,8 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    margin: 3rem 10rem;
+    margin: 3rem 12rem;
+    padding-bottom: 2rem;
 }
 
 .about .main h1 {
@@ -29,8 +30,40 @@
     text-align: left;
 }
 
+.about .main a {
+    font-weight: 600;
+    padding: 0;
+    color: #FA9E9E;
+}
+
+
+.about .photo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .about .photo img {
     width: 20vw;
     border-radius: 20px;
     margin-top: 2rem;
 }
+
+.about .pink-blob {
+    position: absolute;
+    top: 0;
+    margin-top: 7rem;
+    right: 0;
+    width: 21vw;
+    z-index: -1;
+}
+
+.about .purple-blob {
+    position: absolute;
+    bottom: 0;
+    margin-bottom: -5rem;
+    left: 0;
+    width: 17vw;
+    z-index: -1;
+}
+
