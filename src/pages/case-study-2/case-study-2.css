@@ -199,9 +199,17 @@ p {
     text-align: center;
 }
 
+.case-study-2 .img-container {
+    margin: 2.5rem 0;
+}
+
+.case-study-2 .video-container {
+    margin: 0;
+}
+
 .case-study-2 video {
     width: 55vw;
-    margin: 2rem 0;
+    margin: 0;
 }
 
 .case-study-2 .design img {
