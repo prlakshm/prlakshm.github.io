@@ -126,6 +126,10 @@ p {
     font-weight: 700;
 }
 
+.case-study-3 .italic {
+    font-style: italic;
+}
+
 .case-study-3 .app-link {
     font-size: 1.25rem;
     color:#99cec1;
@@ -171,17 +175,22 @@ p {
     padding-bottom: 0.5rem;
 }
 
+.case-study-3 .research ul {
+    padding-bottom:2rem;
+}
+
 
 .case-study-3 .research img {
-    margin: -1rem 0;
+    margin: 0.5rem 0;
     padding: 0;
-    width: 50vw;
+    width: 20vw;
 }
 
 
 
 .case-study-3 .process img {
-    width: 55vw;
+    width: 50vw;
+    margin-bottom: 1rem;
 }
 
 
@@ -196,6 +205,14 @@ p {
     font-weight: 400;
     text-align: left;
     margin-top: 2rem;
+}
+
+.case-study-3 .pm-role p  {
+    width: 60vw;
+    font-size: 1.2rem;
+    font-weight: 400;
+    text-align: left;
+    margin: 2rem 0 4rem 0;
 }
 
 .case-study-3 .process .app-link {
@@ -257,5 +274,9 @@ p {
     font-weight: 400;
     text-align: left;
     margin: 4rem 0 0 0;
+}
+
+.case-study-3 .thanks a  {
+    padding: 0
 }
 

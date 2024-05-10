@@ -23,6 +23,9 @@ function CaseStudy2() {
             <a href="#research">
               <h5>Research</h5>
             </a>
+            <a href="#pm-role">
+              <h5>PM Role</h5>
+            </a>
             <a href="#process">
               <h5>Process</h5>
             </a>
@@ -115,62 +118,67 @@ function CaseStudy2() {
           <h2 id="research">Research</h2>
           <div className="research">
             <p>
-              The CEO and CTO knew they wanted a fresh new look. They wanted to{" "}
-              <span className="bold">
-                gamify their storefront and make it more visually focused
-              </span>
-              , but weren't exactly sure how to do that.
-            </p>
-            <p>
-              We drew inspiration from social media and other online ordering
-              platforms:{" "}
+              Our main inspiration was Etsy, an existing platform for artists to sell their goods. We styled our webpage layout based on popular consignment sites so that users would be familiar using the interface. 
             </p>
             <div className="img-container">
               <img
-                src="/case-study-3/company-logos.png"
-                alt="Doordash, Grubhub, TikTok logos for inspiration"
+                src="/case-study-3/company-logo.png"
+                alt="Etsy for inspiration"
               />
             </div>
             <p>
-              After collective ideation, we thought of two ideas to incorporate
-              into our designs:
+              Layout initiatives:
               <ul>
                 <li>
-                  <span className="bold">Video carousel</span> to entice users
-                  to try featured items
+                  Search bar and navigation on top
                 </li>
                 <li>
-                  <span className="bold">Meal plate with badges</span> to
-                  motivate users to buy different food items and "collect them
-                  all"
+                  Grid of item cards
                 </li>
+                <li>
+                  Filter categories on panel left of grid  
+                </li>
+                <li>Sort options (by price and recent listing) as drop-down on top of grid</li>
               </ul>
             </p>
           </div>
+
+          <h2 id="pm-role">PM Role</h2>
+          <div className="pm-role">
+          <p>As PM, I reported our team's progress to our supervisor and was spokesperson for our team.  
+            Some ways I supported my teammates: 
+            <ul>
+                <li>Organizing team meetings and making sure we were on track to meet deadlines</li>
+                <li>
+                  Providing feedback on designs after each iteration and approving final designs
+                </li>
+                <li>
+                  Solving nasty frontend bugs
+                </li>
+              </ul></p>
+              </div>
 
           <h2 id="process">Process</h2>
           <div className="process">
             <div className="img-container">
               <img
                 src="/case-study-3/timeline.png"
-                alt="Process timeline with design, AI generating images, photoshopping images,coding web app, and inserting animation as steps "
+                alt="Process timeline with collecting data, connecting to MongoDB, implementing sort and filter algorithms, implementing search algorithm "
               />
             </div>
-            <h3>Sketching</h3>
-            <p>Below are my sketches for mobile and desktop.</p>
+            <h3>Collecting Data</h3>
+            <p>I DMed student artists on Instagram to ask if we could use photos of their work as examples in our website!</p>
             <div className="img-container" style={{ marginLeft: "-1rem" }}>
               <img
-                src="/case-study-3/final-sketches.png"
+                src="/case-study-3/example-creations.png"
                 alt="Sketches of mobile and desktop designs for Mi Fonda storefront"
               />
-              <p>Fig 1. Left: Mobile sketches; Right: Desktop Sketches</p>
+              <p>Fig 1. Left: Emily Wang's amazing crochet creations; Right: Sophia Cheng's gorgeous handmade jewelry</p>
             </div>
 
-            <h3>Low-fi Wireframes + Feedback</h3>
+            <h3>MongoDB</h3>
             <p>
-              {" "}
-              I worked on desktop low-fidelity wireframes for my team. I also
-              created Looms after each iteration for feedback from the founders.
+              
             </p>
             <div className="img-container">
               <img
@@ -227,35 +235,24 @@ function CaseStudy2() {
 
           <h2 id="takeaways">Takeaways</h2>
           <div className="takeaways">
-            <h3>1. Iterative Design</h3>
+            <h3>1. Scalable Database</h3>
             <p>
-              Iterating through rounds of design and feedback{" "}
-              <span className="bold">helps maximize client satisfaction</span>.
+              Storing account and item information in a MongoDB database <span className="bold">ensures the data stays secure</span>. Data can be scaled, meaning even when data is added (the website gets more users) the system still runs smoothly. For retreiving items, <span className="bold">queries can still be quick and efficient</span>. 
             </p>
-            <h3>3. Platform Inspiration</h3>
+            <h3>2. Prioritizing for Deadlines</h3>
             <p>
-              Tip: When a client doesn't know what direction to take their
-              design,{" "}
-              <span className="bold">
-                asking for platforms whose UI they admire
-              </span>{" "}
-              is a great place to start! We as designers can use these platforms
-              to draw inspiration.
-            </p>
-            <h3>3. Team Collaboration</h3>
-            <p>
-              Designing in a team{" "}
-              <span className="bold">generates more innovative solutions</span>{" "}
-              and introduces ideas I couldn't have thought of on my own. It also
-              creates a more <span className="bold">user-centered design</span>,
-              because everyone offers a diverse perspective.
+              As the deadline approached, I knew we couldn't do <span className="italic">everything</span>. There were features we hadn't implemented and planned to, like integreting Google OAuth for login. I <span className="bold">prioritized optimizing existing features instead of adding new ones</span>. Limiting the scope was better than delivering a half-baked product.
             </p>
           </div>
 
           <div className="thanks">
             <p>
-              Thank you reading till the end! This project was especially
-              grueling yet rewarding, so I appreciate it!
+              This project is my pride and joy, so thank you reading! Check out the website at <a
+                href="https://artistscornerpvd.github.io/"
+                target="_blank"
+              >
+                <span className="app-link bold">Artist's Corner PVD</span>
+              </a>!
             </p>
           </div>
         </div>
