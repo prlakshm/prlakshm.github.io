@@ -57,7 +57,7 @@ p {
 }
 
 .case-study-3 .quick-links h5:hover {
-    color: #ADE1D5;
+    color: #99cec1;
     text-decoration: underline;
 }
 
@@ -71,7 +71,7 @@ p {
 .case-study-3 .main h3 {
     font-weight: 600;
     font-size: 2rem;
-    color: #ADE1D5;
+    color: #99cec1;
     margin-left: -0.1rem;
 }
 
@@ -128,7 +128,7 @@ p {
 
 .case-study-3 .app-link {
     font-size: 1.25rem;
-    color:#ADE1D5;
+    color:#99cec1;
     text-decoration: underline;
     padding: 0.25rem;
 }
@@ -137,6 +137,27 @@ p {
     padding: 0;
 }
 
+
+.case-study-3 .problem {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items:center;
+}
+
+.case-study-3 .problem .row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.case-study-3 .problem .row p {
+    font-size: 1.25rem;
+    width: 30vw;
+    margin-left: 10rem;
+    text-align: left;
+}
 
 .case-study-3 .research p {
     width: 60vw;
@@ -200,7 +221,8 @@ p {
 }
 
 .case-study-3 .img-container {
-    margin: 3.5rem 0;
+    margin: 0rem 0;
+    width: 60vw;
 }
 
 .case-study-3 .video-container {

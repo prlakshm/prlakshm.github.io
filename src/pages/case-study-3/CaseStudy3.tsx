@@ -17,6 +17,9 @@ function CaseStudy2() {
             <a href="#overview">
               <h5>Overview</h5>
             </a>
+            <a href="#problem">
+              <h5>Problem</h5>
+            </a>
             <a href="#research">
               <h5>Research</h5>
             </a>
@@ -66,27 +69,46 @@ function CaseStudy2() {
           </div>
           <div className="overview">
             <p>
-              At Brown, students sell their art at seasonal markets and fairs.
-              Some students post listings on their Instagram, but these can get
-              buried in people's feeds.
-              <a
-                href="https://artistscornerpvd.github.io/about"
+            Every fall and spring, Brown and RISD students look forward to the seasonal markets and fairs
+            to buy and sell art. Outside of these spaces, there is <span className="bold">no school-sanctioned platform for students to 
+            sell their creations</span>. Some students post listings on their Instagram, but these can get
+            buried in people's feeds. Additonally, students might not feel comfortable sharing their work on social media.
+            </p>  
+              
+              <p><a
+                href="https://artistscornerpvd.github.io/"
                 target="_blank"
               >
                 <span className="app-link bold">Artist's Corner PVD</span>
               </a>{" "}
-              is a digital platform for Brown and RISD students to <span className="bold">sell their crafts and handmade goods</span>.
+              is a <span className="bold">website for Brown and RISD students to sell their crafts and handmade goods</span> all year round. Only artists with an authorized school email can create listings, so students can trust the seller.  
             </p>
 
             <p>
-              We created Artist's Corner as a way to <span className="bold">connect student artists and art lovers</span>, and to <span className="bold">create a sense of community</span> within the art scene in PVD.
+              We wanted to create a safe, designated environment to <span className="bold">connect student artists and art lovers</span>. Artist's Corner <span className="bold">creates a sense of community</span> within the art scene in PVD and encourages students to <span className="bold">turn hobbies into a small business</span>! 
             </p>
 
             <div className="img-container">
               <img
-                src="/case-study-3/mi-fonda-overview.png"
-                alt="Mi Fonda Storefront designs displayed on phones"
+                src="/case-study-3/artists-corner-overview.png"
+                alt="Artist's Corner PVD home page displayed on computer"
               />
+            </div>
+          </div>
+
+          <h2 id="problem">Problem</h2>
+          <div className="problem">
+            <div className="row">
+                <h3>Problem</h3>
+                <p>No school-sanctioned platform for Brown and RISD students to sell their crafts and handmade goods outside of seasonal markets and fairs</p>
+            </div>
+            <div className="row">
+                <h3>Objective</h3>
+                <p>Create a safe environment to connect student artists and art lovers</p>
+            </div>
+            <div className="row">
+                <h3>Outcome</h3>
+                <p style={{paddingTop:"0.75rem"}}><span className="bold">1,200+</span> potential users</p>
             </div>
           </div>
 
