@@ -243,12 +243,17 @@ p {
 }
 
 .case-study-3 .video-container {
-    margin: 0;
+    margin: 2rem 0;
 }
 
 .case-study-3 video {
     width: 55vw;
     margin: 0;
+}
+
+.case-study-3 .screenshot img {
+    width: 55vw;
+    margin: 2rem 0;
 }
 
 .case-study-3 .design img {
@@ -269,7 +274,7 @@ p {
 }
 
 .case-study-3 .thanks p  {
-    width: 60vw;
+    width: 62vw;
     font-size: 1.2rem;
     font-weight: 400;
     text-align: left;
@@ -277,6 +282,7 @@ p {
 }
 
 .case-study-3 .thanks a  {
-    padding: 0
+    padding: 0;
+    margin: 0;
 }
 
