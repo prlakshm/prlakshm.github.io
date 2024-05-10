@@ -242,6 +242,22 @@ p {
     width: 60vw;
 }
 
+.case-study-3 .process .search {
+    margin: 2.25rem 0;
+}
+
+.case-study-3 .process .screenshot {
+    margin: 2rem 0;
+}
+
+.case-study-3 .process .screenshot img {
+    margin-bottom: 0.5rem;
+}
+
+.case-study-3 .process .img-container img {
+    margin: 1.25rem 0;
+}
+
 .case-study-3 .video-container {
     margin: 2rem 0;
 }
@@ -253,7 +269,7 @@ p {
 
 .case-study-3 .screenshot img {
     width: 55vw;
-    margin: 2rem 0;
+    margin: 1.5rem 0;
 }
 
 .case-study-3 .design img {

@@ -244,15 +244,13 @@ function CaseStudy2() {
               <p>Fig 3. My code with comments</p>
             </div>
 
-            <h3 style={{ marginTop: "2rem" }}>Sort/Filter Algorithm</h3>
+            <h3>Sort/Filter Algorithm</h3>
             <p>
               For the category page, I implemented sort and filter options. I
               needed sort and filter to be{" "}
-              <span className="bold">
-                stackable with the ability to reset
-              </span>
-              . Users can sort by price, sort by listing recency, and filter by
-              subcategory. 
+              <span className="bold">stackable with the ability to reset</span>.
+              Users can sort by price, sort by listing recency, and filter by
+              subcategory.
             </p>
             <div className="video-container">
               <video
@@ -268,9 +266,36 @@ function CaseStudy2() {
 
             <h3 style={{ marginTop: "4rem" }}>Search Algorithm</h3>
             <p>
-              Implementing the search algorithm was the hardest, because there was <span className="bold">no "typical behavior" to follow for search results order</span>. 
-              I <span className="bold">increased algorithm complexity incrementally</span> until I was happy with the results. 
+              Implementing the search algorithm was the hardest, because there
+              was{" "}
+              <span className="bold">
+                no "typical behavior" to follow for search results order
+              </span>
+              . I{" "}
+              <span className="bold">
+                increased algorithm complexity incrementally
+              </span>{" "}
+              until I was happy with the results.
             </p>
+
+            <div className="search">
+              <div className="img-container">
+                <img
+                  src="/case-study-3/search-1.png"
+                  alt="MongoDB Compass Portal"
+                />
+
+                <img
+                  src="/case-study-3/search-2.png"
+                  alt="MongoDB Compass Portal"
+                />
+
+                <img
+                  src="/case-study-3/search-3.png"
+                  alt="MongoDB Compass Portal"
+                />
+              </div>
+            </div>
           </div>
 
           <h2 id="takeaways">Takeaways</h2>
@@ -304,7 +329,7 @@ function CaseStudy2() {
           <div className="thanks">
             <p>
               This project is my pride and joy, so thank you reading! Remember
-              to check out our website at{" "}
+              to check out the website at{" "}
               <a href="https://artistscornerpvd.github.io/" target="_blank">
                 <span className="app-link bold">Artist's Corner PVD</span>
               </a>
