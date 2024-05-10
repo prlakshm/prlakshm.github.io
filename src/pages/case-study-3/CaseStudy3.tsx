@@ -266,12 +266,10 @@ function CaseStudy2() {
               </video>
             </div>
 
-            <h3 style={{ marginTop: "4rem" }}>Presenting to Founders</h3>
+            <h3 style={{ marginTop: "4rem" }}>Search Algorithm</h3>
             <p>
-              After countless emails and Loom interactions, we got to meet the
-              company CEO and CTO and present our high-fidelity prototypes via
-              Zoom! We walked them through our mobile and desktop designs and
-              explained our intentions behind certain features.
+              Implementing the search algorithm was the hardest, because there was <span className="bold">no "typical behavior" to follow for search results order</span>. 
+              I <span className="bold">increased algorithm complexity incrementally</span> until I was happy with the results. 
             </p>
           </div>
 
