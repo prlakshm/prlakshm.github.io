@@ -1,7 +1,7 @@
 {
   "name": "prlakshm.github.io",
   "version": "1.0.0",
-  "homepage": "https://prlakshm.github.io",
+  "homepage": "https://prlakshm.github.io/#/",
   "type": "module",
   "scripts": {
     "predeploy": "npm run build",
