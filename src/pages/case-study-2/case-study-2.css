@@ -183,6 +183,8 @@ p {
 
 .case-study-2 .process a {
     padding: 0;
+    color: #C29DCC;
+    font-weight: 700;
 }
 
 .case-study-2 .img-container, .case-study-2 .video-container {
@@ -205,6 +207,10 @@ p {
 
 .case-study-2 .video-container {
     margin: 0;
+}
+
+.case-study-2 .last {
+    margin-bottom: 3rem;
 }
 
 .case-study-2 video {

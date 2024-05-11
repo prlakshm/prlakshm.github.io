@@ -89,11 +89,11 @@ function CaseStudy2() {
           <h2 id="research">Research</h2>
           <div className="research">
             <p>
-              The CEO and CTO knew they wanted a fresh new look. They wanted to{" "}
+              The CEO and CTO wanted a fresh, new look. They wanted to{" "}
               <span className="bold">
                 gamify their storefront and make it more visually focused
               </span>
-              , but weren't exactly sure how to do that.
+              , but weren't sure exactly how to do that.
             </p>
             <p>
               We drew inspiration from social media and other online ordering
@@ -110,7 +110,7 @@ function CaseStudy2() {
               into our designs:
               <ul>
                 <li>
-                  <span className="bold">Video carousel</span> to entice users
+                  <span className="bold">Video carousel</span> to attract users
                   to try featured items
                 </li>
                 <li>
@@ -171,7 +171,7 @@ function CaseStudy2() {
             </div>
             <br />
             <br />
-            <div className="video-container" style={{marginTop:"-2.5rem"}}>
+            <div className="video-container last" style={{marginTop:"-2.5rem"}}>
               <video
                 src="/case-study-2/design-4.mp4"
                 typeof="video/mp4"
@@ -183,7 +183,9 @@ function CaseStudy2() {
               </video>
             </div>
 
-            <h3 style={{marginTop:"4rem"}}>Presenting to Founders</h3>
+            <p>Check out all our final designs <a href="https://www.figma.com/design/iRwhq0w4NT9zuXu6B2jSnr/Iterative-Design?node-id=724%3A999&t=tW0W2tBKeEAzLNiU-1" target="_blank">here!</a></p>
+
+            <h3 style={{marginTop:"3rem"}}>Presenting to Founders</h3>
             <p>
               After countless emails and Loom interactions, we got to meet the
               company CEO and CTO and present our high-fidelity prototypes via
@@ -192,7 +194,7 @@ function CaseStudy2() {
             </p>
           </div>
 
-          <h2 id="takeaways">Takeaways</h2>
+          <h2 id="takeaways" style={{marginTop:"4rem"}}>Takeaways</h2>
           <div className="takeaways">
             <h3>1. Iterative Design</h3>
             <p>
@@ -204,24 +206,23 @@ function CaseStudy2() {
               Tip: When a client doesn't know what direction to take their
               design,{" "}
               <span className="bold">
-                asking for platforms whose UI they admire
-              </span>{" "}
-              is a great place to start! We as designers can use these platforms
+                ask for platforms whose UI they admire
+              </span>! We as designers can use these platforms
               to draw inspiration.
             </p>
             <h3>3. Team Collaboration</h3>
             <p>
               Designing in a team{" "}
-              <span className="bold">generates more innovative solutions</span>{" "}
+              <span className="bold">generates innovative solutions</span>{" "}
               and introduces ideas I couldn't have thought of on my own. It also
-              creates a more <span className="bold">user-centered design</span>,
+              creates a <span className="bold">more user-centered design</span>,
               because everyone offers a diverse perspective.
             </p>
           </div>
 
           <div className="thanks">
             <p>
-              Thank you reading till the end! This project was especially
+              Thank you for reading till the end! This project was especially
               grueling yet rewarding, so I appreciate it!
             </p>
           </div>
