@@ -5,7 +5,7 @@
         "skills": ["Prodia AI", "Photoshop", "Javascript/React"],
         "logline": "Using interaction and animation to enhance shopping UX ",
         "image": "/projects/pbj-time.png",
-        "link": "/pbj-time"
+        "link": "/#/pbj-time"
     },
     {
         "name": "Mi Fonda Storefront",
@@ -13,7 +13,7 @@
         "skills": ["Figma", "UI/UX Design"],
         "logline": "Redesigning storefront for a startup",
         "image": "/projects/mi-fonda.png",
-        "link": "/mi-fonda"
+        "link": "/#/mi-fonda"
     },
     {
         "name": "Artist's Corner PVD",
@@ -21,6 +21,6 @@
         "skills": ["MongoDB", "Algorithms", "Typescript/React"],
         "logline": "Helping students sell art and handmade goods",
         "image": "/projects/artists-corner.png",
-        "link": "/artists-corner"
+        "link": "/#/artists-corner"
     }
 ]
