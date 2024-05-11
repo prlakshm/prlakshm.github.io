@@ -15,12 +15,12 @@ function App() {
     <Router>
       <Header />
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/projects" element={<Projects />} />
-        <Route path="/pbj-time" element={<CaseStudy1 />} />
-        <Route path="/mi-fonda" element={<CaseStudy2 />} />
-        <Route path="/artists-corner" element={<CaseStudy3 />} />
-        <Route path="/about" element={<About />} />
+        <Route path="/#" element={<Home />} />
+        <Route path="#/projects" element={<Projects />} />
+        <Route path="#/pbj-time" element={<CaseStudy1 />} />
+        <Route path="#/mi-fonda" element={<CaseStudy2 />} />
+        <Route path="#/artists-corner" element={<CaseStudy3 />} />
+        <Route path="#/about" element={<About />} />
       </Routes>
     </Router>
   );
