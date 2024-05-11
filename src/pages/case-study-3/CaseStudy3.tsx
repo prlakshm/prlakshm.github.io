@@ -72,7 +72,7 @@ function CaseStudy3() {
           </div>
           <div className="overview">
             <p>
-              Every fall and spring, Brown and RISD students look forward to the
+              Every fall and spring, Brown and RISD students look forward to
               seasonal markets and fairs to buy and sell art. Outside of these
               spaces, there is{" "}
               <span className="bold">
@@ -98,13 +98,9 @@ function CaseStudy3() {
             </p>
 
             <p>
-              We wanted to create a safe, designated environment to{" "}
-              <span className="bold">
-                connect student artists and art lovers
-              </span>
-              . Artist's Corner{" "}
+              Artist's Corner{" "}
               <span className="bold">creates a sense of community</span> within
-              the art scene in PVD and encourages students to{" "}
+              the PVD art scene and encourages students to{" "}
               <span className="bold">turn hobbies into a small business</span>!
             </p>
 
@@ -129,13 +125,18 @@ function CaseStudy3() {
             <div className="row">
               <h3>Objective</h3>
               <p>
-                Create a safe environment to connect student artists and art
-                lovers
+                Create a safe, designated environment to connect student artists
+                and art lovers
               </p>
             </div>
             <div className="row">
               <h3>Outcome</h3>
               <p style={{ paddingTop: "0.75rem" }}>
+                <img
+                  src="/case-study-3/person-icon.png"
+                  alt="filled person icon"
+                  style={{paddingRight:"0.5rem"}}
+                />
                 <span className="bold">1,200+</span> potential users
               </p>
             </div>
@@ -146,8 +147,7 @@ function CaseStudy3() {
             <p>
               Our main inspiration was Etsy, an existing platform for artists to
               sell their goods. We styled our webpage layout based on popular
-              consignment sites so that users would be familiar using the
-              interface.
+              consignment sites so users feel familiar using the interface.
             </p>
             <div className="img-container">
               <img
@@ -159,7 +159,7 @@ function CaseStudy3() {
               Layout initiatives:
               <ul>
                 <li>Search bar and navigation on top</li>
-                <li>Grid of item cards</li>
+                <li>Grid of item cards middle of page</li>
                 <li>Filter categories on panel left of grid</li>
                 <li>
                   Sort options (by price and recent listing) as drop-down on top
@@ -183,7 +183,7 @@ function CaseStudy3() {
                   Providing feedback on designs after each iteration and
                   approving final designs
                 </li>
-                <li>Solving nasty frontend bugs</li>
+                <li>Helping with nasty frontend bugs</li>
               </ul>
             </p>
           </div>
@@ -204,7 +204,7 @@ function CaseStudy3() {
             <div className="img-container" style={{ marginLeft: "-1rem" }}>
               <img
                 src="/case-study-3/example-creations.png"
-                alt="Sketches of mobile and desktop designs for Mi Fonda storefront"
+                alt="Photos of Emily Wang's crochet creations and Sophia Cheng's handmade jewelry"
               />
               <p>
                 Fig 1. Left: Emily Wang's amazing crochet creations; Right:
@@ -212,14 +212,13 @@ function CaseStudy3() {
               </p>
             </div>
 
-            <h3>MongoDB</h3>
+            <h3>MongoDB Database</h3>
             <p>
-              Using a combination of photos from student artists I reached out
-              to and stock images, I{" "}
+              Using a combination of photos from student artists and stock images, I{" "}
               <span className="bold">created mock data</span> of accounts,
               current item listings, and sold item listings. I then{" "}
               <span className="bold">set up a MongoDB database</span> to store
-              this data.
+              the data.
             </p>
             <div className="img-container screenshot">
               <img
@@ -231,7 +230,7 @@ function CaseStudy3() {
 
             <p>
               I <span className="bold">coded query functions</span> for the
-              website to retreive the data from the frontend (get items by
+              website to retreive data from the frontend (get items by
               category, subcategory, seller, etc.). I heavily comment my code so
               that my teammates and future developers can understand my work.{" "}
               <span className="bold">40% of my code is comments!</span>
@@ -271,7 +270,7 @@ function CaseStudy3() {
               <span className="bold">
                 no "typical behavior" to follow for search results order
               </span>
-              . I{" "}
+              . I wanted to rank the items based on a match score, but had to decide how to compute the score. I{" "}
               <span className="bold">
                 increased algorithm complexity incrementally
               </span>{" "}
@@ -282,17 +281,17 @@ function CaseStudy3() {
               <div className="img-container">
                 <img
                   src="/case-study-3/search-1.png"
-                  alt="MongoDB Compass Portal"
+                  alt="Seach Algorthim 1.0 Single Word Search"
                 />
 
                 <img
                   src="/case-study-3/search-2.png"
-                  alt="MongoDB Compass Portal"
+                  alt="Seach Algorthim 2.0 Multi-Word Search"
                 />
 
                 <img
                   src="/case-study-3/search-3.png"
-                  alt="MongoDB Compass Portal"
+                  alt="Seach Algorthim 3.0 Score Partial Words"
                 />
               </div>
             </div>
@@ -303,7 +302,7 @@ function CaseStudy3() {
             <h3>1. Scalable Database</h3>
             <p>
               Storing account and item information in a MongoDB database{" "}
-              <span className="bold">ensures the data stays secure</span>. Data
+              <span className="bold">ensured the data stays secure</span>. Data
               can be scaled, meaning even when data is added (the website gets
               more users) the system still runs smoothly. For retreiving items,{" "}
               <span className="bold">
@@ -315,7 +314,7 @@ function CaseStudy3() {
             <p>
               As the deadline approached, I knew we couldn't do{" "}
               <span className="italic">everything</span>. There were features we
-              hadn't implemented and planned to, like integreting Google OAuth
+              initially planned to implement, like integreting Google OAuth
               for login. I{" "}
               <span className="bold">
                 prioritized optimizing existing features instead of adding new
