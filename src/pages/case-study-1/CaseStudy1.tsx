@@ -58,8 +58,8 @@ function CaseStudy1() {
           </div>
           <div className="overview">
             <p>
-              Many e-commerce websites are static and serve only functionality
-              purposes of aggregating items in cart and checkout.{" "}
+              Many e-commerce websites only serve functionality
+              purpose of aggregating items in a cart and checking out.{" "}
               <a href="https://sandwitch-builder.vercel.app/" target="_blank">
                 <span className="app-link bold">PB&J Time</span>
               </a>{" "}
@@ -84,7 +84,7 @@ function CaseStudy1() {
             <p>
               To learn how to sucessfully build an online ordering platform, I
               researched popular companies. In a{" "}
-              <span className="bold"> competetive analysis</span>, I examined
+              <span className="bold"> competitive analysis</span>, I examined
               the pros and cons of their cart aggregators and shopping UX.
             </p>
             <div className="img-container">
@@ -147,7 +147,7 @@ function CaseStudy1() {
             </p>
             <p>
               <span className="bold">Problem:</span> The AI sometimes generated
-              images with gibberour of erranoues features. <br />
+              images with gibberish or erroneous features. <br />
               <span className="bold">Solution:</span> Photoshop to the rescue!
             </p>
             <p>
@@ -164,8 +164,8 @@ function CaseStudy1() {
 
             <h3>Coding Web App</h3>
             <p>
-              While coding the web app, I implemented a cart aggregator as well
-              as sort and filter functionality from the competitive analysis
+              While coding the web app, I implemented the cart aggregator as well
+              as sorting and filtering functionality from the competitive analysis
               best features list. In the end, I had to{" "}
               <span className="bold">
                 adjust colors to increase contrast and accessiblity
@@ -175,7 +175,7 @@ function CaseStudy1() {
             <div className="img-container">
               <img
                 src="/case-study-1/style-guide.png"
-                alt="AI generated images before and after editing with Photoshop"
+                alt="Style Guide Colors for PB&J Time with high contrast"
               />
             </div>
 
@@ -186,7 +186,7 @@ function CaseStudy1() {
                 <li>Item card tilts when hovered</li>
                 <li>Ingrediants "fall" on sandwitch when added to cart</li>
               </ul>
-              These visual displays entince users to interact with the interface
+              These visual displays entice users to interact with the interface
               and keep shopping. The{" "}
               <span className="bold">
                 challenge was to make the animation responsive
@@ -225,9 +225,9 @@ function CaseStudy1() {
             <p>
               For example:
               <ul>
-                <li>Item card tilting notifies users item was selected</li>
+                <li>Item card tilting notifies users item is selected</li>
                 <li>
-                  Ingrediants "falling" on sandwitch notifies users item was
+                  Ingrediants "falling" on sandwitch notifies users item is
                   added to order
                 </li>
               </ul>
@@ -236,9 +236,9 @@ function CaseStudy1() {
             <p>
               AI generating images for software development can{" "}
               <span className="bold">save money and resources</span>. Though
-              they can be{" "}
+              it can be{" "}
               <span className="bold">tedious to edit with Photoshop</span>,
-              their main benefit is creating images with consistent styles.
+              the benefit is creating images with consistent styles.
               Overall, using AI generated images can help{" "}
               <span className="bold">
                 create a unified visual identity for a website

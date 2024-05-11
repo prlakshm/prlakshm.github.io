@@ -1,7 +1,7 @@
 import Footer from "../../components/Footer";
 import "./case-study-3.css";
 
-function CaseStudy2() {
+function CaseStudy3() {
   return (
     <div className="case-study-3">
       <div className="title-block">
@@ -344,4 +344,4 @@ function CaseStudy2() {
   );
 }
 
-export default CaseStudy2;
+export default CaseStudy3;
