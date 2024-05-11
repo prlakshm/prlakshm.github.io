@@ -19,9 +19,3 @@ target
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# setup 
-tsconfig.json
-tsconfig.node.json
-vite.config.ts
-
