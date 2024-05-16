@@ -1,7 +1,20 @@
+import { RefObject, useRef } from "react";
 import Footer from "../../components/Footer";
 import "./case-study-2.css";
 
 function CaseStudy2() {
+
+  const overviewRef = useRef<HTMLDivElement>(null);
+  const researchRef = useRef<HTMLDivElement>(null);
+  const processRef = useRef<HTMLDivElement>(null);
+  const takeawaysRef = useRef<HTMLDivElement>(null);
+
+  const scrollToSection = (ref: RefObject<HTMLDivElement>) => {
+    if (ref.current) {
+      ref.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <div className="case-study-2">
       <div className="title-block">
@@ -14,23 +27,15 @@ function CaseStudy2() {
       <div className="study">
         <div className="sticky-quick-links">
           <div className="quick-links">
-            <a href="#overview">
-              <h5>Overview</h5>
-            </a>
-            <a href="#research">
-              <h5>Research</h5>
-            </a>
-            <a href="#process">
-              <h5>Process</h5>
-            </a>
-            <a href="#takeaways">
-              <h5>Takeaways</h5>
-            </a>
+          <h5 onClick={() => scrollToSection(overviewRef)}>Overview</h5>
+            <h5 onClick={() => scrollToSection(researchRef)}>Research</h5>
+            <h5 onClick={() => scrollToSection(processRef)}>Process</h5>
+            <h5 onClick={() => scrollToSection(takeawaysRef)}>Takeaways</h5>
           </div>
         </div>
 
         <div className="main">
-          <h2 id="overview" style={{ marginTop: "-0.75rem" }}>
+          <h2 ref={overviewRef} style={{ marginTop: "-0.75rem" }}>
             Overview
           </h2>
           <div className="overview-info">
@@ -86,7 +91,7 @@ function CaseStudy2() {
             </div>
           </div>
 
-          <h2 id="research">Research</h2>
+          <h2 ref={researchRef}>Research</h2>
           <div className="research">
             <p>
               The CEO and CTO wanted a fresh, new look. They wanted to{" "}
@@ -122,7 +127,7 @@ function CaseStudy2() {
             </p>
           </div>
 
-          <h2 id="process">Process</h2>
+          <h2 ref={processRef}>Process</h2>
           <div className="process">
             <div className="img-container">
               <img
@@ -194,7 +199,7 @@ function CaseStudy2() {
             </p>
           </div>
 
-          <h2 id="takeaways" style={{marginTop:"4rem"}}>Takeaways</h2>
+          <h2 ref={takeawaysRef} style={{marginTop:"4rem"}}>Takeaways</h2>
           <div className="takeaways">
             <h3>1. Iterative Design</h3>
             <p>
