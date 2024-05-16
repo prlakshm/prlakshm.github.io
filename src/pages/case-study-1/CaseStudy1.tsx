@@ -3,7 +3,6 @@ import Footer from "../../components/Footer";
 import "./case-study-1.css";
 
 function CaseStudy1() {
-
   const overviewRef = useRef<HTMLDivElement>(null);
   const researchRef = useRef<HTMLDivElement>(null);
   const processRef = useRef<HTMLDivElement>(null);
@@ -26,16 +25,18 @@ function CaseStudy1() {
       </div>
       <div className="study">
         <div className="sticky-quick-links">
-        <div className="quick-links">
-        <h5 onClick={() => scrollToSection(overviewRef)}>Overview</h5>
-          <h5 onClick={() => scrollToSection(researchRef)}>Research</h5>
-          <h5 onClick={() => scrollToSection(processRef)}>Process</h5>
-          <h5 onClick={() => scrollToSection(takeawaysRef)}>Takeaways</h5>
-        </div>
+          <div className="quick-links">
+            <h5 onClick={() => scrollToSection(overviewRef)}>Overview</h5>
+            <h5 onClick={() => scrollToSection(researchRef)}>Research</h5>
+            <h5 onClick={() => scrollToSection(processRef)}>Process</h5>
+            <h5 onClick={() => scrollToSection(takeawaysRef)}>Takeaways</h5>
+          </div>
         </div>
 
         <div className="main">
-          <h2 ref={overviewRef} style={{ marginTop: "-0.75rem" }}>Overview</h2>
+          <h2 ref={overviewRef} style={{ marginTop: "-0.75rem" }}>
+            Overview
+          </h2>
           <div className="overview-info">
             <div className="role">
               <h3>Role</h3>
@@ -62,8 +63,8 @@ function CaseStudy1() {
           </div>
           <div className="overview">
             <p>
-              Many e-commerce websites only serve functionality
-              purpose of aggregating items in a cart and checking out.{" "}
+              Many e-commerce websites only serve functionality purpose of
+              aggregating items in a cart and checking out.{" "}
               <a href="https://sandwitch-builder.vercel.app/" target="_blank">
                 <span className="app-link bold">PB&J Time</span>
               </a>{" "}
@@ -168,9 +169,9 @@ function CaseStudy1() {
 
             <h3>Coding Web App</h3>
             <p>
-              While coding the web app, I implemented the cart aggregator as well
-              as sorting and filtering functionality from the competitive analysis
-              best features list. In the end, I had to{" "}
+              While coding the web app, I implemented the cart aggregator as
+              well as sorting and filtering functionality from the competitive
+              analysis best features list. In the end, I had to{" "}
               <span className="bold">
                 adjust colors to increase contrast and accessiblity
               </span>
@@ -239,11 +240,11 @@ function CaseStudy1() {
             <h3>2. AI Generated Images</h3>
             <p>
               AI generating images for software development can{" "}
-              <span className="bold">save money and resources</span>. Though
-              it can be{" "}
-              <span className="bold">tedious to edit with Photoshop</span>,
-              the benefit is creating images with consistent styles.
-              Overall, using AI generated images can help{" "}
+              <span className="bold">save money and resources</span>. Though it
+              can be{" "}
+              <span className="bold">tedious to edit with Photoshop</span>, the
+              benefit is creating images with consistent styles. Overall, using
+              AI generated images can help{" "}
               <span className="bold">
                 create a unified visual identity for a website
               </span>

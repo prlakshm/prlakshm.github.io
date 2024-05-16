@@ -1,7 +1,23 @@
+import { RefObject, useRef } from "react";
 import Footer from "../../components/Footer";
 import "./case-study-3.css";
 
 function CaseStudy3() {
+
+  const overviewRef = useRef<HTMLDivElement>(null);
+  const problemRef = useRef<HTMLDivElement>(null);
+  const researchRef = useRef<HTMLDivElement>(null);
+  const pmRoleRef = useRef<HTMLDivElement>(null);
+  const processRef = useRef<HTMLDivElement>(null);
+  const takeawaysRef = useRef<HTMLDivElement>(null);
+
+  const scrollToSection = (ref: RefObject<HTMLDivElement>) => {
+    if (ref.current) {
+      ref.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  
   return (
     <div className="case-study-3">
       <div className="title-block">
@@ -14,29 +30,17 @@ function CaseStudy3() {
       <div className="study">
         <div className="sticky-quick-links">
           <div className="quick-links">
-            <a href="#overview">
-              <h5>Overview</h5>
-            </a>
-            <a href="#problem">
-              <h5>Problem</h5>
-            </a>
-            <a href="#research">
-              <h5>Research</h5>
-            </a>
-            <a href="#pm-role">
-              <h5>PM Role</h5>
-            </a>
-            <a href="#process">
-              <h5>Process</h5>
-            </a>
-            <a href="#takeaways">
-              <h5>Takeaways</h5>
-            </a>
+          <h5 onClick={() => scrollToSection(overviewRef)}>Overview</h5>
+          <h5 onClick={() => scrollToSection(problemRef)}>Problem</h5>
+            <h5 onClick={() => scrollToSection(researchRef)}>Research</h5>
+            <h5 onClick={() => scrollToSection(pmRoleRef)}>PM Role</h5>
+            <h5 onClick={() => scrollToSection(processRef)}>Process</h5>
+            <h5 onClick={() => scrollToSection(takeawaysRef)}>Takeaways</h5>
           </div>
         </div>
 
         <div className="main">
-          <h2 id="overview" style={{ marginTop: "-0.75rem" }}>
+          <h2 ref={overviewRef} style={{ marginTop: "-0.75rem" }}>
             Overview
           </h2>
           <div className="overview-info">
@@ -112,7 +116,7 @@ function CaseStudy3() {
             </div>
           </div>
 
-          <h2 id="problem">Problem</h2>
+          <h2 ref={problemRef}>Problem</h2>
           <div className="problem">
             <div className="row">
               <h3>Problem</h3>
@@ -142,7 +146,7 @@ function CaseStudy3() {
             </div>
           </div>
 
-          <h2 id="research">Research</h2>
+          <h2 ref={researchRef}>Research</h2>
           <div className="research">
             <p>
               Our main inspiration was Etsy, an existing platform for artists to
@@ -169,7 +173,7 @@ function CaseStudy3() {
             </p>
           </div>
 
-          <h2 id="pm-role">PM Role</h2>
+          <h2 ref={pmRoleRef}>PM Role</h2>
           <div className="pm-role">
             <p>
               As PM, I reported our team's progress to our supervisor and was
@@ -188,7 +192,7 @@ function CaseStudy3() {
             </p>
           </div>
 
-          <h2 id="process">Process</h2>
+          <h2 ref={processRef}>Process</h2>
           <div className="process">
             <div className="img-container">
               <img
@@ -297,7 +301,7 @@ function CaseStudy3() {
             </div>
           </div>
 
-          <h2 id="takeaways">Takeaways</h2>
+          <h2 ref={takeawaysRef}>Takeaways</h2>
           <div className="takeaways">
             <h3>1. Scalable Database</h3>
             <p>
