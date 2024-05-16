@@ -1,8 +1,13 @@
-import { RefObject, useRef } from "react";
+import { RefObject, useEffect, useRef } from "react";
 import Footer from "../../components/Footer";
 import "./case-study-2.css";
 
 function CaseStudy2() {
+  
+  // This will run once when the component mounts scroll to top page
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const overviewRef = useRef<HTMLDivElement>(null);
   const researchRef = useRef<HTMLDivElement>(null);
@@ -27,7 +32,7 @@ function CaseStudy2() {
       <div className="study">
         <div className="sticky-quick-links">
           <div className="quick-links">
-          <h5 onClick={() => scrollToSection(overviewRef)}>Overview</h5>
+            <h5 onClick={() => scrollToSection(overviewRef)}>Overview</h5>
             <h5 onClick={() => scrollToSection(researchRef)}>Research</h5>
             <h5 onClick={() => scrollToSection(processRef)}>Process</h5>
             <h5 onClick={() => scrollToSection(takeawaysRef)}>Takeaways</h5>
@@ -146,7 +151,11 @@ function CaseStudy2() {
             </div>
 
             <h3>Low-fi Wireframes + Feedback</h3>
-            <p> I worked on desktop low-fidelity wireframes for my team. I also created Looms after each iteration for feedback from the founders.</p>
+            <p>
+              {" "}
+              I worked on desktop low-fidelity wireframes for my team. I also
+              created Looms after each iteration for feedback from the founders.
+            </p>
             <div className="img-container">
               <img
                 src="/case-study-2/design-1.png"
@@ -161,8 +170,11 @@ function CaseStudy2() {
               />
             </div>
 
-            <h3 style={{marginTop:"4rem"}}>Hi-Fi Prototypes + Feedback</h3>
-            <p>For high-fidelity prototypes, I switched over to mobile. Again, I created the Loom for our team to receive feedback.</p>
+            <h3 style={{ marginTop: "4rem" }}>Hi-Fi Prototypes + Feedback</h3>
+            <p>
+              For high-fidelity prototypes, I switched over to mobile. Again, I
+              created the Loom for our team to receive feedback.
+            </p>
             <div className="video-container">
               <video
                 src="/case-study-2/design-3.mp4"
@@ -176,7 +188,10 @@ function CaseStudy2() {
             </div>
             <br />
             <br />
-            <div className="video-container last" style={{marginTop:"-2.5rem"}}>
+            <div
+              className="video-container last"
+              style={{ marginTop: "-2.5rem" }}
+            >
               <video
                 src="/case-study-2/design-4.mp4"
                 typeof="video/mp4"
@@ -188,9 +203,17 @@ function CaseStudy2() {
               </video>
             </div>
 
-            <p>Check out all our final designs <a href="https://www.figma.com/design/iRwhq0w4NT9zuXu6B2jSnr/Iterative-Design?node-id=724%3A999&t=tW0W2tBKeEAzLNiU-1" target="_blank">here!</a></p>
+            <p>
+              Check out all our final designs{" "}
+              <a
+                href="https://www.figma.com/design/iRwhq0w4NT9zuXu6B2jSnr/Iterative-Design?node-id=724%3A999&t=tW0W2tBKeEAzLNiU-1"
+                target="_blank"
+              >
+                here!
+              </a>
+            </p>
 
-            <h3 style={{marginTop:"3rem"}}>Presenting to Founders</h3>
+            <h3 style={{ marginTop: "3rem" }}>Presenting to Founders</h3>
             <p>
               After countless emails and Loom interactions, we got to meet the
               company CEO and CTO and present our high-fidelity prototypes via
@@ -199,7 +222,9 @@ function CaseStudy2() {
             </p>
           </div>
 
-          <h2 ref={takeawaysRef} style={{marginTop:"4rem"}}>Takeaways</h2>
+          <h2 ref={takeawaysRef} style={{ marginTop: "4rem" }}>
+            Takeaways
+          </h2>
           <div className="takeaways">
             <h3>1. Iterative Design</h3>
             <p>
@@ -212,14 +237,14 @@ function CaseStudy2() {
               design,{" "}
               <span className="bold">
                 ask for platforms whose UI they admire
-              </span>! We as designers can use these platforms
-              to draw inspiration.
+              </span>
+              ! We as designers can use these platforms to draw inspiration.
             </p>
             <h3>3. Team Collaboration</h3>
             <p>
               Designing in a team{" "}
-              <span className="bold">generates innovative solutions</span>{" "}
-              and introduces ideas I couldn't have thought of on my own. It also
+              <span className="bold">generates innovative solutions</span> and
+              introduces ideas I couldn't have thought of on my own. It also
               creates a <span className="bold">more user-centered design</span>,
               because everyone offers a diverse perspective.
             </p>

@@ -1,8 +1,14 @@
-import { RefObject, useRef } from "react";
+import { RefObject, useEffect, useRef } from "react";
 import Footer from "../../components/Footer";
 import "./case-study-1.css";
 
 function CaseStudy1() {
+  
+  // This will run once when the component mounts scroll to top page
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const overviewRef = useRef<HTMLDivElement>(null);
   const researchRef = useRef<HTMLDivElement>(null);
   const processRef = useRef<HTMLDivElement>(null);
