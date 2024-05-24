@@ -6,7 +6,7 @@ function Home() {
       <div className="title">
         <h1>Hi, I'm Pranavi</h1>
         <h2>
-          I’m a software engineer interested in full-stack development and
+          I’m a software engineer interested in digital branding and
           AI-assisted design. <br />
           <div className="contact">
             <a href="mailto:pranavi_lakshminarayanan@brown.edu" target="_blank">
