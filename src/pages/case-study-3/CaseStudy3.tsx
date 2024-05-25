@@ -68,7 +68,7 @@ function CaseStudy3() {
               <h3>Skills</h3>
               <div className="all-skills">
                 <div className="skill">
-                  <p>MongoDB</p>
+                  <p>MongoDB/MQL</p>
                 </div>
                 <div className="skill">
                   <p>Algorithms</p>

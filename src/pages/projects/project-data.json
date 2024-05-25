@@ -18,7 +18,7 @@
     {
         "name": "Artist's Corner PVD",
         "color": "#ADE1D5",
-        "skills": ["MongoDB", "Algorithms", "Typescript/React"],
+        "skills": ["MongoDB/MQL", "Algorithms", "Typescript/React"],
         "logline": "Helping students sell art and handmade goods",
         "image": "/projects/artists-corner.png",
         "link": "#/artists-corner"
