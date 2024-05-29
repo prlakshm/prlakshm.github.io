@@ -3,7 +3,6 @@ import Footer from "../../components/Footer";
 import "./case-study-1.css";
 
 function CaseStudy1() {
-  
   // This will run once when the component mounts scroll to top page
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -14,9 +13,15 @@ function CaseStudy1() {
   const processRef = useRef<HTMLDivElement>(null);
   const takeawaysRef = useRef<HTMLDivElement>(null);
 
-  const scrollToSection = (ref: RefObject<HTMLDivElement>) => {
+  const scrollToSection = (ref: RefObject<HTMLDivElement>, offset = -137) => {
     if (ref.current) {
-      ref.current.scrollIntoView({ behavior: "smooth" });
+      const elementTop =
+        ref.current.getBoundingClientRect().top + window.scrollY;
+      const offsetPosition = elementTop + offset;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -208,9 +213,9 @@ function CaseStudy1() {
               <video
                 src="/case-study-1/responsive-screens.mp4"
                 typeof="video/mp4"
-                controls
                 autoPlay
                 muted
+                loop
               >
                 Your browser does not support the video tag.
               </video>

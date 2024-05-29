@@ -1,9 +1,15 @@
+import { useEffect } from "react";
 import Footer from "../../components/Footer";
 import ProjectCard from "./ProjectCard";
 import projectData from "./project-data.json";
 import "./projects.css";
 
 function Projects() {
+    // This will run once when the component mounts scroll to top page
+    useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []); 
+
   return (
     <div className="projects">
         <div className="transition"><br /><br /></div>
