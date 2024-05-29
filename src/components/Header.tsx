@@ -1,8 +1,22 @@
+import { useEffect, useState } from "react";
 import "../app.css";
+import useScrollDirection from "../hooks/useScrollDirection";
 
 function Header() {
+  const scrollDirection = useScrollDirection();
+  const [headerClass, setHeaderClass] = useState('visible');
+
+  useEffect(() => {
+    if (scrollDirection === 'up') {
+      setHeaderClass('visible');
+    } else if (scrollDirection === 'down') {
+      setHeaderClass('hidden');
+    }
+  }, [scrollDirection]);
+
+
   return (
-    <div className="header">
+    <div className={`header ${headerClass}`}>
       <div className="left">
         <a href="/">
           <img

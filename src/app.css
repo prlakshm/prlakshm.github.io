@@ -7,9 +7,24 @@ body {
 .header {
     display: flex;
     justify-content: space-between;
-    margin: 0 1.75rem;
-    width: 96vw;
+    padding: 0 1.75rem;
+    box-sizing: border-box;
+    background-color: white;
+    transition: all 0.3s ease-in-out;
+    z-index: 1000;
 }
+
+.header.hidden {
+    visibility: hidden;
+    transform: translateY(-100%);
+}
+
+.header.visible {
+    top: 0;
+    transform: translateY(0);
+    position: sticky;
+}
+
 
 .footer {
     display: flex;

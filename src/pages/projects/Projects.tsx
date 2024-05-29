@@ -14,9 +14,8 @@ function Projects() {
                 project,
                 index 
               ) => (
-                <a href={project.link}>
+                <a href={project.link} key={index}>
                 <ProjectCard
-                  key={index}
                   name={project.name}
                   color={project.color}
                   skills={project.skills}
