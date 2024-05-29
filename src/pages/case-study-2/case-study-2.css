@@ -40,8 +40,9 @@ p {
 
 .case-study-2 .quick-links {
     position: sticky;
-    top:0;
+    top:20%;
     margin-right: 12rem;
+    margin-top: 1rem;
 }
 
 .case-study-2 .quick-links h5 {

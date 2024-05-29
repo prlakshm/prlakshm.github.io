@@ -40,8 +40,9 @@ p {
 
 .quick-links {
     position: sticky;
-    top:0;
+    top:20%;
     margin-right: 12rem;
+    margin-top: 1rem;
 }
 
 .quick-links h5 {
