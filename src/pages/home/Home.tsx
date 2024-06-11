@@ -1,11 +1,19 @@
-import Spline from '@splinetool/react-spline';
+import { Suspense } from 'react'
+import { Canvas } from '@react-three/fiber'
+import { OrbitControls } from '@react-three/drei'
+import Scene from "./Scene.js"
 import "./home.css";
 
 
 function Home() {
   return (
     <div className="home">
-      <Spline scene="https://prod.spline.design/ucryZISsv-cgGST1/scene.splinecode" />
+    <Suspense fallback={null}>
+      <Canvas shadows flat linear>
+        <Scene />
+        <OrbitControls />
+      </Canvas>
+    </Suspense>
     </div>
   );
 }
