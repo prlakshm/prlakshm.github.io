@@ -1,21 +1,37 @@
-import { Suspense } from 'react'
-import { Canvas } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
-import Scene from "./Scene.js"
+import { useEffect } from "react";
 import "./home.css";
 
 
 function Home() {
-  return (
-    <div className="home">
-    <Suspense fallback={null}>
-      <Canvas shadows flat linear>
-        <Scene />
-        <OrbitControls />
-      </Canvas>
-    </Suspense>
-    </div>
-  );
+
+  useEffect(() => {
+    // Load the lottie.js script dynamically
+    const lottieScript = document.createElement("script");
+    lottieScript.src = "/home/lottie.js";
+    lottieScript.async = true;
+    document.body.appendChild(lottieScript);
+
+    // Load the script.js script dynamically
+    lottieScript.onload = () => {
+      const script = document.createElement("script");
+      script.src = "/home/script.js";
+      script.async = true;
+      document.body.appendChild(script);
+    };
+
+    // Cleanup function to remove scripts when the component unmounts
+    return () => {
+      document.body.removeChild(lottieScript);
+      const loadedScript = document.querySelector('script[src="/script.js"]');
+      if (loadedScript) {
+        document.body.removeChild(loadedScript);
+      }
+    };
+  }, []);
+
+  return <div className="home">
+    <div id="anim"></div>
+  </div>;
 }
 
 export default Home;
