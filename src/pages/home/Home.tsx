@@ -1,37 +1,31 @@
 import { useEffect } from "react";
 import "./home.css";
 
-
 function Home() {
-
-  useEffect(() => {
-    // Load the lottie.js script dynamically
-    const lottieScript = document.createElement("script");
-    lottieScript.src = "/home/lottie.js";
-    lottieScript.async = true;
-    document.body.appendChild(lottieScript);
-
-    // Load the script.js script dynamically
-    lottieScript.onload = () => {
-      const script = document.createElement("script");
-      script.src = "/home/script.js";
-      script.async = true;
-      document.body.appendChild(script);
-    };
-
-    // Cleanup function to remove scripts when the component unmounts
-    return () => {
-      document.body.removeChild(lottieScript);
-      const loadedScript = document.querySelector('script[src="/script.js"]');
-      if (loadedScript) {
-        document.body.removeChild(loadedScript);
-      }
-    };
-  }, []);
-
-  return <div className="home">
-    <div id="anim"></div>
-  </div>;
+  return (
+    <div className="home">
+      <div className="water"></div>
+      <svg>
+        <filter id="turbulence" x="0" y="0" width="100%" height="100%">
+          <feTurbulence
+            id="sea-filter"
+            numOctaves="3"
+            seed="2"
+            baseFrequency="0.02 0.05"
+          ></feTurbulence>
+          <feDisplacementMap scale="7" in="SourceGraphic"></feDisplacementMap>
+          <animate
+            xlinkHref="#sea-filter"
+            attributeName="baseFrequency"
+            dur="100s"
+            keyTimes="0;0.5;1"
+            values="0.02 0.06;0.04 0.08;0.02 0.06"
+            repeatCount="indefinite"
+          />
+        </filter>
+      </svg>
+    </div>
+  );
 }
 
 export default Home;
