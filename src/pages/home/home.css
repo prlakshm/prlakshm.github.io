@@ -40,12 +40,12 @@
 
 .plain2 {  
     background-image: url('/home/lilies-plain2.png');
-    animation: drift2 4s ease-in-out infinite alternate;
+    animation: drift2 5s ease-in-out infinite alternate;
 }
 
 .plain3 {  
     background-image: url('/home/lilies-plain3.png');
-    animation: drift1 5s ease-in-out infinite alternate;
+    animation: drift3 4s ease-in-out infinite alternate;
 } 
 
 @keyframes drift1 {
@@ -53,7 +53,7 @@
     transform: translate(0, 0);
   }
   100% {
-    transform: translate(20px, 5px);
+    transform: translate(30px, 10px);
   }
 }
 
@@ -62,7 +62,16 @@
       transform: translate(0, 0);
     }
     100% {
-      transform: translate(15px, 10px);
+      transform: translate(20px, 15px);
+    }
+  }
+
+  @keyframes drift3 {
+    0% {
+      transform: translate(0, 0);
+    }
+    100% {
+      transform: translate(-30px, -10px);
     }
   }
 

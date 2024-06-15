@@ -16,13 +16,13 @@ function Home() {
             seed="2"
             baseFrequency="0.05 0.1"
           ></feTurbulence>
-          <feDisplacementMap scale="7" in="SourceGraphic"></feDisplacementMap>
+          <feDisplacementMap scale="10" in="SourceGraphic"></feDisplacementMap>
           <animate
             xlinkHref="#sea-filter"
             attributeName="baseFrequency"
             dur="100s"
             keyTimes="0;0.5;1"
-            values="0.02 0.06;0.04 0.08;0.02 0.06"
+            values="0.01 0.05;0.03 0.09;0.01 0.05"
             repeatCount="indefinite"
           />
         </filter>
