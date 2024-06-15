@@ -48,6 +48,16 @@
     animation: drift3 4s ease-in-out infinite alternate;
 } 
 
+.plain4 {  
+    background-image: url('/home/lilies-plain4.png');
+    animation: drift1 4s ease-in-out infinite alternate;
+} 
+
+.plain5 {  
+    background-image: url('/home/lilies-plain5.png');
+    animation: drift2 4s ease-in-out infinite alternate;
+} 
+
 @keyframes drift1 {
   0% {
     transform: translate(0, 0);

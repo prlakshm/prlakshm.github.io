@@ -8,6 +8,8 @@ function Home() {
       <div className="lilies plain1"></div>
       <div className="lilies plain2"></div>
       <div className="lilies plain3"></div>
+      <div className="lilies plain4"></div>
+      <div className="lilies plain5"></div>
       <svg>
         <filter id="turbulence" x="0" y="0" width="100%" height="100%">
           <feTurbulence
