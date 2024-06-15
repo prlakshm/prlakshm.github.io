@@ -23,6 +23,50 @@
     filter: url("#turbulence") 
 }
 
+.home .lilies {  
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+}
+
+.plain1 {
+    background-image: url('/home/lilies-plain1.png');
+    animation: drift1 5s ease-in-out infinite alternate;
+}
+
+.plain2 {  
+    background-image: url('/home/lilies-plain2.png');
+    animation: drift2 4s ease-in-out infinite alternate;
+}
+
+.plain3 {  
+    background-image: url('/home/lilies-plain3.png');
+    animation: drift1 5s ease-in-out infinite alternate;
+} 
+
+@keyframes drift1 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(20px, 5px);
+  }
+}
+
+@keyframes drift2 {
+    0% {
+      transform: translate(0, 0);
+    }
+    100% {
+      transform: translate(15px, 10px);
+    }
+  }
+
+
 .title {
     display: flex;
     flex: 1;
