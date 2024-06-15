@@ -2,6 +2,15 @@ import { useEffect } from "react";
 import "./home.css";
 
 function Home() {
+
+  useEffect(() => {
+    // Reapply the SVG filter when the component mounts
+    const waterElement = document.querySelector('.water');
+    if (waterElement && waterElement instanceof HTMLElement) {
+      waterElement.style.filter = 'url(#turbulence)';
+    }
+  }, []);
+
   return (
     <div className="home">
       <div className="water"></div>
