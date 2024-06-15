@@ -11,7 +11,7 @@ function Home() {
             id="sea-filter"
             numOctaves="3"
             seed="2"
-            baseFrequency="0.02 0.05"
+            baseFrequency="0.05 0.1"
           ></feTurbulence>
           <feDisplacementMap scale="7" in="SourceGraphic"></feDisplacementMap>
           <animate
