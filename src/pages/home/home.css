@@ -103,7 +103,7 @@
 
 .title {
     display: flex;
-    height: 80vh;
+    height: 85vh;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -115,7 +115,8 @@ h1 {
     font-weight: 475;
     font-size: 5rem;
     text-align: center;
-    margin: 0.75rem;
+    margin: 1rem;
+    margin-bottom: 0.5rem;
     padding: 0;
 
     color: #3a3a3a;
@@ -136,12 +137,8 @@ h2 {
     padding: 0;
 }
 
-.title h2 {
-    margin-left: 3.75rem;
-}
-
 .contact {
-    margin-top: 1rem;
+    margin-top: 1.25rem;
     margin-left: -1rem;
 }
 
@@ -154,14 +151,3 @@ h2 {
     padding: 0 0 0 1rem;
 }
   
-.character {
-    display: flex;
-    flex: 0;
-    justify-content: flex-end;
-    align-items: flex-end;
-    height: 83.2vh;
-}
-  
-.character img {
-    width: 48rem;
-}
