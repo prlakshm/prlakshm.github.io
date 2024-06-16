@@ -8,9 +8,8 @@ body, html {
 .header {
     display: flex;
     justify-content: space-between;
-    padding: 0 1.75rem;
+    align-items: center;
     box-sizing: border-box;
-    background-color: white;
     transition: all 0.3s ease-in-out;
     z-index: 1000;
 }
@@ -35,7 +34,9 @@ body, html {
 }
 
 .header img {
-    width: 7rem;
+    width: 2.5rem;
+    margin: 0;
+    padding: 0 2rem;
 }
 
 .left {
@@ -45,19 +46,17 @@ body, html {
     font-family: "Barlow", sans-serif;
     font-weight: 500;
     font-size: 1.1rem;
-    padding: 0;
-    margin-top: 1.5rem;
-    margin-left: 0.5rem;
+    margin: 1.5rem;
 }
 
 .right {
     display: flex;
     align-items: center;
-    margin: 4rem 4rem 2rem 4rem;
+    margin: 2.75rem 2.2rem 2rem 2.2rem;
 }
 
 a {
-    padding: 0 1rem; /* Adjust the padding as needed */
+    padding: 0 1.5rem; /* Adjust the padding as needed */
     font-family: "Barlow", sans-serif;
     font-weight: 500;
     font-size: 1.1rem;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "../app.css";
-import useScrollDirection from "../hooks/useScrollDirection";
+import useScrollDirection from "../hooks/useScrollDirection.js";
 
 function Header() {
   const scrollDirection = useScrollDirection();
@@ -20,7 +20,7 @@ function Header() {
       <div className="left">
         <a href="/">
           <img
-            src="./header/home-icon.png"
+            src="./icons/favicon.png"
             alt="Home icon takes you back to landing page when clicked"
           />
         </a>

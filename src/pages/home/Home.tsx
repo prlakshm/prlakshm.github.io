@@ -12,20 +12,22 @@ function Home() {
 
   return (
     <div className="home">
-      <div className="water"></div>
-      <div className="lilies plain1"></div>
-      <div className="lilies plain2"></div>
-      <div className="lilies plain3"></div>
-      <div className="lilies plain4"></div>
-      <div className="lilies plain5"></div>
-
       <div className="landing-page">
+        <div className="water"></div>
+        <div className="lilies plain1"></div>
+        <div className="lilies plain2"></div>
+        <div className="lilies plain3"></div>
+        <div className="lilies plain4"></div>
+        <div className="lilies plain5"></div>
+
+        <div className="title">
         <h1>Hi, I'm Pranavi</h1>
         <h2>
           I'm a software engineer passionate about story-based design and GenAI.
-          You might know me from Brown University, Tech Cadets, or
-          Rewriting the Code.
+          You might know me from Brown University, Tech Cadets, or Rewriting the
+          Code.
         </h2>
+        </div>
       </div>
       <svg>
         <filter id="turbulence" x="0" y="0" width="100%" height="100%">
