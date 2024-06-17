@@ -12,17 +12,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@react-three/drei": "^9.4.2",
-    "@react-three/fiber": "^8.0.11",
-    "@splinetool/r3f-spline": "^1.0.1",
-    "@splinetool/loader": "^1.5.9",
-    "three": "^0.135.0", 
     "@vitejs/plugin-react": "^4.3.1",
+    "gsap": "^3.12.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.23.1",
     "react-scripts": "^5.0.1",
-    "typescript": "^4.9.5", 
+    "typescript": "^4.9.5",
     "vite": "^5.2.13",
     "vite-plugin-node-polyfills": "^0.22.0"
   },

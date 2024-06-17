@@ -1,23 +1,28 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import "./home.css";
 
 function Home() {
+  const waterElementRef = useRef<HTMLDivElement>(null);
+  const waterElement2Ref = useRef<HTMLDivElement>(null);
+
+  
+
   useEffect(() => {
     // Reapply the SVG filter when the component mounts
-    const waterElement = document.querySelector(".water");
-    const waterElement2 = document.querySelector(".water-full");
-    if (waterElement && waterElement instanceof HTMLElement) {
-      waterElement.style.filter = "url(#turbulence)";
+    if (waterElementRef.current) {
+      waterElementRef.current.style.filter = "url(#turbulence)";
+      console.log("mounted water")
     }
-    if (waterElement2 && waterElement2 instanceof HTMLElement) {
-      waterElement2.style.filter = "url(#turbulence)";
+    if (waterElement2Ref.current) {
+      waterElement2Ref.current.style.filter = "url(#turbulence)";
+      console.log("mounted water full")
     }
   }, []);
 
   return (
     <div className="home">
       <div className="landing-page">
-        <div className="water"></div>
+        <div className="water" ref={waterElementRef}></div>
         <div className="lilies plain1"></div>
         <div className="lilies plain2"></div>
         <div className="lilies plain3"></div>
@@ -45,7 +50,7 @@ function Home() {
         </div>
       </div>
       <div className="projects-page">
-        <div className="water-full"></div>
+        <div className="water-full" ref={waterElement2Ref}></div>
       </div>
       <svg>
         <filter id="turbulence" x="0" y="0" width="100%" height="100%">
