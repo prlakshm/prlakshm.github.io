@@ -35,8 +35,10 @@ body, html {
 .footer {
     display: flex;
     justify-content: space-between;
-    margin: 5rem 1.75rem 0 1.75rem;
-    width: 96vw;
+    align-items: center;
+    margin-top: 5rem;
+    padding: 0 0 0 2rem;
+    width: 96.8vw;
 }
 
 .header img {
@@ -55,11 +57,13 @@ body, html {
     margin: 1.25rem 1.4rem;
 }
 
+
 .right {
     display: flex;
     align-items: center;
     margin: 2.8rem 2.4rem 2rem 2.2rem;
 }
+
 
 a {
     padding: 0 1.5rem; /* Adjust the padding as needed */

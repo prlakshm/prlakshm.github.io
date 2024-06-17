@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import "./home.css";
+import Projects from "../projects/Projects.js";
 
 function Home() {
   const waterElementRef = useRef<HTMLDivElement>(null);
@@ -51,6 +52,7 @@ function Home() {
       </div>
       <div className="projects-page">
         <div className="water-full" ref={waterElement2Ref}></div>
+        <div className="projects-container"><Projects /></div>
       </div>
       <svg>
         <filter id="turbulence" x="0" y="0" width="100%" height="100%">

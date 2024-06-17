@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import Footer from "../../components/Footer";
-import ProjectCard from "./ProjectCard";
+import Footer from "../../components/Footer.js";
+import ProjectCard from "./ProjectCard.js";
 import projectData from "./project-data.json";
 import "./projects.css";
 
@@ -12,7 +12,6 @@ function Projects() {
 
   return (
     <div className="projects">
-        <div className="transition"><br /><br /></div>
         <div className="grid">
         <div className="project-cards">
         {projectData.map(
