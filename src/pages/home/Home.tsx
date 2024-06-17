@@ -5,8 +5,12 @@ function Home() {
   useEffect(() => {
     // Reapply the SVG filter when the component mounts
     const waterElement = document.querySelector(".water");
+    const waterElement2 = document.querySelector(".water-full");
     if (waterElement && waterElement instanceof HTMLElement) {
       waterElement.style.filter = "url(#turbulence)";
+    }
+    if (waterElement2 && waterElement2 instanceof HTMLElement) {
+      waterElement2.style.filter = "url(#turbulence)";
     }
   }, []);
 
@@ -39,6 +43,9 @@ function Home() {
             </a>
           </div>
         </div>
+      </div>
+      <div className="projects-page">
+        <div className="water-full"></div>
       </div>
       <svg>
         <filter id="turbulence" x="0" y="0" width="100%" height="100%">

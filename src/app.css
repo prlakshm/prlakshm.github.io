@@ -1,10 +1,14 @@
 body, html {
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
 }
 
 .header {
+    position: fixed;
+    top: 0;
     display: flex;
+    width: 100vw;
     justify-content: space-between;
     align-items: center;
     box-sizing: border-box;
@@ -20,7 +24,6 @@ body, html {
 .header.visible {
     top: 0;
     transform: translateY(0);
-    position: sticky;
 }
 
 
