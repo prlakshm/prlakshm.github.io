@@ -20,9 +20,15 @@ body, html {
     transform: translateY(-100%);
 }
 
-.header.visible {
+.header.visible-transparent {
     top: 0;
     transform: translateY(0);
+}
+
+.header.visible-color {
+    top: 0;
+    transform: translateY(0);
+    background-color: rgb(249, 241, 240, 75%);
 }
 
 

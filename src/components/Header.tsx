@@ -4,14 +4,26 @@ import useScrollDirection from "../hooks/useScrollDirection.js";
 
 function Header() {
   const scrollDirection = useScrollDirection();
-  const [headerClass, setHeaderClass] = useState('visible');
+  const [headerClass, setHeaderClass] = useState('visible-transparent');
 
   useEffect(() => {
-    if (scrollDirection === 'up') {
-      setHeaderClass('visible');
-    } else if (scrollDirection === 'down') {
-      setHeaderClass('hidden');
-    }
+    const handleScroll = () => {
+      const scrollPos = window.scrollY;
+      if (scrollDirection === "up") {
+        if (scrollPos > 100) {
+          setHeaderClass("visible-color");
+        } else {
+          setHeaderClass("visible-transparent");
+        }
+      } else if (scrollDirection === "down") {
+        setHeaderClass("hidden");
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, [scrollDirection]);
 
 
