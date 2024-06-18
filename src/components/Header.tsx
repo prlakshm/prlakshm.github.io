@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
 import "../app.css";
 import useScrollDirection from "../hooks/useScrollDirection.js";
+import { useNavigate } from "react-router-dom";
 
 function Header() {
   const scrollDirection = useScrollDirection();
   const [headerClass, setHeaderClass] = useState('visible-transparent');
+  const navigate = useNavigate();
+
+  const handleLinkClick = (hash : string) => {
+    navigate(hash);
+    // Ensure the hash change triggers the effect
+    window.location.hash = hash;
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,9 +46,9 @@ function Header() {
         </a>
       </div>
       <div className="right">
-        <a href="/">Home</a>
-        <a href="/#projects">Projects</a>
-        <a href="#/about">About</a>
+      <a href="/" onClick={() => handleLinkClick('/')}>Home</a>
+      <a href="/#projects" onClick={() => handleLinkClick('#projects')}>Projects</a>
+      <a href="#/about" onClick={() => handleLinkClick('#/about')}>About</a>
         <a
           href="/docs/Pranavi_Resume_2024.pdf"
           target="_blank"

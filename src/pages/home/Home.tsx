@@ -1,10 +1,38 @@
 import { useEffect, useRef } from "react";
 import "./home.css";
 import Projects from "../projects/Projects.js";
+import { useLocation } from "react-router-dom";
 
 function Home() {
   const waterElementRef = useRef<HTMLDivElement>(null);
   const waterElement2Ref = useRef<HTMLDivElement>(null);
+  const projectsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (window.location.hash === '#projects' && projectsRef.current) {
+        console.log("hash detected");
+        // Wait for 1 second before scrolling to projects section
+        setTimeout(() => {
+          const yOffset = 45; // Offset value
+          if(projectsRef.current){
+          window.scrollTo({ top: projectsRef.current.offsetTop + yOffset, behavior: 'smooth' });}
+        }, 50);
+      }
+    };
+
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashChange);
+
+    // Call the handler once in case the hash is already '#projects' when the component mounts
+    handleHashChange();
+
+    // Cleanup: remove the event listener
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, [projectsRef]);
+
 
   useEffect(() => {
     // Reapply the SVG filter when the component mounts
@@ -48,7 +76,7 @@ function Home() {
           </div>
         </div>
       </div>
-      <div className="projects-page" id="projects">
+      <div className="projects-page" ref={projectsRef}>
         <div className="water-full"></div>
         <div className="water-full-mask" ref={waterElement2Ref}></div>
         <Projects />
