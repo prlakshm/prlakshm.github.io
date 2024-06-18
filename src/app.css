@@ -64,6 +64,15 @@ body, html {
     margin: 2.8rem 2.4rem 2rem 2.2rem;
 }
 
+.footer .left {
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.footer .right {
+    margin-bottom: 1.5rem;
+}
+
 
 a {
     padding: 0 1.5rem; /* Adjust the padding as needed */
@@ -144,3 +153,24 @@ a {
   }
 
 
+/**
+* Fade Transition
+*/
+
+.fade-enter {
+    opacity: 0;
+  }
+  
+  .fade-enter-active {
+    opacity: 1;
+    transition: opacity 500ms ease-in;
+  }
+  
+  .fade-exit {
+    opacity: 1;
+  }
+  
+  .fade-exit-active {
+    opacity: 0;
+    transition: opacity 500ms ease-out;
+  }
