@@ -1,6 +1,7 @@
 .projects {
-    margin: 0;
+    margin-top: 2rem;
     padding: 0;
+    z-index: 1000;
 }
 
 .grid {
@@ -12,6 +13,9 @@
 .project-cards {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    background-color: rgb(179, 193, 255, 70%);
+    border-radius: 50px;
+    padding: 2rem;
 }
 
 .project-cards a {
@@ -21,10 +25,18 @@
 }
 
 .card {
-    width: 35rem;
-    border-radius: 2rem;
-    box-shadow: 8px 8px 8px rgb(0 0 0 / 10%);
+    border: none;
+    box-shadow: 0 2px 40px 0 rgb(106, 116, 164);
+    background-color: rgb(179, 193, 255,);
     overflow: hidden;
+    transition: box-shadow .3s ease-out, transform .3s ease-out, opacity .2s ease-out;
+    transform: translateY(0);
+    border-radius: 1em;
+}
+
+.card:hover {
+    box-shadow: 0 2px 40px 0 var(--text-light);
+    transform: translateY(-.8em);
 }
 
 .preview-image {
@@ -35,7 +47,7 @@
 }
 
 .preview-image img {
-    width: 25rem;
+    width: 31.25rem;
 }
 
 .info {

@@ -15,7 +15,7 @@ function Home() {
       console.log("mounted water")
     }
     if (waterElement2Ref.current) {
-      waterElement2Ref.current.style.filter = "url(#turbulence)";
+      waterElement2Ref.current.style.filter = "url(#turbulence2)";
       console.log("mounted water full")
     }
   }, []);
@@ -52,7 +52,7 @@ function Home() {
       </div>
       <div className="projects-page">
         <div className="water-full" ref={waterElement2Ref}></div>
-        <div className="projects-container"><Projects /></div>
+        <Projects />
       </div>
       <svg>
         <filter id="turbulence" x="0" y="0" width="100%" height="100%">
@@ -67,6 +67,23 @@ function Home() {
             xlinkHref="#sea-filter"
             attributeName="baseFrequency"
             dur="150s"
+            keyTimes="0;0.5;1"
+            values="0.01 0.05;0.03 0.09;0.01 0.05"
+            repeatCount="indefinite"
+          />
+        </filter>
+        <filter id="turbulence2" x="0" y="0" width="100%" height="100%">
+          <feTurbulence
+            id="sea-filter2"
+            numOctaves="3"
+            seed="2"
+            baseFrequency="0.05 0.1"
+          ></feTurbulence>
+          <feDisplacementMap scale="12" in="SourceGraphic"></feDisplacementMap>
+          <animate
+            xlinkHref="#sea-filter2"
+            attributeName="baseFrequency"
+            dur="60s"
             keyTimes="0;0.5;1"
             values="0.01 0.05;0.03 0.09;0.01 0.05"
             repeatCount="indefinite"
