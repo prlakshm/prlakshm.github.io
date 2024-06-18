@@ -12,6 +12,7 @@ function Projects() {
 
   return (
     <div className="projects">
+
         <div className="grid">
         <div className="project-cards">
         {projectData.map(

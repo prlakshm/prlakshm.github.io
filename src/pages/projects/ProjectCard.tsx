@@ -16,10 +16,25 @@ export default function ProjectCard(props: {
   image: string;
 }) {
 
+  const handleHover = () => {
+    console.log('Project card hovered');
+  };
+
+  const handleFocus = () => {
+    console.log('Project card focused');
+  };
+
+  const handleActive = () => {
+    console.log('Project card active');
+  };
+
   // Convert hex color to RGBA with 30% transparency
   const rgbaColor = hexToRGBA(props.color, 0.5);
 
-  return <div className="card" style={{backgroundColor: props.color}}>
+  return <div className="card" style={{backgroundColor: props.color}}  onMouseEnter={handleHover}
+  onFocus={handleFocus}
+  onMouseDown={handleActive}
+  onTouchStart={handleActive}>
     <div className="preview-image">
         <img src={props.image} alt="Image of web project on device"/>
         </div>

@@ -1,5 +1,5 @@
 import { RefObject, useEffect, useRef } from "react";
-import Footer from "../../components/Footer";
+import Footer from "../../components/Footer.js";
 import "./case-study-3.css";
 
 function CaseStudy3() {

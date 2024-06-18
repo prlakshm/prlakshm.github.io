@@ -18,6 +18,12 @@
 
 .home .projects-page {  
     position: relative;
+}
+
+.home .water-full {
+    position: absolute;
+    margin: 0;
+    padding: 0;
     margin-top: -1rem;
     width: 100%;
     height: 100%;
@@ -31,7 +37,7 @@
 }
 
 
-.home .water-full { 
+.home .water-full-mask { 
   position: absolute;
   margin-top: -0.75rem;
   width: 100%;
@@ -44,6 +50,11 @@
   background-repeat: repeat-y;
   filter: url("#turbulence2");
   z-index: -1; /* Ensure it stays behind other content */ 
+}
+
+.home .projects-container {
+    position: relative;
+    z-index: 1;
 }
 
 .landing-page .water {  

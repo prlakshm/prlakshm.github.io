@@ -38,8 +38,8 @@ function Header() {
         </a>
       </div>
       <div className="right">
-        <a href="/#">Home</a>
-        <a href="#/projects">Projects</a>
+        <a href="/">Home</a>
+        <a href="/#projects">Projects</a>
         <a href="#/about">About</a>
         <a
           href="/docs/Pranavi_Resume_2024.pdf"

@@ -6,19 +6,17 @@ function Home() {
   const waterElementRef = useRef<HTMLDivElement>(null);
   const waterElement2Ref = useRef<HTMLDivElement>(null);
 
-  
-
   useEffect(() => {
     // Reapply the SVG filter when the component mounts
     if (waterElementRef.current) {
       waterElementRef.current.style.filter = "url(#turbulence)";
-      console.log("mounted water")
     }
     if (waterElement2Ref.current) {
       waterElement2Ref.current.style.filter = "url(#turbulence2)";
-      console.log("mounted water full")
+
     }
   }, []);
+
 
   return (
     <div className="home">
@@ -50,8 +48,9 @@ function Home() {
           </div>
         </div>
       </div>
-      <div className="projects-page">
-        <div className="water-full" ref={waterElement2Ref}></div>
+      <div className="projects-page" id="projects">
+        <div className="water-full"></div>
+        <div className="water-full-mask" ref={waterElement2Ref}></div>
         <Projects />
       </div>
       <svg>
