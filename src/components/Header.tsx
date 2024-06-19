@@ -46,8 +46,8 @@ function Header() {
         </a>
       </div>
       <div className="right">
-      <a href="/" onClick={() => handleLinkClick('/')}>Home</a>
-      <a href="/#projects" onClick={() => handleLinkClick('#projects')}>Projects</a>
+      <a href="/#projects" onClick={() => handleLinkClick('#projects')}>Work</a>
+      <a href="#/fun" onClick={() => handleLinkClick('#fun')}>Fun</a>
       <a href="#/about" onClick={() => handleLinkClick('#/about')}>About</a>
         <a
           href="/docs/Pranavi_Resume_2024.pdf"
