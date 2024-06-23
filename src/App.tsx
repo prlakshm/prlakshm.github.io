@@ -6,6 +6,7 @@ import CaseStudy2 from './pages/case-study-2/CaseStudy2.js';
 import About from './pages/about/About.js';
 import CaseStudy3 from './pages/case-study-3/CaseStudy3.js';
 import './app.css';
+import Fun from './pages/fun/Fun.js';
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/projects" element={<Home />} />
+          <Route path="/fun" element={<Fun />} />
           <Route path="/pbj-time" element={<CaseStudy1 />} />
           <Route path="/mi-fonda" element={<CaseStudy2 />} />
           <Route path="/artists-corner" element={<CaseStudy3 />} />

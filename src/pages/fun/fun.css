@@ -1,0 +1,45 @@
+
+.fun {
+    background: linear-gradient(
+        to bottom,
+        #fef8f5 0%,
+        #fbf4f1 50%,
+        #fef8f5 100%
+    );
+}
+
+.fun-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-radius: 50px;
+    width: 82.5vw;
+
+    padding: 3rem 2.5rem;
+    justify-content: center; /* Center grid items horizontally */
+    gap: 2.5rem; /* Add some space between the grid items */
+    margin-top: 5rem;
+}
+
+.fun .card {
+    border: none;
+    box-shadow: 0 2px 40px 0 #f5ddd5;
+    overflow: hidden;
+    transform: translateY(0);
+    transition: box-shadow 0.3s ease-out, transform 0.3s ease-out, opacity 0.2s ease-out; /* Add transition for hover effect */
+    border-radius: 1em;
+    width: 40vw;
+}
+
+
+.fun .card:hover, .card:focus {
+    box-shadow: 0 2px 40px 0 #c1ada2;
+    transform: translateY(-0.8rem);
+}
+
+.fun .info {
+    background-color: #fef8f5;
+}
+
+.fun a {
+    text-decoration: none;
+}

@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import "./home.css";
 import Projects from "../projects/Projects.js";
-import { useLocation } from "react-router-dom";
 
 function Home() {
   const waterElementRef = useRef<HTMLDivElement>(null);
@@ -11,7 +10,6 @@ function Home() {
   useEffect(() => {
     const handleHashChange = () => {
       if (window.location.hash === '#projects' && projectsRef.current) {
-        console.log("hash detected");
         // Wait for 1 second before scrolling to projects section
         setTimeout(() => {
           const yOffset = 45; // Offset value

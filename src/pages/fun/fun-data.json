@@ -1,0 +1,18 @@
+[
+    {
+        "name": "This is Not the Matrix",
+        "color": "#FA9E9E",
+        "skills": ["Sci-fi", "Coming-of-age"],
+        "logline": "Using interaction and animation to enhance shopping UX ",
+        "image": "/projects/pbj-time.png",
+        "link": "#/this-is-not-the-matrix"
+    },
+    {
+        "name": "Wednesday Season 2",
+        "color": "#C29DCC",
+        "skills": ["Horror", "Comedy", "Mystery"],
+        "logline": "Redesigning storefront for a startup",
+        "image": "/projects/mi-fonda.png",
+        "link": "#/wednesday-season-2"
+    }
+]
