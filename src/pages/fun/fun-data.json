@@ -1,15 +1,15 @@
 [
     {
         "name": "This is Not the Matrix",
-        "color": "#4b2840",
+        "color": "#A62D79",
         "skills": ["Sci-fi", "Coming-of-age"],
         "logline": "Using interaction and animation to enhance shopping UX ",
-        "image": "/fun/out-of-my-league.png",
+        "image": "/fun/out-of-my-league.svg",
         "link": "#/this-is-not-the-matrix"
     },
     {
         "name": "Wednesday Season 2",
-        "color": "#58467e",
+        "color": "#443AA3",
         "skills": ["Horror", "Comedy", "Mystery"],
         "logline": "Redesigning storefront for a startup",
         "image": "/fun/wednesday2.png",
