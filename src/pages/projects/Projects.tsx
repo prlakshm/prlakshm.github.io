@@ -27,6 +27,7 @@ function Projects() {
                   skills={project.skills}
                   logline={project.logline}
                   image={project.image}
+                  alphaColor={0.9}
                 /> {/* project card component*/}
                 </a>
               )

@@ -37,6 +37,7 @@ function Fun() {
                 skills={fun.skills}
                 logline={fun.logline}
                 image={fun.image}
+                alphaColor={0.4}
               />{" "}
               {/* fun card component*/}
             </a>

@@ -50,10 +50,12 @@
     justify-content: center;
     align-items: center;
     margin: 0;
+    height: 60vh;
 }
 
 .preview-image img {
     width: 31.25rem;
+    display: none;
 }
 
 .projects .info {
