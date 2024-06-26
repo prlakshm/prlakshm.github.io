@@ -26,6 +26,8 @@ function Fun() {
       <div className="water-full"></div>
       <div className="water-full-mask" ref={waterElementRef}></div>
       <div className="grid">
+        <h1>Fun Stuff!</h1>
+        <h2>Screenplay, movie ideas, and more...</h2>
         <div className="fun-cards">
           {funData.map((fun, index) => (
             <a href={fun.link} key={index}>

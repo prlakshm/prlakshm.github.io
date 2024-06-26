@@ -18,7 +18,7 @@
     border-radius: 50px;
     width: 82.5vw;
 
-    padding: 3rem 2.5rem;
+    padding: 3.5rem 2.5rem;
     justify-content: center; /* Center grid items horizontally */
     gap: 2.5rem; /* Add some space between the grid items */
     margin-top: 3rem;
@@ -75,8 +75,9 @@
 
 .skill {
     border-radius: 0.6rem;
-    border: 1px solid #C5C5C5;
+    border: 1px solid #3a3a3a;
     margin-right: 0.6rem;
+    color: #252525;
 }
 
 h3 {
