@@ -1,7 +1,7 @@
 [
     {
         "name": "PB&J Time",
-        "color": "#f8d9e3",
+        "color": "#f8d6d8",
         "skills": ["Prodia AI", "Photoshop", "Javascript/React"],
         "logline": "Using interaction and animation to enhance shopping UX ",
         "image": "/projects/pbj-time.png",
@@ -9,7 +9,7 @@
     },
     {
         "name": "Mi Fonda Storefront",
-        "color": "#f8d9e3",
+        "color": "#f8d6d8",
         "skills": ["Figma", "UI/UX Design"],
         "logline": "Redesigning storefront for a startup",
         "image": "/projects/mi-fonda.png",
@@ -17,7 +17,7 @@
     },
     {
         "name": "Artist's Corner PVD",
-        "color": "#f8d9e3",
+        "color": "#f8d6d8",
         "skills": ["MongoDB/MQL", "Algorithms", "Typescript/React"],
         "logline": "Helping students sell art and handmade goods",
         "image": "/projects/artists-corner.png",
