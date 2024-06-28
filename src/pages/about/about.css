@@ -84,6 +84,46 @@
     margin-top: 2rem;
 }
 
+.star {
+    position: absolute;
+    background-color: #FFFFFF;
+    clip-path: polygon(50.13% 4.4%, 59.77% 34.48%, 83.97% 42.98%, 59.77% 51.49%, 50.13% 81.83%, 39.22% 51.49%, 15.01% 42.98%, 39.22% 34.48%);
+  }
+  
+
+.star1 {
+    animation: 3s linear 1s infinite alternate twinkle;
+  }
+  
+  .star2 {
+    animation: 4s linear 0s infinite alternate twinkle;
+  }
+  
+  .star3 {
+    animation: 3.5s linear 0.5s infinite alternate twinkle;
+  }
+  
+  .star4 {
+    animation: 1.25s linear 1.5s infinite alternate twinkle;
+  }
+  
+  .star5 {
+    animation: 2.5s linear 1s infinite alternate twinkle;
+  }
+
+  
+  @keyframes twinkle {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }  
+
 
 svg {
     position: absolute;
