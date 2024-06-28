@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import "../app.css";
 import useScrollDirection from "../hooks/useScrollDirection.js";
+import useDarkMode from "../hooks/useDarkMode.js"
 import { useNavigate } from "react-router-dom";
 
 function Header() {
+  const darkMode = useDarkMode();
   const scrollDirection = useScrollDirection();
   const [headerClass, setHeaderClass] = useState('visible-transparent');
   const navigate = useNavigate();
@@ -36,11 +38,11 @@ function Header() {
 
 
   return (
-    <div className={`header ${headerClass}`}>
+    <div className={`header ${darkMode ? 'dark-mode' : ''} ${headerClass}`}>
       <div className="left">
         <a href="/" onClick={() => handleLinkClick('/')}>
           <img
-            src="./icons/favicon.png"
+            src={darkMode? "./icons/favicon-light.svg" : "./icons/favicon.png"}
             alt="Home icon takes you back to landing page when clicked"
           />
         </a>

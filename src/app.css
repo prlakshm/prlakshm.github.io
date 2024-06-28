@@ -31,6 +31,15 @@ body, html {
     background-color: rgb(249, 241, 240, 75%);
 }
 
+/* Dark mode specific styles */
+.header.dark-mode a {
+    color: #eacbfc /* Override with dark mode text color */
+  }
+
+.dark-mode.visible-color {
+    background-color: rgba(0, 0, 0, 1); /* Adjust to solid color for dark mode */
+  }
+
 
 .footer {
     display: flex;
