@@ -82,7 +82,7 @@ function About() {
               Outside of CS, I love cooking, journaling, and watching movies 🎬! 
             </p>
             <p>
-              Thanks for coming on this journey with me 🥳 If you're also interested in these things, I'd love to chat!
+              Thanks for coming on this journey with me 🥳 Feel free to reach out to me. I'd love to chat!
             </p>
             </div>
           <div className="photo"><img src="./about/profile-photo.png" /></div>
