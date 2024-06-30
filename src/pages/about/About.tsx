@@ -79,10 +79,10 @@ function About() {
               me is that I have a twin sister!
             </p>
             <p>
-              Outside of CS, I love cooking, journaling, and watching movies 🎬! 
+              Outside of CS, I love screenwriting, watching movies🎬, and cooking dinners with my friends! 
             </p>
             <p>
-              Thanks for coming on this journey with me 🥳 Feel free to reach out to me. I'd love to chat!
+              Thanks for coming on this journey with me 🥳 Feel free to reach out. I'd love to chat!
             </p>
             </div>
           <div className="photo"><img src="./about/profile-photo.png" /></div>

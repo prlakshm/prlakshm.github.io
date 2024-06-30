@@ -33,7 +33,7 @@ body, html {
 
 /* Dark mode specific styles */
 .header.dark-mode a {
-    color: #efd3ff /* Override with dark mode text color */
+    color: #f8dcff /* Override with dark mode text color */
   }
 
 .dark-mode.visible-color {
