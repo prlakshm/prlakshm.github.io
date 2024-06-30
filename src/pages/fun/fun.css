@@ -16,11 +16,10 @@
 .fun .grid {
     display: flex;
     flex-direction: column;
-    background-color:rgba(179, 193, 255, 0.7);
     border-radius: 50px;
     justify-content: center; /* Center grid items horizontally */
     align-items: center;
-    margin-top: 8rem;
+    margin-top: 4rem;
     width: min-content;
 }
 

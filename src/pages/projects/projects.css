@@ -14,14 +14,12 @@
 .project-cards {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    background-color: rgba(179, 193, 255, 0.7);
     border-radius: 50px;
     width: 82.5vw;
 
     padding: 3.5rem 2.5rem;
     justify-content: center; /* Center grid items horizontally */
     gap: 2.5rem; /* Add some space between the grid items */
-    margin-top: 3rem;
 }
 
 .project-cards a {
@@ -54,6 +52,7 @@
 
 .preview-image img {
     width: 31.25rem;
+
 }
 
 .projects .info {
