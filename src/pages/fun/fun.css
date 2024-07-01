@@ -116,6 +116,7 @@
   z-index: -1; /* Ensure it stays behind other content */ 
 }
 
+
 .fun h1 {
     font-family: "Plein-Variable";
     font-weight: 525;
@@ -125,7 +126,7 @@
     margin-bottom: 0rem;
     padding: 0;
 
-    color: #3a3a3a;
+    color: #393939;
 
 }
 
@@ -135,6 +136,7 @@
     font-size: 1.3rem;
     margin: 0rem 2rem;
     text-align: center;
+    color: #393939;
 }
 
 svg {

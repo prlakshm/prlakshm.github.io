@@ -4,6 +4,8 @@ import "./about.css";
 
 function About() {
   const waterElementRef = useRef<HTMLDivElement>(null);
+  const waterElement2Ref = useRef<HTMLDivElement>(null);
+  const calenderRef = useRef<HTMLDivElement>(null);
 
   const sizes = [
     [2, 2],
@@ -30,8 +32,8 @@ function About() {
     if (waterElementRef.current) {
       waterElementRef.current.style.filter = "url(#turbulence)";
     }
-    if (waterElementRef.current) {
-      waterElementRef.current.style.filter = "url(#turbulence2)";
+    if (waterElement2Ref.current) {
+      waterElement2Ref.current.style.filter = "url(#turbulence2)";
     }
   }, []);
 
@@ -88,6 +90,11 @@ function About() {
           <div className="photo"><img src="./about/profile-photo.png" /></div>
           </div>
         </div>
+        </div>
+        <div className="calendar-page" ref={calenderRef}>
+        <div className="water-full"></div>
+        <div className="water-full-mask" ref={waterElement2Ref}></div>
+        <div className="calender"></div>
         <Footer />
       </div>
       <svg>
