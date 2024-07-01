@@ -70,6 +70,23 @@ const EmailEmbed: React.FC = () => {
         styles: { branding: { brandColor: "#f8dcff" } },
         hideEventTypeDetails: false,
         layout: "month_view",
+        cssVarsPerTheme: {
+            light: {},
+            dark: {
+              "cal-brand": "#f8dcff",
+              "cal-text": "#f8dcff",
+              "cal-text-default": "#f8dcff",
+              "cal-text-emphasis": "#f8dcff",
+              "cal-text-subtle": "#f8dcff",
+              "cal-border-emphasis": "#f8dcff",
+              "cal-text-error": "pink",
+              "cal-border": "#f8dcff",
+              "cal-border-default": "#f8dcff",
+              "cal-border-subtle": "#f8dcff",
+              "cal-border-booker": "#f8dcff",
+              "cal-text-muted": "#f8dcff",
+              "cal-border-muted": "#f8dcff",
+              "cal-bg-emphasis": "#575757"}}
       });
     })();
   }, []);
