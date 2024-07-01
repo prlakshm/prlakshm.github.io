@@ -37,7 +37,7 @@ body, html {
   }
 
 .dark-mode.visible-color {
-    background-color: rgba(0, 0, 0, 1); /* Adjust to solid color for dark mode */
+    background-color: rgb(33, 1, 68, 85%); /* Adjust to solid color for dark mode */
   }
 
 

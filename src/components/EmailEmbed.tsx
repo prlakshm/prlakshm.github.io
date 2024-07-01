@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Cal, { getCalApi } from "@calcom/embed-react";
 import "./email-embed.css";
 
-const EmailEmbed: React.FC = () => {
+function EmailEmbed() { 
   const [formState, setFormState] = useState({
     name: "",
     email: "",
@@ -79,12 +79,14 @@ const EmailEmbed: React.FC = () => {
               "cal-text-emphasis": "#f8dcff",
               "cal-text-subtle": "#f8dcff",
               "cal-border-emphasis": "#f8dcff",
+              "cal-text-info": "#575757",
+              "cal-text-inverted": "#575757",
               "cal-text-error": "pink",
               "cal-border": "#f8dcff",
               "cal-border-default": "#f8dcff",
               "cal-border-subtle": "#f8dcff",
               "cal-border-booker": "#f8dcff",
-              "cal-text-muted": "#f8dcff",
+              "cal-text-muted": "#ccb6d2",
               "cal-border-muted": "#f8dcff",
               "cal-bg-emphasis": "#575757"}}
       });
