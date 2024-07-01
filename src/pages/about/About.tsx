@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import Footer from "../../components/Footer.js";
 import "./about.css";
+import EmailEmbed from "../../components/EmailEmbed.js";
+import Cal, { getCalApi } from "@calcom/embed-react";
 
 function About() {
   const waterElementRef = useRef<HTMLDivElement>(null);
@@ -36,6 +38,13 @@ function About() {
       waterElement2Ref.current.style.filter = "url(#turbulence2)";
     }
   }, []);
+
+  useEffect(()=>{
+	  (async function () {
+		const cal = await getCalApi({});
+		cal("ui", {"theme":"dark","styles":{"branding":{"brandColor":"#f8dcff"}},"hideEventTypeDetails":false,"layout":"month_view"});
+	  })();
+	}, [])
 
   return (
     <div className="about">
@@ -94,7 +103,7 @@ function About() {
         <div className="calendar-page" ref={calenderRef}>
         <div className="water-full"></div>
         <div className="water-full-mask" ref={waterElement2Ref}></div>
-        <div className="calender"></div>
+        <div className="calender"><EmailEmbed /></div>
         <Footer />
       </div>
       <svg>
