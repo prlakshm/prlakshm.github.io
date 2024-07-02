@@ -99,7 +99,7 @@ function EmailEmbed() {
     <div className="tab-content" id="myTabContent">
       <div
         aria-labelledby="form-tab"
-        className="tab-pane fade show active"
+        className="tab-pane"
         id="form"
         role="tabpanel"
       >
@@ -188,7 +188,7 @@ function EmailEmbed() {
       </div>
       <div
         aria-labelledby="schedule-tab"
-        className="tab-pane fade"
+        className="tab-pane"
         id="scheduleMeet"
         role="tabpanel"
       >

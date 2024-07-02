@@ -1,5 +1,29 @@
+.tab-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.tab-pane {
+    background-color: #1f1f1f;
+    width: 62vw;
+    padding: 0 3rem;
+}
+
+.my-cal-container {
+    width:100%;
+    height:100%;
+    overflow:scroll;
+}
+
+.cal-inline-container {
+    scrollbar-width: thin !important;
+    width: 105%
+}
+  
 .dark-mode-form {
-    background-color: black;
+    background-color: #1f1f1f;
     color: #f8dcff;
     border-color: #f8dcff;
 
@@ -57,3 +81,7 @@
   .extra-feild {
     display:none !important
   }
+
+.cal-inline-container {
+    overflow: hidden;
+}
