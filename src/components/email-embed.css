@@ -1,89 +1,59 @@
-.tab-content {
-    margin-top: 1.5rem;
-}
+.dark-mode-form {
+    background-color: black;
+    color: #f8dcff;
+    border-color: #f8dcff;
 
-.box-form {
-    padding: 20px;
-    margin: 10px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-control {
-    width: 100%;
-    padding: 0.75rem;
-    margin-top: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    font-family: "GeneralSans-Variable";
     font-size: 1rem;
-}
+    font-weight: 600;
+  }
+  
+  .dark-mode-form .form-control {
+    background-color: #575757;
+    color: #f8dcff;
+    border-color: #f8dcff;
+  }
+  
+  .dark-mode-form .form-control::placeholder {
+    color: #f8dcff;
 
-.form-control:focus {
-    outline: none;
-    border-color: #0763bb;
-    box-shadow: 0 0 5px rgba(7, 99, 187, 0.5);
-}
-
-.custom-dropdown {
-    position: relative;
-}
-
-.custom-dropdown select {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-}
-
-.custom-dropdown .arrow {
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-    pointer-events: none;
-}
-
-textarea.form-control {
-    resize: vertical;
-}
-
-.btn {
-    display: inline-block;
-    padding: 0.75rem 1.5rem;
+    font-family: "GeneralSans-Variable";
     font-size: 1rem;
-    border-radius: 5px;
-    border: none;
-    color: #fff;
-    background-color: #0763bb;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
+    font-weight: 400;
+  }
+  
+  .dark-mode-form .submit-button {
+    background-color: #575757;
+    border-color: #f8dcff;
+    color: #f8dcff;
 
-.btn:hover {
-    background-color: #054b8a;
-}
+    font-family: "GeneralSans-Variable";
+    font-size: 1rem;
+    font-weight: 400;
+  }
+  
+  .response-message {
+    color: #f8dcff;
 
-.centered-box {
-    margin-top: 1rem;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    background-color: #f9f9f9;
-    text-align: center;
-}
+    font-family: "GeneralSans-Variable";
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  
+  .custom-dropdown select {
+    background-color:#575757;
+    color: #f8dcff;
+    border-color: var(--cal-border);
 
-/* Responsive Styles */
-@media (max-width: 600px) {
-    .box-form {
-        padding: 15px;
-    }
+    font-family: "GeneralSans-Variable";
+    font-size: 1rem;
+    font-weight: 400;
+  }
+  
+  .custom-dropdown .arrow {
+    border-top-color: #f8dcff;
+  }
 
-    .btn {
-        width: 100%;
-        padding: 0.75rem;
-    }
-}
+  .extra-feild {
+    display:none !important
+  }

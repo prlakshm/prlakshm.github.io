@@ -88,13 +88,15 @@ function EmailEmbed() {
               "cal-border-booker": "#f8dcff",
               "cal-text-muted": "#ccb6d2",
               "cal-border-muted": "#f8dcff",
-              "cal-bg-emphasis": "#575757"}}
+              "cal-bg-emphasis": "#575757"
+            }
+        }
       });
     })();
   }, []);
 
   return (
-    <div className="tab-content mt-3" id="myTabContent">
+    <div className="tab-content" id="myTabContent">
       <div
         aria-labelledby="form-tab"
         className="tab-pane fade show active"
@@ -103,8 +105,7 @@ function EmailEmbed() {
       >
         <form
           onSubmit={handleSubmit}
-          className="box-form"
-          style={{ padding: "20px", margin: "10px" }}
+          className="box-form dark-mode-form"
         >
           <div className="form-group">
             <label htmlFor="name">Name:</label>
@@ -155,7 +156,7 @@ function EmailEmbed() {
               <span className="arrow"></span>
             </div>
           </div>
-          <div style={{ display: "none !important" }}>
+          <div className="extra-field">
             <input name="_gotcha" type="text" />
           </div>
           <div className="form-group">
@@ -172,8 +173,7 @@ function EmailEmbed() {
             />
           </div>
           <button
-            className="btn btn-primary btn-block"
-            style={{ background: "#0763bb", marginTop: "10px", width: "100%" }}
+            className="submit-button"
             type="submit"
             disabled={isSubmitting}
           >
@@ -181,11 +181,7 @@ function EmailEmbed() {
           </button>
         </form>
         {responseMessage && (
-          <div
-            className="centered-box"
-            id="responseContainer"
-            style={{ display: "block" }}
-          >
+          <div className="centered-box response-message" id="responseContainer">
             <p>{responseMessage}</p>
           </div>
         )}
@@ -202,6 +198,6 @@ function EmailEmbed() {
       </div>
     </div>
   );
-};
+}
 
 export default EmailEmbed;
