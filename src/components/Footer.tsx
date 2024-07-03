@@ -1,16 +1,13 @@
-import React from 'react';
-import {
-	BrowserRouter as Router,
-	Routes,
-	Route,
-    Link,
-} from "react-router-dom";
+import useDarkMode from "../hooks/useDarkMode.js";
+
 
 
 
 function Footer() {
+  const darkMode = useDarkMode();
+  
     return (
-        <div className="footer">
+        <div className={`footer ${darkMode ? 'dark-mode' : ''}`}>
           <div className="left">
             Coded with 💖 by Pranavi Lakshminarayanan
           </div>

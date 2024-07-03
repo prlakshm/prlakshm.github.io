@@ -68,9 +68,10 @@ function EmailEmbed() {
       try {
         const cal = await getCalApi();
         // Preload the Cal component
-        cal("floatingButton", {
+        cal("preload", {
             calLink: "pranavil/30min",
           });
+
         // Customize UI elements
         cal("ui", {
           theme: "dark",
@@ -218,6 +219,7 @@ function EmailEmbed() {
             <div id="my-cal-inline">
               <Cal
                 calLink="pranavil/30min"
+                config={{ layout: "month_view" }}
               ></Cal>
             </div>
           </div>

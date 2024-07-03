@@ -50,6 +50,10 @@ body, html {
     width: 96.8vw;
 }
 
+.footer.dark-mode {
+    color: #f8dcff
+}
+
 .header img {
     width: 3rem;
     margin: 0;
