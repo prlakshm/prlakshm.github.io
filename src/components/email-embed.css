@@ -6,8 +6,13 @@
 }
 
 .tab-pane {
+    position: relative;
     background-color: #1f1f1f;
     width: 62vw;
+    height: max-content;
+    border: 1px solid #f8dcff;
+    box-sizing: border-box;
+    top: -1px;
 }
 
 .flex-center {
@@ -19,19 +24,32 @@
 }
 
 .tab-list {
+    position: relative;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
+    align-items: flex-start;
     list-style-type: none;
     padding: 0;
-    margin: 0 0 1rem 0;
-    border-bottom: 1px solid #f8dcff;
+    margin: 0;
+    width: 62vw;
+    border-bottom: #1f1f1f;
+    z-index: 1;
   }
   
   .tab-list li {
-    margin: 0 1rem;
+    position: relative;
+    margin: 0;
+    padding: 0.5rem 1rem;
+    background-color: #1f1f1f;
+    border-radius: 8px 8px 0 0;
+    border: 1px solid #f8dcff;
+    border-bottom: 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    z-index: 10;
   }
   
-  .tab-list li button {
+  .tab-list li button{
     background: none;
     border: none;
     color: #f8dcff;
@@ -39,14 +57,16 @@
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid transparent;
   }
   
-  .tab-list li.active button {
-    border-bottom: 2px solid #f8dcff;
+  .tab-list li:hover {
+    background-color: #575757;
   }
-
+  
+  .tab-list li.active {
+    background-color: #1f1f1f;
+  }
+  
 .my-cal-container {
     width:100%;
     height:100%;
@@ -55,6 +75,7 @@
 .cal-inline-container {
     scrollbar-width: thin !important;
     margin: 0 2rem;
+    margin-top: 2rem;
 }
   
 .dark-mode-form {
