@@ -12,6 +12,7 @@ function EmailEmbed() {
 
   const [responseMessage, setResponseMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState("email");
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -96,18 +97,27 @@ function EmailEmbed() {
   }, []);
 
   return (
+    <div className="email-embed">
+        <ul className="tab-list">
+        <li className={activeTab === "email" ? "active" : ""}>
+          <button onClick={() => setActiveTab("email")}>Message Me</button>
+        </li>
+        <li className={activeTab === "schedule" ? "active" : ""}>
+          <button onClick={() => setActiveTab("schedule")}>Schedule a Meeting</button>
+        </li>
+      </ul>
     <div className="tab-content" id="myTabContent">
       <div
         aria-labelledby="form-tab"
-        className="tab-pane"
+        className={`tab-pane flex-center ${activeTab === "email" ? "active" : ""}`}
         id="form"
         role="tabpanel"
       >
         <form
           onSubmit={handleSubmit}
-          className="box-form dark-mode-form"
+          className="dark-mode-form flex-center"
         >
-          <div className="form-group">
+          <div className="form-group" style={{marginTop:"0.25rem"}}>
             <label htmlFor="name">Name:</label>
             <input
               className="form-control"
@@ -181,14 +191,14 @@ function EmailEmbed() {
           </button>
         </form>
         {responseMessage && (
-          <div className="centered-box response-message" id="responseContainer">
+          <div className="response-message" id="responseContainer">
             <p>{responseMessage}</p>
           </div>
         )}
       </div>
       <div
         aria-labelledby="schedule-tab"
-        className="tab-pane"
+        className={`tab-pane ${activeTab === "schedule" ? "active" : ""}`}
         id="scheduleMeet"
         role="tabpanel"
       >
@@ -196,6 +206,7 @@ function EmailEmbed() {
           <Cal calLink="pranavil/30min" config={{ layout: "month_view" }}></Cal>
         </div>
       </div>
+    </div>
     </div>
   );
 }

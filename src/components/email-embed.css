@@ -8,80 +8,159 @@
 .tab-pane {
     background-color: #1f1f1f;
     width: 62vw;
-    padding: 0 3rem;
 }
+
+.flex-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.tab-list {
+    display: flex;
+    justify-content: center;
+    list-style-type: none;
+    padding: 0;
+    margin: 0 0 1rem 0;
+    border-bottom: 1px solid #f8dcff;
+  }
+  
+  .tab-list li {
+    margin: 0 1rem;
+  }
+  
+  .tab-list li button {
+    background: none;
+    border: none;
+    color: #f8dcff;
+    font-family: "GeneralSans-Variable";
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid transparent;
+  }
+  
+  .tab-list li.active button {
+    border-bottom: 2px solid #f8dcff;
+  }
 
 .my-cal-container {
     width:100%;
     height:100%;
-    overflow:scroll;
 }
 
 .cal-inline-container {
     scrollbar-width: thin !important;
-    width: 105%
+    margin: 0 2rem;
 }
   
 .dark-mode-form {
     background-color: #1f1f1f;
     color: #f8dcff;
-    border-color: #f8dcff;
-
+    border: 1px solid #f8dcff;
+    padding: 20px;
+    margin: 2rem 0;
     font-family: "GeneralSans-Variable";
     font-size: 1rem;
     font-weight: 600;
+    width: 93.25%;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+  
+  .dark-mode-form .form-group {
+    margin: 0.75rem;
+    width: 100%;
+  }
+
+  label {
+    padding-left: 2px;
+    font-size: 1.05rem;
   }
   
   .dark-mode-form .form-control {
+    width: 100%;
     background-color: #575757;
     color: #f8dcff;
-    border-color: #f8dcff;
+    border: 1px solid #f8dcff;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 0.5rem;
+    box-sizing: border-box;
+    font-family: "GeneralSans-Variable";
+    font-size: 1rem;
+    font-weight: 450;
+
   }
   
   .dark-mode-form .form-control::placeholder {
     color: #f8dcff;
-
     font-family: "GeneralSans-Variable";
     font-size: 1rem;
-    font-weight: 400;
+    font-weight: 450;
   }
   
   .dark-mode-form .submit-button {
+    width: 25%;
     background-color: #575757;
-    border-color: #f8dcff;
+    border: 1px solid #f8dcff;
+    border-radius: 5px;
     color: #f8dcff;
-
+    padding: 10px;
+    margin-top: 0.5rem;
     font-family: "GeneralSans-Variable";
     font-size: 1rem;
-    font-weight: 400;
+    font-weight: 450;
+    cursor: pointer;
   }
   
   .response-message {
     color: #f8dcff;
-
     font-family: "GeneralSans-Variable";
     font-size: 1rem;
     font-weight: 600;
+    margin-top: 20px;
   }
   
   .custom-dropdown select {
-    background-color:#575757;
+    width: 100%;
+    background-color: #575757;
     color: #f8dcff;
-    border-color: var(--cal-border);
-
+    border: 1px solid var(--cal-border);
+    padding: 10px;
+    box-sizing: border-box;
     font-family: "GeneralSans-Variable";
     font-size: 1rem;
-    font-weight: 400;
+    font-weight: 450;
   }
+
+  .custom-dropdown select:hover,
+.custom-dropdown select:focus {
+  background-color: #f8dcff;
+  color: #1f1f1f;
+}
+
+.custom-dropdown select option {
+  background-color: #575757;
+  color: #f8dcff;
+  font-weight: 450;
+}
+
+.custom-dropdown select option:hover,
+.custom-dropdown select option:focus {
+  background-color: #f8dcff;
+  color: #1f1f1f;
+}
   
   .custom-dropdown .arrow {
     border-top-color: #f8dcff;
   }
-
-  .extra-feild {
-    display:none !important
+  
+  .extra-field {
+    display: none !important;
   }
+  
 
-.cal-inline-container {
-    overflow: hidden;
-}
