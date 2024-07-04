@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import Footer from "../../components/Footer.js";
 import "./about.css";
 import EmailEmbed from "../../components/EmailEmbed.js";
-import Cal, { getCalApi } from "@calcom/embed-react";
 
 function About() {
   const waterElementRef = useRef<HTMLDivElement>(null);
@@ -39,12 +38,6 @@ function About() {
     }
   }, []);
 
-  useEffect(()=>{
-	  (async function () {
-		const cal = await getCalApi({});
-		cal("ui", {"theme":"dark","styles":{"branding":{"brandColor":"#f8dcff"}},"hideEventTypeDetails":false,"layout":"month_view"});
-	  })();
-	}, [])
 
   return (
     <div className="about">
