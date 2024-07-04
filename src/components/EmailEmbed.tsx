@@ -119,10 +119,9 @@ function EmailEmbed() {
           </button>
         </li>
       </ul>
-        {activeTab === "email" ? (
           <div
             aria-labelledby="form-tab"
-            className="tab-pane flex-center"
+            className={`tab-pane flex-center above ${activeTab === "email" ? "active" : "hidden"}`}
             id="form"
             role="tabpanel"
           >
@@ -209,10 +208,9 @@ function EmailEmbed() {
               </div>
             )}
           </div>
-        ) : (
           <div
             aria-labelledby="schedule-tab"
-            className="tab-pane"
+            className={`tab-pane below ${activeTab === "schedule" ? "active" : "hidden"}`}
             id="scheduleMeet"
             role="tabpanel"
           >
@@ -223,7 +221,6 @@ function EmailEmbed() {
               ></Cal>
             </div>
           </div>
-        )}
         ;
       </div>
     </div>
