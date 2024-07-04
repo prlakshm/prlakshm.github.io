@@ -108,7 +108,7 @@ function EmailEmbed() {
 
   return (
     <div className="email-embed">
-      <div className="tab-content" id="myTabContent">
+      <div className={`tab-content ${activeTab === "email" ? "email-height" : "schedule-height"}`} id="myTabContent">
       <ul className="tab-list">
         <li>
           <button onClick={() => setActiveTab("email")}>Message Me</button>

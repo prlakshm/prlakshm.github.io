@@ -3,7 +3,14 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
+}
+
+.email-height {
     height: 85vh;
+}
+
+.schedule-height {
+    height: calc(85vh - 1.7rem);
 }
 
 .tab-pane {
