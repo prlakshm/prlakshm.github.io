@@ -1,6 +1,7 @@
 .home {
     display: flex;
     flex-direction: column;
+    overflow-x: clip;
 }
 
 .home .landing-page {  
