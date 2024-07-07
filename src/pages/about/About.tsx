@@ -13,7 +13,7 @@ function About() {
     [5, 5],
     [7, 7],
     [4, 4],
-    [8, 8]
+    [8, 8],
   ];
 
   //get random position between 1 - 100;
@@ -38,65 +38,74 @@ function About() {
     }
   }, []);
 
-
   return (
     <div className="about">
       <div className="about-page">
-      {[...Array(110)].map((_, index) => {
-         // Randomly select size from sizes array
-         const sizeIndex = Math.floor(Math.random() * sizes.length);
-         let [height, width] = sizes[sizeIndex];
+        {[...Array(110)].map((_, index) => {
+          // Randomly select size from sizes array
+          const sizeIndex = Math.floor(Math.random() * sizes.length);
+          let [height, width] = sizes[sizeIndex];
           // Determine if it's a jumbo star
           if (index < 10) {
             [height, width] = [17, 15]; // Jumbo size
-          } 
-        let starClass = "star1"; // Default to star1, adjust as needed
-        if (index > 20 && index <= 40) starClass = "star2";
-        else if (index > 40 && index <= 60) starClass = "star3";
-        else if (index > 60 && index <= 80) starClass = "star4";
-        else if (index > 80 && index <= 100) starClass = "star5";
+          }
+          let starClass = "star1"; // Default to star1, adjust as needed
+          if (index > 20 && index <= 40) starClass = "star2";
+          else if (index > 40 && index <= 60) starClass = "star3";
+          else if (index > 60 && index <= 80) starClass = "star4";
+          else if (index > 80 && index <= 100) starClass = "star5";
 
-        return (
-          <div
-            key={index}
-            className={`star ${starClass}`}
-            style={{
-              top: `${randomPosition(1, 82)}%`,
-              left: `${randomPosition(1, 98)}%`,
-              height: `${height}px`,
-              width: `${width}px`, // Ensure both height and width are the same
-            }}
-          ></div>
-        );
-      })}
+          return (
+            <div
+              key={index}
+              className={`star ${starClass}`}
+              style={{
+                top: `${randomPosition(1, 82)}%`,
+                left: `${randomPosition(1, 98)}%`,
+                height: `${height}px`,
+                width: `${width}px`, // Ensure both height and width are the same
+              }}
+            ></div>
+          );
+        })}
         <div className="water" ref={waterElementRef}></div>
         <div className="main">
-        <h1>About Me</h1>
+          <h1>About Me</h1>
           <div className="about-me">
             <div className="text">
-            <p>
-              Hi 👋 I'm Pranavi, a junior at Brown University
-              studying computer science under the AI/ML and design pathways.
-            </p>
-            <p>
-              I'm from Virginia and love all the trees there🌲 A fun fact about
-              me is that I have a twin sister!
-            </p>
-            <p>
-              Outside of CS, I love screenwriting, watching movies🎬, and cooking dinners with my friends! 
-            </p>
-            <p>
-              Thanks for coming on this journey with me 🥳 Feel free to reach out. I'd love to chat!
-            </p>
+              <p>
+                Hi 👋 I’m Pranavi, a software engineer and multimedia artist at
+                Brown University. , telling stories both on the page and on the
+                screen.
+              </p>
+              <p>
+                I use computer science as a tool 🔨 to engineer my ideas into
+                existence. I want to bridge together technology 💻 and
+                imagination 💡 to immerse people in new experiences and venture
+                toward an impossible future.
+              </p>
+              <p>
+                I love watching movies (my top three are Past Lives, Tangled,
+                and Walking on Sunshine), writing spinoffs of my favorite shows,
+                and dancing terribly with my friends 💃
+              </p>
+              <p>
+                What movie did you watch recently? Let me know below and reach
+                out if you need anything 🥳 Thanks for stopping by!
+              </p>
             </div>
-          <div className="photo"><img src="./about/profile-photo.png" /></div>
+            <div className="photo">
+              <img src="./about/profile-photo.png" />
+            </div>
           </div>
         </div>
-        </div>
-        <div className="calendar-page" ref={calenderRef}>
+      </div>
+      <div className="calendar-page" ref={calenderRef}>
         <div className="water-full"></div>
         <div className="water-full-mask" ref={waterElement2Ref}></div>
-        <div className="calender"><EmailEmbed /></div>
+        <div className="calendar-container">
+          <EmailEmbed />
+        </div>
         <Footer />
       </div>
       <svg>
