@@ -9,28 +9,31 @@ function Home() {
 
   useEffect(() => {
     const handleHashChange = () => {
-      if (window.location.hash === '#projects' && projectsRef.current) {
+      if (window.location.hash === "#projects" && projectsRef.current) {
         // Wait for 1 second before scrolling to projects section
         setTimeout(() => {
           const yOffset = 45; // Offset value
-          if(projectsRef.current){
-          window.scrollTo({ top: projectsRef.current.offsetTop + yOffset, behavior: 'smooth' });}
+          if (projectsRef.current) {
+            window.scrollTo({
+              top: projectsRef.current.offsetTop + yOffset,
+              behavior: "smooth",
+            });
+          }
         }, 50);
       }
     };
 
     // Listen for hash changes
-    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener("hashchange", handleHashChange);
 
     // Call the handler once in case the hash is already '#projects' when the component mounts
     handleHashChange();
 
     // Cleanup: remove the event listener
     return () => {
-      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener("hashchange", handleHashChange);
     };
   }, [projectsRef]);
-
 
   useEffect(() => {
     // Reapply the SVG filter when the component mounts
@@ -39,10 +42,8 @@ function Home() {
     }
     if (waterElement2Ref.current) {
       waterElement2Ref.current.style.filter = "url(#turbulence2)";
-
     }
   }, []);
-
 
   return (
     <div className="home">
@@ -55,13 +56,13 @@ function Home() {
         <div className="lilies plain5"></div>
 
         <div className="title">
-        <h1>Hi, I'm Pranavi</h1>
-        <h2>
-          I'm a software engineer passionate about story-based design and GenAI.
-          You might know me from Brown University, Tech Cadets, or Rewriting the
-          Code.
-        </h2>
-        <div className="contact">
+          <h1>Hi, I'm Pranavi</h1>
+          <h2>
+            I'm a software engineer passionate about story-based design and
+            GenAI in app development. You might know me from Brown University,
+            Tech Cadets, or Rewriting the Code.
+          </h2>
+          <div className="contact">
             <a href="mailto:pranavi_lakshminarayanan@brown.edu" target="_blank">
               <img src="./icons/email-icon.svg" alt="Email icon" />
             </a>

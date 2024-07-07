@@ -24,6 +24,10 @@
     background-repeat: no-repeat;
 }
 
+.about .calendar-container {
+    margin-top: 1.5rem;
+}
+
 .about-page .water {  
     position: absolute;
     top: 0;
@@ -41,7 +45,7 @@
     display: flex;
     flex-direction: column;
     border-radius: 5rem;
-    width: 60vw;
+    width: 70vw;
     margin-top: -1.25rem;
     padding-top: 0;
 
@@ -58,7 +62,7 @@
 .about .main h1 {
     font-family: "Plein-Variable";
     margin: 0rem 1rem;
-    margin-bottom: 0.65rem;
+    margin-bottom: 1rem;
     font-weight: 500;
     font-size: 3.4rem;
     color: #f8dcff;

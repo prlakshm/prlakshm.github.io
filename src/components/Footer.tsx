@@ -9,7 +9,7 @@ function Footer() {
     return (
         <div className={`footer ${darkMode ? 'dark-mode' : ''}`}>
           <div className="left">
-            Coded with 💖 by Pranavi Lakshminarayanan
+          © 2024 Coded with 💖 by Pranavi Lakshminarayanan
           </div>
           <div className="right">
           <div className="contact">

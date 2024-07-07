@@ -75,13 +75,14 @@ function About() {
             <div className="text">
               <p>
                 Hi 👋 I’m Pranavi, a software engineer and multimedia artist at
-                Brown University. , telling stories both on the page and on the
-                screen.
+                Brown University. I create worlds 🌎 through computer
+                interfaces, animations, screenplays, and more, telling stories
+                both on the page and on the screen.
               </p>
               <p>
-                I use computer science as a tool 🔨 to engineer my ideas into
+                I use computer science as a tool to engineer my ideas into
                 existence. I want to bridge together technology 💻 and
-                imagination 💡 to immerse people in new experiences and venture
+                imagination 🌈 to immerse people in new experiences and venture
                 toward an impossible future.
               </p>
               <p>
@@ -91,7 +92,7 @@ function About() {
               </p>
               <p>
                 What movie did you watch recently? Let me know below and reach
-                out if you need anything 🥳 Thanks for stopping by!
+                out if you need anything 💌 Thanks for stopping by!
               </p>
             </div>
             <div className="photo">
