@@ -59,8 +59,22 @@ function Home() {
           <h1>Hi, I'm Pranavi</h1>
           <h2>
             I'm a software engineer passionate about story-based design and
-            GenAI in app development. You might know me from Brown University,
-            Tech Cadets, or Rewriting the Code.
+            GenAI in app development. You might know me from{" "}
+            <a href="www.brown.edu">
+              Brown University
+              
+            </a>
+            ,
+            <a>
+              Tech Cadets
+              
+            </a>
+            , or{" "}
+            <a>
+              Rewriting the Code
+             
+            </a>
+            .
           </h2>
           <div className="contact">
             <a href="mailto:pranavi_lakshminarayanan@brown.edu" target="_blank">

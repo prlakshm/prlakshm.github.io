@@ -25,7 +25,7 @@
 }
 
 .about .calendar-container {
-    margin-top: 1.5rem;
+    margin-top: 2rem;
 }
 
 .about-page .water {  
@@ -83,10 +83,20 @@
     z-index: 1000;
 }
 
+
 .about .main a {
-    font-weight: 600;
-    padding: 0;
+    text-decoration: none;
 }
+
+.about .main a:hover, .about .main a:active {
+    text-decoration: underline;
+}
+
+.about .main img {
+    width: 1rem;
+    padding-left: 2px;
+}
+
 
 
 .about .photo {

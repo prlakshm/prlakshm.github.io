@@ -15,7 +15,7 @@
 
 .tab-pane {
     position: absolute;
-    top: calc(4rem - 1px); /* Aligns both tabs to start at the same top position */
+    top: calc(4.5rem - 1px); /* Aligns both tabs to start at the same top position */
     left: 18%; /* Aligns both tabs to start at the same left position */
     background-color: #1f1f1f;
     width: 62vw;

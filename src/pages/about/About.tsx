@@ -86,13 +86,14 @@ function About() {
                 toward an impossible future.
               </p>
               <p>
-                I love watching movies (my top three are Past Lives, Tangled,
-                and Walking on Sunshine), writing spinoffs of my favorite shows,
-                and dancing terribly with my friends 💃
+                I love watching movies (my top three are <i>Past Lives</i>,{" "}
+                <i>Tangled</i>, and <i>Walking on Sunshine</i>), writing
+                spinoffs of my favorite shows, and dancing terribly with my
+                friends 💃
               </p>
               <p>
-                What movie did you watch recently? Let me know below and reach
-                out if you need anything 💌 Thanks for stopping by!
+                What movie did you watch recently? Let me know below 👇🏼 and
+                reach out if you need anything 💌 Thanks for stopping by!
               </p>
             </div>
             <div className="photo">

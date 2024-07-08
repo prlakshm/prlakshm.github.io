@@ -97,6 +97,9 @@ body, html {
     text-decoration: none;
   }
 
+  .header a:hover, .header a:active {
+    text-decoration: underline;
+  }
 
 /**
 * This is a variable font

@@ -186,6 +186,24 @@ h2 {
     width: 52rem;
     margin: 0;
     padding: 0;
+    z-index: 2;
+}
+
+.home h2 a {
+    display: inline-flex;
+    color: #5b137d;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.home h2 a:hover, .home h2 a:active {
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.home h2 a img {
+    width: 1rem;
+    padding-left: 2px;
 }
 
 .contact {
