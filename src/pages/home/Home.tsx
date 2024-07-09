@@ -60,15 +60,15 @@ function Home() {
           <h2>
             I'm a software engineer passionate about story-based design and
             GenAI in app development. You might know me from{" "}
-            <a href="www.brown.edu">
+            <a href="https://www.brown.edu" target="_blank">
               Brown University  
             </a>
             ,
-            <a href="www.brown.edu">
+            <a href="https://bit.ly/TheTechCadets" target="_blank">
               Tech Cadets  
             </a>
             , or{" "}
-            <a href="www.brown.edu">
+            <a href="https://rewritingthecode.org/" target="_blank">
               Rewriting the Code            
             </a>
             .
