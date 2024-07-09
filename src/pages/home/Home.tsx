@@ -61,18 +61,15 @@ function Home() {
             I'm a software engineer passionate about story-based design and
             GenAI in app development. You might know me from{" "}
             <a href="www.brown.edu">
-              Brown University
-              
+              Brown University  
             </a>
             ,
-            <a>
-              Tech Cadets
-              
+            <a href="www.brown.edu">
+              Tech Cadets  
             </a>
             , or{" "}
-            <a>
-              Rewriting the Code
-             
+            <a href="www.brown.edu">
+              Rewriting the Code            
             </a>
             .
           </h2>
