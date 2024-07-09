@@ -46,12 +46,14 @@
 .preview-image {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     margin: 0;
+    overflow: clip;
+    height: 50vh;
 }
 
 .preview-image img {
-    width: 31.25rem;
+    width: 40rem;
 
 }
 
