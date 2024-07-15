@@ -58,8 +58,8 @@ function Home() {
         <div className="title">
           <h1>Hi, I'm Pranavi</h1>
           <h2>
-            I'm a software engineer passionate about story-based design and
-            GenAI in app development. You might know me from{" "}
+            I'm a software engineer bringing ideas to life with story-based design and
+            GenAI. You might know me from{" "}
             <a href="https://www.brown.edu" target="_blank">
               Brown University  
             </a>
