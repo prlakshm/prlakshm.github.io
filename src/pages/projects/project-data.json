@@ -1,5 +1,21 @@
 [
     {
+        "name": "RichDreamer Text-to-3D",
+        "color": "#f8d6d8",
+        "skills": ["Machine Learning", "GenAI", "Prompt Engineering", "Python"],
+        "logline": "Educating users on best prompt engineering practices",
+        "image": "/projects/richdreamer.png",
+        "link": "#/binary-escape"
+    },
+    {
+        "name": "Binary Escape",
+        "color": "#f8d6d8",
+        "skills": ["Game Development", "Javascript", "3D Animation", "Blender"],
+        "logline": "Modelling 3D characters for puzzle-adventure game",
+        "image": "/projects/binary-escape.png",
+        "link": "#/binary-escape"
+    },
+    {
         "name": "PB&J Time",
         "color": "#f8d6d8",
         "skills": ["Prodia AI", "Photoshop", "Javascript/React"],
