@@ -67,7 +67,7 @@
     text-align: center;
     margin: 3rem;
     margin-bottom: 0rem;
-    padding: 0;
+    padding-left: 2.5rem;
 }
 
 .case-study-4 h2 {
@@ -82,7 +82,7 @@
 .overview-info {
     display: flex;
     justify-content: space-between;
-    width: 50vw;
+    width: 60vw;
     margin-top: 1.5rem;
 }
 
@@ -124,9 +124,10 @@
 
 .overview p {
     width: 70vw;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     font-weight: 400;
     text-align: left;
+    margin-top: 1.5rem;
 }
 
 .overview img {
@@ -135,22 +136,32 @@
 }
 
 .bold {
-    font-weight: 700;
+    font-weight: 600;
+}
+
+.vert-bar {
+    font-weight: 550;
 }
 
 .app-link {
-    font-size: 1.25rem;
-    color: #5b137d;
+    font-size: 1.35rem;
+    color: #7c16ab;
+    font-weight: 550;
+}
+
+.app-link:hover {
+    font-size: 1.35rem;
+    font-weight: 600;
     text-decoration: underline;
-    padding: 0.25rem;
 }
 
 .seperator {
-    height: 1rem;
+    height: 1.5rem;
 }
 
 .overview a {
     padding: 0;
+    text-decoration: none;
 }
 
 svg {

@@ -29,7 +29,7 @@ function CaseStudy4() {
                     <div className="overview-info">
                         <div className="role">
                             <h3>Role</h3>
-                            <p>Frontend Engineer</p>
+                            <p>Front-end Engineer</p>
                         </div>
                         <div className="timeline">
                             <h3>Timeline</h3>
@@ -45,6 +45,9 @@ function CaseStudy4() {
                                     <p>Photoshop</p>
                                 </div>
                                 <div className="skill">
+                                    <p>2D Animation</p>
+                                </div>
+                                <div className="skill">
                                     <p>Javascript/React</p>
                                 </div>
                             </div>
@@ -52,19 +55,28 @@ function CaseStudy4() {
                     </div>
                     <div className="overview">
                         <p>
-                            <a href="https://sandwitch-builder.vercel.app/" target="_blank">
-                                <span className="app-link bold">PB&J Time</span>
-                            </a>{" "}
-                            is a gourmet sandwitch building app that explores different ways
+                            <span className="bold">PB&J Time</span> is a gourmet sandwitch building app that explores different ways
                             an online ordering platform can use
                             <span className="bold">
                                 {" "}
                                 interaction and animation to engage users
                             </span>{" "}
                             in the purchasing experience.
-                        <div className="seperator"/>
-                        <span className="bold">Technologies used:</span> <a href="https://app.prodia.com/" target="_blank"><span className="app-link bold">Prodia AI</span>
-                        </a>, Photoshop, Javascript, React, HTML/CSS
+                            <div className="seperator" />
+                            <a href="https://sandwitch-builder.vercel.app/" target="_blank">
+                                <span className="app-link bold">PB&J Time</span>
+                            </a>
+                            <span className="vert-bar">
+                                {" | "}
+                            </span>
+                            <a href="https://github.com/prlakshm/pbj-time" target="_blank">
+                                <span className="app-link bold">Repo Link</span>
+                            </a>
+                            <span className="vert-bar">
+                                {" | "}
+                            </span>
+                            <span className="bold">Technologies used:</span> <a href="https://app.prodia.com/" target="_blank"><span className="app-link bold">Prodia AI</span>
+                            </a>, Photoshop, Javascript, React, Node.js, HTML/CSS
                         </p>
                         <div className="img-container">
                             <img
