@@ -71,13 +71,43 @@
 }
 
 .case-study-4 h2 {
-    font-family: "GeneralSans-Variable";
-    font-weight: 450;
-    font-size: 1.3rem;
-    margin: 0rem 2rem;
+    font-family: "Plein-Variable";
+    font-weight: 525;
+    font-size: 2.5rem;
+    margin: 1rem 3rem 0.5rem 3rem;
     text-align: center;
 }
 
+.case-study-4 ul, .case-study-4 li {
+    margin-top: 0;
+}
+
+.takeaways ul {
+    list-style-type: decimal;
+    font-size: 1.3rem;
+}
+
+.takeaways li::marker {
+    font-weight: 600;
+}
+
+
+.takeaways .sub-section {
+    padding-left: 4rem;
+}
+
+.takeaways .sub-section ul {
+    list-style-type: disc;
+}
+
+.takeaways {
+    margin-bottom: 1rem;
+}
+
+.sub-section li::marker {
+    font-size: 1.1rem;
+    font-weight: 400;
+}
 
 .overview-info {
     display: flex;
@@ -114,7 +144,7 @@
     font-size: 1.2rem;
 }
 
-.overview {
+.overview, .pain-points, .takeaways {
     display: flex;
     flex-direction: column;
     position: relative;
@@ -122,7 +152,7 @@
     align-items: center;
 }
 
-.overview p {
+.overview p, .pain-points p, .takeaways p {
     width: 70vw;
     font-size: 1.3rem;
     font-weight: 400;
@@ -130,10 +160,25 @@
     margin-top: 1.5rem;
 }
 
-.overview img {
+.overview img, .pain-points img, .takeaways img {
     margin: 2rem 0;
     width: 40vw;
+    border-radius: 5px;
 }
+
+.video-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+video {
+    width: 55vw;
+    margin-bottom: 2rem;
+    border-radius: 5px;
+}
+
 
 .bold {
     font-weight: 600;
@@ -147,6 +192,7 @@
     font-size: 1.35rem;
     color: #7c16ab;
     font-weight: 550;
+    text-decoration: underline;
 }
 
 .app-link:hover {
@@ -159,7 +205,7 @@
     height: 1.5rem;
 }
 
-.overview a {
+.overview a, .pain-points a, .takeaways a {
     padding: 0;
     text-decoration: none;
 }
