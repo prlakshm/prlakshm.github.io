@@ -1,5 +1,5 @@
 import { RefObject, useEffect, useRef } from "react";
-import Footer from "../../components/Footer";
+import Footer from "../../components/Footer.js";
 import "./case-study-1.css";
 
 function CaseStudy1() {
@@ -27,13 +27,6 @@ function CaseStudy1() {
 
   return (
     <div className="case-study-1">
-      <div className="title-block">
-        <h1>PB&J Time</h1>
-        <img
-          src="/case-study-1/skew-carousel.png"
-          alt="Examples of sandwitch item cards from web app"
-        />
-      </div>
       <div className="study">
         <div className="sticky-quick-links">
           <div className="quick-links">
@@ -45,7 +38,8 @@ function CaseStudy1() {
         </div>
 
         <div className="main">
-          <h2 ref={overviewRef} style={{ marginTop: "-0.75rem" }}>
+        <h1>PB&J Time</h1>
+          <h2 ref={overviewRef}>
             Overview
           </h2>
           <div className="overview-info">

@@ -7,28 +7,17 @@ p {
 .case-study-1 {
     font-family: "Barlow", sans-serif;
     width: 98.9vw;
+    position: relative;
 }
 
-.case-study-1 .title-block {
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    background-color: #FA9E9E;
-    width: 100%;
-    margin: 3rem 0;
+
+.case-study-1 h1 {
+    text-align: left;
+    margin: 3rem 0 0 0;
+    font-size: 3.5rem;
+    font-weight: 550;
 }
 
-.case-study-1 .title-block img {
-    width: 45rem;
-    padding: 0;
-    margin: 0;
-}
-
-.case-study-1 .title-block h1 {
-    color: white;
-    padding: 6rem 0 6rem 6rem;
-    margin: 0;
-}
 
 .study {
     position: relative;
@@ -41,13 +30,13 @@ p {
 .quick-links {
     position: sticky;
     top:20%;
-    margin-right: 12rem;
+    margin-right: 1rem;
     margin-top: 1rem;
 }
 
 .quick-links h5 {
     color: #AEAEAE;
-    text-decoration: underline;
+    text-decoration: none;
     font-weight: 500;
     font-size: 1.2rem;
     line-height: 2.5rem;
@@ -58,27 +47,31 @@ p {
 }
 
 .quick-links h5:hover {
-    color: #FA9E9E;
     text-decoration: underline;
+}
+
+.main {
+    padding: 0 6rem;
 }
 
 
 .main h2 {
     margin-top: 2rem;
     font-weight: 500;
-    font-size: 2.25rem;
+    font-size: 2.5rem;
+    text-align: left;
 }
 
 .main h3 {
     font-weight: 600;
     font-size: 2rem;
-    color: #FA9E9E;
+    color: #3a3a3a;
     margin-left: -0.1rem;
 }
 
 .overview-info {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    gap: 5rem;
     margin-top: 1.5rem;
 }
 
@@ -101,7 +94,7 @@ p {
 }
 
 .skill {
-    background-color: #FCCECE;
+    background-color: rgba(248, 214, 216, 0.9);
 }
 
 .skill p {
@@ -109,7 +102,7 @@ p {
 }
 
 .overview p {
-    width: 60vw;
+    width: 70vw;
     font-size: 1.2rem;
     font-weight: 400;
     text-align: left;
@@ -127,7 +120,7 @@ p {
 
 .app-link {
     font-size: 1.25rem;
-    color:#FA9E9E;
+    color: rgb(237, 190, 193);
     text-decoration: underline;
     padding: 0.25rem;
 }

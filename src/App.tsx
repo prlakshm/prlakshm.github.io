@@ -7,6 +7,7 @@ import About from './pages/about/About.js';
 import CaseStudy3 from './pages/case-study-3/CaseStudy3.js';
 import './app.css';
 import Fun from './pages/fun/Fun.js';
+import CaseStudy4 from './pages/case-study-4/CaseStudy4.js';
 
 
 function App() {
@@ -18,7 +19,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/projects" element={<Home />} />
           <Route path="/fun" element={<Fun />} />
-          <Route path="/pbj-time" element={<CaseStudy1 />} />
+          <Route path="/pbj-time" element={<CaseStudy4 />} />
           <Route path="/mi-fonda" element={<CaseStudy2 />} />
           <Route path="/artists-corner" element={<CaseStudy3 />} />
           <Route path="/about" element={<About />} />

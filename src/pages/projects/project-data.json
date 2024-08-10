@@ -11,7 +11,7 @@
         "name": "Binary Escape",
         "color": "#f8d6d8",
         "skills": ["Game Development", "3D Animation", "Javascript"],
-        "logline": "Modelling 3D characters for puzzle-adventure game",
+        "logline": "Building rounds and modelling 3D characters for a puzzle game",
         "image": "/projects/binary-escape.png",
         "link": "#/binary-escape"
     },
@@ -27,7 +27,7 @@
         "name": "Mi Fonda Storefront",
         "color": "#f8d6d8",
         "skills": ["Figma", "UI/UX Design"],
-        "logline": "Redesigning storefront for a startup",
+        "logline": "Redesigning storefront for a food delivery startup",
         "image": "/projects/mi-fonda.png",
         "link": "#/mi-fonda"
     },
