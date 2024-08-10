@@ -17,6 +17,9 @@ function Header() {
   };
 
   useEffect(() => {
+     // Ensure the header is visible on page load
+     setHeaderClass('visible-transparent');
+     
     const handleScroll = () => {
       const scrollPos = window.scrollY;
       if (scrollDirection === "up") {
