@@ -67,12 +67,12 @@ function CaseStudy4() {
                                 creations
                             </span>
                             .
-                            <div className="seperator" />
-                            <span className="bold">Artist's Corner PVD</span> is a{" "}
-                            <span className="bold">
-                                website for students to sell their crafts and
-                                handmade goods
-                            </span>{" "}
+                            <div className="seperator" /> Aimed at <span className="bold">1,200+ potential users</span>,{" "}
+                            Artist's Corner PVD is a{" "}
+
+                            <span className="bold">website for students to sell their crafts and
+                                handmade goods</span>
+                            {" "}
                             year-round. Only artists with an authorized school email can
                             create listings, so students can trust the seller.
                             <div className="seperator" />
@@ -88,7 +88,7 @@ function CaseStudy4() {
                             <span className="vert-bar">
                                 {" | "}
                             </span>
-                            <span className="bold">Technologies used:</span> Typescript, React, Node.js, Vite, Figma, MQL, MongoDB
+                            <span className="bold">Technologies used:</span> Typescript, React, Node.js, Vite, Figma, MQL, MongoDB, AWS
                         </p>
                         <div className="img-container">
                             <img
@@ -101,25 +101,22 @@ function CaseStudy4() {
                         <h2>Pain Points</h2>
                         <ul>
                             <li>
-                                <p><span className="bold">Cohesive Image Assets:</span> I needed my images to be in the same illustration style, but
-                                    this was hard to find with stock photos. I used <a href="https://app.prodia.com/" target="_blank"><span className="app-link bold">Prodia AI</span>
-                                    </a>, an
-                                    AI image generator, to generate images with the same "Children's Stories V1 3D" style!</p>
+                                <p><span className="bold">Receiveing Feedback:</span> We were on a tight deadline, so to maximize output I intitiated a feedback loop where team members critiqued each other's work. This allowed us to iteratively improve while still conserving time and resources.</p>
                             </li>
                             <li>
-                                <p><span className="bold">Learning Photoshop:</span> The AI sometimes generated
-                                    images with gibberish or erroneous features. I used Photoshop to edit these photos, which was a tedious but rewarding process.</p>
+                                <p><span className="bold">Cloud Database Design:</span> Using MongoDB Atlas, AWS, and lots of YouTube videos,
+                                    I designed a cloud database to accelerate and simplify how we stored data. I also used MQL (similar to SQL) to create data query functions for our front-end.</p>
                             </li>
                             <li>
-                                <p><span className="bold">Responsive 2D Animations:</span> The 2D animation of the ingediants falling on the sandwitch entice users to keep interacting with the web app. The
-                                    challenge was to make it responsive so that the ingrediants line up on different screens.</p>
+                                <p><span className="bold">Search Algorithm:</span> Implementing the search algorithm was the hardest, because there
+                                    was no "typical behavior" to follow for search results order. I developed an algorithm that ranked items based on partial-word matches in their descriptions.</p>
                             </li>
                         </ul>
                     </div>
                     <div className="video-container">
                         <video
-                            src="/case-study-5/pbj-time-screens.mp4"
-                            aria-label="PB&J Time web app playing on laptop and phone"
+                            src="/case-study-5/artists-corner-screen.mp4"
+                            aria-label="Artist's Corner PVD website playing on laptop"
                             typeof="video/mp4"
                             autoPlay
                             muted
@@ -132,41 +129,32 @@ function CaseStudy4() {
                     <h2>Takeaways</h2>
                     <div className="takeaways">
                         {" "}
-                        <ul><li>
-                            <p>
-                                <span className="bold">Accessibility:</span> Animation <span className="bold">
-                                    should be used sparingly
-                                </span>{" "}
-                                because they could distract users or not be accessibile. However,
-                                when used thoughtfully, they can increase accessibility and serve
-                                as an{" "}
-                                <span className="bold">
-                                    additional way to notify users of updates to the system
-                                </span>
-                                .{" "}
-                                <br />
-                                <div className="sub-section">
-                                    For example:
-                                    <ul>
-                                        <li>Item card tilting notifies users item is selected</li>
-                                        <li>
-                                            Ingrediants "falling" on sandwitch notifies users item is
-                                            added to order
-                                        </li>
-                                    </ul>
-                                </div>
-                            </p>
-                        </li>
+                        <ul>
                             <li>
                                 <p>
-                                    <span className="bold">AI Generated Images:</span> AI generating images can{" "}
-                                    <span className="bold">save money and resources</span>. Though it
-                                    can be tedious to edit with Photoshop, the
-                                    benefit is creating images with consistent styles. AI-generated images can help{" "}
-                                    <span className="bold">
-                                        create a unified visual identity
+                                    <span className="bold">Prioritize for Deadlines:</span> There were features we
+                                    initially planned to implement, like Google OAuth
+                                    for login. I{" "}
+                                    
+                                        prioritized <span className="bold">optimizing existing features instead of adding new
+                                        ones
                                     </span>
-                                    .
+                                    . Limiting the scope was better than delivering a half-baked
+                                    product.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <span className="bold">Keep Future Engineers in Mind:</span> I created query functions for current use cases and for use cases
+                                    that might come up in the future. By commenting and coding with future software engineers in mind, we can <span className="bold">streamline development workflow and new feature integrations</span>.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <span className="bold">Scalable Database:</span> Storing account and item information in a <span className="bold">MongoDB database
+                                    ensured data security</span>. Data
+                                    can be scaled, meaning even when data is added (the website gets
+                                    more users) the system still runs smoothly.
                                 </p>
                             </li>
                         </ul>
