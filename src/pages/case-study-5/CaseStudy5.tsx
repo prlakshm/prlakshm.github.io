@@ -59,33 +59,41 @@ function CaseStudy4() {
                     </div>
                     <div className="overview">
                         <p>
-                            <span className="bold">PB&J Time</span> is a gourmet sandwitch building app that explores different ways
-                            an online ordering platform can use
+                            Every fall and spring, Brown and RISD students look forward to
+                            seasonal markets to buy and sell art. Outside of these
+                            spaces, there is{" "}
                             <span className="bold">
-                                {" "}
-                                interaction and animation to engage users
-                            </span>{" "}
-                            in the purchasing experience.
+                                no school-sanctioned platform for students to sell their
+                                creations
+                            </span>
+                            .
                             <div className="seperator" />
-                            <a href="https://sandwitch-builder.vercel.app/" target="_blank">
-                                <span className="app-link bold">PB&J Time</span>
+                            <span className="bold">Artist's Corner PVD</span> is a{" "}
+                            <span className="bold">
+                                website for students to sell their crafts and
+                                handmade goods
+                            </span>{" "}
+                            year-round. Only artists with an authorized school email can
+                            create listings, so students can trust the seller.
+                            <div className="seperator" />
+                            <a href="https://artistscornerpvd.github.io/" target="_blank">
+                                <span className="app-link bold">Artist's Corner PVD</span>
                             </a>
                             <span className="vert-bar">
                                 {" | "}
                             </span>
-                            <a href="https://github.com/prlakshm/pbj-time" target="_blank">
+                            <a href="https://github.com/artistscornerpvd/artistscornerpvd.github.io" target="_blank">
                                 <span className="app-link bold">Repo Link</span>
                             </a>
                             <span className="vert-bar">
                                 {" | "}
                             </span>
-                            <span className="bold">Technologies used:</span> <a href="https://app.prodia.com/" target="_blank"><span className="app-link bold">Prodia AI</span>
-                            </a>, Photoshop, Javascript, React, Node.js, HTML/CSS
+                            <span className="bold">Technologies used:</span> Typescript, React, Node.js, Vite, Figma, MQL, MongoDB
                         </p>
                         <div className="img-container">
                             <img
-                                src="/case-study-5/pbj-time-overview.png"
-                                alt="PB&J Time web app displayed on laptop"
+                                src="/case-study-5/artists-corner-overview.png"
+                                alt="Artist's Corner PVD website displayed on desktop"
                             />
                         </div>
                     </div>
