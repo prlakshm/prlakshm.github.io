@@ -3,7 +3,7 @@ import Footer from "../../components/Footer.js";
 import "./case-study-5.css";
 
 
-function CaseStudy4() {
+function CaseStudy5() {
     const waterElementRef = useRef<HTMLDivElement>(null);
 
     // This will run once when the component mounts scroll to top page
@@ -187,4 +187,4 @@ function CaseStudy4() {
     );
 }
 
-export default CaseStudy4;
+export default CaseStudy5;
