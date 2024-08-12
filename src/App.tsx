@@ -22,7 +22,7 @@ function App() {
           <Route path="/fun" element={<Fun />} />
           <Route path="/pbj-time" element={<CaseStudy4 />} />
           <Route path="/mi-fonda" element={<CaseStudy3 />} />
-          <Route path="/binary-escape" element={<CaseStudy3 />} />
+          <Route path="/binary-escape" element={<CaseStudy1 />} />
           <Route path="/richdreamer" element={<CaseStudy2 />} />
           <Route path="/artists-corner" element={<CaseStudy5 />} />
           <Route path="/about" element={<About />} />
