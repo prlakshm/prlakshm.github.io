@@ -65,12 +65,12 @@ function CaseStudy3() {
           </div>
           <div className="overview">
             <p>
-              Mi Fonda is a {" "}
+              <a href="https://mifonda.io/" target="_blank"><span className="app-link bold">Mi Fonda</span></a> is a {" "}
               <span className="bold">tech startup</span>{" "}
-              that <span className="bold">serves 100+ clients and consolidates food ordering apps</span> through partnerships with UberEats,
+              that serves <span className="bold">100+ restaurants</span> and consolidates food ordering apps through partnerships with UberEats,
               GrubHub, DoorDash, etc. to decrease third-party fees and increase
               profit.
-              <div className="seperator" /> Our team's job was to <span className="bold">redesign the storefront to appeal to a younger generation of users</span>. And who better to do this than a group of Gen-Zers?
+              <div className="seperator" /> Our team's job was to <span className="bold">redesign the storefront</span> of their food ordering platform <span className="bold">to appeal to a younger generation of users</span>. And who better to do this than a group of Gen-Zers?
               <div className="seperator" />
               <a href="https://www.figma.com/design/iRwhq0w4NT9zuXu6B2jSnr/Iterative-Design?node-id=724-999&t=RGIXh9TZEBI2kvla-1" target="_blank">
                 <span className="app-link bold">Figma Design</span>
@@ -89,7 +89,7 @@ function CaseStudy3() {
             </p>
             <div className="img-container">
               <img
-                src="/case-study-3/artists-corner-overview.png"
+                src="/case-study-3/mi-fonda-overview.png"
                 alt="Artist's Corner PVD website displayed on desktop"
               />
             </div>
@@ -98,21 +98,21 @@ function CaseStudy3() {
             <h2>Pain Points</h2>
             <ul>
               <li>
-                <p><span className="bold">Gamification:</span> We were on a tight deadline, so to maximize output I intitiated a feedback loop where team members critiqued each other's work. This allowed us to iteratively improve while still conserving time and resources.</p>
+                <p><span className="bold">Gamification:</span> The clients wanted us to gamify the ordering experience in some way. We designed "meal plate badges" where users collect badges by ordering food from different categories until they get a discount on their purchase.</p>
               </li>
               <li>
-                <p><span className="bold">Appealing to Younger Audiences:</span> Using MongoDB Atlas, AWS, and lots of YouTube videos,
-                  I designed a cloud database to accelerate and simplify how we stored data. I also used MQL (similar to SQL) to create data query functions for our front-end.</p>
+                <p><span className="bold">Appealing to Younger Audiences:</span> We took inspiration from TikTok to incorporate short-form videos of "featured foods" on the main page. Not only do these quickly engage users, they also make Mi Fonda stand out from other
+                food ordering platforms. </p>
               </li>
               <li>
-                <p><span className="bold">Defending Design Choices:</span> Our team changed the layout of the storefront to adhere to design principles and scan patterns. The clients were initally hesitant, and we had to defend our design choices to demonstrate how they increased usability.</p>
+                <p><span className="bold">Defending Design Choices:</span> Our team changed the layout of the storefront to adhere to design principles and scan patterns. The clients were initially hesitant, and we had to defend our design choices to demonstrate how they increased usability.</p>
               </li>
             </ul>
           </div>
           <div className="video-container">
             <video
-              src="/case-study-3/artists-corner-screen.mp4"
-              aria-label="Artist's Corner PVD website playing on laptop"
+              src="/case-study-3/mi-fonda-phone.mp4"
+              aria-label="Mi Fonda Figma mobile prototype walkthrough on phone"
               typeof="video/mp4"
               autoPlay
               muted
