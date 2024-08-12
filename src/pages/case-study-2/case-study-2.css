@@ -1,246 +1,217 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
-p {
-    line-height: 2rem;
-}
-
 .case-study-2 {
-    font-family: "Barlow", sans-serif;
-    width: 98.9vw;
-}
-
-.case-study-2 .title-block {
+    position: relative;
+    font-family: "GeneralSans-Variable";
+    color: #393939;;
+    z-index: 1;
     display: flex;
     justify-content: center;
-    align-content: center;
-    background-color: #C29DCC;
-    width: 100%;
-    margin: 3rem 0;
+    align-items: center;
+    overflow-x: clip;
 }
 
-.case-study-2 .title-block img {
-    width: 45rem;
-    padding: 0;
-    margin: 0;
-}
-
-.case-study-2 .title-block h1 {
-    color: white;
-    padding: 6rem 0 6rem 3rem;
-    margin: 0;
-}
-
-.case-study-2 .study {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    margin: 3.5rem 5rem;
-}
-
-
-.case-study-2 .quick-links {
-    position: sticky;
-    top:20%;
-    margin-right: 12rem;
-    margin-top: 1rem;
-}
-
-.case-study-2 .quick-links h5 {
-    color: #AEAEAE;
-    text-decoration: underline;
-    font-weight: 500;
-    font-size: 1.2rem;
-    line-height: 2.5rem;
-}
-
-.case-study-2 .quick-links a {
-    text-decoration: none;
-}
-
-.case-study-2 .quick-links h5:hover {
-    color: #C29DCC;
-    text-decoration: underline;
-}
-
-
-.case-study-2 .main h2 {
-    margin-top: 2rem;
-    font-weight: 500;
-    font-size: 2.25rem;
-}
-
-.case-study-2 .main h3 {
-    font-weight: 600;
-    font-size: 2rem;
-    color: #C29DCC;
-    margin-left: -0.1rem;
-}
-
-.case-study-2 .overview-info {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    margin-top: 1.5rem;
-}
-
-.case-study-2 .overview-info h3 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin: 0;
-}
-
-.case-study-2 .overview-info p {
-    font-size: 1.2rem;
-    font-weight: 400;
-    text-align: left;
-}
-
-.case-study-2 .overview-info .team p {
-    width: 20rem;
-}
-
-.case-study-2 .all-skills {
-    margin: 1rem 0;
-}
-
-.case-study-2 .skill {
-    background-color: #E0CEE5;
-}
-
-.case-study-2 .skill p {
-    margin: 0.25rem 0.75rem;
-}
-
-.case-study-2 .overview p {
-    width: 60vw;
-    font-size: 1.2rem;
-    font-weight: 400;
-    text-align: left;
-    margin-top: 2rem;
-}
-
-.case-study-2 .overview img {
-    margin: 2rem 0;
-    width: 40vw;
-}
-
-.case-study-2 .bold {
-    font-weight: 700;
-}
-
-.case-study-2 .app-link {
-    font-size: 1.25rem;
-    color:#C29DCC;
-    text-decoration: underline;
-    padding: 0.25rem;
-}
-
-.case-study-2 .overview a {
-    padding: 0;
-}
-
-
-.case-study-2 .research p {
-    width: 60vw;
-    font-size: 1.2rem;
-    font-weight: 400;
-    text-align: left;
-    margin-top: 0rem;
-}
-
-.case-study-2 .research li {
-    padding-bottom: 0.5rem;
-}
-
-
-.case-study-2 .research img {
-    margin: -1rem 0;
-    padding: 0;
-    width: 50vw;
-}
-
-
-
-.case-study-2 .process img {
-    width: 55vw;
-}
-
-
-.case-study-2 p {
-    text-align: left;
-}
-
-
-.case-study-2 .process p  {
-    width: 60vw;
-    font-size: 1.2rem;
-    font-weight: 400;
-    text-align: left;
-    margin-top: 2rem;
-}
-
-.case-study-2 .process .app-link {
-    padding: 0 0.25rem;
-}
-
-.case-study-2 .process a {
-    padding: 0;
-    color: #C29DCC;
-    font-weight: 700;
-}
-
-.case-study-2 .img-container, .case-study-2 .video-container {
+.study {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
-.case-study-2 .img-container p {
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    margin-top: 0.5rem;
+.main {
+    display: flex;
+    flex-direction: column;
+    border-radius: 50px;
+    justify-content: center; /* Center grid items horizontally */
+    align-items: center;
+    background-color:rgba(179, 193, 255, 0.7);
+    margin-top: 8rem;
+    padding: 0 6rem;
+    width: min-content;
+}
+
+
+.case-study-2 .water-full {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    margin-top: -1rem;
+    width: 100%;
+    height: 102%;
+    background-image:
+    url('/fun/water-full-light3.png');
+    background-size: cover;
+    background-position: center top;
+    background-repeat: repeat-y;
+    z-index: -1000;
+}
+
+
+.case-study-2 .water-full-mask { 
+  position: absolute;
+  margin-top: -0.75rem;
+  width: 100%;
+  height: 100%;
+  background-image:
+    url('/fun/water-full-light3.png');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: repeat-y;
+  filter: url("#turbulence");
+  z-index: -1; /* Ensure it stays behind other content */ 
+}
+
+
+.case-study-2 h1 {
+    font-family: "Plein-Variable";
+    font-weight: 525;
+    font-size: 3.4rem;
+    text-align: center;
+    margin: 3rem;
+    margin-bottom: 0rem;
+    padding-left: 2.5rem;
+}
+
+.case-study-2 h2 {
+    font-family: "Plein-Variable";
+    font-weight: 525;
+    font-size: 2.5rem;
+    margin: 1rem 3rem 0.5rem 3rem;
     text-align: center;
 }
 
-.case-study-2 .img-container {
-    margin: 2.5rem 0;
+.case-study-2 ul, .case-study-2 li {
+    margin-top: 0;
 }
 
-.case-study-2 .video-container {
-    margin: 0;
+.takeaways ul {
+    list-style-type: decimal;
+    font-size: 1.3rem;
 }
 
-.case-study-2 .last {
-    margin-bottom: 3rem;
+.takeaways li::marker {
+    font-weight: 600;
 }
 
-.case-study-2 video {
+
+.takeaways .sub-section {
+    padding-left: 4rem;
+}
+
+.takeaways .sub-section ul {
+    list-style-type: disc;
+}
+
+.takeaways {
+    margin-bottom: 1rem;
+}
+
+.sub-section li::marker {
+    font-size: 1.1rem;
+    font-weight: 400;
+}
+
+.case-study-2 .overview-info {
+    display: flex;
+    justify-content: space-between;
     width: 55vw;
+    margin-top: 1.5rem;
+}
+
+
+.overview-info h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
     margin: 0;
+    text-align: center;
 }
 
-.case-study-2 .design img {
-    width: 60vw;
+.overview-info p {
+    font-size: 1.3rem;
+    font-weight: 400;
+    text-align: left;
+}
+
+
+.all-skills {
+    margin: 1rem 0;
+}
+
+.skill {
+    background-color: rgba(248, 214, 216, 0.9);
+}
+
+.skill p {
+    margin: 0.25rem 0.75rem;
+    font-size: 1.2rem;
+}
+
+.overview, .pain-points, .takeaways {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+}
+
+.overview p, .pain-points p, .takeaways p {
+    width: 70vw;
+    font-size: 1.3rem;
+    font-weight: 400;
+    text-align: left;
+    margin-top: 1.5rem;
+}
+
+.overview img, .pain-points img, .takeaways img {
+    margin: 2rem 0;
+    width: 40vw;
+    border-radius: 5px;
+}
+
+.video-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+video {
+    width: 55vw;
     margin-bottom: 2rem;
+    border-radius: 5px;
 }
 
-.case-study-2 .takeaways {
-    margin-top: 2rem;
+
+.bold {
+    font-weight: 600;
 }
 
-.case-study-2 .takeaways p  {
-    width: 60vw;
-    font-size: 1.2rem;
-    font-weight: 400;
-    text-align: left;
-    margin-top: 2rem;
+.vert-bar {
+    font-weight: 550;
 }
 
-.case-study-2 .thanks p  {
-    width: 60vw;
-    font-size: 1.2rem;
-    font-weight: 400;
-    text-align: left;
-    margin: 4rem 0 0 0;
+.app-link {
+    font-size: 1.35rem;
+    color: #7c16ab;
+    font-weight: 550;
+    text-decoration: underline;
 }
 
+.app-link:hover {
+    font-size: 1.35rem;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.seperator {
+    height: 1.5rem;
+}
+
+.overview a, .pain-points a, .takeaways a {
+    padding: 0;
+    text-decoration: none;
+}
+
+svg {
+    position: absolute;
+    width: 0;
+    height: 0;
+  }
