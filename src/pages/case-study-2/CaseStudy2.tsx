@@ -77,7 +77,7 @@ function CaseStudy2() {
                         <h2 style={{marginTop:"2rem"}}>Pain Points</h2>
                         <ul>
                             <li>
-                                <p><span className="bold">Running the Model:</span> After battling with the SSH terminal all summer, I finally got the RichDreamer model to run on my GPU! I created a <a href="https://github.com/modelscope/richdreamer/blob/main/gpu_installation_guide.md" target="_blank"><span className="app-link bold">step-by-step installation guide</span>
+                                <p><span className="bold">Running the Model:</span> After a summer of struggling with setup, I finally succeeded in running the RichDreamer model on my GPU! I created a <a href="https://github.com/modelscope/richdreamer/blob/main/gpu_installation_guide.md" target="_blank"><span className="app-link bold">step-by-step installation guide</span>
                                     </a> to help users resolve dependency issues, set up the conda environment, and configure the model to correctly utilize GPU.</p>
                             </li>
                             <li>

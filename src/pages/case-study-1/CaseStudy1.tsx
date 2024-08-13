@@ -59,36 +59,23 @@ function CaseStudy1() {
                     </div>
                     <div className="overview">
                         <p>
-                            Every fall and spring, Brown and RISD students look forward to
-                            seasonal markets to buy and sell art. Outside of these
-                            spaces, there is{" "}
-                            <span className="bold">
-                                no school-sanctioned platform for students to sell their
-                                creations
-                            </span>
-                            .
-                            <div className="seperator" /> Aimed at <span className="bold">1,200+ potential users</span>,{" "}
-                            Artist's Corner PVD is a{" "}
-
-                            <span className="bold">website for students to sell their crafts and
-                                handmade goods</span>
-                            {" "}
-                            year-round. Only artists with an authorized school email can
-                            create listings, so students can trust the seller.
+                            Binary Escape is an <span className="bold">8-round puzzle-adventure game</span> that challenges players' critical thinking skills.
+                            An intern is <span className="bold">trapped inside a computer</span> and the player has to solve riddles to help the intern escape!
                             <div className="seperator" />
-                            <a href="https://artistscornerpvd.github.io/" target="_blank">
-                                <span className="app-link bold">Artist's Corner PVD</span>
+                            <a href="https://binaryescape.netlify.app/" target="_blank">
+                                <span className="app-link bold">Binary Escape</span>
                             </a>
                             <span className="vert-bar">
                                 {" | "}
                             </span>
-                            <a href="https://github.com/artistscornerpvd/artistscornerpvd.github.io" target="_blank">
+                            <a href="https://github.com/sageellefson0/binary-escape" target="_blank">
                                 <span className="app-link bold">Repo Link</span>
                             </a>
                             <span className="vert-bar">
                                 {" | "}
                             </span>
-                            <span className="bold">Technologies used:</span> Typescript, React, Node.js, Vite, Figma, MQL, MongoDB, AWS
+                            <span className="bold">Technologies used:</span> JavaScript, HTML/CSS, Blender, <a href="https://www.mixamo.com/" target="_blank"><span className="app-link bold">Mixamo</span>
+                            </a>, Photoshop, After Effects, Firebase
                         </p>
                         <div className="img-container">
                             <img
@@ -101,16 +88,10 @@ function CaseStudy1() {
                         <h2>Pain Points</h2>
                         <ul>
                             <li>
-                                <p><span className="bold">Receiveing Feedback:</span> We were on a tight deadline, so to maximize output I intitiated a feedback loop where team members critiqued each other's work. This allowed us to iteratively improve while still conserving time and resources.</p>
+                                <p><span className="bold">Simulating Apps:</span> To invoke familiarity and nostalgia from users, I recreated the Microsoft Word 2007 application. This was by far the most complicated UI I've worked on with lots of toggles, buttons, and components.</p>
                             </li>
                             <li>
-                                <p><span className="bold">Cloud Database Design:</span> Using MongoDB Atlas, AWS, and lots of YouTube videos,
-                                    I designed a cloud database to accelerate and simplify how we stored data. I also used MQL (similar to SQL) to create data query functions for our front-end.</p>
-                            </li>
-                            <li>
-                                <p><span className="bold">Search Algorithm:</span> Implementing the search algorithm was the hardest, because there
-                                    was no "typical behavior" to follow for search results order. I developed an algorithm that ranked items based on partial-word matches in their descriptions.</p>
-                            </li>
+                                <p><span className="bold">Character Rigging:</span> </p></li>
                         </ul>
                     </div>
                     <div className="video-container">
@@ -132,30 +113,18 @@ function CaseStudy1() {
                         <ul>
                             <li>
                                 <p>
-                                    <span className="bold">Prioritize for Deadlines:</span> There were features we
-                                    initially planned to implement, like Google OAuth
-                                    for login. I{" "}
-                                    
-                                        prioritized <span className="bold">optimizing existing features instead of adding new
-                                        ones
-                                    </span>
-                                    . Limiting the scope was better than delivering a half-baked
-                                    product.
+                                    <span className="bold">Outsource Whenever Possible:</span> Creating the 3D characters was , but using <a href="https://www.mixamo.com/" target="_blank"><span className="app-link bold">Mixamo</span>
+                                    </a> for action animations simplified the process. <span className="bold">Coders are friends!</span> I also built my Microsoft Word UI off of Rahul's open-source <a href="https://github.com/lolstring/window98-html-css-js" target="_blank"><span className="app-link bold">recreation of Microsoft Word 95</span>
+                                    </a>. 
                                 </p>
                             </li>
                             <li>
                                 <p>
-                                    <span className="bold">Keep Future Engineers in Mind:</span> I created query functions for current use cases and for use cases
-                                    that might come up in the future. By commenting and coding with future software engineers in mind, we can <span className="bold">streamline development workflow and new feature integrations</span>.
+                                    <span className="bold">Design Versatile Assets:</span> 
                                 </p>
                             </li>
                             <li>
-                                <p>
-                                    <span className="bold">Scalable Database:</span> Storing account and item information in a <span className="bold">MongoDB database
-                                    ensured data security</span>. Data
-                                    can be scaled, meaning even when data is added (the website gets
-                                    more users) the system still runs smoothly.
-                                </p>
+                              <p><span className="bold">Balance Creativity and Consistency:</span></p>
                             </li>
                         </ul>
                     </div>
