@@ -9,14 +9,14 @@
     overflow-x: clip;
 }
 
-.study {
+.case-study-3 .study {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
-.main {
+.case-study-3 .main {
     display: flex;
     flex-direction: column;
     border-radius: 50px;
