@@ -121,6 +121,18 @@ function CaseStudy3() {
               Your browser does not support the video tag.
             </video>
           </div>
+          <div className="video-container">
+            <video
+              src="/case-study-3/mi-fonda-laptop.mp4"
+              aria-label="Mi Fonda Figma desktop prototype walkthrough on laptop"
+              typeof="video/mp4"
+              autoPlay
+              muted
+              loop
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
 
           <h2>Takeaways</h2>
           <div className="takeaways">
