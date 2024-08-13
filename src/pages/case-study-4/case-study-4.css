@@ -1,0 +1,217 @@
+.case-study-4 {
+    position: relative;
+    font-family: "GeneralSans-Variable";
+    color: #393939;;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: clip;
+}
+
+.case-study-4 .study {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.case-study-4 .main {
+    display: flex;
+    flex-direction: column;
+    border-radius: 50px;
+    justify-content: center; /* Center grid items horizontally */
+    align-items: center;
+    background-color:rgba(179, 193, 255, 0.7);
+    margin-top: 8rem;
+    padding: 0 6rem;
+    width: min-content;
+}
+
+
+.case-study-4 .water-full {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    margin-top: -1rem;
+    width: 100%;
+    height: 102%;
+    background-image:
+    url('/fun/water-full-light3.png');
+    background-size: cover;
+    background-position: center top;
+    background-repeat: repeat-y;
+    z-index: -1000;
+}
+
+
+.case-study-4 .water-full-mask { 
+  position: absolute;
+  margin-top: -0.75rem;
+  width: 100%;
+  height: 100%;
+  background-image:
+    url('/fun/water-full-light3.png');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: repeat-y;
+  filter: url("#turbulence");
+  z-index: -1; /* Ensure it stays behind other content */ 
+}
+
+
+.case-study-4 h1 {
+    font-family: "Plein-Variable";
+    font-weight: 525;
+    font-size: 3.4rem;
+    text-align: center;
+    margin: 3rem;
+    margin-bottom: 0rem;
+    padding-left: 2.5rem;
+}
+
+.case-study-4 h2 {
+    font-family: "Plein-Variable";
+    font-weight: 525;
+    font-size: 2.5rem;
+    margin: 1rem 3rem 0.5rem 3rem;
+    text-align: center;
+}
+
+.case-study-4 ul, .case-study-4 li {
+    margin-top: 0;
+}
+
+.takeaways ul {
+    list-style-type: decimal;
+    font-size: 1.3rem;
+}
+
+.takeaways li::marker {
+    font-weight: 600;
+}
+
+
+.takeaways .sub-section {
+    padding-left: 4rem;
+}
+
+.takeaways .sub-section ul {
+    list-style-type: disc;
+}
+
+.takeaways {
+    margin-bottom: 1rem;
+}
+
+.sub-section li::marker {
+    font-size: 1.1rem;
+    font-weight: 400;
+}
+
+.case-study-4 .overview-info {
+    display: flex;
+    justify-content: space-between;
+    width: 60vw;
+    margin-top: 1.5rem;
+}
+
+
+.overview-info h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0;
+    text-align: center;
+}
+
+.overview-info p {
+    font-size: 1.3rem;
+    font-weight: 400;
+    text-align: left;
+}
+
+
+.all-skills {
+    margin: 1rem 0;
+}
+
+.skill {
+    background-color: rgba(248, 214, 216, 0.9);
+}
+
+.skill p {
+    margin: 0.25rem 0.75rem;
+    font-size: 1.2rem;
+}
+
+.overview, .pain-points, .takeaways {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+}
+
+.overview p, .pain-points p, .takeaways p {
+    width: 70vw;
+    font-size: 1.3rem;
+    font-weight: 400;
+    text-align: left;
+    margin-top: 1.5rem;
+}
+
+.overview img, .pain-points img, .takeaways img {
+    margin: 2rem 0;
+    width: 40vw;
+    border-radius: 5px;
+}
+
+.video-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+video {
+    width: 55vw;
+    margin-bottom: 2rem;
+    border-radius: 5px;
+}
+
+
+.bold {
+    font-weight: 600;
+}
+
+.vert-bar {
+    font-weight: 550;
+}
+
+.app-link {
+    font-size: 1.35rem;
+    color: #7c16ab;
+    font-weight: 550;
+    text-decoration: underline;
+}
+
+.app-link:hover {
+    font-size: 1.35rem;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.seperator {
+    height: 1.5rem;
+}
+
+.overview a, .pain-points a, .takeaways a {
+    padding: 0;
+    text-decoration: none;
+}
+
+svg {
+    position: absolute;
+    width: 0;
+    height: 0;
+  }

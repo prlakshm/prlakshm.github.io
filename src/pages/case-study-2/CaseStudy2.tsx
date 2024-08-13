@@ -1,273 +1,187 @@
-import { RefObject, useEffect, useRef } from "react";
-import Footer from "../../components/Footer";
+import { useEffect, useRef } from "react";
+import Footer from "../../components/Footer.js";
 import "./case-study-2.css";
 
+
 function CaseStudy2() {
-  
-  // This will run once when the component mounts scroll to top page
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+    const waterElementRef = useRef<HTMLDivElement>(null);
 
-  const overviewRef = useRef<HTMLDivElement>(null);
-  const researchRef = useRef<HTMLDivElement>(null);
-  const processRef = useRef<HTMLDivElement>(null);
-  const takeawaysRef = useRef<HTMLDivElement>(null);
+    // This will run once when the component mounts scroll to top page
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
-  const scrollToSection = (ref: RefObject<HTMLDivElement>, offset = -137) => {
-    if (ref.current) {
-      const elementTop =
-        ref.current.getBoundingClientRect().top + window.scrollY;
-      const offsetPosition = elementTop + offset;
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
-    }
-  };
+    useEffect(() => {
+        // Reapply the SVG filter when the component mounts
+        if (waterElementRef.current) {
+            waterElementRef.current.style.filter = "url(#turbulence)";
+        }
+    }, []);
 
-  return (
-    <div className="case-study-2">
-      <div className="title-block">
-        <h1>Mi Fonda Storefront</h1>
-        <img
-          src="/case-study-2/skew-carousel.png"
-          alt="Examples of sandwitch item cards from web app"
-        />
-      </div>
-      <div className="study">
-        <div className="sticky-quick-links">
-          <div className="quick-links">
-            <h5 onClick={() => scrollToSection(overviewRef)}>Overview</h5>
-            <h5 onClick={() => scrollToSection(researchRef)}>Research</h5>
-            <h5 onClick={() => scrollToSection(processRef)}>Process</h5>
-            <h5 onClick={() => scrollToSection(takeawaysRef)}>Takeaways</h5>
-          </div>
-        </div>
+    return (
+        <div className="case-study-2">
+            <div className="study">
+                <div className="water-full"></div>
+                <div className="water-full-mask" ref={waterElementRef}></div>
 
-        <div className="main">
-          <h2 ref={overviewRef} style={{ marginTop: "-0.75rem" }}>
-            Overview
-          </h2>
-          <div className="overview-info">
-            <div className="role">
-              <h3>Role</h3>
-              <p>Designer</p>
-            </div>
-            <div className="timeline">
-              <h3>Timeline</h3>
-              <p>May 2024</p>
-            </div>
-            <div className="team">
-              <h3>Team</h3>
-              <p>Jackie Cohen, Anna Wang, Brooke Wangenheim (Designers)</p>
-            </div>
-            <div className="skills">
-              <h3>Skills</h3>
-              <div className="all-skills">
-                <div className="skill">
-                  <p>Figma</p>
-                </div>
-                <div className="skill">
-                  <p>UI/UX Design</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="overview">
-            <p>
-              <a href="https://mifonda.io/" target="_blank">
-                <span className="app-link bold">Mi Fonda</span>
-              </a>{" "}
-              is a{" "}
-              <span className="bold">tech startup/all-in-one platform</span>{" "}
-              that helps restaurants manage and market their online presence.
-              They consolidate ordering apps through partnerships with UberEats,
-              GrubHub, DoorDash, etc. to decrease third-party fees and increase
-              profit.
-            </p>
-            <p>
-              Our team's job was to{" "}
-              <span className="bold">
-                redesign the storefront page for mobile and desktop
-              </span>{" "}
-              to attract the next generation of users. And who better to do this
-              than a group of Gen Zers?
-            </p>
-            <div className="img-container">
-              <img
-                src="/case-study-2/mi-fonda-overview.png"
-                alt="Mi Fonda Storefront designs displayed on phones"
-              />
-            </div>
-          </div>
+                <div className="main">
+                    <h1>RichDreamer Text-to-3D</h1>
+                    <div className="overview-info">
+                        <div className="role">
+                            <h3>Role</h3>
+                            <p>Machine Learning Engineer</p>
+                        </div>
+                        <div className="timeline">
+                            <h3>Timeline</h3>
+                            <p>Jun - Aug 2024</p>
+                        </div>
+                        <div className="skills">
+                            <h3>Skills</h3>
+                            <div className="all-skills">
+                                <div className="skill">
+                                    <p>ML/GenAI</p>
+                                </div>
+                                <div className="skill">
+                                    <p>Prompt Engineering</p>
+                                </div>
+                                <div className="skill">
+                                    <p>Python</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="overview">
+                        <p>
+                            <span className="bold">RichDreamer</span> is an <span className="bold">
+                                {" "}
+                                open-source text-to-3D GenAI model
+                            </span>{" "}
+                            that uses text inputs to generate high-quality 3D outputs.
+                            <div className="seperator" />
+                            <a href="https://github.com/modelscope/richdreamer" target="_blank">
+                                <span className="app-link bold">Repo Link</span>
+                            </a>
+                            <span className="vert-bar">
+                                {" | "}
+                            </span>
+                            <a href="https://arxiv.org/pdf/2311.16918" target="_blank">
+                                <span className="app-link bold">Published Paper</span>
+                            </a>
+                            <span className="vert-bar">
+                                {" | "}
+                            </span>
+                            <span className="bold">Technologies used:</span> Python, PyTorch, SSH, Bash/Shell Scripting, NVIDIA Quadro GPU
+                        </p>
+                    </div>
+                    <div className="pain-points">
+                        <h2 style={{marginTop:"2rem"}}>Pain Points</h2>
+                        <ul>
+                            <li>
+                                <p><span className="bold">Running the Model:</span> After a summer of struggling with setup, I finally succeeded in running the RichDreamer model on my GPU! I created a <a href="https://github.com/modelscope/richdreamer/blob/main/gpu_installation_guide.md" target="_blank"><span className="app-link bold">step-by-step installation guide</span>
+                                    </a> to help users resolve dependency issues, set up the conda environment, and configure the model to correctly utilize GPU.</p>
+                            </li>
+                            <li>
+                                <p><span className="bold">Expanding GPU Compatibility:</span> I expanded GPU compatibility by enabling support for CUDA 11.7 <span style={{fontStyle:"italic", paddingRight:"5px"}}>and</span> 11.8. I modified code, managed python package 
+                                dependencies, and tested the model in different conda environments. Users can now run the model on various NVIDIA GPUs.</p> 
+                            </li>
+                        </ul>
+                    </div>
 
-          <h2 ref={researchRef}>Research</h2>
-          <div className="research">
-            <p>
-              The CEO and CTO wanted a fresh, new look. They wanted to{" "}
-              <span className="bold">
-                gamify their storefront and make it more visually focused
-              </span>
-              , but weren't sure exactly how to do that.
-            </p>
-            <p>
-              We drew inspiration from social media and other online ordering
-              platforms:{" "}
-            </p>
-            <div className="img-container">
-              <img
-                src="/case-study-2/company-logos.png"
-                alt="Doordash, Grubhub, TikTok logos for inspiration"
-              />
-            </div>
-            <p>
-              After collective ideation, we thought of two ideas to incorporate
-              into our designs:
-              <ul>
-                <li>
-                  <span className="bold">Video carousel</span> to attract users
-                  to try featured items
-                </li>
-                <li>
-                  <span className="bold">Meal plate with badges</span> to
-                  motivate users to buy different food items and "collect them
-                  all"
-                </li>
-              </ul>
-            </p>
-          </div>
-
-          <h2 ref={processRef}>Process</h2>
-          <div className="process">
-            <div className="img-container">
-              <img
-                src="/case-study-2/timeline.png"
-                alt="Process timeline with design, AI generating images, photoshopping images,coding web app, and inserting animation as steps "
-              />
-            </div>
-            <h3>Sketching</h3>
-            <p>Below are my sketches for mobile and desktop.</p>
-            <div className="img-container" style={{ marginLeft: "-1rem" }}>
-              <img
-                src="/case-study-2/final-sketches.png"
-                alt="Sketches of mobile and desktop designs for Mi Fonda storefront"
-              />
-              <p>Fig 1. Left: Mobile sketches; Right: Desktop Sketches</p>
-            </div>
-
-            <h3>Low-fi Wireframes + Feedback</h3>
-            <p>
-              {" "}
-              I worked on desktop low-fidelity wireframes for my team. I also
-              created Looms after each iteration for feedback from the founders.
-            </p>
-            <div className="img-container">
-              <img
-                src="/case-study-2/design-1.png"
-                alt="Initial low-fi wireframes"
-              />
-            </div>
-
-            <div className="img-container">
-              <img
-                src="/case-study-2/design-2.png"
-                alt="Low-fi wireframes after first round feedback"
-              />
-            </div>
-
-            <h3 style={{ marginTop: "4rem" }}>Hi-Fi Prototypes + Feedback</h3>
-            <p>
-              For high-fidelity prototypes, I switched over to mobile. Again, I
-              created the Loom for our team to receive feedback.
-            </p>
-            <div className="video-container">
-              <video
-                src="/case-study-2/design-3.mp4"
-                typeof="video/mp4"
-                autoPlay
-                muted
-                loop
-              >
-                Your browser does not support the video tag.
-              </video>
-            </div>
-            <br />
-            <br />
-            <div
-              className="video-container last"
-              style={{ marginTop: "-2.5rem" }}
-            >
-              <video
-                src="/case-study-2/design-4.mp4"
-                typeof="video/mp4"
-                autoPlay
-                muted
-                loop
-              >
-                Your browser does not support the video tag.
-              </video>
-            </div>
-
-            <p>
-              Check out all our final designs{" "}
-              <a
-                href="https://www.figma.com/design/iRwhq0w4NT9zuXu6B2jSnr/Iterative-Design?node-id=724%3A999&t=tW0W2tBKeEAzLNiU-1"
-                target="_blank"
-              >
-                here!
-              </a>
-            </p>
-
-            <h3 style={{ marginTop: "3rem" }}>Presenting to Founders</h3>
-            <p>
-              After countless emails and Loom interactions, we got to meet the
-              company CEO and CTO and present our high-fidelity prototypes via
-              Zoom! We walked them through our mobile and desktop designs and
-              explained our intentions behind certain features.
-            </p>
-          </div>
-
-          <h2 ref={takeawaysRef} style={{ marginTop: "4rem" }}>
-            Takeaways
-          </h2>
+                    <h2>Takeaways</h2>
           <div className="takeaways">
-            <h3>1. Iterative Design</h3>
+              {" "}
+              <ul><li>
             <p>
-              Iterating through rounds of design and feedback{" "}
-              <span className="bold">helps maximize client satisfaction</span>.
-            </p>
-            <h3>2. Platform Inspiration</h3>
-            <p>
-              Tip: When a client doesn't know what direction to take their
-              design,{" "}
-              <span className="bold">
-                ask for platforms whose UI they admire
-              </span>
-              ! We as designers can use these platforms to draw inspiration.
-            </p>
-            <h3>3. Team Collaboration</h3>
-            <p>
-              Designing in a team{" "}
-              <span className="bold">generates innovative solutions</span> and
-              introduces ideas I couldn't have thought of on my own. It also
-              creates a <span className="bold">more user-centered design</span>,
-              because everyone offers a diverse perspective.
-            </p>
+              <span className="bold">Every Prompt Matters:</span> Because the model takes ≈2 hours to generate an output, it's important to <span className="bold">utilize every 
+              prompt</span>. I created a <a href="https://github.com/modelscope/richdreamer/blob/main/prompt_engineering_basics.md" target="_blank"><span className="app-link bold">prompt engineering basics guide </span>
+              </a> to help users maximize model performance.
+              </p>
+              </li>
+              <li>
+                <p>
+            <span className="bold">Open-source Contributing:</span> Contributing to open-source projects is a <span className="bold">great way to {" "}
+              gain experience</span>. The <span className="bold">opportunity is available to anyone</span>  (regardless of age) at anytime. It’s an excellent way to discover side projects and enhance skills!
+              </p>
+              </li>
+              </ul>
+              <p>Check out animations I made of the model's 3D outputs in Blender!</p>
+              <div className="video-container">
+            <video
+              src="/case-study-2/strawberry_donut.mp4"
+              aria-label="camera spin animation of strayberry donut 3d output"
+              typeof="video/mp4"
+              autoPlay
+              muted
+              loop
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div className="video-container">
+            <video
+              src="/case-study-2/fig.mp4"
+              aria-label="camera spin animation of fig 3d output"
+              typeof="video/mp4"
+              autoPlay
+              muted
+              loop
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div className="video-container">
+            <video
+              src="/case-study-2/realistic tiger.mp4"
+              aria-label="camera spin animation of realistic tiger 3d output"
+              typeof="video/mp4"
+              autoPlay
+              muted
+              loop
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div className="video-container">
+            <video
+              src="/case-study-2/stuffed_dog.mp4"
+              aria-label="camera spin animation of stuffed animal dog 3d output"
+              typeof="video/mp4"
+              autoPlay
+              muted
+              loop
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div className="seperator" />
+          <div className="seperator" style={{height:"1rem"}}/>
           </div>
 
-          <div className="thanks">
-            <p>
-              Thank you for reading till the end! This project was especially
-              grueling yet rewarding, so I appreciate it!
-            </p>
-          </div>
+                </div>
+
+                <Footer />
+            </div>
+            <svg>
+                <filter id="turbulence" x="0" y="0" width="100%" height="100%">
+                    <feTurbulence
+                        id="sea-filter2"
+                        numOctaves="3"
+                        seed="2"
+                        baseFrequency="0.05 0.1"
+                    ></feTurbulence>
+                    <feDisplacementMap scale="10" in="SourceGraphic"></feDisplacementMap>
+                    <animate
+                        xlinkHref="#sea-filter2"
+                        attributeName="baseFrequency"
+                        dur="60s"
+                        keyTimes="0;0.5;1"
+                        values="0.01 0.05;0.03 0.09;0.01 0.05"
+                        repeatCount="indefinite"
+                    />
+                </filter>
+            </svg>
         </div>
-      </div>
-
-      <Footer />
-    </div>
-  );
+    );
 }
 
 export default CaseStudy2;

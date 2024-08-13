@@ -1,15 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
-body {
+body, html {
     margin: 0;
+    padding: 0;
 }
 
 .header {
+    position: fixed;
+    top: 0;
     display: flex;
+    width: 100vw;
     justify-content: space-between;
-    padding: 0 1.75rem;
+    align-items: center;
     box-sizing: border-box;
-    background-color: white;
     transition: all 0.3s ease-in-out;
     z-index: 1000;
 }
@@ -19,50 +20,153 @@ body {
     transform: translateY(-100%);
 }
 
-.header.visible {
+.header.visible-transparent {
     top: 0;
     transform: translateY(0);
-    position: sticky;
 }
+
+.header.visible-color {
+    top: 0;
+    transform: translateY(0);
+    background-color: rgb(249, 241, 240, 75%);
+}
+
+/* Dark mode specific styles */
+.header.dark-mode a {
+    color: #f8dcff /* Override with dark mode text color */
+  }
+
+.dark-mode.visible-color {
+    background-color: rgb(47, 32, 91, 90%); /* Adjust to solid color for dark mode */
+  }
 
 
 .footer {
     display: flex;
     justify-content: space-between;
-    margin: 5rem 1.75rem 0 1.75rem;
-    width: 96vw;
+    align-items: center;
+    margin-top: 4rem;
+    padding: 0 0 0 2rem;
+    width: 96.8vw;
+}
+
+.footer.dark-mode {
+    color: #f8dcff
 }
 
 .header img {
-    width: 7rem;
+    width: 3rem;
+    margin: 0;
+    padding: 0 2rem;
 }
 
 .left {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: "Barlow", sans-serif;
+    font-family: "GeneralSans-Variable";
     font-weight: 500;
     font-size: 1.1rem;
-    padding: 0;
-    margin-top: 1.5rem;
-    margin-left: 0.5rem;
+    margin: 1.25rem 1.4rem;
 }
+
 
 .right {
     display: flex;
     align-items: center;
-    margin: 4rem 4rem 2rem 4rem;
+    margin: 2.8rem 3rem 2rem 2.2rem;
 }
 
-a {
-    padding: 0 1rem; /* Adjust the padding as needed */
-    font-family: "Barlow", sans-serif;
-    font-weight: 500;
-    font-size: 1.1rem;
-    color: black;
+.footer .left {
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.footer .right {
+    margin-right: 2.6rem;
+    margin-bottom: 1.5rem;
+}
+
+
+.header a {
+    padding: 0 1.5rem; /* Adjust the padding as needed */
+    font-family: "Plein-Variable";
+    font-weight: 600;
+    font-size: 1.3rem;
+    color: #2b2b2b;
+    text-decoration: none;
+  }
+
+  .header a:hover, .header a:active {
     text-decoration: underline;
   }
 
+/**
+* This is a variable font
+* You can control variable axes as shown below:
+* font-variation-settings: wght 300.0wght 900.0;
+*
+* available axes:
+'wght' (range from 300.0 to 900.0'wght' (range from 300.0 to 900.0
+*/
+@font-face {
+    font-family: 'Plein-Variable';
+    src: url('/fonts/plein/Plein-Variable.woff2') format('woff2'),
+         url('/fonts/plein/Plein-Variable.woff') format('woff');
+    font-weight: 300 900;
+    font-display: swap;
+    font-style: normal;
+  }
 
+  /**
+  * This is a variable font
+  * You can control variable axes as shown below:
+  * font-variation-settings: wght 300.0wght 900.0;
+  *
+  * available axes:
+  'wght' (range from 300.0 to 900.0'wght' (range from 300.0 to 900.0
+  */
+  @font-face {
+    font-family: 'Plein-VariableItalic';
+    src: url('/fonts/plein/Plein-VariableItalic.woff2') format('woff2'),
+         url('/fonts/plein/Plein-VariableItalic.woff') format('woff');
+    font-weight: 300 900;
+    font-display: swap;
+    font-style: italic;
+  }
+
+  /**
+* This is a variable font
+* You can control variable axes as shown below:
+* font-variation-settings: wght 700.0;
+*
+* available axes:
+'wght' (range from 200.0 to 700.0
+*/
+@font-face {
+    font-family: 'GeneralSans-Variable';
+    src: url('/fonts/general-sans/GeneralSans-Variable.woff2') format('woff2'),
+         url('/fonts/general-sans/GeneralSans-Variable.woff') format('woff');
+    font-weight: 200 700;
+    font-display: swap;
+    font-style: normal;
+  }
   
+/**
+* This is a variable font
+* You can control variable axes as shown below:
+* font-variation-settings: wght 700.0;
+*
+* available axes:
+'wght' (range from 200.0 to 700.0
+*/
+@font-face {
+    font-family: 'GeneralSans-VariableItalic';
+    src: url('/fonts/general-sans/GeneralSans-VariableItalic.woff2') format('woff2'),
+         url('/fonts/general-sans/GeneralSans-VariableItalic.woff') format('woff');
+    font-weight: 200 700;
+    font-display: swap;
+    font-style: italic;
+  }
+
+

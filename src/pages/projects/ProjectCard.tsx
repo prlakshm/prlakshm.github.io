@@ -14,10 +14,11 @@ export default function ProjectCard(props: {
   skills: string[];
   logline: string;
   image: string;
+  alphaColor: number;
 }) {
 
-  // Convert hex color to RGBA with 30% transparency
-  const rgbaColor = hexToRGBA(props.color, 0.5);
+  // Convert hex color to RGBA with 30% transparency -- #f8dee6 other pink option
+  const rgbaColor = hexToRGBA(props.color, props.alphaColor);
 
   return <div className="card" style={{backgroundColor: props.color}}>
     <div className="preview-image">

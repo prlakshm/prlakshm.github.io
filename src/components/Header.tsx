@@ -1,34 +1,59 @@
 import { useEffect, useState } from "react";
 import "../app.css";
-import useScrollDirection from "../hooks/useScrollDirection";
+import useScrollDirection from "../hooks/useScrollDirection.js";
+import useDarkMode from "../hooks/useDarkMode.js"
+import { useNavigate } from "react-router-dom";
 
 function Header() {
+  const darkMode = useDarkMode();
   const scrollDirection = useScrollDirection();
-  const [headerClass, setHeaderClass] = useState('visible');
+  const [headerClass, setHeaderClass] = useState('visible-transparent');
+  const navigate = useNavigate();
+
+  const handleLinkClick = (hash : string) => {
+    navigate(hash);
+    // Ensure the hash change triggers the effect
+    window.location.hash = hash;
+  };
 
   useEffect(() => {
-    if (scrollDirection === 'up') {
-      setHeaderClass('visible');
-    } else if (scrollDirection === 'down') {
-      setHeaderClass('hidden');
-    }
+     // Ensure the header is visible on page load
+     setHeaderClass('visible-transparent');
+     
+    const handleScroll = () => {
+      const scrollPos = window.scrollY;
+      if (scrollDirection === "up") {
+        if (scrollPos > 100) {
+          setHeaderClass("visible-color");
+        } else {
+          setHeaderClass("visible-transparent");
+        }
+      } else if (scrollDirection === "down") {
+        setHeaderClass("hidden");
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, [scrollDirection]);
 
 
   return (
-    <div className={`header ${headerClass}`}>
+    <div className={`header ${darkMode ? 'dark-mode' : ''} ${headerClass}`}>
       <div className="left">
-        <a href="/">
+        <a href="/" onClick={() => handleLinkClick('/')}>
           <img
-            src="./header/home-icon.png"
+            src={darkMode? "./icons/favicon-light.svg" : "./icons/favicon.svg"}
             alt="Home icon takes you back to landing page when clicked"
           />
         </a>
       </div>
       <div className="right">
-        <a href="/#">Home</a>
-        <a href="#/projects">Projects</a>
-        <a href="#/about">About</a>
+      <a href="/#projects" onClick={() => handleLinkClick('#projects')}>Work</a>
+      <a href="#/fun" onClick={() => handleLinkClick('#fun')}>Fun</a>
+      <a href="#/about" onClick={() => handleLinkClick('#/about')}>About</a>
         <a
           href="/docs/Pranavi_Resume_2024.pdf"
           target="_blank"

@@ -1,16 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
 .projects {
-    width: 98.9vw;
-    background-color: rgb(245, 245, 245);
-}
-
-.projects .footer {
-    background-color: rgb(245, 245, 245);
-}
-
-.transition {
-    background: linear-gradient(to bottom, rgba(255,255,255,1),rgb(245, 245, 245)); /* Gradient from white to a slightly darker shade */
+    position: relative;
+    margin-top: 2rem;
+    padding: 0;
+    z-index: 1;
 }
 
 .grid {
@@ -22,37 +14,53 @@
 .project-cards {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    padding: 1rem 0;
-    margin-left: -6rem;
-    background-color: linear-gradient(to bottom, transparent 0%, rgb(245, 245, 245) 100%); 
+    border-radius: 50px;
+    width: 82.5vw;
+
+    padding: 3.5rem 2.5rem;
+    justify-content: center; /* Center grid items horizontally */
+    gap: 2.5rem; /* Add some space between the grid items */
 }
 
 .project-cards a {
     text-decoration: none;
+    margin: 0;
+    padding: 0;
 }
 
 .card {
-    width: 35rem;
-    border-radius: 2rem;
-    box-shadow: 8px 8px 8px rgb(0 0 0 / 10%);
+    border: none;
+    box-shadow: 0 2px 40px 0 rgb(152, 165, 226);
     overflow: hidden;
-    margin: 0 0rem 3.5rem 6rem;
+    transform: translateY(0);
+    transition: box-shadow 0.3s ease-out, transform 0.3s ease-out, opacity 0.2s ease-out; /* Add transition for hover effect */
+    border-radius: 1em;
+    width: 40vw;
+}
+
+.card:hover, .card:focus {
+    box-shadow: 0 2px 40px 0 rgb(106, 116, 164);
+    transform: translateY(-0.8rem);
 }
 
 .preview-image {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     margin: 0;
+    overflow: clip;
+    height: 50vh;
 }
 
 .preview-image img {
-    width: 25rem;
+    width: 40rem;
+
 }
 
-.info {
-    background-color: white;
-    padding: 2rem 0 1rem 0;
+.projects .info {
+    background-color: #fef8f5;
+    padding: 0.5rem 0;
+    color: #3a3a3a;
 }
 
 .all-skills {
@@ -62,32 +70,35 @@
 }
 
 .info .all-skills {
-    margin-left: 2rem;
+    margin-left: 1.9rem;
+    margin-bottom: 0.4rem;
 }
 
 .skill {
     border-radius: 0.6rem;
-    border: 1px solid #C5C5C5;
+    border: 1px solid #3a3a3a;
     margin-right: 0.6rem;
+    color: #252525;
 }
 
 h3 {
-    font-family: "Barlow", sans-serif;
+    font-family: "Plein-Variable";
     font-weight: 500;
-    font-size: 2.25rem;
-    margin: 1.5rem 1.25rem 0 1.9rem;
+    font-size: 2.5rem;
+    margin: 0rem 1.25rem 0.25rem 1.9rem;
 }
 
 h4 {
-    font-family: "Barlow", sans-serif;
+    font-family: "GeneralSans-Variable";
     font-weight: 400;
-    font-size: 1.2rem;
-    margin: 0.7rem 2rem;
+    font-size: 1.3rem;
+    margin: 0rem 2rem;
+    margin-bottom: 0.7rem;
 }
 
 h5 {
-    font-family: "Barlow", sans-serif;
+    font-family: "GeneralSans-Variable";
     font-weight: 400;
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     margin: 0.25rem 0.6rem;
 }

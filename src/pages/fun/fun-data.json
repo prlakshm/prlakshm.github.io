@@ -1,0 +1,18 @@
+[
+    {
+        "name": "This is Not the Matrix",
+        "color": "#A62D79",
+        "skills": ["Sci-fi", "Coming-of-age"],
+        "logline": "Reality is a simulation and Lavine, an average teenage girl by day and supergenius hacker by night, has hacked the system.",
+        "image": "/fun/out-of-my-league.svg",
+        "link": "/docs/This_is_Not_the_Matrix.pdf"
+    },
+    {
+        "name": "Wednesday Season 2",
+        "color": "#443AA3",
+        "skills": ["Horror", "Comedy", "Mystery"],
+        "logline": "Redesigning storefront for a startup",
+        "image": "/fun/wednesday2.png",
+        "link": "#/wednesday-season-2"
+    }
+]
