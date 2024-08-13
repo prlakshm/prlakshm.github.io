@@ -79,8 +79,8 @@ function CaseStudy1() {
                         </p>
                         <div className="img-container">
                             <img
-                                src="/case-study-1/artists-corner-overview.png"
-                                alt="Artist's Corner PVD website displayed on desktop"
+                                src="/case-study-1/binary-escape-overview.png"
+                                alt="Binary Escape start page displayed on laptop"
                             />
                         </div>
                     </div>
@@ -96,8 +96,32 @@ function CaseStudy1() {
                     </div>
                     <div className="video-container">
                         <video
-                            src="/case-study-1/artists-corner-screen.mp4"
-                            aria-label="Artist's Corner PVD website playing on laptop"
+                            src="/case-study-1/start-screen.mp4"
+                            aria-label="Start page animation"
+                            typeof="video/mp4"
+                            autoPlay
+                            muted
+                            loop
+                        >
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <div className="video-container">
+                        <video
+                            src="/case-study-1/pranavi-level-screen.mp4"
+                            aria-label="Microsoft Word 2007 recreation puzzle round"
+                            typeof="video/mp4"
+                            autoPlay
+                            muted
+                            loop
+                        >
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <div className="video-container">
+                        <video
+                            src="/case-study-1/end-screen.mp4"
+                            aria-label="End page animation"
                             typeof="video/mp4"
                             autoPlay
                             muted
