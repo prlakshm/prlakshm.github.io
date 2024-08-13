@@ -30,7 +30,7 @@ function Fun() {
         <h2>Screenplay, movie ideas, and more...</h2>
         <div className="fun-cards">
           {funData.map((fun, index) => (
-            <a href={fun.link} key={index}>
+            <a href={fun.link} target="_blank" rel="noopener noreferrer" key={index}>
               <ProjectCard
                 name={fun.name}
                 color={fun.color}
