@@ -91,7 +91,7 @@ function CaseStudy1() {
                                 <p><span className="bold">Simulating Apps:</span> To invoke familiarity and nostalgia from users, I recreated the Microsoft Word 2007 application. This was by far the most complicated UI I've worked on with lots of toggles, buttons, and components.</p>
                             </li>
                             <li>
-                                <p><span className="bold">Character Rigging:</span> </p></li>
+                                <p><span className="bold">Character Rigging:</span> Character rigging is the process of attaching bones to a character to create a movable digital skeleton. Even though I've worked with Blender for a year, I still find this process difficult with all the steps and manual marking required.</p></li>
                         </ul>
                     </div>
                     <div className="video-container">
@@ -113,18 +113,18 @@ function CaseStudy1() {
                         <ul>
                             <li>
                                 <p>
-                                    <span className="bold">Outsource Whenever Possible:</span> Creating the 3D characters was , but using <a href="https://www.mixamo.com/" target="_blank"><span className="app-link bold">Mixamo</span>
-                                    </a> for action animations simplified the process. <span className="bold">Coders are friends!</span> I also built my Microsoft Word UI off of Rahul's open-source <a href="https://github.com/lolstring/window98-html-css-js" target="_blank"><span className="app-link bold">recreation of Microsoft Word 95</span>
-                                    </a>. 
+                                    <span className="bold">Outsource Whenever Possible:</span> Creating the 3D characters was arduous, but using <a href="https://www.mixamo.com/" target="_blank"><span className="app-link bold">Mixamo</span>
+                                    </a> for action animations simplified the process. Coders are friends! I also built my Microsoft Word UI off of Rahul's open-source <a href="https://github.com/lolstring/window98-html-css-js" target="_blank"><span className="app-link bold">recreation of Microsoft Word 95</span>
+                                    </a>. Outsourcing can <span className="bold">significantly ease the software development process.</span>
                                 </p>
                             </li>
                             <li>
                                 <p>
-                                    <span className="bold">Design Versatile Assets:</span> 
+                                    <span className="bold">Design Versatile Assets:</span> I designed logo and character assets that could be used in my round and reused by my teammates in their rounds. This streamlined workflow and established <span className="bold">visual consistency across the project</span>.
                                 </p>
                             </li>
                             <li>
-                              <p><span className="bold">Balance Creativity and Consistency:</span></p>
+                              <p><span className="bold">Balance Creativity and Consistency:</span> As design lead, I would review my teammates' puzzle rounds for UI design. I had to give feedback that ensured <span className="bold">cohesive UI design across rounds</span> while still allowing them to <span className="bold">showcase their individuality</span>.</p>
                             </li>
                         </ul>
                     </div>
