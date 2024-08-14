@@ -108,6 +108,7 @@ function About() {
         <div className="calendar-container">
           <EmailEmbed />
         </div>
+        <div style={{height:"4rem"}}/>
         <Footer />
       </div>
       <svg>

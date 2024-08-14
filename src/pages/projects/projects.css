@@ -49,11 +49,11 @@
     align-items: flex-start;
     margin: 0;
     overflow: clip;
-    height: 45vh;
+    height: 50vh;
 }
 
 .preview-image img {
-    width: 40rem;
+    width: 35rem;
 
 }
 

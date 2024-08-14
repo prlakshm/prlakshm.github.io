@@ -13,14 +13,6 @@ import { useEffect } from 'react';
 
 
 function App() {
-  useEffect(() => {
-    function zoom() {
-      document.body.style.transform = "scale(0.9)";
-      document.body.style.transformOrigin = "top left";
-    }
-
-    zoom();
-  }, []);
 
   return (
     <Router>
