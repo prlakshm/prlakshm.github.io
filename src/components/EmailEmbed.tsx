@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Cal, { getCalApi } from "@calcom/embed-react";
+import { getCalApi } from "@calcom/embed-react";
+import Cal from "@calcom/embed-react"
 import "./email-embed.css";
 
 function EmailEmbed() {
@@ -215,10 +216,10 @@ function EmailEmbed() {
             role="tabpanel"
           >
             <div id="my-cal-inline">
-              <Cal
+             <Cal
                 calLink="pranavil/30min"
                 config={{ layout: "month_view" }}
-              ></Cal>
+              />
             </div>
           </div>
         ;
