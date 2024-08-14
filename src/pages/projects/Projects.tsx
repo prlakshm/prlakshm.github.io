@@ -5,22 +5,22 @@ import projectData from "./project-data.json";
 import "./projects.css";
 
 function Projects() {
-    // This will run once when the component mounts scroll to top page
-    useEffect(() => {
-      window.scrollTo(0, 0);
-    }, []); 
+  // This will run once when the component mounts scroll to top page
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="projects">
 
-        <div className="grid">
+      <div className="grid">
         <div className="project-cards">
-        {projectData.map(
-              (
-                project,
-                index 
-              ) => (
-                <a href={project.link} key={index}>
+          {projectData.map(
+            (
+              project,
+              index
+            ) => (
+              <a href={project.link} key={index}>
                 <ProjectCard
                   name={project.name}
                   color={project.color}
@@ -29,12 +29,14 @@ function Projects() {
                   image={project.image}
                   alphaColor={0.9}
                 /> {/* project card component*/}
-                </a>
-              )
-            )}
+              </a>
+            )
+          )}
         </div>
-        </div>
+      </div>
+      <div className="custom-footer">
         <Footer />
+      </div>
     </div>
   );
 }

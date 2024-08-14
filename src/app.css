@@ -50,6 +50,10 @@ body, html {
     width: 96.8vw;
 }
 
+.custom-footer .footer {
+  margin-top: 2rem;
+}
+
 .footer.dark-mode {
     color: #f8dcff
 }
