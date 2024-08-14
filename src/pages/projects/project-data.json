@@ -11,7 +11,7 @@
         "name": "Binary Escape",
         "color": "#f8d6d8",
         "skills": ["Game Development", "3D Animation", "Javascript"],
-        "logline": "Building rounds and modelling 3D characters for a puzzle game",
+        "logline": "Modelling 3D characters for a puzzle game",
         "image": "/projects/binary-escape.png",
         "link": "#/binary-escape"
     },
