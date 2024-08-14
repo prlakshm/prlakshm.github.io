@@ -9,9 +9,18 @@ import './app.css';
 import Fun from './pages/fun/Fun.js';
 import CaseStudy4 from './pages/case-study-4/CaseStudy4.js';
 import CaseStudy5 from './pages/case-study-5/CaseStudy5.js';
+import { useEffect } from 'react';
 
 
 function App() {
+  useEffect(() => {
+    function zoom() {
+      document.body.style.transform = "scale(0.9)";
+      document.body.style.transformOrigin = "top left";
+    }
+
+    zoom();
+  }, []);
 
   return (
     <Router>
