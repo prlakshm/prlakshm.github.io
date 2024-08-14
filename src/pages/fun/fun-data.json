@@ -11,8 +11,8 @@
         "name": "Wednesday Season 2",
         "color": "#443AA3",
         "skills": ["Horror", "Comedy", "Mystery"],
-        "logline": "When students at Evermore start mysteriously losing their powers, will Wednesday and her friends be able to figure out what's happening before it's too late?",
+        "logline": "When students at Nevermore start mysteriously losing their powers, will Wednesday and her friends be able to figure out what's happening before it's too late?",
         "image": "/fun/wednesday2.png",
-        "link": "#/wednesday-season-2"
+        "link": "/docs/Wednesday_Season_2.pdf"
     }
 ]

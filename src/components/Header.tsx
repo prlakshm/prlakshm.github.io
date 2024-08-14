@@ -55,7 +55,7 @@ function Header() {
       <a href="#/fun" onClick={() => handleLinkClick('#fun')}>Fun</a>
       <a href="#/about" onClick={() => handleLinkClick('#/about')}>About</a>
         <a
-          href="/docs/Pranavi_Resume_2024.pdf"
+          href="/docs/Pranavi_Lakshminarayanan_Resume_2024.pdf"
           target="_blank"
           rel="noopener noreferrer"
         >
