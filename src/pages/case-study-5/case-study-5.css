@@ -6,7 +6,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow-x: clip;
+    overflow: clip;
 }
 
 .case-study-5 .study {
@@ -24,7 +24,7 @@
     align-items: center;
     background-color: rgba(179, 193, 255, 0.7);
     margin-top: 7.2rem; 
-    padding: 0 5.4rem; 
+    padding: 0 5.25rem; 
     width: min-content;
 }
 
@@ -63,18 +63,18 @@
 .case-study-5 h1 {
     font-family: "Plein-Variable";
     font-weight: 525;
-    font-size: 3.06rem; /* 3.4rem scaled down by 0.9 */
+    font-size: 3.06rem; 
     text-align: center;
-    margin: 2.7rem; /* 3rem scaled down by 0.9 */
+    margin: 2.7rem;
     margin-bottom: 0rem;
-    padding-left: 2.25rem; /* 2.5rem scaled down by 0.9 */
+    padding-left: 2.25rem; 
 }
 
 .case-study-5 h2 {
     font-family: "Plein-Variable";
     font-weight: 525;
-    font-size: 2.25rem; /* 2.5rem scaled down by 0.9 */
-    margin: 0.9rem 2.7rem 0.45rem 2.7rem; /* 1rem and 3rem scaled down by 0.9 */
+    font-size: 2.25rem; 
+    margin: 0.9rem 2.7rem 0.45rem 2.7rem; 
     text-align: center;
 }
 
@@ -84,7 +84,7 @@
 
 .takeaways ul {
     list-style-type: decimal;
-    font-size: 1.17rem; /* 1.3rem scaled down by 0.9 */
+    font-size: 1.17rem;
 }
 
 .takeaways li::marker {
@@ -92,7 +92,7 @@
 }
 
 .takeaways .sub-section {
-    padding-left: 3.6rem; /* 4rem scaled down by 0.9 */
+    padding-left: 3.6rem; 
 }
 
 .takeaways .sub-section ul {
@@ -100,30 +100,30 @@
 }
 
 .takeaways {
-    margin-bottom: 0.9rem; /* 1rem scaled down by 0.9 */
+    margin-bottom: 0.9rem;
 }
 
 .sub-section li::marker {
-    font-size: 0.99rem; /* 1.1rem scaled down by 0.9 */
+    font-size: 0.99rem; 
     font-weight: 400;
 }
 
 .overview-info {
     display: flex;
     justify-content: space-between;
-    width: 69vw; /* 69vw scaled down by 0.9 */
-    margin-top: 1.35rem; /* 1.5rem scaled down by 0.9 */
+    width: 69vw; 
+    margin-top: 1.35rem; 
 }
 
 .overview-info h3 {
-    font-size: 1.17rem; /* 1.3rem scaled down by 0.9 */
+    font-size: 1.17rem; 
     font-weight: 600;
     margin: 0;
     text-align: center;
 }
 
 .overview-info p {
-    font-size: 1.17rem; /* 1.3rem scaled down by 0.9 */
+    font-size: 1.17rem; 
     font-weight: 400;
     text-align: left;
 }
@@ -131,8 +131,8 @@
 .case-study-5 .all-skills {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    row-gap: 0.585rem; /* 0.65rem scaled down by 0.9 */
-    margin: 0.9rem 0; /* 1rem scaled down by 0.9 */
+    row-gap: 0.585rem; 
+    margin: 0.9rem 0; 
 }
 
 .skill {
@@ -140,12 +140,12 @@
 }
 
 .skill p {
-    margin: 0.225rem 0.675rem; /* 0.25rem and 0.75rem scaled down by 0.9 */
-    font-size: 1.08rem; /* 1.2rem scaled down by 0.9 */
+    margin: 0.225rem 0.675rem; 
+    font-size: 1.08rem;
 }
 
 .team {
-    width: 20vw; /* 20vw scaled down by 0.9 */
+    width: 20vw;
 }
 
 .overview, .pain-points, .takeaways {
@@ -157,17 +157,17 @@
 }
 
 .overview p, .pain-points p, .takeaways p {
-    width: 70vw; /* 70vw scaled down by 0.9 */
-    font-size: 1.17rem; /* 1.3rem scaled down by 0.9 */
+    width: 70vw; 
+    font-size: 1.17rem; 
     font-weight: 400;
     text-align: left;
-    margin-top: 1.35rem; /* 1.5rem scaled down by 0.9 */
+    margin-top: 1.35rem; 
 }
 
 .overview img, .pain-points img, .takeaways img {
-    margin: 1.8rem 0; /* 2rem scaled down by 0.9 */
-    width: 40vw; /* 40vw scaled down by 0.9 */
-    border-radius: 4.5px; /* 5px scaled down by 0.9 */
+    margin: 1.8rem 0; 
+    width: 40vw; 
+    border-radius: 4.5px;
 }
 
 .video-container {
@@ -178,9 +178,9 @@
 }
 
 video {
-    width: 55vw; /* 55vw scaled down by 0.9 */
-    margin-bottom: 1.8rem; /* 2rem scaled down by 0.9 */
-    border-radius: 4.5px; /* 5px scaled down by 0.9 */
+    width: 55vw; 
+    margin-bottom: 1.8rem; 
+    border-radius: 4.5px; 
 }
 
 .bold {
@@ -192,20 +192,20 @@ video {
 }
 
 .app-link {
-    font-size: 1.215rem; /* 1.35rem scaled down by 0.9 */
+    font-size: 1.215rem; 
     color: #7c16ab;
     font-weight: 550;
     text-decoration: underline;
 }
 
 .app-link:hover {
-    font-size: 1.215rem; /* 1.35rem scaled down by 0.9 */
+    font-size: 1.215rem; 
     font-weight: 600;
     text-decoration: underline;
 }
 
 .seperator {
-    height: 1.35rem; /* 1.5rem scaled down by 0.9 */
+    height: 1.35rem; 
 }
 
 
