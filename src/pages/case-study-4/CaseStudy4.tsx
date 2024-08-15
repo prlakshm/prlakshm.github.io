@@ -55,7 +55,7 @@ function CaseStudy4() {
                     </div>
                     <div className="overview">
                         <p>
-                            <span className="bold">PB&J Time</span> is a gourmet sandwitch building app that explores different ways
+                            PB&J Time is a <span className="bold">gourmet sandwitch building app</span> that explores different ways
                             an online ordering platform can use
                             <span className="bold">
                                 {" "}

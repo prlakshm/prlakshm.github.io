@@ -52,11 +52,14 @@ function CaseStudy2() {
                     </div>
                     <div className="overview">
                         <p>
-                            <span className="bold">RichDreamer</span> is an <span className="bold">
+                            RichDreamer is an <span className="bold">
                                 {" "}
                                 open-source text-to-3D GenAI model
                             </span>{" "}
                             that uses text inputs to generate high-quality 3D outputs.
+                            Text-to-3D can be used for <span className="bold">CGI in movies, TV shows, 
+                            and animated films</span> to generate 3D assets,
+                            speed up the production process, and reduce costs.
                             <div className="seperator" />
                             <a href="https://github.com/modelscope/richdreamer" target="_blank">
                                 <span className="app-link bold">Repo Link</span>
