@@ -17,10 +17,10 @@
 .fun .grid {
     display: flex;
     flex-direction: column;
-    border-radius: 50px;
+    border-radius: 45px; 
     justify-content: center; /* Center grid items horizontally */
     align-items: center;
-    margin-top: 4rem;
+    margin-top: 2.7rem; 
     width: min-content;
 }
 
@@ -28,30 +28,29 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     justify-content: center; /* Center grid items horizontally */
-    gap: 2.5rem; /* Add some space between the grid items */
-    padding: 3rem;
-    padding-top: 2rem;
+    gap: 2.25rem;
+    padding: 2.7rem;
+    padding-top: 1.8rem; 
 }
 
 .fun .card {
     border: none;
-    box-shadow: 0 2px 40px 0 rgb(152, 165, 226);
+    box-shadow: 0 1.8px 36px 0 rgb(152, 165, 226); 
     overflow: hidden;
     transform: translateY(0);
     transition: box-shadow 0.3s ease-out, transform 0.3s ease-out, opacity 0.2s ease-out; /* Add transition for hover effect */
-    border-radius: 1em;
-    width: 40vw;
+    border-radius: 0.9em; 
+    width: 40vw; 
 }
 
-
 .fun .card:hover, .card:focus {
-    box-shadow: 0 2px 40px 0 rgb(106, 116, 164);
-    transform: translateY(-0.8rem);
+    box-shadow: 0 1.8px 36px 0 rgb(106, 116, 164); 
+    transform: translateY(-0.72rem); 
 }
 
 .fun .info {
     background-color: #fef8f5;
-    padding: 0.5rem 0;
+    padding: 0.45rem 0; 
     color: #3a3a3a;
 }
 
@@ -65,7 +64,7 @@
     justify-content: center;
     align-items: center;
     margin: 0;
-    height: 50vh;
+    height: 50vh; 
     z-index: -1;
     overflow: hidden;
 }
@@ -77,21 +76,21 @@
 .fun .all-skills {
     display: flex;
     flex-direction: row;
-    margin-left: 1.9rem;
-    margin-bottom: 0.4rem;
+    margin-left: 1.71rem; 
+    margin-bottom: 0.36rem; 
 }
 
 .fun .skill {
-    border-radius: 0.4rem;
+    border-radius: 0.36rem; 
     border: 1px solid #3a3a3a;
-    margin-right: 0.6rem;
+    margin-right: 0.54rem; 
 }
 
 .fun .water-full {
     position: absolute;
     margin: 0;
     padding: 0;
-    margin-top: -1rem;
+    margin-top: -0.9rem;
     width: 100%;
     height: 102%;
     background-image:
@@ -105,7 +104,7 @@
 
 .fun .water-full-mask { 
   position: absolute;
-  margin-top: -0.75rem;
+  margin-top: -0.675rem;
   width: 100%;
   height: 100%;
   background-image:
@@ -121,21 +120,19 @@
 .fun h1 {
     font-family: "Plein-Variable";
     font-weight: 525;
-    font-size: 3.4rem;
+    font-size: 3.06rem; 
     text-align: center;
-    margin: 3rem;
+    margin: 2.7rem; 
     margin-bottom: 0rem;
     padding: 0;
-
     color: #393939;
-
 }
 
 .fun h2 {
     font-family: "GeneralSans-Variable";
     font-weight: 450;
-    font-size: 1.3rem;
-    margin: 0rem 2rem;
+    font-size: 1.17rem; 
+    margin: 0rem 1.8rem; 
     text-align: center;
     color: #393939;
 }
