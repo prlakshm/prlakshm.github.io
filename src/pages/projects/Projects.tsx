@@ -34,9 +34,7 @@ function Projects() {
           )}
         </div>
       </div>
-      <div className="custom-footer">
         <Footer />
-      </div>
     </div>
   );
 }
