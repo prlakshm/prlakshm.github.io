@@ -17,7 +17,7 @@ function App() {
     <Router>
       <Header />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="" element={<Home />} />
           <Route path="/projects" element={<Home />} />
           <Route path="/fun" element={<Fun />} />
           <Route path="/pbj-time" element={<CaseStudy4 />} />
