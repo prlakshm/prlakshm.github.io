@@ -43,7 +43,7 @@ function Header() {
   return (
     <div className={`header ${darkMode ? 'dark-mode' : ''} ${headerClass}`}>
       <div className="left">
-        <a href="/#/" onClick={() => handleLinkClick('/#/')}>
+        <a href="/" onClick={() => handleLinkClick('/')}>
           <img
             src={darkMode? "./icons/favicon-light.svg" : "./icons/favicon.svg"}
             alt="Home icon takes you back to landing page when clicked"
