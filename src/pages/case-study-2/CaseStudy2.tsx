@@ -85,7 +85,7 @@ function CaseStudy2() {
                             </li>
                             <li>
                                 <p><span className="bold">Expanding GPU Compatibility:</span> I expanded GPU compatibility by enabling support for CUDA 11.7 <span style={{fontStyle:"italic", paddingRight:"5px"}}>and</span> 11.8. I modified code, managed python package 
-                                dependencies, and tested the model in different conda environments. Users can now run the model on various NVIDIA GPUs.</p> 
+                                dependencies, and tested the model in different environments. Users can now run the model on various NVIDIA GPUs.</p> 
                             </li>
                         </ul>
                     </div>
