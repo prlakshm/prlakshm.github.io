@@ -61,8 +61,8 @@ function CaseStudy2() {
                             and animated films</span> to generate 3D assets,
                             speed up the production process, and reduce costs.
                             <div className="seperator" />
-                            <a href="https://github.com/modelscope/richdreamer" target="_blank">
-                                <span className="app-link bold">Repo Link</span>
+                            <a href="https://aigc3d.github.io/richdreamer/" target="_blank">
+                                <span className="app-link bold">Project Link</span>
                             </a>
                             <span className="vert-bar">
                                 {" | "}
