@@ -38,8 +38,7 @@ function CaseStudy1() {
                         <div className="team">
                             <h3>Team</h3>
                             <p>
-                            Sage Ellefson (PM), Alexandru Soroiu, Demilade Onasanya,
-                            Sergio Montufar (Software Engineers)
+                            Sage Ellefson (PM), Alexandru Soroiu, Demilade Onasanya (Software Engineers)
                             </p>
                         </div>
                         <div className="skills">
@@ -92,6 +91,9 @@ function CaseStudy1() {
                             </li>
                             <li>
                                 <p><span className="bold">Character Rigging:</span> Character rigging is the process of attaching bones to a character to create a movable digital skeleton. Even though I've worked with Blender for a year, I still find this process difficult with all the steps and manual marking required.</p></li>
+                                <li>
+                                <p><span className="bold">Cross-browser Compatibility:</span> The animations needed to be consistent across web browsers. They were initially WebM videos with transparent backgrounds, but I changed them to MP4s to work on Safari, Chrome, Firefox, and Microsoft Edge.</p>
+                            </li>
                         </ul>
                     </div>
                     <div className="video-container">

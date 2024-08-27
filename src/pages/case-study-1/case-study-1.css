@@ -135,6 +135,10 @@
     margin: 0.9rem 0;
 }
 
+.case-study-1 .team p {
+    margin-left: 1.75rem;
+}
+
 .skill {
     background-color: rgba(248, 214, 216, 0.9);
 }
