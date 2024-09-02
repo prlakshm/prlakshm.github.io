@@ -220,3 +220,58 @@ svg {
   width: 0;
   height: 0;
 }
+
+/*------------------------ Media Queries --------------------------*/
+
+@media screen  and (max-width: 768px) {
+    .plain3 {  
+        animation: drift6 8s ease-in-out infinite alternate;
+    } 
+    @keyframes drift6 {
+        0% {
+            background-position: center calc(0% + 10px);
+        }
+        100% {
+            background-position: calc(50% + 70px) calc(0% + 20px);
+        }
+      }
+
+    .plain2 {  
+        animation: drift7 7s ease-in-out infinite alternate;
+    } 
+    @keyframes drift7 {
+        0% {
+            background-position: center top;
+        }
+        100% {
+            background-position: calc(50% + 35px) calc(0% + 15px);
+        }
+      }
+    
+      .plain5 {  
+        animation: drift8 6.5s ease-in-out infinite alternate;
+    } 
+    @keyframes drift8 {
+        0% {
+            background-position: calc(50% - 20px) top;
+        }
+        100% {
+            background-position: calc(50% - 80px) calc(0% + 10px);
+        }
+      }
+
+    h1 {
+        font-size: 3.75rem;
+    }
+
+    h2 {
+        font-size: 1.1rem;
+        width: 89%;
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    h1 {
+        font-size: 2.75rem;
+    }
+}
