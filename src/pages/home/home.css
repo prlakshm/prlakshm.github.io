@@ -1,219 +1,223 @@
 .home {
-    display: flex;
-    flex-direction: column;
-    overflow-x: clip;
+  display: flex;
+  flex-direction: column;
+  overflow-x: clip;
 }
 
-.home .landing-page {  
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    background-image: url('/home/water-background.png');
-    background-size: cover;
-    background-position: center top;
-    background-repeat: no-repeat;
+.home .landing-page {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-image: url("/home/water-background.png");
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
 
-    margin: auto;
-    overflow: hidden;
+  margin: auto;
+  overflow: hidden;
 }
 
-
-.home .projects-page {  
-    position: relative;
+.home .projects-page {
+  position: relative;
 }
 
 .home .water-full {
-    position: absolute;
-    margin: 0;
-    padding: 0;
-    margin-top: -1rem;
-    width: 100%;
-    height: 101%;
-    background-image:
-      linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0) 1rem),
-      url('/home/water-full3.png');
-    background-size: cover;
-    background-position: center top;
-    background-repeat: repeat-y;
-    z-index: -1000;
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  margin-top: -1rem;
+  width: 100%;
+  height: 101%;
+  background-image: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0) 1rem
+    ),
+    url("/home/water-full3.png");
+  background-size: cover;
+  background-position: center top;
+  background-repeat: repeat-y;
+  z-index: -1000;
 }
 
-
-.home .water-full-mask { 
+.home .water-full-mask {
   position: absolute;
   margin-top: -0.75rem;
   width: 100%;
   height: 100%;
-  background-image:
-    linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0) 1rem),
-    url('/home/water-full3.png');
+  background-image: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0) 1rem
+    ),
+    url("/home/water-full3.png");
   background-size: cover;
   background-position: center top;
   background-repeat: repeat-y;
   filter: url("#turbulence2");
-  z-index: -1; /* Ensure it stays behind other content */ 
+  z-index: -1; /* Ensure it stays behind other content */
 }
 
 .home .projects-container {
-    position: relative;
-    z-index: 1;
+  position: relative;
+  z-index: 1;
 }
 
-.landing-page .water {  
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 100vh;
-    background-image: url('/home/water-mask.png');
-    background-size: cover;
-    background-position: center top;
-    background-repeat: no-repeat;
-    filter: url("#turbulence") 
+.landing-page .water {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  background-image: url("/home/water-mask.png");
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  filter: url("#turbulence");
 }
 
-.home .lilies {  
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 100vh;
-    background-size: cover;
-    background-position: center top;
-    background-repeat: no-repeat;
+.home .lilies {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
 }
 
 .plain1 {
-    background-image: url('/home/lilies-plain1.png');
-    animation: drift1 6s ease-in-out infinite alternate;
+  background-image: url("/home/lilies-plain1.png");
+  animation: drift1 6s ease-in-out infinite alternate;
 }
 
-.plain2 {  
-    background-image: url('/home/lilies-plain2.png');
-    animation: drift2 5s ease-in-out infinite alternate;
+.plain2 {
+  background-image: url("/home/lilies-plain2.png");
+  animation: drift2 5s ease-in-out infinite alternate;
 }
 
-.plain3 {  
-    background-image: url('/home/lilies-plain3.png');
-    animation: drift3 5s ease-in-out infinite alternate;
-} 
+.plain3 {
+  background-image: url("/home/lilies-plain3.png");
+  animation: drift3 5s ease-in-out infinite alternate;
+}
 
-.plain4 {  
-    background-image: url('/home/lilies-plain4.png');
-    animation: drift4 7s ease-in-out infinite alternate;
-} 
+.plain4 {
+  background-image: url("/home/lilies-plain4.png");
+  animation: drift4 7s ease-in-out infinite alternate;
+}
 
-.plain5 {  
-    background-image: url('/home/lilies-plain5.png');
-    animation: drift5 5s ease-in-out infinite alternate;
-} 
+.plain5 {
+  background-image: url("/home/lilies-plain5.png");
+  animation: drift5 5s ease-in-out infinite alternate;
+}
 
 @keyframes drift1 {
   0% {
-      background-position: center top;
+    background-position: center top;
   }
   100% {
-      background-position: calc(50% + 30px) calc(0% + 10px);
+    background-position: calc(50% + 30px) calc(0% + 10px);
   }
 }
 
 @keyframes drift2 {
   0% {
-      background-position: center top;
+    background-position: center top;
   }
   100% {
-      background-position: calc(50% + 20px) calc(0% + 10px);
+    background-position: calc(50% + 20px) calc(0% + 10px);
   }
 }
 
 @keyframes drift3 {
   0% {
-      background-position: calc(50% - 5px) top;
+    background-position: calc(50% - 5px) top;
   }
   100% {
-      background-position: calc(50% - 10px) calc(0% + 15px);
+    background-position: calc(50% - 10px) calc(0% + 15px);
   }
 }
 
 @keyframes drift4 {
   0% {
-      background-position: calc(50% - 30px) calc(0% - 10px);
+    background-position: calc(50% - 30px) calc(0% - 10px);
   }
   100% {
-      background-position: calc(50% + 5px) calc(0% + 15px);
+    background-position: calc(50% + 5px) calc(0% + 15px);
   }
 }
 
 @keyframes drift5 {
   0% {
-      background-position: calc(50% - 10px) calc(0% + 10px);
+    background-position: calc(50% - 10px) calc(0% + 10px);
   }
   100% {
-      background-position: calc(50% - 30px) calc(0% + 25px);
+    background-position: calc(50% - 30px) calc(0% + 25px);
   }
 }
 
 .title {
-    display: flex;
-    height: 85vh; 
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  height: 85vh;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 h1 {
-    font-family: "Plein-Variable";
-    font-weight: 475;
-    font-size: 4.5rem; 
-    text-align: center;
-    margin: 0.9rem; 
-    margin-bottom: 0.45rem; 
-    padding: 0;
-    color: #3a3a3a;
+  font-family: "Plein-Variable";
+  font-weight: 475;
+  font-size: 4.5rem;
+  text-align: center;
+  margin: 0.9rem;
+  margin-bottom: 0.45rem;
+  padding: 0;
+  color: #3a3a3a;
 }
 
 h2 {
-    font-family: "GeneralSans-Variable";
-    font-weight: 400;
-    font-size: 1.17rem; 
-    line-height: 1.8rem; 
-    letter-spacing: 1.35px; 
-    text-align: center;
-    color: #3a3a3a;
-    width: 46.8rem; 
-    margin: 0;
-    padding: 0;
-    z-index: 2;
+  font-family: "GeneralSans-Variable";
+  font-weight: 400;
+  font-size: 1.17rem;
+  line-height: 1.8rem;
+  letter-spacing: 1.35px;
+  text-align: center;
+  color: #3a3a3a;
+  width: 46.8rem;
+  margin: 0;
+  padding: 0;
+  z-index: 2;
 }
 
 .home h2 a {
-    display: inline-flex;
-    color: #7c16ab;
-    font-weight: 525;
-    text-decoration: none;
+  display: inline-flex;
+  color: #7c16ab;
+  font-weight: 525;
+  text-decoration: none;
 }
 
-.home h2 a:hover, .home h2 a:active {
-    text-decoration: underline;
-    font-weight: 600;
+.home h2 a:hover,
+.home h2 a:active {
+  text-decoration: underline;
+  font-weight: 600;
 }
 
 .home h2 a img {
-    width: 0.9rem; 
-    padding-left: 1.8px; 
+  width: 0.9rem;
+  padding-left: 1.8px;
 }
 
 .contact {
-    margin-top: 1.125rem; 
-    z-index: 1;
+  margin-top: 1.125rem;
+  z-index: 1;
 }
 
 .contact img {
-    width: 1.89rem;
+  width: 1.89rem;
 }
 
 .contact a {
-    padding: 0 0.9rem; 
+  padding: 0 0.9rem;
 }
-
 
 svg {
   position: absolute;
@@ -223,55 +227,55 @@ svg {
 
 /*------------------------ Media Queries --------------------------*/
 
-@media screen  and (max-width: 768px) {
-    .plain3 {  
-        animation: drift6 8s ease-in-out infinite alternate;
-    } 
-    @keyframes drift6 {
-        0% {
-            background-position: center calc(0% + 10px);
-        }
-        100% {
-            background-position: calc(50% + 70px) calc(0% + 20px);
-        }
-      }
-
-    .plain2 {  
-        animation: drift7 7s ease-in-out infinite alternate;
-    } 
-    @keyframes drift7 {
-        0% {
-            background-position: center top;
-        }
-        100% {
-            background-position: calc(50% + 35px) calc(0% + 15px);
-        }
-      }
-    
-      .plain5 {  
-        animation: drift8 6.5s ease-in-out infinite alternate;
-    } 
-    @keyframes drift8 {
-        0% {
-            background-position: calc(50% - 20px) top;
-        }
-        100% {
-            background-position: calc(50% - 80px) calc(0% + 10px);
-        }
-      }
-
-    h1 {
-        font-size: 3.75rem;
+@media screen and (max-width: 768px) {
+  .plain3 {
+    animation: drift6 8s ease-in-out infinite alternate;
+  }
+  @keyframes drift6 {
+    0% {
+      background-position: center calc(0% + 10px);
     }
-
-    h2 {
-        font-size: 1.1rem;
-        width: 89%;
+    100% {
+      background-position: calc(50% + 70px) calc(0% + 20px);
     }
   }
 
-  @media screen and (max-width: 600px) {
-    h1 {
-        font-size: 2.75rem;
+  .plain2 {
+    animation: drift7 7s ease-in-out infinite alternate;
+  }
+  @keyframes drift7 {
+    0% {
+      background-position: center top;
     }
+    100% {
+      background-position: calc(50% + 35px) calc(0% + 15px);
+    }
+  }
+
+  .plain5 {
+    animation: drift8 6.5s ease-in-out infinite alternate;
+  }
+  @keyframes drift8 {
+    0% {
+      background-position: calc(50% - 20px) top;
+    }
+    100% {
+      background-position: calc(50% - 80px) calc(0% + 10px);
+    }
+  }
+
+  h1 {
+    font-size: 3.75rem;
+  }
+
+  h2 {
+    font-size: 1.1rem;
+    width: 89%;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  h1 {
+    font-size: 2.75rem;
+  }
 }

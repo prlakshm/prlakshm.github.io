@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "../app.css";
 import useScrollDirection from "../hooks/useScrollDirection.js";
-import useDarkMode from "../hooks/useDarkMode.js"
+import useDarkMode from "../hooks/useDarkMode.js";
 import { useNavigate } from "react-router-dom";
 
 function Header() {
@@ -9,17 +9,26 @@ function Header() {
   const scrollDirection = useScrollDirection();
   const [headerClass, setHeaderClass] = useState('visible-transparent');
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
 
-  const handleLinkClick = (hash : string) => {
+  const handleLinkClick = (hash: string) => {
     navigate(hash);
-    // Ensure the hash change triggers the effect
     window.location.hash = hash;
+    setIsMenuOpen(false); // Close the menu after clicking a link
+  };
+
+  const handleMenuToggle = () => {
+    setIsMenuOpen(!isMenuOpen);
   };
 
   useEffect(() => {
-     // Ensure the header is visible on page load
-     setHeaderClass('visible-transparent');
-     
+    setHeaderClass('visible-transparent');
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 600);
+    };
+
     const handleScroll = () => {
       const scrollPos = window.scrollY;
       if (scrollDirection === "up") {
@@ -34,34 +43,68 @@ function Header() {
     };
 
     window.addEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleResize);
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
     };
   }, [scrollDirection]);
-
 
   return (
     <div className={`header ${darkMode ? 'dark-mode' : ''} ${headerClass}`}>
       <div className="left">
         <a href="" onClick={() => handleLinkClick('')}>
           <img
-            src={darkMode? "./icons/favicon-light.svg" : "./icons/favicon.svg"}
+            src={darkMode ? "./icons/favicon-light.svg" : "./icons/favicon.svg"}
             alt="Home icon takes you back to landing page when clicked"
           />
         </a>
       </div>
-      <div className="right">
-      <a href="/#projects" onClick={() => handleLinkClick('#projects')}>Work</a>
-      <a href="#/fun" onClick={() => handleLinkClick('#fun')}>Fun</a>
-      <a href="#/about" onClick={() => handleLinkClick('#/about')}>About</a>
-        <a
-          href="/docs/Pranavi_Lakshminarayanan_Resume_2024.pdf"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Resume
-        </a>
-      </div>
+      {isMobile ? (
+        <div className="menu-icon" onClick={handleMenuToggle}>
+          <img src={darkMode ? "./icons/menu-light.svg" : "./icons/menu-icon.svg"} alt="Menu" />
+        </div>
+      ) : (
+        <div className="right">
+          <a href="/#projects" onClick={() => handleLinkClick('#projects')}>
+            Work
+          </a>
+          <a href="#/fun" onClick={() => handleLinkClick('#fun')}>
+            Fun
+          </a>
+          <a href="#/about" onClick={() => handleLinkClick('#about')}>
+            About
+          </a>
+          <a
+            href="/docs/Pranavi_Lakshminarayanan_Resume_2024.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Resume
+          </a>
+        </div>
+      )}
+      {isMenuOpen && isMobile && (
+        <div className="dropdown-menu">
+          <a href="/#projects" onClick={() => handleLinkClick('#projects')}>
+            Work
+          </a>
+          <a href="#/fun" onClick={() => handleLinkClick('#fun')}>
+            Fun
+          </a>
+          <a href="#/about" onClick={() => handleLinkClick('#about')}>
+            About
+          </a>
+          <a
+            href="/docs/Pranavi_Lakshminarayanan_Resume_2024.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Resume
+          </a>
+        </div>
+      )}
     </div>
   );
 }
