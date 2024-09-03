@@ -66,6 +66,7 @@
 .all-skills {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   margin-left: 1.8rem;
 }
 
@@ -107,87 +108,88 @@ h5 {
 
 /* Media Query for screens 768px or smaller */
 @media screen and (max-width: 768px) {
- 
-    .card {
-      width: 80vw; /* Adjust card width for smaller screens */
-      margin-bottom: 1.5rem; /* Add space between stacked cards */
-    }
-  
-    .preview-image {
-      height: 40vh; /* Adjust image height */
-    }
-  
-    h3 {
-      font-size: 1.75rem; /* Reduce font size for smaller screens */
-      margin: 0.75rem 1rem; /* Adjust margins */
-    }
-  
-    h4 {
-      font-size: 1rem; /* Reduce font size */
-      margin: 0.5rem 1rem; /* Adjust margins */
-    }
-  
-    h5 {
-      font-size: 0.9rem; /* Reduce font size */
-      margin: 0.4rem 0.5rem; /* Adjust margins */
-    }
-  
-    .all-skills {
-      margin-left: 0; /* Remove left margin */
-    }
-  
-    .skill {
-      margin-bottom: 0.5rem; /* Add space between skills */
-      width: 100%; /* Make skills take up full width */
-      text-align: center; /* Center the text */
-    }
+
+  .project-cards {
+    gap: 1.25rem;
   }
   
-  /* Media Query for screens 600px or smaller */
-  @media screen and (max-width: 600px) {
-
-    .project-cards {
-        grid-template-columns: 1fr;
-    }
-
-    .projects {
-      margin-top: 1rem; /* Reduce top margin */
-    }
-  
-  
-    .card {
-      width: 80vw; /* Adjust card width */
-      margin-bottom: 1rem; /* Add space between stacked cards */
-      padding: 1rem; /* Adjust padding */
-    }
-  
-    .preview-image {
-      height: 35vh; /* Adjust image height */
-    }
-  
-    h3 {
-      font-size: 1.5rem; /* Further reduce font size */
-      margin: 0.5rem 0.75rem; /* Adjust margins */
-    }
-  
-    h4 {
-      font-size: 0.9rem; /* Further reduce font size */
-      margin: 0.4rem 0.75rem; /* Adjust margins */
-    }
-  
-    h5 {
-      font-size: 0.8rem; /* Further reduce font size */
-      margin: 0.3rem 0.4rem; /* Adjust margins */
-    }
-  
-    .all-skills {
-      margin-left: 0; /* Remove left margin */
-    }
-  
-    .skill {
-      margin-bottom: 0.4rem; /* Add space between skills */
-      width: 100%; /* Make skills take up full width */
-      text-align: center; /* Center the text */
-    }
+  .card {
+    width: 45vw;
+    margin-bottom: 1.5rem; /* Add space between stacked cards */
   }
-  
+
+  .preview-image {
+    height: 40vh; /* Adjust image height */
+  }
+
+  h3 {
+    font-size: 1.75rem; /* Reduce font size for smaller screens */
+    margin: 0.75rem 1rem; /* Adjust margins */
+  }
+
+  h4 {
+    font-size: 1rem; /* Reduce font size */
+    margin: 0.5rem 1rem; /* Adjust margins */
+  }
+
+  h5 {
+    font-size: 0.9rem; /* Reduce font size */
+    margin: 0.4rem 0.5rem; /* Adjust margins */
+  }
+
+  .info .all-skills {
+    margin-left: 1rem; /* Remove left margin */
+  }
+
+  .skill {
+    margin-bottom: 0.5rem; /* Add space between skills */
+    width: 100%; /* Make skills take up full width */
+    text-align: center; /* Center the text */
+  }
+}
+
+/* Media Query for screens 600px or smaller */
+@media screen and (max-width: 600px) {
+  .project-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .projects {
+    margin-top: 1rem; /* Reduce top margin */
+  }
+
+  .card {
+    width: 80vw; /* Adjust card width */
+    margin-bottom: 1rem; /* Add space between stacked cards */
+    padding: 1rem; /* Adjust padding */
+  }
+
+  .preview-image {
+    height: 35vh; /* Adjust image height */
+  }
+
+  h3 {
+    font-size: 1.5rem; /* Further reduce font size */
+    margin: 0.5rem 0.75rem; /* Adjust margins */
+  }
+
+  h4 {
+    font-size: 0.9rem; /* Further reduce font size */
+    margin: 0.4rem 0.75rem; /* Adjust margins */
+  }
+
+  h5 {
+    font-size: 0.8rem; /* Further reduce font size */
+    margin: 0.3rem 0.4rem; /* Adjust margins */
+  }
+
+  .all-skills {
+    margin-left: 0; /* Remove left margin */
+  }
+
+  .skill {
+    margin-bottom: 0.4rem; /* Add space between skills */
+    width: 100%; /* Make skills take up full width */
+    text-align: center; /* Center the text */
+  }
+}

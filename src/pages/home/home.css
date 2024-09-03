@@ -207,6 +207,7 @@ h2 {
 }
 
 .contact {
+  display: block;
   margin-top: 1.125rem;
   z-index: 1;
 }
@@ -272,6 +273,10 @@ svg {
     font-size: 1.1rem;
     width: 89%;
   }
+
+  .contact img {
+    width: 1.75rem;
+}
 }
 
 @media screen and (max-width: 600px) {
@@ -279,3 +284,13 @@ svg {
     font-size: 2.75rem;
   }
 }
+
+@media screen and (max-width: 444px) {
+    .contact img {
+        width: 1.6rem;
+    }
+
+    .contact a {
+        padding: 0 0.5rem;
+    }
+  }
