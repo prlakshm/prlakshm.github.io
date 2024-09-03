@@ -100,8 +100,8 @@ function Home() {
               Brown University  
             </a>
             ,
-            <a href="https://bit.ly/TheTechCadets" target="_blank">
-              Tech Cadets  
+            <a href="https://www.linkedin.com/company/23careerday/" target="_blank">
+              CareerDay  
             </a>
             , or{" "}
             <a href="https://rewritingthecode.org/" target="_blank">
