@@ -83,7 +83,6 @@
   color: #252525;
 }
 
-
 h3 {
   font-family: "Plein-Variable";
   font-weight: 500;
@@ -110,31 +109,29 @@ h5 {
 
 /* Media Query for screens 1024px or smaller */
 @media screen and (max-width: 1024px) {
+  h3 {
+    font-size: 2.05rem;
+  }
 
-    h3 {
-      font-size: 2.05rem;
-    }
+  h4 {
+    font-size: 1.125rem;
+  }
 
-    h4 {
-        font-size: 1.125rem;
-    }
+  .preview-image {
+    height: 43.5vh;
+  }
 
-    .preview-image {
-        height: 43.5vh;
-      }
-
-    .preview-image img {
-        width: 25rem;
-      }
+  .preview-image img {
+    width: 25rem;
+  }
 }
 
 /* Media Query for screens 768px or smaller */
 @media screen and (max-width: 768px) {
-
   .project-cards {
     gap: 1.25rem;
   }
-  
+
   .card {
     width: 45vw;
     margin-bottom: 1rem; /* Add space between stacked cards */
@@ -144,7 +141,7 @@ h5 {
     height: 38.5vh;
   }
 
-.preview-image img {
+  .preview-image img {
     width: 22rem;
   }
 
@@ -186,35 +183,63 @@ h5 {
   .card {
     width: 80vw; /* Adjust card width */
     margin-bottom: 1rem; /* Add space between stacked cards */
-    padding: 1rem; /* Adjust padding */
   }
 
   .preview-image {
-    height: 35vh; /* Adjust image height */
+    height: 34.75vh; /* Adjust image height */
+  }
+
+  .preview-image img {
+    width: 20rem;
+  }
+
+  .all-skills {
+    row-gap: 0.5rem; /* Add space between skills */
+  }
+
+  .info .all-skills {
+    margin-left: 0.9rem;
+    margin-bottom: 0.4rem;
   }
 
   h3 {
-    font-size: 1.5rem; /* Further reduce font size */
-    margin: 0.5rem 0.75rem; /* Adjust margins */
+    font-size: 1.8rem; /* Further reduce font size */
+    margin: 0 0.75rem; /* Adjust margins */
   }
 
   h4 {
     font-size: 0.9rem; /* Further reduce font size */
-    margin: 0.4rem 0.75rem; /* Adjust margins */
+    margin: 0.2rem 0.75rem; /* Adjust margins */
+    margin-bottom: 0.35rem;
   }
 
   h5 {
-    font-size: 0.8rem; /* Further reduce font size */
+    font-size: 0.9rem; /* Further reduce font size */
     margin: 0.3rem 0.4rem; /* Adjust margins */
   }
 
-  .all-skills {
-    margin-left: 0; /* Remove left margin */
-  }
-
   .skill {
-    margin-bottom: 0.4rem; /* Add space between skills */
     width: 100%; /* Make skills take up full width */
     text-align: center; /* Center the text */
+  }
+}
+
+@media screen and (max-width: 425px) {
+    .preview-image {
+        height: 31.75vh; /* Adjust image height */
+      }
+
+  .preview-image img {
+    width: 18rem;
+  }
+}
+
+@media screen and (max-width: 375px) {
+    .preview-image {
+        height: 28vh; /* Adjust image height */
+      }
+
+  .preview-image img {
+    width: 16rem;
   }
 }

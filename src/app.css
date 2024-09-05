@@ -186,15 +186,10 @@ html {
 
   .left {
     width: 45vw;
-    font-size: 0.82rem;
+    font-size: 0.85rem;
   }
 }
 
-@media screen and (max-width: 386px) {
-  .left {
-    font-size: 0.81rem;
-  }
-}
 
 /*------------------------ Master Fonts --------------------------*/
 
