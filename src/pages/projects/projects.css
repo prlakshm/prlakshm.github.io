@@ -137,26 +137,30 @@ h5 {
   
   .card {
     width: 45vw;
-    margin-bottom: 1.5rem; /* Add space between stacked cards */
+    margin-bottom: 1rem; /* Add space between stacked cards */
   }
 
   .preview-image {
-    height: 40vh; /* Adjust image height */
+    height: 38.5vh;
+  }
+
+.preview-image img {
+    width: 22rem;
   }
 
   h3 {
-    font-size: 1.8rem; /* Reduce font size for smaller screens */
-    margin: 0.75rem 1rem; /* Adjust margins */
+    font-size: 2rem; /* Reduce font size for smaller screens */
+    margin: 0rem 1rem; /* Adjust margins */
+    line-height: 2.6rem;
   }
 
   h4 {
-    font-size: 1rem; /* Reduce font size */
+    font-size: 1.1rem; /* Reduce font size */
     margin: 0.5rem 1rem; /* Adjust margins */
   }
 
   h5 {
     font-size: 0.9rem; /* Reduce font size */
-    margin: 0.4rem 0.5rem; /* Adjust margins */
   }
 
   .info .all-skills {
@@ -164,7 +168,6 @@ h5 {
   }
 
   .skill {
-    margin-bottom: 0.5rem; /* Add space between skills */
     width: 100%; /* Make skills take up full width */
     text-align: center; /* Center the text */
   }
