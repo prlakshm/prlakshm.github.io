@@ -67,6 +67,7 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  row-gap: 0.5rem;
   margin-left: 1.8rem;
 }
 
@@ -81,6 +82,7 @@
   margin-right: 0.54rem;
   color: #252525;
 }
+
 
 h3 {
   font-family: "Plein-Variable";
@@ -106,6 +108,26 @@ h5 {
 
 /*------------------------ Media Queries --------------------------*/
 
+/* Media Query for screens 1024px or smaller */
+@media screen and (max-width: 1024px) {
+
+    h3 {
+      font-size: 2.05rem;
+    }
+
+    h4 {
+        font-size: 1.125rem;
+    }
+
+    .preview-image {
+        height: 43.5vh;
+      }
+
+    .preview-image img {
+        width: 25rem;
+      }
+}
+
 /* Media Query for screens 768px or smaller */
 @media screen and (max-width: 768px) {
 
@@ -123,7 +145,7 @@ h5 {
   }
 
   h3 {
-    font-size: 1.75rem; /* Reduce font size for smaller screens */
+    font-size: 1.8rem; /* Reduce font size for smaller screens */
     margin: 0.75rem 1rem; /* Adjust margins */
   }
 

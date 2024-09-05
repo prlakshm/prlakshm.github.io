@@ -33,7 +33,7 @@ export default function ProjectCard(props: {
                 <div className="skill" style={{backgroundColor: rgbaColor}} key={index}><h5>{skill}</h5></div>
               )
             )}</div>
-        <h3>{props.name}</h3>
+        <h3>{props.name.replace(/-/g, "\u2011")}</h3>
         <h4>{props.logline}</h4>
     </div>
 
