@@ -1,144 +1,263 @@
 .fun {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow-x: clip;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: clip;
 }
 
 .fun-page {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .fun .grid {
-    display: flex;
-    flex-direction: column;
-    border-radius: 45px; 
-    justify-content: center; /* Center grid items horizontally */
-    align-items: center;
-    margin-top: 2.7rem; 
-    width: min-content;
+  display: flex;
+  flex-direction: column;
+  border-radius: 45px;
+  justify-content: center; /* Center grid items horizontally */
+  align-items: center;
+  margin-top: 2.7rem;
+  width: min-content;
 }
 
 .fun-cards {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    justify-content: center; /* Center grid items horizontally */
-    gap: 2.25rem;
-    padding: 2.7rem;
-    padding-top: 1.8rem; 
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-content: center; /* Center grid items horizontally */
+  gap: 2.25rem;
+  padding: 2.7rem;
+  padding-top: 1.8rem;
 }
 
 .fun .card {
-    border: none;
-    box-shadow: 0 1.8px 36px 0 rgb(152, 165, 226); 
-    overflow: hidden;
-    transform: translateY(0);
-    transition: box-shadow 0.3s ease-out, transform 0.3s ease-out, opacity 0.2s ease-out; /* Add transition for hover effect */
-    border-radius: 0.9em; 
-    width: 40vw; 
+  border: none;
+  box-shadow: 0 1.8px 36px 0 rgb(152, 165, 226);
+  overflow: hidden;
+  transform: translateY(0);
+  transition: box-shadow 0.3s ease-out, transform 0.3s ease-out,
+    opacity 0.2s ease-out; /* Add transition for hover effect */
+  border-radius: 0.9em;
+  width: 40vw;
 }
 
-.fun .card:hover, .card:focus {
-    box-shadow: 0 1.8px 36px 0 rgb(106, 116, 164); 
-    transform: translateY(-0.72rem); 
+.fun .card:hover,
+.card:focus {
+  box-shadow: 0 1.8px 36px 0 rgb(106, 116, 164);
+  transform: translateY(-0.72rem);
 }
 
 .fun .info {
-    background-color: #fef8f5;
-    padding: 0.45rem 0; 
-    color: #3a3a3a;
+  background-color: #fef8f5;
+  padding: 0.45rem 0;
+  color: #3a3a3a;
 }
 
 .fun a {
-    text-decoration: none;
+  text-decoration: none;
 }
 
 .fun .preview-image {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0;
-    height: 50vh; 
-    z-index: -1;
-    overflow: hidden;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  height: 50vh;
+  z-index: -1;
+  overflow: hidden;
 }
 
 .fun .preview-image img {
     width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image covers the entire container */
+    object-position: center; /* Ensures the image stays centered */
 }
 
 .fun .all-skills {
-    display: flex;
-    flex-direction: row;
-    margin-left: 1.71rem; 
-    margin-bottom: 0.36rem; 
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-left: 1.71rem;
+  margin-bottom: 0.36rem;
 }
 
 .fun .skill {
-    border-radius: 0.36rem; 
-    border: 1px solid #3a3a3a;
-    margin-right: 0.54rem; 
+  border-radius: 0.36rem;
+  border: 1px solid #3a3a3a;
+  margin-right: 0.54rem;
 }
 
 .fun .water-full {
-    position: absolute;
-    margin: 0;
-    padding: 0;
-    margin-top: -0.9rem;
-    width: 100%;
-    height: 102%;
-    background-image:
-    url('/fun/water-full-light3.png');
-    background-size: cover;
-    background-position: center top;
-    background-repeat: repeat-y;
-    z-index: -1000;
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  margin-top: -0.9rem;
+  width: 100%;
+  height: 102%;
+  background-image: url("/fun/water-full-light3.png");
+  background-size: cover;
+  background-position: center top;
+  background-repeat: repeat-y;
+  z-index: -1000;
 }
 
-
-.fun .water-full-mask { 
+.fun .water-full-mask {
   position: absolute;
   margin-top: -0.675rem;
   width: 100%;
   height: 100%;
-  background-image:
-    url('/fun/water-full-light3.png');
+  background-image: url("/fun/water-full-light3.png");
   background-size: cover;
   background-position: center top;
   background-repeat: repeat-y;
   filter: url("#turbulence");
-  z-index: -1; /* Ensure it stays behind other content */ 
+  z-index: -1; /* Ensure it stays behind other content */
 }
 
-
 .fun h1 {
-    font-family: "Plein-Variable";
-    font-weight: 525;
-    font-size: 3.06rem; 
-    text-align: center;
-    margin: 2.7rem; 
-    margin-bottom: 0rem;
-    padding: 0;
-    color: #393939;
+  font-family: "Plein-Variable";
+  font-weight: 525;
+  font-size: 3.06rem;
+  text-align: center;
+  margin: 2.7rem;
+  margin-bottom: 0rem;
+  padding: 0;
+  color: #393939;
 }
 
 .fun h2 {
-    font-family: "GeneralSans-Variable";
-    font-weight: 450;
-    font-size: 1.17rem; 
-    margin: 0rem 1.8rem; 
-    text-align: center;
-    color: #393939;
+  font-family: "GeneralSans-Variable";
+  font-weight: 450;
+  font-size: 1.17rem;
+  margin: 0rem 1.8rem;
+  text-align: center;
+  color: #393939;
 }
 
 svg {
-    position: absolute;
-    width: 0;
-    height: 0;
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+/*------------------------ Media Queries --------------------------*/
+
+/* Media Query for screens 1024px or smaller */
+@media screen and (max-width: 1024px) {
+  .fun h3 {
+    font-size: 2.05rem;
   }
+
+  .fun h4 {
+    font-size: 1.125rem;
+  }
+
+  .fun .preview-image {
+    height: 43.5vh;
+  }
+
+}
+
+/* Media Query for screens 768px or smaller */
+@media screen and (max-width: 768px) {
+  .fun .fun-cards {
+    gap: 1.25rem;
+  }
+
+  .fun .card {
+    width: 45vw;
+    margin-bottom: 1rem; /* Add space between stacked cards */
+  }
+
+  .fun .preview-image {
+    height: 38.5vh;
+  }
+
+
+  .fun h3 {
+    font-size: 2rem; /* Reduce font size for smaller screens */
+    margin: 0rem 1rem; /* Adjust margins */
+    line-height: 2.6rem;
+  }
+
+  .fun h4 {
+    font-size: 1.05rem; /* Reduce font size */
+    margin: 0.5rem 1rem; /* Adjust margins */
+  }
+
+  .fun h5 {
+    font-size: 0.9rem; /* Reduce font size */
+  }
+
+  .fun .info .all-skills {
+    margin-left: 1.1rem; /* Remove left margin */
+  }
+
+  .fun .skill {
+    text-align: center; /* Center the text */
+  }
+}
+
+/* Media Query for screens 600px or smaller */
+@media screen and (max-width: 600px) {
+  .fun .fun-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .fun .card {
+    width: 80vw; /* Adjust card width */
+    margin-bottom: 1rem; /* Add space between stacked cards */
+  }
+
+  .fun .preview-image {
+    height: 34.75vh; /* Adjust image height */
+  }
+
+  .fun .all-skills {
+    row-gap: 0.5rem; /* Add space between skills */
+  }
+
+  .fun .info .all-skills {
+    margin-left: 0.9rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .fun h3 {
+    font-size: 1.8rem; /* Further reduce font size */
+    margin: 0 0.75rem; /* Adjust margins */
+  }
+
+  .fun h4 {
+    font-size: 0.9rem; /* Further reduce font size */
+    margin: 0.2rem 0.75rem; /* Adjust margins */
+    margin-bottom: 0.35rem;
+  }
+
+  .fun h5 {
+    font-size: 0.9rem; /* Further reduce font size */
+    margin: 0.3rem 0.4rem; /* Adjust margins */
+  }
+
+  .fun .skill {
+    text-align: center; /* Center the text */
+  }
+}
+
+@media screen and (max-width: 425px) {
+  .fun .preview-image {
+    height: 31.75vh; /* Adjust image height */
+  }
+
+}
+
+@media screen and (max-width: 375px) {
+  .fun .preview-image {
+    height: 28vh; /* Adjust image height */
+  }
+
+}
