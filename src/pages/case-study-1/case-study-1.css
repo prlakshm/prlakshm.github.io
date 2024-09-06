@@ -264,20 +264,25 @@ svg {
   }
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 716px) {
   .case-study-1 .overview-info {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+  
+    .team {
+      width: 35vw;
+    }
   }
+  
+
+@media screen and (max-width: 600px) {
   .case-study-1 h1 {
     font-size: 3rem;
     margin-left: 0;
     margin-right: 0;
   }
 
-  .team {
-    width: 35vw;
-  }
 }
 
 @media screen and (max-width: 550px) {
