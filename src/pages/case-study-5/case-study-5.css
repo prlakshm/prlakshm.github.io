@@ -125,7 +125,7 @@
 .overview-info p {
     font-size: 1.17rem; 
     font-weight: 400;
-    text-align: left;
+    text-align: center;
 }
 
 .case-study-5 .all-skills {
@@ -144,7 +144,7 @@
     font-size: 1.08rem;
 }
 
-.team {
+.case-study-5 .team {
     width: 20vw;
 }
 
@@ -219,3 +219,29 @@ svg {
     width: 0;
     height: 0;
   }
+
+
+  @media screen and (max-width: 768px) {
+    .overview img,
+    .pain-points img,
+    .takeaways img {
+      width: 60vw;
+    }
+  
+    video {
+      width: 60vw;
+    }
+  }
+
+  @media screen and (max-width: 550px) {
+    .overview img,
+    .pain-points img,
+    .takeaways img {
+      width: 70vw;
+    }
+  
+    video {
+      width: 70vw;
+    }
+  }
+  
