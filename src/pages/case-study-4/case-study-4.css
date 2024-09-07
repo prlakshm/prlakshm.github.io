@@ -132,6 +132,7 @@
     margin: 0.9rem 0; 
 }
 
+
 .skill {
     background-color: rgba(248, 214, 216, 0.9);
 }
@@ -211,4 +212,113 @@ svg {
     position: absolute;
     width: 0;
     height: 0;
+  }
+
+/*------------------------ Media Queries --------------------------*/
+
+@media screen and (max-width: 1276px) { 
+    .case-study-4 .all-skills {
+      margin-left: 3rem;
+    }
+  }
+
+@media screen and (max-width: 1024px) {
+    .case-study-4 .main {
+      padding: 0 2rem;
+    }
+  
+    .case-study-4 .overview-info {
+      width: 69vw;
+    }
+  }
+  
+  @media screen and (max-width: 768px) {
+  
+    .case-study-4 h1 {
+      font-size: 3.75rem;
+    }
+    .overview-info h3 {
+      font-size: 1.2rem; /* Reduce font size for smaller screens */
+      margin: 0rem 1rem; /* Adjust margins */
+      line-height: 2rem;
+    }
+  
+    .overview-info p {
+      font-size: 1.1rem; /* Reduce font size */
+    }
+  
+    .overview img,
+    .pain-points img,
+    .takeaways img {
+      width: 60vw;
+    }
+  
+    video {
+      width: 75vw;
+    }
+  }
+  
+  @media screen and (max-width: 750px) {
+  .case-study-4 .overview-info {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  
+    .case-study-4 .team {
+      width: 35vw;
+    }
+  }
+  
+  @media screen and (max-width: 600px) {
+    .case-study-4 h1 {
+      font-size: 3rem;
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+  
+  @media screen and (max-width: 550px) {
+    .case-study-4 .main {
+      padding: 0 1rem;
+    }
+    .case-study-4 .all-skills {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .case-study-4 .skill-row {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .overview img,
+    .pain-points img,
+    .takeaways img {
+      width: 70vw;
+    }
+  
+    video {
+      width: 70vw;
+    }
+  }
+  
+  @media screen and (max-width: 426px) {
+    .case-study-4 h1 {
+      padding-left: 1.25rem;
+    }
+  }
+  
+  @media screen and (max-width: 396px) {
+    .case-study-4 .main {
+      padding: 0 0.5rem;
+    }
+    .case-study-4 h1 {
+      font-size: 2.25rem;
+      padding-left: 1.25rem;
+    }
+    .case-study-4 .overview-info {
+      width: 82vw;
+    }
   }
