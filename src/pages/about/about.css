@@ -73,11 +73,11 @@
 
 .about .main p {
   font-family: "GeneralSans-Variable";
-  font-size: 1.17rem; /* 1.3rem scaled down by 0.9 */
+  font-size: 1.17rem; 
   font-weight: 600;
   color: #f8dcff;
-  width: 94%; /* 94% scaled down by 0.9 */
-  letter-spacing: 0.45px; /* 0.5px scaled down by 0.9 */
+  width: 94%; 
+  letter-spacing: 0.45px; 
   margin-top: 0rem;
   text-align: left;
   z-index: 1000;
@@ -194,3 +194,98 @@ svg {
     width: 0;
     height: 0;
   }
+
+
+  /*------------------------ Media Queries --------------------------*/
+
+/* Media Query for screens 1024px or smaller */
+@media screen and (max-width: 1024px) {
+  .about .main h1 {
+    font-size: 2.9rem; 
+  }
+  
+  .about .main p {
+    font-size: 1rem; 
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .about .main h1 {
+    margin-bottom: 0.5rem;
+  }
+  .about .main {
+    width: 80vw;
+  }
+
+  .about .photo img {
+    width: 20vw;
+  }
+
+}
+
+@media screen and (max-width: 794px) {
+  .about .main h1 {
+    margin-bottom: 0.3rem;
+  }
+  .about .main p {
+    font-size: 0.9rem; 
+  }
+
+  .about .photo img {
+    width: 22vw;
+  }
+
+}
+
+/* Media Query for screens 600px or smaller */
+@media screen and (max-width: 672px) {
+  .about-me {
+    flex-direction: column;
+}
+
+.about .main {
+  width: 95vw;
+  margin-top: 1rem;
+}
+
+.about .text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.about .main h1 {
+  font-size: 2.25rem;
+}
+.about .main p {
+  font-size: 0.8rem;
+  text-align: center; 
+}
+
+.about .photo img {
+  width: 25vw;
+}
+
+
+}
+
+
+@media screen and (max-width: 400px) {
+  .about .main {
+    margin-top: 3rem;
+  }
+
+  .about .photo img {
+    width: 30vw;
+  }
+}
+
+@media screen and (max-width: 330px) {
+  .about .main {
+    margin-top: 6.5rem;
+  }
+
+  .about .photo img {
+    width: 35vw;
+  }
+}
