@@ -245,7 +245,7 @@ svg {
 
 .about .main {
   width: 95vw;
-  margin-top: 1rem;
+  margin-top: 2rem;
 }
 
 .about .text {
@@ -266,13 +266,17 @@ svg {
   width: 25vw;
 }
 
+.about .calendar-container {
+  margin-top: 2.3rem;
+  margin-bottom: 4.6rem;
+}
 
 }
 
 
 @media screen and (max-width: 400px) {
   .about .main {
-    margin-top: 3rem;
+    margin-top: 4rem;
   }
 
   .about .photo img {
@@ -280,12 +284,24 @@ svg {
   }
 }
 
+@media screen and (max-width: 370px) {
+  .about .calendar-container {
+    margin-top: 3.3rem;
+    margin-bottom: 6.6rem;
+  }
+}
+
 @media screen and (max-width: 330px) {
   .about .main {
-    margin-top: 6.5rem;
+    margin-top: 7.5rem;
   }
 
   .about .photo img {
     width: 35vw;
+  }
+
+  .about .calendar-container {
+    margin-top: 7.3rem;
+    margin-bottom: 7.6rem;
   }
 }

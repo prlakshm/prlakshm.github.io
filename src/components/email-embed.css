@@ -1,26 +1,26 @@
 .tab-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
 }
 
 .email-height {
-    height: 85vh;
+  height: 85vh;
 }
 
 .schedule-height {
-    height: calc(85vh - 1.7rem);
+  height: max-content
 }
 
 .tab-pane {
-  position: absolute;
-  top: calc(4.05rem - 0.9px); 
-  left: 18%; 
+  position: relative;
+  top: -1px;
+  left: 18%;
   background-color: #1f1f1f;
-  width: 62vw; 
+  width: 62vw;
   height: max-content;
-  border: 0.9px solid #f8dcff; 
+  border: 0.9px solid #f8dcff;
   box-sizing: border-box;
 }
 
@@ -45,14 +45,14 @@
 
 .tab-list {
   position: relative;
-  left: 18%; 
+  left: 18%;
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
   list-style-type: none;
   padding: 0;
   margin: 0;
-  width: 62vw; 
+  width: 62vw;
   border-bottom: #1f1f1f;
   z-index: 2;
 }
@@ -60,9 +60,9 @@
 .tab-list li {
   position: relative;
   margin: 0;
-  padding: 0.44rem 0.9rem; 
+  padding: 0.44rem 0.9rem;
   background-color: #1f1f1f;
-  border-radius: 7.2px 7.2px 0 0; 
+  border-radius: 7.2px 7.2px 0 0;
   border: 0.9px solid #f8dcff;
   border-bottom: 0;
   cursor: pointer;
@@ -74,7 +74,7 @@
   border: none;
   color: #f8dcff;
   font-family: "GeneralSans-Variable";
-  font-size: 0.9rem; 
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
 }
@@ -96,62 +96,62 @@
 .cal-inline-container {
   scrollbar-width: thin !important;
   overflow: hidden;
-  margin: 0 1.8rem; 
-  margin-top: 1.8rem; 
+  margin: 0 1.8rem;
+  margin-top: 1.8rem;
 }
 
 .dark-mode-form {
   background-color: #1f1f1f;
   color: #f8dcff;
-  border: 0.9px solid #f8dcff; 
-  padding: 18px; 
-  margin: 1.8rem 0; 
+  border: 0.9px solid #f8dcff;
+  padding: 18px;
+  margin: 1.8rem 0;
   font-family: "GeneralSans-Variable";
-  font-size: 0.9rem; 
+  font-size: 0.9rem;
   font-weight: 600;
-  width: 93.25%; 
-  border-radius: 4.5px; 
+  width: 93.25%;
+  border-radius: 4.5px;
   box-sizing: border-box;
 }
 
 .dark-mode-form .form-group {
-  margin: 0.675rem; 
+  margin: 0.675rem;
   width: 100%;
 }
 
 label {
   padding-left: 1.8px;
-  font-size: 0.945rem; 
+  font-size: 0.945rem;
 }
 
 .dark-mode-form .form-control {
   width: 100%;
   background-color: #575757;
   color: #f8dcff;
-  border: 0.9px solid #f8dcff; 
+  border: 0.9px solid #f8dcff;
   border-radius: 4.5px;
-  padding: 9px; 
-  margin-top: 0.45rem; 
+  padding: 9px;
+  margin-top: 0.45rem;
   box-sizing: border-box;
   font-family: "GeneralSans-Variable";
-  font-size: 0.9rem; 
+  font-size: 0.9rem;
   font-weight: 450;
 }
 
 .dark-mode-form .form-control::placeholder {
   color: #f8dcff;
   font-family: "GeneralSans-Variable";
-  font-size: 0.9rem; 
+  font-size: 0.9rem;
   font-weight: 450;
 }
 
 .dark-mode-form .submit-button {
-  width: 25%; 
+  width: 25%;
   background-color: #575757;
-  border: 0.9px solid #f8dcff; 
+  border: 0.9px solid #f8dcff;
   border-radius: 4.5px;
   color: #f8dcff;
-  padding: 9px; 
+  padding: 9px;
   margin-top: 0.45rem;
   font-family: "GeneralSans-Variable";
   font-size: 0.9rem;
@@ -164,7 +164,7 @@ label {
   font-family: "GeneralSans-Variable";
   font-size: 0.9rem;
   font-weight: 600;
-  margin-top: 18px; 
+  margin-top: 18px;
 }
 
 .custom-dropdown select {
@@ -172,14 +172,14 @@ label {
   background-color: #575757;
   color: #f8dcff;
   border: 0.9px solid var(--cal-border);
-  padding: 9px; 
+  padding: 9px;
   box-sizing: border-box;
   font-family: "GeneralSans-Variable";
   font-size: 0.9rem;
   font-weight: 450;
 }
 
-  .custom-dropdown select:hover,
+.custom-dropdown select:hover,
 .custom-dropdown select:focus {
   background-color: #f8dcff;
   color: #1f1f1f;
@@ -196,13 +196,37 @@ label {
   background-color: #f8dcff;
   color: #1f1f1f;
 }
-  
-  .custom-dropdown .arrow {
-    border-top-color: #f8dcff;
-  }
-  
-  .extra-field {
-    display: none !important;
-  }
-  
 
+.custom-dropdown .arrow {
+  border-top-color: #f8dcff;
+}
+
+.extra-field {
+  display: none !important;
+}
+
+/*------------------------ Media Queries --------------------------*/
+
+@media screen and (max-width: 794px) {
+  .tab-pane {
+    left: 10%;
+    width: 80vw;
+  }
+
+  .tab-list {
+    left: 10%;
+  }
+
+}
+
+@media screen and (max-width: 495px) {
+  .tab-list {
+    width: 80vw;
+  }
+}
+
+@media screen and (max-width: 370px) {
+  .dark-mode-form .submit-button {
+    width: 35%;
+  }
+}
