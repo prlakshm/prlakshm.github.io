@@ -100,7 +100,7 @@ function Home() {
               Brown University  
             </a>
             ,
-            <a href="https://www.linkedin.com/company/23careerday/" target="_blank">
+            <a href="https://www.linkedin.com/company/23careerday/" target="_blank" style={{paddingLeft: "2px"}}>
               CareerDay  
             </a>
             , or{" "}
