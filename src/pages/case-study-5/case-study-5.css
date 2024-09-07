@@ -303,6 +303,10 @@ svg {
   .case-study-5 h1 {
     padding-left: 1.25rem;
   }
+
+  .overview-info h3 {
+    line-height: 1.5rem;
+  }
 }
 
 @media screen and (max-width: 396px) {
