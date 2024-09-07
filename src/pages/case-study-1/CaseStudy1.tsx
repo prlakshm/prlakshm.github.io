@@ -104,6 +104,7 @@ function CaseStudy1() {
                             autoPlay
                             muted
                             loop
+                            playsInline
                         >
                             Your browser does not support the video tag.
                         </video>
@@ -116,6 +117,7 @@ function CaseStudy1() {
                             autoPlay
                             muted
                             loop
+                            playsInline
                         >
                             Your browser does not support the video tag.
                         </video>
@@ -128,6 +130,7 @@ function CaseStudy1() {
                             autoPlay
                             muted
                             loop
+                            playsInline
                         >
                             Your browser does not support the video tag.
                         </video>

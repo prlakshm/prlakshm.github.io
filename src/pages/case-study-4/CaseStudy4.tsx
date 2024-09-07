@@ -112,6 +112,7 @@ function CaseStudy4() {
                 autoPlay
                 muted
                 loop
+                playsInline
               >
                 Your browser does not support the video tag.
               </video>
