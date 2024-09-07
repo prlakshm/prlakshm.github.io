@@ -118,7 +118,7 @@ h5 {
   }
 
   .preview-image {
-    height: 43.5vh;
+    height: 15.5rem;
   }
 
   .preview-image img {
@@ -138,7 +138,7 @@ h5 {
   }
 
   .preview-image {
-    height: 38.5vh;
+    height: 13.5rem;
   }
 
   .preview-image img {
@@ -186,7 +186,7 @@ h5 {
   }
 
   .preview-image {
-    height: 34.75vh; /* Adjust image height */
+    height: 12.5rem;
   }
 
   .preview-image img {
@@ -225,19 +225,18 @@ h5 {
 }
 
 @media screen and (max-width: 425px) {
-    .preview-image {
-        height: 31.75vh; /* Adjust image height */
-      }
-
+  .preview-image {
+    height: 12rem;
+  }
   .preview-image img {
     width: 18rem;
   }
 }
 
 @media screen and (max-width: 375px) {
-    .preview-image {
-        height: 28vh; /* Adjust image height */
-      }
+  .preview-image {
+    height: 10rem;
+  }
 
   .preview-image img {
     width: 16rem;
