@@ -45,22 +45,22 @@ html {
   position: absolute;
   top: 60px;
   right: 10px;
-  background-color: rgba(249, 241, 240, 75%);
+  background-color:  rgba(248, 220, 255, 95%);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   border-radius: 2px;
   z-index: 1;
 }
 
 .header .dropdown-menu a {
-  padding: 0.25rem 2.5rem;
+  padding: 0.35rem 2.5rem;
   text-align: center;
-  color: #333;
+  color: #5b137d !important;
   text-decoration: none;
-  border: 1px solid #ccc;
+  border: 1px solid rgba(91, 19, 125, 50%);
 }
 
 .dropdown-menu a:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(241, 186, 255, 0.95);
 }
 
 .dropdown-menu a:last-child {
