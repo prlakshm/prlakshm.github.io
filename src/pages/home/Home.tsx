@@ -94,14 +94,14 @@ function Home() {
         <div className="title">
           <h1>Hi, I'm Pranavi</h1>
           <h2>
-            I'm a software engineer bringing ideas to life with story-based design and
+            I'm a product designer bringing ideas to life with story-based design and
             GenAI. You might know me from{" "}
             <a href="https://www.brown.edu" target="_blank">
               Brown University  
             </a>
             ,
-            <a href="https://www.linkedin.com/company/23careerday/" target="_blank" style={{paddingLeft: "2px"}}>
-              CareerDay  
+            <a href="https://www.emmabowenfoundation.org/" target="_blank" style={{paddingLeft: "2px"}}>
+              Emma Bowen  
             </a>
             , or{" "}
             <a href="https://rewritingthecode.org/" target="_blank">
