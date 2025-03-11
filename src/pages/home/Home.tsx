@@ -100,12 +100,12 @@ function Home() {
               Brown University  
             </a>
             ,
-            <a href="https://www.emmabowenfoundation.org/" target="_blank" style={{paddingLeft: "2px"}}>
-              Emma Bowen  
+            <a href="https://www.wbd.com/" target="_blank" style={{paddingLeft: "2px"}}>
+              Warner Bros 
             </a>
-            , or{" "}
-            <a href="https://rewritingthecode.org/" target="_blank">
-              Rewriting the Code            
+            , or {" "}
+            <a href="https://www.emmabowenfoundation.org/" target="_blank">
+              Emma Bowen Foundation           
             </a>
             .
           </h2>
