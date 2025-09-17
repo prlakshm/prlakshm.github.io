@@ -60,11 +60,11 @@
 }
 
 .about .main h1 {
-  font-family: "Plein-Variable";
+  font-family: "Flotha-Variable";
   margin: 0rem 0.9rem; /* 1rem scaled down by 0.9 */
-  margin-bottom: 0.9rem; /* 1rem scaled down by 0.9 */
+  margin-bottom: 0.925rem; /* 1rem scaled down by 0.9 */
   font-weight: 500;
-  font-size: 3.06rem; /* 3.4rem scaled down by 0.9 */
+  font-size: 3.4rem; /* 3.4rem scaled down by 0.9 */
   color: #f8dcff;
   text-align: center;
   width: 100%;

@@ -56,7 +56,7 @@
 }
 
 .case-study-1 h1 {
-  font-family: "Plein-Variable";
+  font-family: "Flotha-Variable";
   font-weight: 525;
   font-size: 3.06rem;
   text-align: center;
@@ -66,10 +66,10 @@
 }
 
 .case-study-1 h2 {
-  font-family: "Plein-Variable";
-  font-weight: 525;
+  font-family: "GeneralSans-Variable";
+  font-weight: 570;
   font-size: 2.25rem;
-  margin: 0.9rem 2.7rem 0.45rem 2.7rem;
+  margin: 0.9rem 2.7rem 0.2rem 2.7rem;
   text-align: center;
 }
 

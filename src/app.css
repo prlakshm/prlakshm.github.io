@@ -122,15 +122,15 @@ html {
 }
 
 .footer .right {
-  margin-right: 2.34rem;
+  margin-right: 2.24rem;
   margin-bottom: 1.35rem;
 }
 
 .header a {
   padding: 0 1.35rem;
-  font-family: "Plein-Variable";
+  font-family: "GeneralSans-Variable";
   font-weight: 600;
-  font-size: 1.17rem;
+  font-size: 1.2rem;
   color: #2b2b2b;
   text-decoration: none;
 }
