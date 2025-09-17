@@ -261,3 +261,12 @@ html {
   font-display: swap;
   font-style: italic;
 }
+
+@font-face {
+  font-family: "Flotha-Variable";
+  src: url("/fonts/flotha/Flotha-Display-0ea8.woff2") format("woff2"),
+    url("/fonts/flotha/FlothaDisplayBold-aYOr5.ttf") format("ttf");
+  font-weight: 300 900;
+  font-display: swap;
+  font-style: normal;
+}

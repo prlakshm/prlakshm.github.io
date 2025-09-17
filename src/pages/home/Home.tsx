@@ -92,7 +92,7 @@ function Home() {
         <div className="lilies plain5"></div>
 
         <div className="title">
-          <h1>Hi, I'm Pranavi</h1>
+          <h1>Hi, I<span style={{ marginLeft: "0.12em" }}>'m</span> Pranavi</h1>
           <h2>
             I'm a product designer bringing ideas to life with story-based design and
             GenAI. You might know me from{" "}
