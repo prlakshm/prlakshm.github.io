@@ -23,8 +23,8 @@
     justify-content: center; /* Center grid items horizontally */
     align-items: center;
     background-color: rgba(179, 193, 255, 0.7);
-    margin-top: 7.2rem; 
-    padding: 0 5.25rem; 
+    margin-top: 7rem; 
+    padding: 0.5rem 5.25rem; 
     width: min-content;
 }
 

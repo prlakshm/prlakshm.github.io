@@ -17,45 +17,45 @@
 }
 
 .case-study-2 .main {
-    display: flex;
-    flex-direction: column;
-    border-radius: 45px; 
-    justify-content: center; /* Center grid items horizontally */
-    align-items: center;
-    background-color: rgba(179, 193, 255, 0.7);
-    margin-top: 7.2rem; 
-    padding: 0 5.25rem; 
-    width: min-content;
+  display: flex;
+  flex-direction: column;
+  border-radius: 45px; 
+  justify-content: center; /* Center grid items horizontally */
+  align-items: center;
+  background-color: rgba(179, 193, 255, 0.7);
+  margin-top: 7rem; 
+  padding: 0.5rem 5.25rem; 
+  width: min-content;
 }
 
 .case-study-2 .water-full {
-    position: absolute;
-    margin: 0;
-    padding: 0;
-    margin-top: -1rem;
-    width: 100%;
-    height: 102%;
-    background-image:
-    url('/fun/water-full-light3.png');
-    background-size: cover;
-    background-position: center top;
-    background-repeat: repeat-y;
-    z-index: -1000;
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  margin-top: -1rem;
+  width: 100%;
+  height: 102%;
+  background-image:
+  url('/fun/water-full-light3.png');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: repeat-y;
+  z-index: -1000;
 }
 
 
 .case-study-2 .water-full-mask { 
-  position: absolute;
-  margin-top: -0.75rem;
-  width: 100%;
-  height: 100%;
-  background-image:
-    url('/fun/water-full-light3.png');
-  background-size: cover;
-  background-position: center top;
-  background-repeat: repeat-y;
-  filter: url("#turbulence");
-  z-index: -1; /* Ensure it stays behind other content */ 
+position: absolute;
+margin-top: -0.75rem;
+width: 100%;
+height: 100%;
+background-image:
+  url('/fun/water-full-light3.png');
+background-size: cover;
+background-position: center top;
+background-repeat: repeat-y;
+filter: url("#turbulence");
+z-index: -1; /* Ensure it stays behind other content */ 
 }
 
 

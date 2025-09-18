@@ -3,7 +3,7 @@
         "name": "RichDreamer Text-to-3D",
         "color": "#f8d6d8",
         "skills": ["ML/Gen AI", "Prompt Engineering", "Python"],
-        "logline": "Educating users on best prompt engineering practices",
+        "logline": "Educating users on best AI prompt engineering practices",
         "image": "/projects/richdreamer.png",
         "link": "#/richdreamer"
     },
