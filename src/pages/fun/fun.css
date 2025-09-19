@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Krub:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
 .fun {
   position: relative;
   z-index: 1;
@@ -53,7 +55,7 @@
 .fun .info {
   background-color: #fef8f5;
   padding: 0.45rem 0;
-  color: #3a3a3a;
+  color: #2b2b2b;
 }
 
 .fun a {
@@ -88,7 +90,7 @@
 
 .fun .skill {
   border-radius: 0.36rem;
-  border: 1px solid #3a3a3a;
+  border: 1px solid #2b2b2b;
   margin-right: 0.54rem;
 }
 
@@ -120,23 +122,23 @@
 }
 
 .fun h1 {
-  font-family: "GeneralSans-Variable";
+  font-family: "Krub";
   font-weight: 560;
   font-size: 3.06rem;
   text-align: center;
   margin: 2.7rem;
   margin-bottom: 0rem;
   padding: 0;
-  color: #393939;
+  color: #2b2b2b;
 }
 
 .fun h2 {
-  font-family: "GeneralSans-Variable";
+  font-family: "Krub";
   font-weight: 450;
   font-size: 1.17rem;
   margin: 0rem 1.8rem;
   text-align: center;
-  color: #393939;
+  color: #2b2b2b;
 }
 
 svg {

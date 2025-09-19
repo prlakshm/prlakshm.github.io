@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Krub:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
 .projects {
   position: relative;
   margin-top: 1.8rem;
@@ -60,7 +62,7 @@
 .projects .info {
   background-color: #fef8f5;
   padding: 0.45rem 0;
-  color: #3a3a3a;
+  color: #2b2b2b;
 }
 
 .all-skills {
@@ -80,28 +82,28 @@
   border-radius: 0.54rem;
   border: 1px solid #3a3a3a;
   margin-right: 0.54rem;
-  color: #252525;
+  color: #2b2b2b;
 }
 
 h3 {
-  font-family: "GeneralSans-Variable";
+  font-family: "Krub";
   font-weight: 560;
   font-size: 2.25rem;
   margin: 0rem 1.125rem 0.225rem 1.71rem;
 }
 
 h4 {
-  font-family: "GeneralSans-Variable";
-  font-weight: 400;
-  font-size: 1.17rem;
+  font-family: "Krub";
+  font-weight: 425;
+  font-size: 1.1rem;
   margin: 0.75rem 1.8rem;
   margin-bottom: 0.63rem;
 }
 
 h5 {
-  font-family: "GeneralSans-Variable";
-  font-weight: 400;
-  font-size: 1.125rem;
+  font-family: "Krub";
+  font-weight: 425;
+  font-size: 1.1rem;
   margin: 0.225rem 0.54rem;
 }
 

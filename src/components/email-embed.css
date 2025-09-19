@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Krub:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
 .tab-content {
   display: flex;
   flex-direction: column;
@@ -73,9 +75,9 @@
   background: none;
   border: none;
   color: #f8dcff;
-  font-family: "GeneralSans-Variable";
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-family: "Krub";
+  font-size: 1rem;
+  font-weight: 625;
   cursor: pointer;
 }
 
@@ -106,9 +108,9 @@
   border: 0.9px solid #f8dcff;
   padding: 18px;
   margin: 1.8rem 0;
-  font-family: "GeneralSans-Variable";
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-family: "Krub";
+  font-size: 1rem;
+  font-weight: 625;
   width: 93.25%;
   border-radius: 4.5px;
   box-sizing: border-box;
@@ -121,7 +123,7 @@
 
 label {
   padding-left: 1.8px;
-  font-size: 0.945rem;
+  font-size: 1rem;
 }
 
 .dark-mode-form .form-control {
@@ -133,16 +135,16 @@ label {
   padding: 9px;
   margin-top: 0.45rem;
   box-sizing: border-box;
-  font-family: "GeneralSans-Variable";
+  font-family: "Krub";
   font-size: 0.9rem;
-  font-weight: 450;
+  font-weight: 425;
 }
 
 .dark-mode-form .form-control::placeholder {
   color: #f8dcff;
-  font-family: "GeneralSans-Variable";
+  font-family: "Krub";
   font-size: 0.9rem;
-  font-weight: 450;
+  font-weight: 425;
 }
 
 .dark-mode-form .submit-button {
@@ -153,17 +155,23 @@ label {
   color: #f8dcff;
   padding: 9px;
   margin-top: 0.45rem;
-  font-family: "GeneralSans-Variable";
-  font-size: 0.9rem;
-  font-weight: 450;
+  font-family: "Krub";
+  font-size: 1rem;
+  font-weight: 425;
   cursor: pointer;
+}
+
+.dark-mode-form .submit-button:hover {
+  background-color: #f8dcff;
+  border: 0.9px solid #575757;
+  color: #575757;
 }
 
 .response-message {
   color: #f8dcff;
-  font-family: "GeneralSans-Variable";
+  font-family: "Krub";
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 625;
   margin-top: 18px;
 }
 
@@ -174,9 +182,9 @@ label {
   border: 0.9px solid var(--cal-border);
   padding: 9px;
   box-sizing: border-box;
-  font-family: "GeneralSans-Variable";
+  font-family: "Krub";
   font-size: 0.9rem;
-  font-weight: 450;
+  font-weight: 425;
 }
 
 .custom-dropdown select:hover,
@@ -188,7 +196,7 @@ label {
 .custom-dropdown select option {
   background-color: #575757;
   color: #f8dcff;
-  font-weight: 450;
+  font-weight: 425;
 }
 
 .custom-dropdown select option:hover,
@@ -216,6 +224,20 @@ label {
   .tab-list {
     left: 10%;
   }
+
+  .dark-mode-form {
+    font-size: 0.9rem;
+  }
+  
+  
+  label {
+    font-size: 0.9rem;
+  }
+
+  .tab-list li button {
+    font-size: 0.9rem;
+  }
+  
 
 }
 

@@ -1,7 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Krub:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
 .case-study-2 {
     position: relative;
-    font-family: "GeneralSans-Variable";
-    color: #393939;;
+    font-family: "Krub";
+    color: #2b2b2b;;
     z-index: 1;
     display: flex;
     justify-content: center;
@@ -22,9 +24,9 @@
   border-radius: 45px; 
   justify-content: center; /* Center grid items horizontally */
   align-items: center;
-  background-color: rgba(179, 193, 255, 0.7);
+  background-color: rgba(179, 193, 255, 0.9);
   margin-top: 7rem; 
-  padding: 0.5rem 5.25rem; 
+  padding: 1.5rem 5.25rem; 
   width: min-content;
 }
 
@@ -65,12 +67,12 @@ z-index: -1; /* Ensure it stays behind other content */
     font-size: 3.06rem; 
     text-align: center;
     margin: 2.7rem; 
-    margin-bottom: 0rem;
+    margin-bottom: 0.5rem;
     padding-left: 2.25rem; 
 }
 
 .case-study-2 h2 {
-    font-family: "GeneralSans-Variable";
+    font-family: "Krub";
     font-weight: 570;
     font-size: 2.25rem; 
     margin: 0.9rem 2.7rem 0.2rem 2.7rem; 
@@ -84,11 +86,11 @@ z-index: -1; /* Ensure it stays behind other content */
 
 .takeaways ul {
     list-style-type: decimal;
-    font-size: 1.17rem; 
+    font-size: 1.1rem; 
 }
 
 .takeaways li::marker {
-    font-weight: 600;
+    font-weight: 625;
 }
 
 .takeaways .sub-section {
@@ -104,8 +106,8 @@ z-index: -1; /* Ensure it stays behind other content */
 }
 
 .sub-section li::marker {
-    font-size: 0.99rem; 
-    font-weight: 400;
+    font-size: 1rem; 
+    font-weight: 425;
 }
 
 .case-study-2 .overview-info {
@@ -116,15 +118,15 @@ z-index: -1; /* Ensure it stays behind other content */
 }
 
 .overview-info h3 {
-    font-size: 1.17rem; 
-    font-weight: 600;
+    font-size: 1.2rem; 
+    font-weight: 625;
     margin: 0;
     text-align: center;
 }
 
 .overview-info p {
-    font-size: 1.17rem;
-    font-weight: 400;
+    font-size: 1.1rem;
+    font-weight: 425;
     text-align: left;
 }
 
@@ -138,7 +140,7 @@ z-index: -1; /* Ensure it stays behind other content */
 
 .skill p {
     margin: 0.225rem 0.675rem; 
-    font-size: 1.08rem;
+    font-size: 1.1rem;
 }
 
 .overview, .pain-points, .takeaways {
@@ -151,8 +153,8 @@ z-index: -1; /* Ensure it stays behind other content */
 
 .overview p, .pain-points p, .takeaways p {
     width: 70vw;
-    font-size: 1.17rem; 
-    font-weight: 400;
+    font-size: 1.1rem; 
+    font-weight: 425;
     text-align: left;
     margin-top: 1.35rem; 
 }
@@ -177,23 +179,23 @@ video {
 }
 
 .bold {
-    font-weight: 600;
+    font-weight: 625;
 }
 
 .vert-bar {
-    font-weight: 550;
+    font-weight: 625;
 }
 
 .app-link {
-    font-size: 1.215rem; 
+    font-size: 1.15rem; 
     color: #7c16ab;
     font-weight: 550;
     text-decoration: underline;
 }
 
 .app-link:hover {
-    font-size: 1.215rem; 
-    font-weight: 600;
+    font-size: 1.15rem; 
+    font-weight: 625;
     text-decoration: underline;
 }
 
@@ -231,13 +233,9 @@ svg {
       font-size: 3.75rem;
     }
     .overview-info h3 {
-      font-size: 1.2rem; /* Reduce font size for smaller screens */
+      font-size: 1.15rem; /* Reduce font size for smaller screens */
       margin: 0rem 1rem; /* Adjust margins */
       line-height: 2rem;
-    }
-  
-    .overview-info p {
-      font-size: 1.1rem; /* Reduce font size */
     }
   
     .overview img,

@@ -17,7 +17,7 @@
     },
     {
         "name": "This is Not the Matrix",
-        "color": "#007000",
+        "color": "#05a505",
         "skills": ["Sci-fi", "Coming-of-age"],
         "logline": "Reality is a simulation and our lives are AI-generated. A teenage girl hacks the system to try to get her best friend back.",
         "image": "/fun/matrix-cover-art.png",

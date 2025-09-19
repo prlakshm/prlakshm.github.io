@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Krub:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
 body,
 html {
   margin: 0;
@@ -104,9 +106,9 @@ html {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  font-family: "GeneralSans-Variable";
-  font-weight: 500;
-  font-size: 0.99rem;
+  font-family: "Krub";
+  font-weight: 425;
+  font-size: 1.05rem;
   margin: 1.125rem 1.26rem;
 }
 
@@ -128,8 +130,8 @@ html {
 
 .header a {
   padding: 0 1.35rem;
-  font-family: "GeneralSans-Variable";
-  font-weight: 600;
+  font-family: "Krub";
+  font-weight: 625;
   font-size: 1.2rem;
   color: #2b2b2b;
   text-decoration: none;
@@ -186,81 +188,12 @@ html {
 
   .left {
     width: 45vw;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
   }
 }
 
 
 /*------------------------ Master Fonts --------------------------*/
-
-/**
-* This is a variable font
-* You can control variable axes as shown below:
-* font-variation-settings: wght 300.0wght 900.0;
-*
-* available axes:
-'wght' (range from 300.0 to 900.0'wght' (range from 300.0 to 900.0
-*/
-@font-face {
-  font-family: "Plein-Variable";
-  src: url("/fonts/plein/Plein-Variable.woff2") format("woff2"),
-    url("/fonts/plein/Plein-Variable.woff") format("woff");
-  font-weight: 300 900;
-  font-display: swap;
-  font-style: normal;
-}
-
-/**
-* This is a variable font
-* You can control variable axes as shown below:
-* font-variation-settings: wght 300.0wght 900.0;
-*
-* available axes:
-'wght' (range from 300.0 to 900.0'wght' (range from 300.0 to 900.0
-*/
-@font-face {
-  font-family: "Plein-VariableItalic";
-  src: url("/fonts/plein/Plein-VariableItalic.woff2") format("woff2"),
-    url("/fonts/plein/Plein-VariableItalic.woff") format("woff");
-  font-weight: 300 900;
-  font-display: swap;
-  font-style: italic;
-}
-
-/**
-* This is a variable font
-* You can control variable axes as shown below:
-* font-variation-settings: wght 700.0;
-*
-* available axes:
-'wght' (range from 200.0 to 700.0
-*/
-@font-face {
-  font-family: "GeneralSans-Variable";
-  src: url("/fonts/general-sans/GeneralSans-Variable.woff2") format("woff2"),
-    url("/fonts/general-sans/GeneralSans-Variable.woff") format("woff");
-  font-weight: 200 700;
-  font-display: swap;
-  font-style: normal;
-}
-
-/**
-* This is a variable font
-* You can control variable axes as shown below:
-* font-variation-settings: wght 700.0;
-*
-* available axes:
-'wght' (range from 200.0 to 700.0
-*/
-@font-face {
-  font-family: "GeneralSans-VariableItalic";
-  src: url("/fonts/general-sans/GeneralSans-VariableItalic.woff2")
-      format("woff2"),
-    url("/fonts/general-sans/GeneralSans-VariableItalic.woff") format("woff");
-  font-weight: 200 700;
-  font-display: swap;
-  font-style: italic;
-}
 
 @font-face {
   font-family: "Flotha-Variable";

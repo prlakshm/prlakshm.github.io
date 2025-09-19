@@ -45,7 +45,7 @@
   display: flex;
   flex-direction: column;
   border-radius: 4.5rem; /* 5rem scaled down by 0.9 */
-  width: 70vw; /* 70vw scaled down by 0.9 */
+  width: 65vw; /* 70vw scaled down by 0.9 */
   margin-top: -1.125rem; /* -1.25rem scaled down by 0.9 */
   padding-top: 0;
 
@@ -62,7 +62,7 @@
 .about .main h1 {
   font-family: "Flotha-Variable";
   margin: 0rem 0.9rem; /* 1rem scaled down by 0.9 */
-  margin-bottom: 0.9rem; /* 1rem scaled down by 0.9 */
+  margin-bottom: 0.7rem; /* 1rem scaled down by 0.9 */
   font-weight: 500;
   font-size: 3.4rem; /* 3.4rem scaled down by 0.9 */
   color: #f8dcff;
@@ -72,11 +72,11 @@
 }
 
 .about .main p {
-  font-family: "GeneralSans-Variable";
-  font-size: 1.17rem; 
+  font-family: "Krub";
+  font-size: 1.1rem; 
   font-weight: 600;
   color: #f8dcff;
-  width: 94%; 
+  width: 95%; 
   letter-spacing: 0.45px; 
   margin-top: 0rem;
   text-align: left;
@@ -201,11 +201,11 @@ svg {
 /* Media Query for screens 1024px or smaller */
 @media screen and (max-width: 1024px) {
   .about .main h1 {
-    font-size: 2.9rem; 
+    font-size: 2.7rem; 
   }
   
   .about .main p {
-    font-size: 1rem; 
+    font-size: 0.9rem; 
   }
 }
 
@@ -228,7 +228,7 @@ svg {
     margin-bottom: 0.3rem;
   }
   .about .main p {
-    font-size: 0.9rem; 
+    font-size: 0.8rem; 
   }
 
   .about .photo img {
@@ -258,7 +258,7 @@ svg {
   font-size: 2.25rem;
 }
 .about .main p {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   text-align: center; 
 }
 

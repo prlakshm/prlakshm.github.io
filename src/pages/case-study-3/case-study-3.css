@@ -1,7 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Krub:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
 .case-study-3 {
     position: relative;
-    font-family: "GeneralSans-Variable";
-    color: #393939;;
+    font-family: "Krub";
+    color: #2b2b2b;;
     z-index: 1;
     display: flex;
     justify-content: center;
@@ -70,8 +72,8 @@
 }
 
 .case-study-3 h2 {
-    font-family: "GeneralSans-Variable";
-    font-weight: 570;
+    font-family: "Krub";
+    font-weight: 575;
     font-size: 2.25rem; 
     margin: 0.9rem 2.7rem 0.2rem 2.7rem; 
     text-align: center;
@@ -83,11 +85,11 @@
 
 .takeaways ul {
     list-style-type: decimal;
-    font-size: 1.17rem; 
+    font-size: 1.1rem; 
 }
 
 .takeaways li::marker {
-    font-weight: 600;
+    font-weight: 625;
 }
 
 .takeaways .sub-section {
@@ -103,8 +105,8 @@
 }
 
 .sub-section li::marker {
-    font-size: 0.99rem; 
-    font-weight: 400;
+    font-size: 1rem; 
+    font-weight: 425;
 }
 
 .case-study-3 .overview-info {
@@ -115,15 +117,15 @@
 }
 
 .overview-info h3 {
-    font-size: 1.17rem;
-    font-weight: 600;
+    font-size: 1.2rem;
+    font-weight: 625;
     margin: 0;
     text-align: center;
 }
 
 .overview-info p {
-    font-size: 1.17rem; 
-    font-weight: 400;
+    font-size: 1.1rem; 
+    font-weight: 425;
     text-align: left;
 }
 
@@ -148,7 +150,7 @@
 
 .skill p {
     margin: 0.225rem 0.675rem; 
-    font-size: 1.08rem;
+    font-size: 1.1rem;
 }
 
 .case-study-3 .overview-info .team {
@@ -165,8 +167,8 @@
 
 .overview p, .pain-points p, .takeaways p {
     width: 70vw; 
-    font-size: 1.17rem; 
-    font-weight: 400;
+    font-size: 1.1rem; 
+    font-weight: 425;
     text-align: left;
     margin-top: 1.35rem; 
 }
@@ -191,22 +193,22 @@ video {
 }
 
 .bold {
-    font-weight: 600;
+    font-weight: 625;
 }
 
 .vert-bar {
-    font-weight: 550;
+    font-weight: 625;
 }
 
 .app-link {
-    font-size: 1.215rem; 
+    font-size: 1.15rem; 
     color: #7c16ab;
     font-weight: 550;
     text-decoration: underline;
 }
 
 .app-link:hover {
-    font-size: 1.215rem; 
+    font-size: 1.15rem; 
     font-weight: 600;
     text-decoration: underline;
 }
@@ -245,13 +247,9 @@ svg {
       font-size: 3.75rem;
     }
     .overview-info h3 {
-      font-size: 1.2rem; /* Reduce font size for smaller screens */
+      font-size: 1.15rem; /* Reduce font size for smaller screens */
       margin: 0rem 1rem; /* Adjust margins */
       line-height: 2rem;
-    }
-  
-    .overview-info p {
-      font-size: 1.1rem; /* Reduce font size */
     }
   
     .overview img,

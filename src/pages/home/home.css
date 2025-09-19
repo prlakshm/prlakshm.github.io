@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Krub:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
 .home {
   display: flex;
   flex-direction: column;
@@ -172,17 +174,17 @@ h1 {
   margin: 0.9rem;
   margin-bottom: 0.45rem;
   padding: 0;
-  color: #3a3a3a;
+  color: #2b2b2b;
 }
 
 h2 {
-  font-family: "GeneralSans-Variable";
-  font-weight: 400;
-  font-size: 1.17rem;
+  font-family: "Krub";
+  font-weight: 425;
+  font-size: 1.1rem;
   line-height: 1.8rem;
   letter-spacing: 1.35px;
   text-align: center;
-  color: #3a3a3a;
+  color: #2b2b2b;
   width: 46.8rem;
   margin: 0;
   padding: 0;
@@ -192,14 +194,14 @@ h2 {
 .home h2 a {
   display: inline-flex;
   color: #7c16ab;
-  font-weight: 525;
+  font-weight: 625;
   text-decoration: none;
 }
 
 .home h2 a:hover,
 .home h2 a:active {
   text-decoration: underline;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .home h2 a img {
@@ -271,7 +273,7 @@ svg {
   }
 
   h2 {
-    font-size: 1.1rem;
+    font-size: 1rem;
     width: 89%;
   }
 
