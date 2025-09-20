@@ -74,7 +74,7 @@ function About() {
           <div className="about-me">
             <div className="text">
               <p>
-                Hi 👋 I’m Pranavi, a product designer and multimedia artist at
+                I’m Pranavi 👋 , a product designer and multimedia artist at
                 Brown University. I create worlds 🌎 through computer
                 interfaces, animations, screenplays, and more, telling stories
                 both on the page and on the screen.
@@ -89,11 +89,11 @@ function About() {
                 I love watching movies (my top three are <i>Past Lives</i>,{" "}
                 <i>Tangled</i>, and <i>Walking on Sunshine</i>), writing
                 spinoffs of my favorite shows, and dancing terribly with my
-                friends 💃
+                friends 💃.
               </p>
               <p>
                 What movie did you watch recently? Let me know below 👇🏼 and
-                reach out if you need anything 💌 Thanks for stopping by!
+                reach out if you need anything 💌. Thanks for stopping by!
               </p>
             </div>
             <div className="photo">

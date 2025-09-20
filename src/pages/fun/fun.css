@@ -43,7 +43,7 @@
   transition: box-shadow 0.3s ease-out, transform 0.3s ease-out,
     opacity 0.2s ease-out; /* Add transition for hover effect */
   border-radius: 0.9em;
-  width: 40vw;
+  width: 38vw;
 }
 
 .fun .card:hover,
@@ -68,7 +68,7 @@
   justify-content: center;
   align-items: center;
   margin: 0;
-  height: 50vh;
+  height: 42.5vh;
   z-index: -1;
   overflow: hidden;
 }
