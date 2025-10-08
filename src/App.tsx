@@ -1,6 +1,7 @@
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header.js';
 import Home from './pages/home/Home.js';
+import CaseStudyHBOMax1 from './pages/case-study-hbo-max1/CaseStudyHBOMax1.js';
 import CaseStudy1 from './pages/case-study-1/CaseStudy1.js';
 import CaseStudy2 from './pages/case-study-2/CaseStudy2.js';
 import About from './pages/about/About.js';
@@ -20,6 +21,7 @@ function App() {
           <Route path="" element={<Home />} />
           <Route path="/projects" element={<Home />} />
           <Route path="/fun" element={<Fun />} />
+          <Route path="/hbo-max-surprise" element={<CaseStudyHBOMax1 />} />
           <Route path="/pbj-time" element={<CaseStudy4 />} />
           <Route path="/mi-fonda" element={<CaseStudy3 />} />
           <Route path="/binary-escape" element={<CaseStudy1 />} />

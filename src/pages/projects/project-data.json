@@ -1,5 +1,13 @@
 [
     {
+        "name": "Surprise Rail",
+        "color": "#f8d6d8",
+        "skills": ["Human-AI Interaction", "UX Research", "Figma"],
+        "logline": "Designing an AI-powered rail for the HBO Max app",
+        "image": "/projects/surprise-rail-overview.mp4",
+        "link": "#/hbo-max-surprise"
+    },
+    {
         "name": "RichDreamer Text-to-3D",
         "color": "#f8d6d8",
         "skills": ["ML/Gen AI", "Prompt Engineering", "Python"],
@@ -14,14 +22,6 @@
         "logline": "Building rounds and modelling 3D characters for a puzzle game",
         "image": "/projects/binary-escape.png",
         "link": "#/binary-escape"
-    },
-    {
-        "name": "PB&J Time",
-        "color": "#f8d6d8",
-        "skills": ["Prodia AI", "Photoshop", "2D Animation", "Javascript/React"],
-        "logline": "Using interaction and animation to enhance shopping UX",
-        "image": "/projects/pbj-time.png",
-        "link": "#/pbj-time"
     },
     {
         "name": "Mi Fonda Storefront",

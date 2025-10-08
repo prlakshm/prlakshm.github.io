@@ -136,7 +136,7 @@
 
 
 .skill {
-    background-color: rgba(248, 214, 216, 0.9);
+    background-color: rgba(255, 212, 198, 0.9);
 }
 
 .skill p {
@@ -149,7 +149,7 @@
     flex-direction: column;
     position: relative;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
 }
 
 .overview p, .pain-points p, .takeaways p {
@@ -189,9 +189,8 @@ video {
 
 .app-link {
     font-size: 1.15rem; 
-    color: #7c16ab;
+    color: #de7e5d;
     font-weight: 550;
-    text-decoration: underline;
 }
 
 .app-link:hover {

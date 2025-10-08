@@ -1,26 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Krub:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
 
-.projects {
+.project-cards {
   position: relative;
   margin-top: 1.8rem;
   padding: 0;
   z-index: 1;
 }
 
-.grid {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .project-cards {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
   border-radius: 45px;
-  width: 82.5vw;
-  padding: 3.15rem 2.25rem;
+  padding: 1.25rem;
   justify-content: center;
-  gap: 2.25rem;
 }
 
 .project-cards a {
@@ -29,38 +19,56 @@
   padding: 0;
 }
 
-.card {
-  border: none;
-  box-shadow: 0 1.8px 36px 0 rgb(152, 165, 226);
-  overflow: hidden;
-  transform: translateY(0);
-  transition: box-shadow 0.3s ease-out, transform 0.3s ease-out,
-    opacity 0.2s ease-out; /* Add transition for hover effect */
-  border-radius: 0.9em;
-  width: 40vw;
+.card-content {
+  position: relative; /* overlay only on this area */
 }
 
-.card:hover,
-.card:focus {
-  box-shadow: 0 1.8px 36px 0 rgb(106, 116, 164);
-  transform: translateY(-0.72rem);
+.card {
+  position: relative;
+  border: none;
+  overflow: hidden;
+  border-radius: 0rem;
+  width: 40vw;
+  background-color: white;
+  box-sizing: border-box;
 }
+
 
 .preview-image {
+  position: relative; 
   display: flex;
-  justify-content: center;
+  justify-content: start;
   align-items: flex-start;
   margin: 0;
   overflow: clip;
-  height: 45vh;
+  height: fit-content;
 }
 
-.preview-image img {
-  width: 35rem;
-  transform: translateY(-3%);
+/* overlay only on the image */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: white;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 2;
+  pointer-events: none;
 }
 
-.projects .info {
+/* activate overlay when the entire card is hovered */
+.card:hover::before,
+.card:focus::before {
+  opacity: 0.4; 
+}
+
+
+.preview-image video {
+  width: 105%;
+  margin-bottom: 0;
+}
+
+.project-cards .info {
   background-color: #fef8f5;
   padding: 0.45rem 0;
   color: #2b2b2b;
@@ -71,12 +79,12 @@
   flex-direction: row;
   flex-wrap: wrap;
   row-gap: 0.5rem;
-  margin-left: 1.8rem;
+  margin-left: 1.5rem;
 }
 
 .info .all-skills {
-  margin-left: 1.71rem;
-  margin-bottom: 0.36rem;
+  margin-left: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .skill {
@@ -87,24 +95,28 @@
 }
 
 h3 {
-  font-family: "Krub";
+  font-family: "forma-djr-text", sans-serif;
   font-weight: 560;
   font-size: 2.25rem;
   margin: 0rem 1.125rem 0.225rem 1.71rem;
 }
 
 h4 {
-  font-family: "Krub";
+  font-family: "forma-djr-text", sans-serif;
   font-weight: 425;
-  font-size: 1.1rem;
-  margin: 0.75rem 1.8rem;
+  font-size: 1.05rem;
+  line-height: 1.8rem;
+  letter-spacing: 1.5px;
+  margin: 0.75rem 1.05rem;
   margin-bottom: 0.63rem;
 }
 
 h5 {
-  font-family: "Krub";
+  font-family: "forma-djr-text", sans-serif;
   font-weight: 425;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
+  line-height: 1.5rem;
+  letter-spacing: 1.5px;
   margin: 0.225rem 0.54rem;
 }
 
@@ -179,7 +191,7 @@ h5 {
     grid-template-columns: 1fr;
   }
 
-  .projects {
+  .project-cards {
     margin-top: 1rem; /* Reduce top margin */
   }
 

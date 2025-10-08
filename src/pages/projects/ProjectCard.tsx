@@ -20,9 +20,17 @@ export default function ProjectCard(props: {
   // Convert hex color to RGBA with 30% transparency -- #f8dee6 other pink option
   const rgbaColor = hexToRGBA(props.color, props.alphaColor);
 
-  return <div className="card" style={{backgroundColor: props.color}}>
+  return <div className="card-content">
+    <div className="card" style={{backgroundColor: props.color}}>
     <div className="preview-image">
-        <img src={props.image} alt="Image of web project on device"/>
+      <video
+      src={props.image}
+      autoPlay
+      loop
+      muted
+      playsInline
+    > Your browser does not support the video tag.
+    </video>
         </div>
     <div className="info">
         <div className="all-skills">{props.skills.map(
@@ -35,6 +43,6 @@ export default function ProjectCard(props: {
             )}</div>
         <h4>{props.logline}</h4>
     </div>
-
+            </div>
   </div>;
 }
