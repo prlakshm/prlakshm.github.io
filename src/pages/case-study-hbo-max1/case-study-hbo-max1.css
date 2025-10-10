@@ -33,6 +33,14 @@
   text-decoration: underline;
 }
 
+.case-study-hbo-max1 .side-nav img {
+  width: 7px;
+  height: auto;
+  opacity: 55%;
+  margin: 0 5px -0.5px 0;
+}
+
+
 .case-study-hbo-max1 .study {
   display: flex;
   flex-direction: column;
@@ -71,18 +79,6 @@
   text-align: left;
 }
 
-.case-study-hbo-max1 h3 {
-  font-family: "adobe-text-pro", serif;
-  font-weight: 500;
-  font-size: 3rem;
-  text-align: left;
-  align-items: flex-start;
-  width: 100%;
-  letter-spacing: 1.1px;
-  margin: 1.1rem 2.7rem 0.2rem 0rem;
-  color: #2b2b2b;
-  margin-left: 0;
-}
 
 .case-study-hbo-max1 ul,
 .case-study-hbo-max1 li {

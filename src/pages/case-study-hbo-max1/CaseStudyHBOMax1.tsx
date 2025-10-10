@@ -27,7 +27,7 @@ function CaseStudyHBOMax1() {
         <div className="case-study-hbo-max1">
             <div className="content">
             <div className="side-nav">
-                <p onClick={() => scrollToSection(topRef)}>Top</p>
+                <p onClick={() => scrollToSection(topRef)}><img src="/icons/up-arrow.png" alt="up arrow icon"/>Top</p>
                     <p onClick={() => scrollToSection(problemRef)}>Problem</p>
                     <p onClick={() => scrollToSection(solutionRef)}>Solution</p>
                     <p onClick={() => scrollToSection(iterationsRef)}>Iterations</p>
@@ -130,7 +130,7 @@ function CaseStudyHBOMax1() {
                         {/* Introducing the Surprise Rail... */}
                         <p>Inspired by <span className="italic">Blind Date with a Book</span>, I came up with surprise tiles where the key art is hidden and replaced with AI-generated teaser descriptors.</p>
                         
-                        <h3 ref={iterationsRef}>What will it look like?</h3>
+                        <h2 ref={iterationsRef}>What will it look like?</h2>
                         {/* <div className="img-container">
                             <img
                                 src="/case-study-hbo-max1/CTV-Themed-Rail.png"
