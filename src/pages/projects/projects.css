@@ -8,6 +8,11 @@
   color: rgba(43, 43, 43, 0.8);
 }
 
+.fun .project-cards {
+  margin-top: 0rem;
+  margin-bottom: 1.8rem;
+}
+
 .project-cards {
   border-radius: 0rem;
   padding: 1.25rem;
@@ -70,9 +75,15 @@
   border-radius: 0rem;
 }
 
+.preview-image img {
+  width: 105%;
+  margin-bottom: 0;
+  border-radius: 0rem;
+}
+
 .project-cards .info {
   /* background-color: #fef8f5; */
-  background-color: #fef7f4;
+  background-color: #fff4ef;
   padding: 0.2rem 0;
   color: rgba(43, 43, 43, 0.8);
 }

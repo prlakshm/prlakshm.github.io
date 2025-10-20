@@ -20,30 +20,34 @@ export default function ProjectCard(props: {
   // Convert hex color to RGBA with 30% transparency -- #f8dee6 other pink option
   const rgbaColor = hexToRGBA(props.color, props.alphaColor);
 
-  return <div className="card-content">
-    <div className="card" style={{backgroundColor: props.color}}>
-    <div className="preview-image">
-      <video
-      src={props.image}
-      autoPlay
-      loop
-      muted
-      playsInline
-    > Your browser does not support the video tag.
-    </video>
-        </div>
-    <div className="info">
-        <div className="all-skills">{props.skills.map(
-              (
-                skill,
-                index 
-              ) => (
-                <div className="skill" style={{backgroundColor: rgbaColor}} key={index}><h5>{skill}</h5></div>
-              )
-            )}</div>
-          <h3>{props.name}</h3>
-        <h4>{props.logline}</h4>
-    </div>
-            </div>
-  </div>;
+ // Helper function to detect if file is a video
+ const isVideo = props.image.endsWith(".mp4") || props.image.endsWith(".webm") || props.image.endsWith(".mov");
+
+
+ return (
+   <div className="card-content">
+     <div className="card" style={{ backgroundColor: props.color }}>
+       <div className="preview-image">
+         {isVideo ? (
+           <video src={props.image} autoPlay loop muted playsInline>
+             Your browser does not support the video tag.
+           </video>
+         ) : (
+           <img src={props.image} alt={props.name} />
+         )}
+       </div>
+       <div className="info">
+         <div className="all-skills">
+           {props.skills.map((skill, index) => (
+             <div className="skill" style={{ backgroundColor: rgbaColor }} key={index}>
+               <h5>{skill}</h5>
+             </div>
+           ))}
+         </div>
+         <h3>{props.name}</h3>
+         <h4>{props.logline}</h4>
+       </div>
+     </div>
+   </div>
+ );
 }
