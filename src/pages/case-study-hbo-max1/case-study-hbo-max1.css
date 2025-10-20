@@ -37,7 +37,11 @@
   width: 7px;
   height: auto;
   opacity: 55%;
-  margin: 0 5px -0.5px 0;
+  margin: 0 1px -0.5px 0;
+}
+
+.case-study-hbo-max1 .side-nav img:hover {
+  text-decoration: underline;
 }
 
 
@@ -116,7 +120,7 @@
   display: flex;
   justify-content: space-around;
   width: 85%;
-  margin-top: 1.35rem;
+  margin-top: 0rem;
   margin-bottom: 1rem;
 }
 

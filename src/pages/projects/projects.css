@@ -71,8 +71,9 @@
 }
 
 .project-cards .info {
-  background-color: #fef8f5;
-  padding: 0.45rem 0;
+  /* background-color: #fef8f5; */
+  background-color: #fef7f4;
+  padding: 0.2rem 0;
   color: rgba(43, 43, 43, 0.8);
 }
 
@@ -85,8 +86,8 @@
 }
 
 .info .all-skills {
-  margin-left: 1rem;
-  margin-bottom: 0.5rem;
+  margin-left: 1.15rem;
+  margin-bottom: 0.2rem;
 }
 
 .skill {
@@ -108,14 +109,14 @@
   color: #2b2b2b;
 }
 
-h4 {
+.info h4 {
   font-family: "forma-djr-text", sans-serif;
   font-weight: 425;
   font-size: 1.05rem;
-  line-height: 1.8rem;
+  line-height: 1.5rem;
   letter-spacing: 1.5px;
-  margin: 0rem 1.05rem;
-  margin-bottom: 0.63rem;
+  margin: 0.1rem 1.05rem;
+  margin-bottom: 0.75rem;
 }
 
 h5 {

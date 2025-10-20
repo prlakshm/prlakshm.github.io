@@ -56,7 +56,7 @@ function Header() {
       <div className="left">
         <a href="" onClick={() => handleLinkClick('')}>
           <img
-            src="./icons/favicon-icon1.png"
+            src="./icons/punch-holes-favicon-light.png"
             alt="P.L. Home icon takes you back to landing page when clicked"
           />
         </a>
