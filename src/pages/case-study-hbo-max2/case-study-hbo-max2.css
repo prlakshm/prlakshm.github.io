@@ -1,0 +1,353 @@
+@import url("https://use.typekit.net/ovs8xoo.css");
+
+
+.case-study-hbo-max2 {
+  position: relative;
+  font-family: "forma-djr-text", sans-serif;
+  color: rgba(43, 43, 43, 0.8);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.case-study-hbo-max2 .content {
+  display: flex;
+  flex-direction: row;
+}
+
+.case-study-hbo-max2 .side-nav {
+  position: fixed;
+  top: 15.5%;
+  padding-left: 4.75%;
+  padding-right: 4rem;
+  font-size: 1.1rem;
+  font-weight: 525;
+  color: rgba(43, 43, 43, 0.75);;
+  letter-spacing: 1px;
+  line-height: 1.6rem;
+}
+
+.case-study-hbo-max2 .side-nav p:hover {
+  text-decoration: underline;
+}
+
+.case-study-hbo-max2 .side-nav img {
+  width: 7px;
+  height: auto;
+  opacity: 55%;
+  margin: 0 1px -0.5px 0;
+}
+
+.case-study-hbo-max2 .side-nav img:hover {
+  text-decoration: underline;
+}
+
+
+.case-study-hbo-max2 .study {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: left;
+  padding-left: 18.5%;
+}
+
+.case-study-hbo-max2 .main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center grid items horizontally */
+  align-items: left;
+  margin-top: 4rem; 
+  padding: 0.5rem 5.25rem; 
+  width: min-content;
+}
+
+
+.case-study-hbo-max2 h1 {
+  font-family: "adobe-text-pro", serif;
+  font-weight: normal;
+  font-size: 4rem;
+  text-align: left;
+  margin-top: 2.7rem;
+  margin-bottom: 1.5rem;
+  margin-left: 0;
+}
+
+.case-study-hbo-max2 h2 {
+  font-family: "adobe-text-pro", serif;
+  font-weight: 500;
+  font-size: 3rem;
+  margin: 1.5rem 2.7rem 1rem 0rem;
+  letter-spacing: 1.1px;
+  text-align: left;
+}
+
+
+.case-study-hbo-max2 ul,
+.case-study-hbo-max2 li {
+  padding-left: 1.25rem;
+  margin-top: 0rem;
+}
+
+.takeaways ul, .pain-points ul {
+  list-style-type: decimal;
+}
+
+.takeaways li::marker, .pain-points li::marker {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.takeaways .sub-section {
+  padding-left: 3.6rem;
+}
+
+.takeaways .sub-section ul {
+  list-style-type: decimal;
+}
+
+.takeaways {
+  margin-bottom: 0.9rem;
+}
+
+.sub-section li::marker {
+  font-size: 1.1rem;
+  font-weight: 425;
+}
+
+.overview-info {
+  display: flex;
+  justify-content: space-between;
+  width: 85%;
+  margin-top: 0rem;
+  margin-bottom: 1rem;
+}
+
+.case-study-hbo-max2 .overview-info h3 {
+  font-family: "forma-djr-text", sans-serif;
+  color: rgba(43, 43, 43, 0.75);
+  font-size: 1.15rem;
+  font-weight: 625;
+  margin: 0;
+  text-align: center;
+}
+
+.case-study-hbo-max2 .overview-info p {
+  font-size: 1.1rem;
+  font-weight: 425;
+  text-align: center;
+  letter-spacing: 1px;
+  line-height: 1.6rem;
+}
+
+.case-study-hbo-max2 .all-skills {
+  width: 15vw;
+  justify-content: center; /* center the grid as a whole */
+  margin: 0rem;
+}
+
+
+.overview,
+.pain-points,
+.takeaways {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  justify-content: center;
+  align-items: left;
+}
+
+.case-study-hbo-max2
+.overview p,
+.case-study-hbo-max2
+.pain-points p,
+.case-study-hbo-max2
+.takeaways p {
+  width: 65vw;
+  font-size: 1.1rem;
+  font-weight: 425;
+  text-align: left;
+  margin-top: 1.35rem;
+  letter-spacing: 1px;
+  line-height: 1.6rem;
+}
+
+.overview img,
+.pain-points img,
+.takeaways img {
+  margin: 1.8rem 0;
+  width: 45vw;
+  border-radius: 4.5px;
+}
+
+.video-container {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;  
+  align-items: flex-start;
+  width: 70%;
+  overflow: hidden;        
+}
+
+.video-container video {
+  position: relative;                  
+  width: 105%;       /* make the video a bit wider so it fills height */
+  height: auto;      /* keep the existing height */               
+  margin-bottom: 1.8rem;
+  object-fit: cover;            
+  object-position: left center; 
+}
+
+
+.bold {
+  font-weight: 625;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.vert-bar {
+  font-weight: 625;
+}
+
+.arrow {
+  font-weight: 800;
+  font-size: 1.4rem;
+  color: rgba(43, 43, 43, 0.8);
+}
+
+.case-study-hbo-max2 .app-link {
+  font-size: 1.1rem;
+  color: #de7e5d;
+  font-weight: 550;
+  text-decoration: none;
+  letter-spacing: 1px;
+  line-height: 1.6rem;
+}
+
+.team a {
+  text-decoration: none;
+
+}
+
+.case-study-hbo-max2 .app-link:hover {
+  font-size: 1.1rem;
+  font-weight: 625;
+  text-decoration: underline;
+}
+
+.seperator {
+  height: 1.35rem;
+}
+
+.overview a,
+.pain-points a,
+.takeaways a {
+  padding: 0;
+  text-decoration: none;
+  font-size: 1.1rem;
+}
+
+svg {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+/*------------------------ Media Queries --------------------------*/
+
+@media screen and (max-width: 1024px) {
+  .case-study-hbo-max2 .main {
+    padding: 0 2rem;
+  }
+
+  .case-study-hbo-max2 .overview-info {
+    width: 75vw;
+  }
+}
+
+@media screen and (max-width: 768px) {
+
+  .case-study-hbo-max2 h1 {
+    font-size: 3.75rem;
+  }
+  .overview-info h3 {
+    font-size: 1.15rem; /* Reduce font size for smaller screens */
+    margin: 0rem 1rem; /* Adjust margins */
+    line-height: 2rem;
+  }
+
+
+  .overview img,
+  .pain-points img,
+  .takeaways img {
+    width: 60vw;
+  }
+
+  video {
+    width: 75vw;
+  }
+}
+
+@media screen and (max-width: 716px) {
+.case-study-hbo-max2 .overview-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .case-study-hbo-max2 .team {
+    width: 35vw;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .case-study-hbo-max2 h1 {
+    font-size: 3rem;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+@media screen and (max-width: 550px) {
+  .case-study-hbo-max2 .main {
+    padding: 0 1rem;
+  }
+  .case-study-hbo-max2 .all-skills {
+    display: flex;
+    flex-direction: column;
+  }
+  .overview img,
+  .pain-points img,
+  .takeaways img {
+    width: 70vw;
+  }
+
+  video {
+    width: 70vw;
+  }
+}
+
+@media screen and (max-width: 426px) {
+  .case-study-hbo-max2 h1 {
+    padding-left: 1.25rem;
+  }
+
+  .overview-info h3 {
+    line-height: 1.15rem;
+  }
+}
+
+@media screen and (max-width: 396px) {
+  .case-study-hbo-max2 .main {
+    padding: 0 0.5rem;
+  }
+  .case-study-hbo-max2 h1 {
+    font-size: 2.25rem;
+    padding-left: 1.25rem;
+  }
+  .case-study-hbo-max2 .overview-info {
+    width: 82vw;
+  }
+}

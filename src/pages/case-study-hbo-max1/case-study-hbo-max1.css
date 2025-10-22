@@ -87,7 +87,7 @@
 .case-study-hbo-max1 ul,
 .case-study-hbo-max1 li {
   padding-left: 1.25rem;
-  margin-top: 0;
+  margin-top: 0rem;
 }
 
 .takeaways ul, .pain-points ul {
@@ -118,7 +118,7 @@
 
 .overview-info {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   width: 85%;
   margin-top: 0rem;
   margin-bottom: 1rem;
@@ -147,10 +147,6 @@
   margin: 0rem;
 }
 
-
-.case-study-hbo-max1 .team {
-  width: 22vw;
-}
 
 
 .overview,
@@ -197,11 +193,9 @@
 
 .video-container video {
   position: relative;                  
-  left: 2%;         /* shift left to crop more off the right */
   width: 105%;       /* make the video a bit wider so it fills height */
   height: auto;      /* keep the existing height */               
   margin-bottom: 1.8rem;
-  border-radius: 4.5px;
   object-fit: cover;            
   object-position: left center; 
 }

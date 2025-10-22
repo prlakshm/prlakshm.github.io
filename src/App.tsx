@@ -2,14 +2,13 @@ import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header.js';
 import Home from './pages/home/Home.js';
 import CaseStudyHBOMax1 from './pages/case-study-hbo-max1/CaseStudyHBOMax1.js';
-import CaseStudy1 from './pages/case-study-1/CaseStudy1.js';
-import CaseStudy2 from './pages/case-study-2/CaseStudy2.js';
+import CaseStudyHBOMax2 from './pages/case-study-hbo-max2/CaseStudyHBOMax2.js';
+import CaseStudyBinary from './pages/case-study-binary/CaseStudyBinary.js';
+import CaseStudyDreamer from './pages/case-study-dreamer/CaseStudyDreamer.js';
 import About from './pages/about/About.js';
-import CaseStudy3 from './pages/case-study-3/CaseStudy3.js';
 import './app.css';
 import Fun from './pages/fun/Fun.js';
-import CaseStudy4 from './pages/case-study-4/CaseStudy4.js';
-import CaseStudy5 from './pages/case-study-5/CaseStudy5.js';
+
 
 
 function App() {
@@ -22,11 +21,9 @@ function App() {
           <Route path="/projects" element={<Home />} />
           <Route path="/fun" element={<Fun />} />
           <Route path="/hbo-max-surprise" element={<CaseStudyHBOMax1 />} />
-          <Route path="/pbj-time" element={<CaseStudy4 />} />
-          <Route path="/mi-fonda" element={<CaseStudy3 />} />
-          <Route path="/binary-escape" element={<CaseStudy1 />} />
-          <Route path="/richdreamer" element={<CaseStudy2 />} />
-          <Route path="/artists-corner" element={<CaseStudy5 />} />
+          <Route path="/hbo-max-rtw" element={<CaseStudyHBOMax2 />} />
+          <Route path="/binary-escape" element={<CaseStudyBinary />} />
+          <Route path="/richdreamer" element={<CaseStudyDreamer />} />
           <Route path="/about" element={<About />} />
         </Routes>
     </Router>

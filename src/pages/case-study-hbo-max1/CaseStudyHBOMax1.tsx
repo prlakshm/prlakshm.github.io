@@ -24,7 +24,7 @@ function CaseStudyHBOMax1() {
 
 
     return (
-        <div className="case-study-hbo-max1">
+        <div className="case-study-hbo-max1" ref={topRef}>
             <div className="content">
             <div className="side-nav">
                 <p onClick={() => scrollToSection(topRef)}>(<img src="/icons/up-arrow.png" alt="up arrow icon"/>) Top</p>
@@ -36,7 +36,7 @@ function CaseStudyHBOMax1() {
             <div className="study">
 
                 <div className="main">
-                    <h1>Surprise Rail - HBO Max</h1>
+                    <h1 >Surprise Rail - HBO Max</h1>
                     <div className="overview">
                     <div className="video-container">
                     <video
@@ -59,7 +59,7 @@ function CaseStudyHBOMax1() {
                         </div>
                         <div className="timeline">
                             <h3>Timeline</h3>
-                            <p>Jun 2025 - Jul 2025</p>
+                            <p>Jun - Jul 2025</p>
                         </div>
                         <div className="team">
                             <h3>Team</h3>

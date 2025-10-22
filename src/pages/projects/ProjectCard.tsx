@@ -27,15 +27,17 @@ export default function ProjectCard(props: {
  return (
    <div className="card-content">
      <div className="card" style={{ backgroundColor: props.color }}>
-       <div className="preview-image">
          {isVideo ? (
+          <div className="preview-video">
            <video src={props.image} autoPlay loop muted playsInline>
              Your browser does not support the video tag.
            </video>
+           </div>
          ) : (
+          <div className="preview-image">
            <img src={props.image} alt={props.name} />
+           </div>
          )}
-       </div>
        <div className="info">
          <div className="all-skills">
            {props.skills.map((skill, index) => (
