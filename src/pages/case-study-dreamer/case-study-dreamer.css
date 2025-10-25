@@ -87,7 +87,7 @@
 .case-study-dreamer ul,
 .case-study-dreamer li {
   padding-left: 1.25rem;
-  margin-top: 0rem;
+  margin: 0rem 0 0.5rem 0;
 }
 
 .takeaways ul, .pain-points ul {

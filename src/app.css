@@ -133,6 +133,10 @@ html {
   margin-bottom: 1.35rem;
 }
 
+a {
+  transition: 0.5s;
+}
+
 .header a {
   padding: 0 1.35rem;
   font-family:  "forma-djr-text", sans-serif;

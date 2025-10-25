@@ -78,16 +78,27 @@
   font-family: "adobe-text-pro", serif;
   font-weight: 500;
   font-size: 3rem;
-  margin: 1.5rem 2.7rem 1rem 0rem;
+  margin: 2rem 2.7rem 1rem 0rem;
   letter-spacing: 1.1px;
   text-align: left;
+}
+
+.case-study-hbo-max1 h4 {
+  font-family: "adobe-text-pro", serif;
+  font-weight: 500;
+  font-size: 2.75rem;
+  margin: 1rem 0 0 0;
+  letter-spacing: 1.1px;
+  text-align: left;
+  color: #2b2b2b;
+  
 }
 
 
 .case-study-hbo-max1 ul,
 .case-study-hbo-max1 li {
   padding-left: 1.25rem;
-  margin-top: 0rem;
+  margin: 0rem 0 0.5rem 0;
 }
 
 .takeaways ul, .pain-points ul {
@@ -182,6 +193,7 @@
   border-radius: 4.5px;
 }
 
+
 .video-container {
   position: relative;
   display: flex;
@@ -200,6 +212,23 @@
   object-position: left center; 
 }
 
+.img-caption {
+  display: flex;
+  align-items: end;
+  margin-top: 0rem;
+}
+
+.img-caption h5 {
+  font-family: "adobe-text-pro", serif;
+  font-weight: 500;
+  font-size: 1.35rem;
+  line-height: 1.5rem;
+  margin: 1rem 0rem 0 1.8rem;
+  letter-spacing: 1.0px;
+  text-align: left;
+  color: #2b2b2b;
+  width: 18vw;
+}
 
 .bold {
   font-weight: 625;
@@ -211,6 +240,11 @@
 
 .vert-bar {
   font-weight: 625;
+}
+
+.img-border {
+  box-shadow: 0px 0px 3px #2b2b2b;
+  
 }
 
 .arrow {

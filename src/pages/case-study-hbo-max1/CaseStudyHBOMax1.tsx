@@ -13,6 +13,7 @@ function CaseStudyHBOMax1() {
      // Section references
      const topRef = useRef(null);
      const problemRef = useRef(null);
+     const researchRef = useRef(null);
      const iterationsRef = useRef(null);
      const solutionRef = useRef(null);
      const reflectionRef = useRef(null);
@@ -29,8 +30,9 @@ function CaseStudyHBOMax1() {
             <div className="side-nav">
                 <p onClick={() => scrollToSection(topRef)}>(<img src="/icons/up-arrow.png" alt="up arrow icon"/>) Top</p>
                     <p onClick={() => scrollToSection(problemRef)}>Problem</p>
-                    <p onClick={() => scrollToSection(solutionRef)}>Solution</p>
+                    <p onClick={() => scrollToSection(researchRef)}>Research</p>
                     <p onClick={() => scrollToSection(iterationsRef)}>Iterations</p>
+                    <p onClick={() => scrollToSection(solutionRef)}>Solution</p>
                     <p onClick={() => scrollToSection(reflectionRef)}>Reflection</p>
             </div>
             <div className="study">
@@ -125,18 +127,114 @@ function CaseStudyHBOMax1() {
                             </li> 
                         </ul>
                     </div>
-                    <div className="pain-points" ref={solutionRef}>
+                    <div className="pain-points" ref={researchRef}>
                         <h2>My Idea</h2>
                         {/* Introducing the Surprise Rail... */}
-                        <p>Inspired by <span className="italic">Blind Date with a Book</span>, I came up with surprise tiles where the key art is hidden and replaced with AI-generated teaser descriptors.</p>
+                        <p>Inspired by <span className="italic">Blind Date with a Book</span>, I came up with surprise tiles where the key art is hidden and replaced with AI-generated teaser descriptors. This way, lesser known titles can get discovered by playing off  the appeal of surprise.</p>
+                        
+                        <h4>From UX Research we found...</h4>
+
+                        <p>Out of atmospheric, behavior, thematic, and tactical descriptors, thematic and tactical descriptors have the highest impact on decision making. As a bonus, they tell more about the title. </p>
+
+                        <h4>I decided to use 2-3 word thematic or tactical descriptors.</h4>
+                        <p> Going back to our intitial problems, we are trying to help users feel more confident choosing a title and give them more context on what the its is about. 
+                        <br />
+                        <br />
+                        So, thematic and tactical descriptors replace the key art in surprise tiles. I'm keeping them to 2-3 words as per advice from our UX writer, because then they are easily skimmable and invite exploration. </p>
+
+                        <h4 ref={iterationsRef}>How will the AI work?</h4>
+
+                        <p>The AI will take in 3 inputs: the title, the point of the user journey the user is on (current HBO Max subpage), and the copy guide with descriptor guidelines and title metadata.
+                        <br />
+                        <br />
+
+                        Inputs → Title, Point in User Journey, Copy Guide
+                        <br />Outputs → Teaser Descriptor
+
+                        <br />
+                        <br />
+
+                        The key is that the page the user is on gives us a hint on what they are interested in and what might intrigue them!
+                        </p>
+
+                        <div className="img-container">
+                            <div className="img-caption">
+                            <img
+                                
+                                src="/case-study-hbo-max1/Hacks Example.png"
+                                alt="Hacks through Comedy subpage is described as 'Fame gets Feral' and LGBTQ+ is 'Outsiders with Mics'"
+                            />
+                            <h5 style={{transform: "translateY(-1.9rem)"}}>The descriptors for <span className="italic">Hacks</span> would be different if the user was on the Comedy genre page vs. the LGBTQ+ collection page.</h5>
+                            </div>
+                            <div className="img-caption">
+                            <img
+                               
+                                src="/case-study-hbo-max1/GOT Example.png"
+                                alt="Game of Thrones through Drama subpage is described as 'Bloodline Betrayal' and Sci-fi & Fantasy is 'Ancient Powers Rise'"
+                            />
+                            <h5 style={{transform: "translateY(-1.5rem)"}}>Based on the subpage, the descriptor would appeal to the content focus and theme.</h5>
+                            </div>
+                        </div>
+                        <p></p>
                         
                         <h2 ref={iterationsRef}>What will it look like?</h2>
-                        {/* <div className="img-container">
+                        <p>My first iteration of the tile was a film-reel design with tiles placed randomly on the page.</p>
+
+                        <div className="img-caption">
                             <img
-                                src="/case-study-hbo-max1/CTV-Themed-Rail.png"
-                                alt="Surprise Rail Overview Image"
+                               
+                                src="/case-study-hbo-max1/film-reel-tiles.png"
+                                alt="first iteration tile design where surprise tiles are rectangle film reels'"
                             />
-                        </div> */}
+                            <h5 style={{transform: "translateY(-1.5rem)"}}>Through cubby testing, I found randomly-placed tiles disrupted existing mental models for users and they were confused why those tiles are hidden. </h5>
+                            </div>
+
+                        <p>So, I decided to turn the surprise tiles into their own rail. I also received feedback from my skip-level <a href="https://www.linkedin.com/in/mmcwatters/" target="_blank">
+                                <span className="app-link">Michael McWatters</span>
+                            </a> and he thought the film-reel concept was overdone in the entertainment/media industry.</p>
+
+                        <h4>A/B Testing</h4>
+                        <p>I now presented my test group with two new tile designs: a solid black and a frosted-glass inspired by HBO Max's new visual style rebrand.</p>
+
+                        <div className="img-caption">
+                            <img
+                               
+                                src="/case-study-hbo-max1/tile-testing-options.png"
+                                alt="solid black vs. frosted glass tile designs'"
+                            />
+                            <h5 style={{transform: "translateY(-2.25rem)"}}>Participants preferred the frosted glass design because it was more visually engaging and indicated that there was something behind the tile.</h5>
+                            </div>
+
+                            <p>I narrowed down to two names: "Blind Date with a [theme]" or "Surprise [theme]." It's important the title changes based on the subpage to indicate how the AI results change based on the point of the user journey.</p>
+
+                            <div className="img-caption">
+                            <img
+                               
+                                src="/case-study-hbo-max1/name-options.png"
+                                alt="solid black vs. frosted glass tile designs'"
+                            />
+                            <h5 style={{transform: "translateY(-1.5rem)"}}>Younger ages 18-25 understood the play on <span className="italic">blind date</span>, but older ages took it more literal and thought it involved romance.</h5>
+                            </div>
+
+                            <p>As per advice from our UX writers, I decided on "Surprise [theme]" because it clearly communicated the concept and was the most straightforward. </p>
+                        
+                        <h2 ref={solutionRef}>Final Design</h2>
+                        <p>I added a card-flip animation and a delayed reveal for the top preview rail for a more playful interactive experience!</p>
+                        <div className="video-container" style={{marginTop: "1.5rem"}}>
+                    <video
+                            src="/case-study-hbo-max1/demo-video.mp4"
+                            aria-label="Final Design for Surprise Tail on CTV Click-Through Animation"
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                        >
+                            Your browser does not support the video tag.
+                        </video>
+                        </div>
+
+
+
                     
                     </div>
 
@@ -146,29 +244,18 @@ function CaseStudyHBOMax1() {
                         <ul>
                             <li>
                                 <p>
-                                    <span className="bold">Prioritize for Deadlines:</span> There were features we
-                                    initially planned to implement, like Google OAuth
-                                    for login. I{" "}
-                                    
-                                        prioritized <span className="bold">optimizing existing features instead of adding new
-                                        ones
-                                    </span>
-                                    . Limiting the scope was better than delivering a half-baked
-                                    product.
+                                    <span className="bold">Presenting to PMs:</span> Even if your idea doesn't get picked up by a PM, presenting  gets you visibility as a designer so they can understand where your skills and interests lie (AI-enhanced discovery in my case!).
                                 </p>
                             </li>
                             <li>
                                 <p>
-                                    <span className="bold">Keep Future Engineers in Mind:</span> I created query functions for current use cases and for use cases
-                                    that might come up in the future. By commenting and coding with future software engineers in mind, we can <span className="bold">streamline development workflow and new feature integrations</span>.
+                                    <span className="bold">Hold on Tightly, Let Go Lightly:</span> I learned to fight for my ideas and defend my design choices when asked in reviews, but also let go if something isn't working. We pivot quickly and often, so I learned to not get too attached to one idea.
                                 </p>
                             </li>
                             <li>
                                 <p>
-                                    <span className="bold">Scalable Database:</span> Storing account and item information in a <span className="bold">MongoDB database
-                                    ensured data security</span>. Data
-                                    can be scaled, meaning even when data is added (the website gets
-                                    more users) the system still runs smoothly.
+                                    <span className="bold">Sometimes Naming is the Hardest Part:</span> I tossed out many name ideas like "Mystery Match," "Blindbox," "Surprise Inside," and "What's This?" to name a few. <span className="bold">Being direct is more effective because it helps users instantly understand what’s going on</span>. 
+                                    Still, we aren't the happiest with this because TedEx has a feature called "Surprise Me!"
                                 </p>
                             </li>
                         </ul>
