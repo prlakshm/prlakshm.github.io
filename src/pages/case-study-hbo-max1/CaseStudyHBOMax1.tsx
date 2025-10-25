@@ -130,17 +130,18 @@ function CaseStudyHBOMax1() {
                     <div className="pain-points" ref={researchRef}>
                         <h2>My Idea</h2>
                         {/* Introducing the Surprise Rail... */}
-                        <p>Inspired by <span className="italic">Blind Date with a Book</span>, I came up with surprise tiles where the key art is hidden and replaced with AI-generated teaser descriptors. This way, lesser known titles can get discovered by playing off  the appeal of surprise.</p>
+                        <p>Inspired by <span className="italic">Blind Date with a Book</span>, I came up with surprise tiles where the <span className="bold">key art is hidden and replaced with AI-generated teaser descriptors</span>. This way, lesser known titles can get discovered by playing off  the appeal of surprise.</p>
                         
                         <h4>From UX Research we found...</h4>
 
-                        <p>Out of atmospheric, behavior, thematic, and tactical descriptors, thematic and tactical descriptors have the highest impact on decision making. As a bonus, they tell more about the title. </p>
+                        <p>Out of atmospheric, behavior, thematic, and tactical descriptors, <span className="bold">thematic and tactical descriptors have the highest impact on decision making</span>. As a bonus, they tell more about the title. </p>
 
                         <h4>I decided to use 2-3 word thematic or tactical descriptors.</h4>
-                        <p> Going back to our intitial problems, we are trying to help users feel more confident choosing a title and give them more context on what the its is about. 
+                        <p> Going back to our intitial problems, we are trying to <span className="bold">help users feel more confident choosing a title and give them more context</span> on what the its is about. 
+
                         <br />
                         <br />
-                        So, thematic and tactical descriptors replace the key art in surprise tiles. I'm keeping them to 2-3 words as per advice from our UX writer, because then they are easily skimmable and invite exploration. </p>
+                        So, thematic and tactical descriptors replace the key art in surprise tiles. Based on advice from our UX writer, I'm keeping them to <span className="bold">2-3 words because they are easily skimmable and invite exploration</span>. </p>
 
                         <h4 ref={iterationsRef}>How will the AI work?</h4>
 
@@ -148,8 +149,8 @@ function CaseStudyHBOMax1() {
                         <br />
                         <br />
 
-                        Inputs → Title, Point in User Journey, Copy Guide
-                        <br />Outputs → Teaser Descriptor
+                        <span className="bold">Inputs → Title, Point in User Journey, Copy Guide</span>
+                        <br /><span className="bold">Outputs → Teaser Descriptor</span>
 
                         <br />
                         <br />
@@ -178,7 +179,7 @@ function CaseStudyHBOMax1() {
                         <p></p>
                         
                         <h2 ref={iterationsRef}>What will it look like?</h2>
-                        <p>My first iteration of the tile was a film-reel design with tiles placed randomly on the page.</p>
+                        <p>My first iteration of the tile was a <span className="bold">film-reel design with tiles placed randomly</span> on the page.</p>
 
                         <div className="img-caption">
                             <img
@@ -194,7 +195,7 @@ function CaseStudyHBOMax1() {
                             </a> and he thought the film-reel concept was overdone in the entertainment/media industry.</p>
 
                         <h4>A/B Testing</h4>
-                        <p>I now presented my test group with two new tile designs: a solid black and a frosted-glass inspired by HBO Max's new visual style rebrand.</p>
+                        <p>I now presented my test group with two new tile designs: <span className="bold">a solid black and a frosted-glass</span> inspired by HBO Max's new visual style rebrand.</p>
 
                         <div className="img-caption">
                             <img
@@ -205,7 +206,7 @@ function CaseStudyHBOMax1() {
                             <h5 style={{transform: "translateY(-2.25rem)"}}>Participants preferred the frosted glass design because it was more visually engaging and indicated that there was something behind the tile.</h5>
                             </div>
 
-                            <p>I narrowed down to two names: "Blind Date with a [theme]" or "Surprise [theme]." It's important the title changes based on the subpage to indicate how the AI results change based on the point of the user journey.</p>
+                            <p>I narrowed down to two names: <span className="bold">"Blind Date with a [theme]" and "Surprise [theme]."</span> The title changes based on the subpage to indicate how the AI results change based on the point of the user journey.</p>
 
                             <div className="img-caption">
                             <img
@@ -216,10 +217,10 @@ function CaseStudyHBOMax1() {
                             <h5 style={{transform: "translateY(-1.5rem)"}}>Younger ages 18-25 understood the play on <span className="italic">blind date</span>, but older ages took it more literal and thought it involved romance.</h5>
                             </div>
 
-                            <p>As per advice from our UX writers, I decided on "Surprise [theme]" because it clearly communicated the concept and was the most straightforward. </p>
+                            <p>As per advice from our UX writer, I decided on <span className="bold">"Surprise [theme]"</span> because it <span className="bold">clearly communicated the concept and was the most straightforward</span>. </p>
                         
                         <h2 ref={solutionRef}>Final Design</h2>
-                        <p>I added a card-flip animation and a delayed reveal for the top preview rail for a more playful interactive experience!</p>
+                        <p>I added a <span className="bold">card-flip animation and a delayed reveal</span> for the top preview rail for a <span className="bold">more playful interactive experience</span>!</p>
                         <div className="video-container" style={{marginTop: "1.5rem"}}>
                     <video
                             src="/case-study-hbo-max1/demo-video.mp4"
@@ -244,12 +245,12 @@ function CaseStudyHBOMax1() {
                         <ul>
                             <li>
                                 <p>
-                                    <span className="bold">Presenting to PMs:</span> Even if your idea doesn't get picked up by a PM, presenting  gets you visibility as a designer so they can understand where your skills and interests lie (AI-enhanced discovery in my case!).
+                                    <span className="bold">Presenting to PMs:</span> Even if your idea doesn't get picked up by a PM, <span className="bold">presenting  gets you visibility as a designer</span> so they can understand where your skills and interests lie (AI-enhanced discovery in my case!).
                                 </p>
                             </li>
                             <li>
                                 <p>
-                                    <span className="bold">Hold on Tightly, Let Go Lightly:</span> I learned to fight for my ideas and defend my design choices when asked in reviews, but also let go if something isn't working. We pivot quickly and often, so I learned to not get too attached to one idea.
+                                    <span className="bold">Hold on Tightly, Let Go Lightly:</span> I learned to <span className="bold">fight for my ideas</span> and defend my design choices when asked in reviews, but also let go if something isn't working. <span className="bold">We pivot quickly and often</span>, so I learned to not get too attached to one idea.
                                 </p>
                             </li>
                             <li>
