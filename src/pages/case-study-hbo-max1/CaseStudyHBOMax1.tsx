@@ -116,7 +116,7 @@ function CaseStudyHBOMax1() {
                         <h2>Current Problems</h2>
                         <ul>
                             <li>
-                                <p><span className="bold">Lack of Engagement on Subpages:</span> 98% of users don't make it past the HBO Max home page and most of the interior pages aren't driving any meaningful traffic .</p>
+                                <p><span className="bold">Lack of Engagement on Subpages:</span> 98% of users don't make it past the HBO Max home page and most of the interior pages aren't driving any meaningful traffic.</p>
                             </li>
                             <li>
                                 <p><span className="bold">Lack of Context:</span> Users don't know what they're getting themselves into when clicking a title based on just the keyart.</p>
@@ -234,9 +234,20 @@ function CaseStudyHBOMax1() {
                         </video>
                         </div>
 
+                        <p>You can view the <a href="https://www.figma.com/design/XVlsXuMb5tnBTed7jCXIKf/Surprise-Tiles-Component-Idea?node-id=6006-97068&t=RzE8cLmEwRnKQrBi-1" target="_blank">
+                        <span className="app-link bold">Figma</span></a> here.</p>
+                        <div className="figma-embed" style={{ maxWidth: 800 }}>
+                        <iframe
+                            title="Surprise Tiles Component Idea"
+                            src="https://embed.figma.com/design/XVlsXuMb5tnBTed7jCXIKf/Surprise-Tiles-Component-Idea?node-id=6006-97068&embed-host=share"
+                            width="800"
+                            height="450"
+                            style={{ border: "1px solid rgba(0, 0, 0, 0.1)" }}
+                            allowFullScreen
+                            loading="lazy"
+                        />
+                        </div>
 
-
-                    
                     </div>
 
                     <h2>Reflection</h2>

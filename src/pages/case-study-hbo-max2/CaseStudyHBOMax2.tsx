@@ -12,6 +12,7 @@ function CaseStudyHBOMax2() {
 
      // Section references
      const topRef = useRef(null);
+     const contextRef = useRef(null);
      const problemRef = useRef(null);
      const iterationsRef = useRef(null);
      const solutionRef = useRef(null);
@@ -28,19 +29,20 @@ function CaseStudyHBOMax2() {
             <div className="content">
             <div className="side-nav">
                 <p onClick={() => scrollToSection(topRef)}>(<img src="/icons/up-arrow.png" alt="up arrow icon"/>) Top</p>
+                <p onClick={() => scrollToSection(contextRef)}>Context</p>
                     <p onClick={() => scrollToSection(problemRef)}>Problem</p>
-                    <p onClick={() => scrollToSection(solutionRef)}>Solution</p>
                     <p onClick={() => scrollToSection(iterationsRef)}>Iterations</p>
+                    <p onClick={() => scrollToSection(solutionRef)}>Solution</p>
                     <p onClick={() => scrollToSection(reflectionRef)}>Reflection</p>
             </div>
             <div className="study">
 
                 <div className="main">
-                    <h1>Surprise Rail - HBO Max</h1>
+                    <h1>Reasons to Watch LLM</h1>
                     <div className="overview">
                     <div className="video-container">
                     <video
-                            src="/case-study-hbo-max2/surprise-rail-overview.mp4"
+                            src="/case-study-hbo-max2/rtw-overview2.mp4"
                             aria-label="Surprise Tail Click Through Animation"
                             typeof="video/mp4"
                             autoPlay
@@ -59,20 +61,20 @@ function CaseStudyHBOMax2() {
                         </div>
                         <div className="timeline">
                             <h3>Timeline</h3>
-                            <p>Jun - Jul 2025</p>
+                            <p>Jun - Aug 2025</p>
                         </div>
                         <div className="team">
                             <h3>Team</h3>
                             <p>
-                            <a href="https://www.linkedin.com/in/annahoprofile/" target="_blank">
+                            <a href="https://www.linkedin.com/in/tracy-oneil/" target="_blank">
+                                <span className="app-link">Tracy O'Neil</span>
+                            </a> (Product Designer), <br />
+                            {" "} <a href="https://www.linkedin.com/in/jeff-romaniuk-7ab4646/" target="_blank">
+                                <span className="app-link">Jeff Romaniuk</span>
+                            </a> (UX Writer), <br />
+                            {" "} <a href="https://www.linkedin.com/in/annahoprofile/" target="_blank">
                                 <span className="app-link">Anna Ho</span>
                             </a> (UX Research), <br />
-                            {" "} <a href="https://www.linkedin.com/in/ccmorrison/" target="_blank">
-                                <span className="app-link">Caitlin Morrison</span>
-                            </a> (UX Research), <br />
-                            {" "} <a href="https://www.linkedin.com/in/natalialopezleon/" target="_blank">
-                                <span className="app-link">Natalia Lopez Leon</span>
-                            </a> (Visual Designer), <br />
                             {" "} <a href="https://www.linkedin.com/in/hakha-mashayekhi-964b38a/" target="_blank">
                                 <span className="app-link">Hakha Mashayekhi</span>
                             </a> (Manager) 
@@ -81,63 +83,272 @@ function CaseStudyHBOMax2() {
                         <div className="skills">
                             <h3>Skills</h3>
                             <div className="all-skills">
-                                    <p>Human-AI Interaction ● <br /> Visual Design ● Figma</p>
+                                    <p>ML/Gen AI ● <br /> Prompt Engineering ● Prototyping</p>
                             </div>
                         </div>
                     </div>
                     <div className="overview">
-                        <p>
-                        The Surprise Rail is an <span className="bold">AI-powered feature </span> for the HBO Max streaming app
-                        that hides keyart and replaces it with teaser descriptors. It's designed to  {" "}
-                            <span className="bold">
-                            spark curiosity and increase traffic on subpages
-                            </span>
-                            .
+                        <p>                      
+                        Reasons to Watch (RTW) is a new description that appears when a user focuses on an existing recommendation. It <span className="bold">explains why the title is relevant based on their preferred themes and moods</span>. 
+                        
+                        <br />
+                        <br />                        
+                        I built a 1st-generation POC for a personalized version of RTW where <span className="bold">descriptions are specific to a user's watch history.</span>
                         
                             <div className="seperator" />
-                            <a href="https://www.figma.com/proto/XVlsXuMb5tnBTed7jCXIKf/Surprise-Tiles-Component-Idea?page-id=6006%3A97068&node-id=6196-44768&viewport=1022%2C366%2C0.04&t=fJQsBq8Ro4YMNmMp-1&scaling=contain&content-scaling=fixed&starting-point-node-id=6196%3A44768&show-proto-sidebar=1" target="_blank">
+                            <a href="https://docs.google.com/presentation/d/1re-kPSn8nNVJDsieV3Misp4Xcn-eBrfK/edit?usp=sharing&ouid=116774489859738726779&rtpof=true&sd=true" target="_blank">
                                 <span className="app-link bold">Presentation</span>
                             </a>
                             <span className="vert-bar">
                                 {" | "}
                             </span>
-                            <a href="https://www.figma.com/proto/XVlsXuMb5tnBTed7jCXIKf/Surprise-Tiles-Component-Idea?page-id=6006%3A97068&node-id=6069-227551&viewport=1022%2C366%2C0.04&t=fJQsBq8Ro4YMNmMp-1&scaling=contain&content-scaling=fixed&starting-point-node-id=6069%3A227551&show-proto-sidebar=1" target="_blank">
-                                <span className="app-link bold">Prototype</span>
+                            <a href="https://drive.google.com/file/d/1-qUXaHEFNvA5jhT4-ZloqK-blHu-Oq2h/view?usp=sharing" target="_blank">
+                                <span className="app-link bold">Recording</span>
                             </a>
                             <span className="vert-bar">
                                 {" | "}
                             </span>
-                            <span className="bold">Technologies used:</span> Figma 
+                            <span className="bold">Technologies used:</span> Python, Gemini API, Typescript, Figma 
                         </p>
+                    </div>
+                    <div className="pain-points" ref={contextRef} style={{marginTop: "0.5rem"}}>
+                        <h2>Part of a bigger project...</h2>
+                        <p> We did not start with the personalized version of RTW due to <span className="bold">cost and scalability.</span> Instead, the <span className="bold">team was pursuing optimized descriptions through user segmentation</span>.
+                            <br />
+                            <br />
+                            Segments are content-based, where <span className="bold">each segment reflects certain themes or storylines a user is drawn to</span>. A user is assigned a segment based on what their watch history most closely aligns with. 
+                            <br />
+                            <br />
+                            Below are examples of how RTW descriptions could differ across the different user segments.
+                        </p>
+                        {/* <div className="description-section">
+                        <div className="column">
+                            <img
+                            src="/case-study-hbo-max2/gilded-age-key-art.png"
+                            alt="16:9 Key Art for The Gilded Age"
+                            className="show-image"
+                            />
+
+                            <h4>DEFAULT COPY</h4>
+                            <p>
+                                From Julian Fellowes, this sprawling period drama chronicles the great
+                                conflict between old and new in New York's glittering Gilded Age.
+                            </p>
+                            </div>
+                        
+
+                        <div className="column">
+                            <h4>GENERATED DESCRIPTIONS</h4>
+
+                            <div className="segment">
+                            <h5>Prestige Superfans</h5>
+                            <p>
+                                A gripping portrayal of wealth, power, and societal change in old New
+                                York through the lens of layered, elite families.
+                            </p>
+                            </div>
+
+                            <div className="segment">
+                            <h5>Connoisseur-istas</h5>
+                            <p>
+                                Ambitious women navigate intricate relationships and societal pressures
+                                in a fiercely stratified 19th-century New York.
+                            </p>
+                            </div>
+
+                            <div className="segment">
+                            <h5>Armchair Detectives</h5>
+                            <p>
+                                Witness the sweeping transformation of New York through the eyes of
+                                powerful families during a dramatic social upheaval.
+                            </p>
+                            </div>
+                        </div>
+                        </div> */}
+                        <div className="img-container">
+                            <img
+                                src="/case-study-hbo-max2/segmentation-example.png"
+                                alt="Examples of how the RTW description of 'The Gilded Age' can differ if for the user segments 'Prestige Superfans', 'Connoisseur-istas','Armchair Detectives'."
+                            />
+                        </div>
+
                     </div>
                     <div className="pain-points" ref={problemRef}>
                         <h2>Current Problems</h2>
+
                         <ul>
                             <li>
-                                <p><span className="bold">Lack of Engagement on Subpages:</span> 98% of users don't make it past the HBO Max home page and most of the interior pages aren't driving any meaningful traffic .</p>
+                                <p><span className="bold">Users Are Pigeon-Holed:</span> A user might love slow-burn period dramas on weekdays and lighthearted comedies on weekends. A <span className="bold">single segment doesn't capture the nuances in a user's watch behavior</span>. In addition, recommendations end up feeling repetitive and focusing on the same themes.</p>
                             </li>
                             <li>
-                                <p><span className="bold">Lack of Context:</span> Users don't know what they're getting themselves into when clicking a title based on just the keyart.</p>
+                                <p><span className="bold">Feels Too Generic:</span> Every quarter, <span className="bold">HBO Max ranks lowest on PXI</span> (Product Experience Index), a soft CPI metric that measures the extent users feel the app is "designed with them in mind." <span className="bold">Descriptions don’t feel personalized and could easily apply to anyone</span>, which doesn't help our case.</p>
                             </li>
-                            <li>
-                            {/* Do they beleive they'll like it before pressing play? */}
-                                <p><span className="bold">Lack of Confidence:</span> Users spend an average of 2 minutes searching for something to watch. When they can’t decide with confidence, they leave the app and turn to competitors.</p>
-                            </li> 
                         </ul>
+
                     </div>
-                    <div className="pain-points" ref={solutionRef}>
-                        <h2>My Idea</h2>
+                    <div className="pain-points" ref={iterationsRef}>
+                        <h2>My POC</h2>
                         {/* Introducing the Surprise Rail... */}
-                        <p>Inspired by <span className="italic">Blind Date with a Book</span>, I came up with surprise tiles where the key art is hidden and replaced with AI-generated teaser descriptors.</p>
+                        <p>We wanted to <span className="bold">validate the value of personalized descriptions to determine if it's worth investing in</span> for the future direction of RTW.
                         
-                        <h2 ref={iterationsRef}>What will it look like?</h2>
-                        {/* <div className="img-container">
+                        <br />
+                        <br />
+                        
+                        To streamline the manual process and scale efficiently, we wanted to <span className="bold">build an LLM agent to generate RTW descriptions</span>. I implemented the agent with Gemini API. 
+                        
+                        <br />
+                        <br />
+
+                        The tricky part was <span className="bold">constructing a prompt to produce consistent, high-quality outputs</span>.
+                        </p>
+
+                        <h4>First Iteration Results</h4>
+
+                        <div className="img-container">
                             <img
-                                src="/case-study-hbo-max2/CTV-Themed-Rail.png"
-                                alt="Surprise Rail Overview Image"
+                                src="/case-study-hbo-max2/single-agent-prompt.png"
+                                alt="Prompt breakdown with basic specs, core tenents, and good/bad examples"
                             />
-                        </div> */}
+                        </div>
+
+
+                        <table className="results-table">
+                        <thead>
+                        <tr>
+                            <th>Watch History</th>
+                            <th>Recommended Title</th>
+                            <th>Generated RTW</th>
+                            <th>Default Copy</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td rowSpan={2} style={{ width: "14rem" }}>
+                                Succession<br />
+                                The Lord of the Rings: The Fellowship of the Ring<br />
+                                Friends<br />
+                                The O.C.<br />
+                                Game of Thrones<br />
+                                Big Bang Theory</td>
+                            <td>House of the Dragon</td>
+                            <td>The creators of <span className="italic">Game of Thrones</span> bring another epic series of power, politics, and family feuds. It's <span className="italic">Succession with dragons</span>.</td>
+                            <td>Set 200 years before the events of Game of Thrones, this epic series tells the story of House Targaryen.</td>
+                        </tr>
+                        <tr>
+                            <td>One Tree Hill</td>
+                            <td>From high school halls to intense rivalries, this series explores brotherhood, love, and self-discovery. A perfect watch after <span className="italic">The O.C</span>.</td>
+                            <td>In a small North Carolina town, two estranged half brothers carry on very different lives.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                        
+                        <h2>Modifying Inputs</h2>
+
+                        <p>The model kept namedropping titles from the watch history, so I wanted to add limitations on when another title was mentioned. <span className="bold">I added a "Liked List" input</span> to denote which titles can be referenced in RTW descriptions. 
+                        
+                        <br />
+                        <br />
+                        
+                        This is <span className="bold">from HBO Max’s new ratings feature where you can rate titles as "like," "love," or "not for me."</span> So now the inputs are:
+
+                        <br />
+                        <br />
+
+                        <span className="bold">Inputs → Watch History, Liked List</span>
+                        <br /><span className="bold">Outputs → RTW Description</span>
+
+                        
+                        </p>
+
+                        <h4>Testing More Variables</h4>
+
+                        <p> I also tested different <span className="bold">temperatures, character lengths, and external sources</span> to evaluate their impact on blurb writing.</p>
+
+                        <table className="results-table">
+                        <thead>
+                            <tr>
+                            <th>Variable</th>
+                            <th>Options Tested</th>
+                            <th>Best Performing</th>
+                            <th>Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                            <td><strong>Temperature</strong></td>
+                            <td>0.5, 0.6, 0.7, 0.8, 0.9</td>
+                            <td>0.7</td>
+                            <td>Creative, varied sentence structures. Best aligned with the core tenet "embrace variation."</td>
+                            </tr>
+                            <tr>
+                            <td><strong>Character Length</strong></td>
+                            <td>135-character, 175-character</td>
+                            <td>135-character</td>
+                            <td>Shorter descriptions were easier to skim and can be just as effective in compelling to press play.</td>
+                            </tr>
+                            <tr>
+                            <td><strong>External Sources</strong></td>
+                            <td>(any combination of) IMDB, OMDB, Wikipedia, Youtube</td>
+                            <td>IMDB, OMDB, and Wikipedia</td>
+                            <td>More sources improved quality, but we ran into YouTube API quota limits so we used these three.</td>
+                            </tr>
+                        </tbody>
+                        </table>
+
+                        <h4>More Agents...</h4>
+
+                        <p>The blurbs still felt generic and <span className="bold">didn't feel personalized</span>. Additionally, they <span className="bold">didn't always meet the basic specs</span> of being within 135 characters, having no exclamation marks, etc. 
+                            
+                            <br />
+                            <br />
+
+                            I realized the one agent was doing too much. 
+                            
+                            <br />
+                            <br />
+                            
+                            Instead of single agent, I <span className="bold">split the tasks into 3 seperate agents</span>: a pattern anaylst to analyze the watch history, the blurb writer, and the editor to ensure compliance. Then, I added an optional 4th agent too choose the best out of three.</p>
+
+                         <div className="img-container">
+                            <img
+                                src="/case-study-hbo-max2/agent-breakdown.png"
+                                alt="Tasks and Roles of the 4 agents: Pattern Analyst to anaylze watch history, Blurb Writer, Editor to ensure compliance, and Critic to choose best out of 3"
+                            />
+                        </div>
+
+                        <p>You can see my notes and the results from each individual iteration in the Figjam below.</p>
+                        <div className="figma-embed">
+                        <iframe
+                            title="RTW POC — Hyper Personalized"
+                            src="https://embed.figma.com/board/QSKdEIHPB35s2UbyV7oEyI/RTW-POC-%E2%80%93-Hyper-Personalized?node-id=0-1&embed-host=share"
+                            style={{ border: "1px solid rgba(0, 0, 0, 0.1)" }}
+                            allowFullScreen
+                            loading="lazy"
+                        />
+                        </div>
                     
+                    </div>
+
+                    <div className="pain-points" ref={solutionRef}>
+                            <h2>Final Results</h2>
+
+                            <p>Below are exmaples of the RTW descriptions generated by the LLM agents I created. We can also see how <span className="bold">themes extracted from the watch history effected the generated output</span>. </p>
+
+                            <div className="img-container">
+                            <img
+                                src="/case-study-hbo-max2/final-result1.png"
+                                alt="Final generated result of House of the Dragon: “The creators of Game of Thrones bring another epic series of power, politics, and family feuds. It's Succession with dragons.”"
+                            />
+                        </div>
+                        <div className="img-container">
+                            <img
+                                src="/case-study-hbo-max2/final-result2.png"
+                                alt="Final result of Succession: “Love the chaos of The Righteous Gemstones? Its corporate cousin is a vicious fight for Daddy's love where the jokes cut like glass.”"
+                            />
+                        </div>
+
+                        <p>Compared to the default copy, these descriptions <span className="bold">feel more personalized</span> and are  <span className="bold">intentially designed to compel the veiwer to press play</span>.</p>
+
                     </div>
 
                     <h2>Reflection</h2>
