@@ -1,98 +1,44 @@
 import { useEffect, useRef } from "react";
 import "./home.css";
-import Projects from "../projects/Projects.js";
+import Footer from "../../components/Footer.js";
+import ProjectCard from "../projects/ProjectCard.js";
+import projectData from "../projects/project-data.json";
+import "../projects/projects.css";
 
 function Home() {
-  const waterElementRef = useRef<HTMLDivElement>(null);
-  const waterElement2Ref = useRef<HTMLDivElement>(null);
-  const projectsRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleHashChange = () => {
-      if (window.location.hash === "#projects" && projectsRef.current) {
-        // Wait for 1 second before scrolling to projects section
-        setTimeout(() => {
-          const yOffset = 45; // Offset value
-          if (projectsRef.current) {
-            window.scrollTo({
-              top: projectsRef.current.offsetTop + yOffset,
-              behavior: "smooth",
-            });
-          }
-        }, 50);
-      }
-    };
-
-    // Listen for hash changes
-    window.addEventListener("hashchange", handleHashChange);
-
-    // Call the handler once in case the hash is already '#projects' when the component mounts
-    handleHashChange();
-
-    // Cleanup: remove the event listener
-    return () => {
-      window.removeEventListener("hashchange", handleHashChange);
-    };
-  }, [projectsRef]);
-
-  useEffect(() => {
-    // Reapply the SVG filter when the component mounts
-    if (waterElementRef.current) {
-      waterElementRef.current.style.filter = "url(#turbulence)";
-    }
-    if (waterElement2Ref.current) {
-      waterElement2Ref.current.style.filter = "url(#turbulence2)";
-    }
-  }, []);
 
   return (
+    <div className="app">
     <div className="home">
-            <svg>
-        <filter id="turbulence" x="0" y="0" width="100%" height="100%">
-          <feTurbulence
-            id="sea-filter"
-            numOctaves="3"
-            seed="2"
-            baseFrequency="0.05 0.1"
-          ></feTurbulence>
-          <feDisplacementMap scale="10" in="SourceGraphic"></feDisplacementMap>
-          <animate
-            xlinkHref="#sea-filter"
-            attributeName="baseFrequency"
-            dur="150s"
-            keyTimes="0;0.5;1"
-            values="0.01 0.05;0.03 0.09;0.01 0.05"
-            repeatCount="indefinite"
-          />
-        </filter>
-        <filter id="turbulence2" x="0" y="0" width="100%" height="100%">
-          <feTurbulence
-            id="sea-filter2"
-            numOctaves="3"
-            seed="2"
-            baseFrequency="0.05 0.1"
-          ></feTurbulence>
-          <feDisplacementMap scale="12" in="SourceGraphic"></feDisplacementMap>
-          <animate
-            xlinkHref="#sea-filter2"
-            attributeName="baseFrequency"
-            dur="60s"
-            keyTimes="0;0.5;1"
-            values="0.01 0.05;0.03 0.09;0.01 0.05"
-            repeatCount="indefinite"
-          />
-        </filter>
-      </svg>
       <div className="landing-page">
-        <div className="water" ref={waterElementRef}></div>
-        <div className="lilies plain1"></div>
-        <div className="lilies plain2"></div>
-        <div className="lilies plain3"></div>
-        <div className="lilies plain4"></div>
-        <div className="lilies plain5"></div>
-
         <div className="title">
-          <h1>Hi, I<span style={{ marginLeft: "0.12em" }}>'m</span> Pranavi</h1>
+        <h1 className="cutout-text">
+        <span>H</span>
+        <span>I</span>
+        <span>,</span>
+        {" "}
+        <span>I</span>
+        <span>'</span>
+        <span>M</span>
+        {" "}
+        <span>P</span>
+        <span>R</span>
+        <span>A</span>
+        <span>N</span>
+        <span>A</span>
+        <span>V</span>
+        <span>I</span>
+      </h1>
+          {/* <div className="name-image">
+          <img
+                className="profile"
+                src="/home/linkedin_profile.jpg"
+                alt="Profile Picture of Pranavi"
+            />
+            <img
+                src="/home/flowers-dense.png"
+                alt="Hi, I'm Pranavi in vine font"
+            /></div> */}
           <h2>
             I'm a product designer bringing ideas to life with story-based design and
             GenAI. You might know me from{" "}
@@ -122,11 +68,30 @@ function Home() {
           </div>
         </div>
       </div>
-      <div className="projects-page" ref={projectsRef}>
-        <div className="water-full"></div>
-        <div className="water-full-mask" ref={waterElement2Ref}></div>
-        <Projects />
-      </div>
+                {projectData.map(
+                  (
+                    project,
+                    index
+                  ) => (
+                    <div className="project-cards">
+                    <a href={project.link} key={index}>
+                      <ProjectCard
+                        name={project.name}
+                        color={project.color}
+                        skills={project.skills}
+                        logline={project.logline}
+                        image={project.image}
+                        alphaColor={0.9}
+                      /> {/* project card component*/}
+                    </a>
+                    </div>
+                  )
+                )}
+              </div>
+
+    <div>
+      <Footer />
+    </div>
     </div>
   );
 }

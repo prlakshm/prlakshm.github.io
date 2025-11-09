@@ -4,147 +4,64 @@
   position: relative;
   z-index: 1;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   overflow-x: clip;
+  margin-top: 6rem;
 }
 
-.fun-page {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
 
 .fun .grid {
-  display: flex;
-  flex-direction: column;
-  border-radius: 45px;
-  justify-content: center; /* Center grid items horizontally */
-  align-items: center;
-  margin-top: 2.7rem;
-  width: min-content;
-}
-
-.fun-cards {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  justify-content: center; /* Center grid items horizontally */
-  gap: 2.25rem;
-  padding: 2.7rem;
-  padding-top: 1.8rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2.5rem;
+  padding: 2.2rem 6rem;
 }
 
-.fun .card {
-  border: none;
-  box-shadow: 0 1.8px 36px 0 rgb(152, 165, 226);
-  overflow: hidden;
-  transform: translateY(0);
-  transition: box-shadow 0.3s ease-out, transform 0.3s ease-out,
-    opacity 0.2s ease-out; /* Add transition for hover effect */
-  border-radius: 0.9em;
-  width: 38vw;
+.fun .grid > :nth-child(1) {
+  grid-row: 1;
+  grid-column: 1;
 }
 
-.fun .card:hover,
-.card:focus {
-  box-shadow: 0 1.8px 36px 0 rgb(106, 116, 164);
-  transform: translateY(-0.72rem);
+.fun .grid > :nth-child(2) {
+  grid-row: 2;
+  grid-column: 1;
 }
 
-.fun .info {
-  background-color: #fef8f5;
-  padding: 0.45rem 0;
-  color: #2b2b2b;
+.fun .grid > :nth-child(3) {
+  grid-row: 1;
+  grid-column: 2;
 }
 
-.fun a {
-  text-decoration: none;
+.fun .grid > :nth-child(1){
+  padding-bottom: 0;
 }
 
-.fun .preview-image {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0;
-  height: 42.5vh;
-  z-index: -1;
-  overflow: hidden;
-}
-
-.fun .preview-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ensures the image covers the entire container */
-    object-position: center; /* Ensures the image stays centered */
-}
-
-.fun .all-skills {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  margin-left: 1.71rem;
-  margin-bottom: 0.36rem;
-}
-
-.fun .skill {
-  border-radius: 0.36rem;
-  border: 1px solid #2b2b2b;
-  margin-right: 0.54rem;
-}
-
-.fun .water-full {
-  position: absolute;
-  margin: 0;
-  padding: 0;
-  margin-top: -0.9rem;
-  width: 100%;
-  height: 102%;
-  background-image: url("/fun/water-full-light3.png");
-  background-size: cover;
-  background-position: center top;
-  background-repeat: repeat-y;
-  z-index: -1000;
-}
-
-.fun .water-full-mask {
-  position: absolute;
-  margin-top: -0.675rem;
-  width: 100%;
-  height: 100%;
-  background-image: url("/fun/water-full-light3.png");
-  background-size: cover;
-  background-position: center top;
-  background-repeat: repeat-y;
-  filter: url("#turbulence");
-  z-index: -1; /* Ensure it stays behind other content */
+.fun .grid > :nth-child(2){
+  padding-top: 0;
+  margin-top: 0rem;
 }
 
 .fun h1 {
-  font-family: "Krub";
-  font-weight: 560;
-  font-size: 3.06rem;
-  text-align: center;
-  margin: 2.7rem;
-  margin-bottom: 0rem;
-  padding: 0;
-  color: #2b2b2b;
+    font-family: "punch-holes";
+    font-weight: 400;
+    font-size: 3.75rem;
+    letter-spacing: 0.05cap;
+    margin-top: 0.9rem;
+    margin-bottom: 0.9rem;
+    padding: 0;
+    color: #2b2b2b;
 }
 
 .fun h2 {
-  font-family: "Krub";
-  font-weight: 450;
-  font-size: 1.17rem;
-  margin: 0rem 1.8rem;
-  text-align: center;
-  color: #2b2b2b;
-}
-
-svg {
-  position: absolute;
-  width: 0;
-  height: 0;
+  font-family: "forma-djr-text", sans-serif;
+  color: rgba(43, 43, 43, 0.75);
+  font-size: 1.15rem;
+  font-weight: 625;
+  line-height: 1.5rem;
+  letter-spacing: 1.5px;
+  margin: 0rem 1.05rem;
 }
 
 /*------------------------ Media Queries --------------------------*/

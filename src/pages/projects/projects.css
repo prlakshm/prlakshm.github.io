@@ -1,26 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Krub:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
 
-.projects {
+.project-cards {
   position: relative;
   margin-top: 1.8rem;
   padding: 0;
   z-index: 1;
+  color: rgba(43, 43, 43, 0.8);
 }
 
-.grid {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.fun .project-cards {
+  margin-top: 0rem;
+  margin-bottom: 1.8rem;
 }
 
 .project-cards {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  border-radius: 45px;
-  width: 82.5vw;
-  padding: 3.15rem 2.25rem;
+  border-radius: 0rem;
+  padding: 1.25rem;
   justify-content: center;
-  gap: 2.25rem;
 }
 
 .project-cards a {
@@ -29,41 +25,77 @@
   padding: 0;
 }
 
+.card-content {
+  position: relative; /* overlay only on this area */
+}
+
 .card {
+  position: relative;
   border: none;
-  box-shadow: 0 1.8px 36px 0 rgb(152, 165, 226);
   overflow: hidden;
-  transform: translateY(0);
-  transition: box-shadow 0.3s ease-out, transform 0.3s ease-out,
-    opacity 0.2s ease-out; /* Add transition for hover effect */
-  border-radius: 0.9em;
+  border-radius: 0rem;
   width: 40vw;
+  background-color: white;
+  box-sizing: border-box;
 }
 
-.card:hover,
-.card:focus {
-  box-shadow: 0 1.8px 36px 0 rgb(106, 116, 164);
-  transform: translateY(-0.72rem);
-}
 
-.preview-image {
+.preview-video {
+  position: relative; 
   display: flex;
-  justify-content: center;
+  justify-content: start;
   align-items: flex-start;
   margin: 0;
   overflow: clip;
-  height: 45vh;
+  height: fit-content;
+}
+
+.preview-image {
+  position: relative; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  overflow: clip;
+  height: fit-content;
+}
+
+/* overlay only on the image */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: white;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* activate overlay when the entire card is hovered */
+.card:hover::before,
+.card:focus::before {
+  opacity: 0.4; 
+}
+
+
+.preview-video video {
+  width: 105%;
+  margin-bottom: 0;
+  border-radius: 0rem;
 }
 
 .preview-image img {
-  width: 35rem;
-  transform: translateY(-3%);
+  width: 105%;
+  margin-bottom: 0;
+  border-radius: 0rem;
 }
 
-.projects .info {
-  background-color: #fef8f5;
-  padding: 0.45rem 0;
-  color: #2b2b2b;
+.project-cards .info {
+  /* background-color: #fef8f5; */
+  background-color: #fff4ef;
+  padding: 0.2rem 0;
+  color: rgba(43, 43, 43, 0.8);
 }
 
 .all-skills {
@@ -71,40 +103,50 @@
   flex-direction: row;
   flex-wrap: wrap;
   row-gap: 0.5rem;
-  margin-left: 1.8rem;
+  margin: 0.9rem 0;
+  margin-left: 1.5rem;
 }
 
 .info .all-skills {
-  margin-left: 1.71rem;
-  margin-bottom: 0.36rem;
+  margin-left: 1.15rem;
+  margin-bottom: 0.2rem;
 }
 
 .skill {
   border-radius: 0.54rem;
-  border: 1px solid #3a3a3a;
+  border: 1px solid rgba(43, 43, 43, 0.8);;
   margin-right: 0.54rem;
+  color: rgba(43, 43, 43, 0.8);
+}
+
+.card h3 {
+  font-family: "adobe-text-pro", serif;
+  font-weight: 500;
+  font-size: 3rem;
+  margin: 0.1rem 1rem 0.1rem 0rem;
+  padding-bottom: 0;
+  padding-left: 1rem;
+  letter-spacing: 1.1px;
+  text-align: left;
   color: #2b2b2b;
 }
 
-h3 {
-  font-family: "Krub";
-  font-weight: 560;
-  font-size: 2.25rem;
-  margin: 0rem 1.125rem 0.225rem 1.71rem;
-}
-
-h4 {
-  font-family: "Krub";
+.info h4 {
+  font-family: "forma-djr-text", sans-serif;
   font-weight: 425;
-  font-size: 1.1rem;
-  margin: 0.75rem 1.8rem;
-  margin-bottom: 0.63rem;
+  font-size: 1.05rem;
+  line-height: 1.5rem;
+  letter-spacing: 1.5px;
+  margin: 0.1rem 1.05rem;
+  margin-bottom: 0.75rem;
 }
 
 h5 {
-  font-family: "Krub";
+  font-family: "forma-djr-text", sans-serif;
   font-weight: 425;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
+  line-height: 1.5rem;
+  letter-spacing: 1.5px;
   margin: 0.225rem 0.54rem;
 }
 
@@ -179,7 +221,7 @@ h5 {
     grid-template-columns: 1fr;
   }
 
-  .projects {
+  .project-cards {
     margin-top: 1rem; /* Reduce top margin */
   }
 

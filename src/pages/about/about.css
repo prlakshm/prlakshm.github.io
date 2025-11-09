@@ -2,85 +2,42 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    margin-top: 0;
-    padding-top: 0;
-    overflow-x: clip;
+    margin-top: 4rem;
+    overflow: clip;
     
 }
 
-
-.about .about-page {  
-    display: flex;
-    position: relative;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    
-    width: 100%;
-    height: 100vh;
-    background-image: url('/about/dark-water-background2.png');
-    background-size: cover;
-    background-position: center top;
-    background-repeat: no-repeat;
-}
-
-.about .calendar-container {
-    margin-top: 1.8rem;
-    margin-bottom: 3.6rem;
-}
-
-.about-page .water {  
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 100vh;
-    background-image: url('/about/dark-water-mask.png');
-    background-size: cover;
-    background-position: center top;
-    background-repeat: no-repeat;
-    filter: url("#turbulence"); 
-
-}
 .about .main {
   display: flex;
   flex-direction: column;
-  border-radius: 4.5rem; /* 5rem scaled down by 0.9 */
-  width: 65vw; /* 70vw scaled down by 0.9 */
-  margin-top: -1.125rem; /* -1.25rem scaled down by 0.9 */
   padding-top: 0;
-
-  z-index: 1;
-}
-
-.about-me {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
   align-items: center;
+  padding: 2.5rem 6rem 1.5rem 6rem;
 }
+
 
 .about .main h1 {
-  font-family: "Flotha-Variable";
-  margin: 0rem 0.9rem; /* 1rem scaled down by 0.9 */
-  margin-bottom: 0.7rem; /* 1rem scaled down by 0.9 */
-  font-weight: 500;
-  font-size: 3.4rem; /* 3.4rem scaled down by 0.9 */
-  color: #f8dcff;
-  text-align: center;
-  width: 100%;
-  z-index: 1000;
+    font-family: "punch-holes";
+    font-weight: 400;
+    font-size: 3.75rem;
+    letter-spacing: 0.05cap;
+    margin-top: 0.9rem;
+    margin-bottom: 0.9rem;
+    padding: 0;
+    color: #2b2b2b;
 }
 
 .about .main p {
-  font-family: "Krub";
-  font-size: 1.1rem; 
-  font-weight: 600;
-  color: #f8dcff;
-  width: 95%; 
-  letter-spacing: 0.45px; 
-  margin-top: 0rem;
+  font-family: "forma-djr-text", sans-serif;
+  width: 55vw;
+  font-size: 1.1rem;
+  font-weight: 425;
   text-align: left;
-  z-index: 1000;
+  margin-top: 1rem;
+  letter-spacing: 1px;
+  line-height: 1.6rem;
+  color: #2b2b2b;
+
 }
 
 .about .main a {
@@ -91,110 +48,21 @@
   text-decoration: underline;
 }
 
-.about .main img {
-  width: 0.9rem; /* 1rem scaled down by 0.9 */
-  padding-left: 1.8px; /* 2px scaled down by 0.9 */
-}
 
-.about .photo {
+.image-row {
   display: flex;
+  width: 100vw;
+  margin-top: 4.5rem;
+  overflow: hidden;
   align-items: center;
-  justify-content: center;
+  justify-content: space-evenly;
 }
 
-.about .photo img {
-  width: 18vw; /* 18vw scaled down by 0.9 */
-  border-radius: 18px; /* 20px scaled down by 0.9 */
+.image-row img {
+  width: 12vw; /* 100 / 8 = 12.5 */
+  height: auto;
+  object-fit: cover;
 }
-
-
-.star {
-    position: absolute;
-    background-color: #FFFFFF;
-    clip-path: polygon(50.13% 4.4%, 59.77% 34.48%, 83.97% 42.98%, 59.77% 51.49%, 50.13% 81.83%, 39.22% 51.49%, 15.01% 42.98%, 39.22% 34.48%);
-    z-index: 0;
-}
-  
-
-.star1 {
-    animation: 3s linear 1s infinite alternate twinkle;
-  }
-  
-  .star2 {
-    animation: 4s linear 0s infinite alternate twinkle;
-  }
-  
-  .star3 {
-    animation: 3.5s linear 0.5s infinite alternate twinkle;
-  }
-  
-  .star4 {
-    animation: 1.25s linear 1.5s infinite alternate twinkle;
-  }
-  
-  .star5 {
-    animation: 2.5s linear 1s infinite alternate twinkle;
-  }
-
-  
-  @keyframes twinkle {
-    0% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }  
-
-  .about .calendar-page {  
-    position: relative;
-}
-
-
-.about .water-full {
-    position: absolute;
-    margin: 0;
-    padding: 0;
-    margin-top: -1rem;
-    width: 100%;
-    height: 102%;
-    overflow: hidden;
-    background-image:
-      linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0) 1rem),
-      url('/about/dark-water-full.png');
-    background-size: cover;
-    background-position: center top;
-    background-repeat: repeat-y;
-    z-index: -1000;
-}
-
-
-.about .water-full-mask { 
-  position: absolute;
-  margin-top: -0.75rem;
-  width: 100%;
-  height: 100%;
-  background-image:
-    linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0) 1rem),
-    url('/about/dark-water-full.png');
-  background-size: cover;
-  background-position: center top;
-  background-repeat: repeat-y;
-  filter: url("#turbulence2");
-  z-index: -1; /* Ensure it stays behind other content */ 
-}
-
-
-
-svg {
-    position: absolute;
-    width: 0;
-    height: 0;
-  }
-
 
   /*------------------------ Media Queries --------------------------*/
 

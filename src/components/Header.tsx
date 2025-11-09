@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import "../app.css";
 import useScrollDirection from "../hooks/useScrollDirection.js";
-import useDarkMode from "../hooks/useDarkMode.js";
 import { useNavigate } from "react-router-dom";
 
 function Header() {
-  const darkMode = useDarkMode();
   const scrollDirection = useScrollDirection();
   const [headerClass, setHeaderClass] = useState('visible-transparent');
   const navigate = useNavigate();
@@ -52,18 +50,18 @@ function Header() {
   }, [scrollDirection]);
 
   return (
-    <div className={`header ${darkMode ? 'dark-mode' : ''} ${headerClass}`}>
+    <div className={`header ${headerClass}`}>
       <div className="left">
         <a href="" onClick={() => handleLinkClick('')}>
           <img
-            src={darkMode ? "./icons/favicon-light.svg" : "./icons/favicon.svg"}
-            alt="Home icon takes you back to landing page when clicked"
+            src="./icons/punch-holes-favicon-light.png"
+            alt="P.L. Home icon takes you back to landing page when clicked"
           />
         </a>
       </div>
       {isMobile ? (
         <div className="menu-icon" onClick={handleMenuToggle}>
-          <img src={darkMode ? "./icons/menu-light.svg" : "./icons/menu-icon.svg"} alt="Menu" />
+          <img src="./icons/menu-icon.svg" alt="Menu" />
         </div>
       ) : (
         <div className="right">

@@ -1,26 +1,26 @@
 [
     {
         "name": "Scrabble My Heart",
-        "color": "#a59b52",
+        "color": "#f8d6d8",
         "skills": ["Adventure", "Wordplay"],
         "logline": "Two unsuspecting college students get thrown into a hunt for the treasure of a legendary 1950s Scrabble player.",
         "image": "/fun/scrabble-cover-art.png",
         "link": "/docs/Scrabble_My_Heart.pdf"
     },
+        {
+        "name": "This is Not the Matrix",
+        "color": "#f8d6d8",
+        "skills": ["Sci-fi", "Coming-of-age"],
+        "logline": "Reality is a simulation and our lives are AI-generated. A teenage girl hacks the system to try to get her best friend back.",
+        "image": "/fun/matrix-cover-art1.png",
+        "link": "/docs/This_is_Not_the_Matrix.pdf"
+    },
     {
         "name": "Dear Abby",
-        "color": "#4f4f4f",
+        "color": "#f8d6d8",
         "skills": ["Friendship", "Comedy"],
         "logline": "Two girls steal their friend’s ashes and embark on a road trip to fulfill their promise of sprinkling her ashes in the ocean.",
         "image": "/fun/dear-abby-cover-art.png",
         "link": "/docs/Dear_Abby.pdf"
-    },
-    {
-        "name": "This is Not the Matrix",
-        "color": "#05a505",
-        "skills": ["Sci-fi", "Coming-of-age"],
-        "logline": "Reality is a simulation and our lives are AI-generated. A teenage girl hacks the system to try to get her best friend back.",
-        "image": "/fun/matrix-cover-art.png",
-        "link": "/docs/This_is_Not_the_Matrix.pdf"
     }
 ]
