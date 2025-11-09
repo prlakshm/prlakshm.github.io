@@ -15,7 +15,7 @@
         "logline": "Educating users on best AI prompt engineering practices",
         "image": "/projects/dreamer.mp4",
         "link": "#/richdreamer",
-        "locked": true
+        "locked": false
     },
     {
         "name": "Reasons to Watch LLM",
@@ -24,7 +24,7 @@
         "logline": "Prototyping a personalized content discovery feature for HBO Max",
         "image": "/projects/rtw-overview2.mp4",
         "link": "#/hbo-max-rtw",
-        "locked": false
+        "locked": true
     },
     {
         "name": "Binary Escape",
