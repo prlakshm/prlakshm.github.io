@@ -432,7 +432,7 @@ function CaseStudyHBOMax2() {
                         </tbody>
                     </table>
 
-                        <p>The POC demonstrated the ways personalized RTW exceeded the default copy, and the team is <span className="bold">now identifying touchpoints to bring these personalized descriptions into the product experience</span>.
+                        <p>The POC was sucessful in validating the impact of RTW, and the team is <span className="bold">now identifying touchpoints to bring these personalized descriptions into the HBO Max product experience</span>.
                         </p>
                     </div>
 
