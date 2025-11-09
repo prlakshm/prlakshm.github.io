@@ -5,7 +5,8 @@
         "skills": ["Human-AI Interaction", "UX Research", "Figma"],
         "logline": "Designing an AI-powered rail for the HBO Max streaming app",
         "image": "/projects/surprise-rail-overview.mp4",
-        "link": "#/hbo-max-surprise"
+        "link": "#/hbo-max-surprise",
+        "locked": true
     },
     {
         "name": "RichDreamer Text-to-3D",
@@ -13,7 +14,8 @@
         "skills": ["ML/Gen AI", "Prompt Engineering", "Python"],
         "logline": "Educating users on best AI prompt engineering practices",
         "image": "/projects/dreamer.mp4",
-        "link": "#/richdreamer"
+        "link": "#/richdreamer",
+        "locked": true
     },
     {
         "name": "Reasons to Watch LLM",
@@ -21,7 +23,8 @@
         "skills": ["ML/Gen AI", "Prompt Engineering", "Prototyping"],
         "logline": "Prototyping a personalized content discovery feature for HBO Max",
         "image": "/projects/rtw-overview2.mp4",
-        "link": "#/hbo-max-rtw"
+        "link": "#/hbo-max-rtw",
+        "locked": false
     },
     {
         "name": "Binary Escape",
@@ -29,6 +32,8 @@
         "skills": ["Game Development", "3D Animation", "Javascript"],
         "logline": "Building rounds and modelling 3D characters for a puzzle game",
         "image": "/projects/binary-escape-preview.mp4",
-        "link": "#/binary-escape"
+        "link": "#/binary-escape",
+        "locked": false
+
     }
 ]

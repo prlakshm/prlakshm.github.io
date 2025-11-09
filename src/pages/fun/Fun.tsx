@@ -34,7 +34,7 @@ function Fun() {
                     index
                   ) => (
                     <div className="project-cards">
-                    <a href={project.link} key={index}>
+                    <a href={project.link} target="_blank" key={index}>
                       <ProjectCard
                         name={project.name}
                         color={project.color}

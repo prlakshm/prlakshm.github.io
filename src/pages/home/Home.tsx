@@ -74,7 +74,20 @@ function Home() {
                     index
                   ) => (
                     <div className="project-cards">
-                    <a href={project.link} key={index}>
+                    <a href={project.link} key={index}
+                     onClick={(e) => {
+                      if (project.locked) {
+                        e.preventDefault();
+                        const password = prompt("Enter password to view this case study:");
+                        if (password === "warbros21") {
+                          window.location.href = project.link;
+                        } else if (password !== null) {
+                          alert("Incorrect password.");
+                        }
+                      }
+                    }}
+                    
+                    >
                       <ProjectCard
                         name={project.name}
                         color={project.color}
