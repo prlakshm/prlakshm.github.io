@@ -68,41 +68,21 @@
 
 /* Media Query for screens 1024px or smaller */
 @media screen and (max-width: 1024px) {
-  .about .main h1 {
-    font-size: 2.7rem; 
-  }
-  
+
   .about .main p {
-    font-size: 0.9rem; 
+    width: 70vw;
+    font-size: 1.1rem; 
   }
 }
 
-@media screen and (max-width: 1000px) {
-  .about .main h1 {
-    margin-bottom: 0.5rem;
-  }
+@media screen and (max-width: 768px) {
+
   .about .main {
-    width: 80vw;
   }
 
-  .about .photo img {
-    width: 20vw;
-  }
-
-}
-
-@media screen and (max-width: 794px) {
-  .about .main h1 {
-    margin-bottom: 0.3rem;
-  }
   .about .main p {
-    font-size: 0.8rem; 
+    font-size: 1rem; 
   }
-
-  .about .photo img {
-    width: 22vw;
-  }
-
 }
 
 /* Media Query for screens 600px or smaller */

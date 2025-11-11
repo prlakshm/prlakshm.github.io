@@ -152,33 +152,15 @@ h5 {
 
 /*------------------------ Media Queries --------------------------*/
 
-/* Media Query for screens 1024px or smaller */
-@media screen and (max-width: 1024px) {
-  h3 {
-    font-size: 2.05rem;
-  }
-
-  h4 {
-    font-size: 1.125rem;
-  }
-
-  .preview-image {
-    height: 15.5rem;
-  }
-
-  .preview-image img {
-    width: 25rem;
-  }
-}
 
 /* Media Query for screens 768px or smaller */
 @media screen and (max-width: 768px) {
   .project-cards {
-    gap: 1.25rem;
+    padding: 0;
   }
 
   .card {
-    width: 45vw;
+    width: 42.5vw;
     margin-bottom: 1rem; /* Add space between stacked cards */
   }
 
@@ -190,10 +172,9 @@ h5 {
     width: 22rem;
   }
 
-  h3 {
-    font-size: 2rem; /* Reduce font size for smaller screens */
-    margin: 0rem 1rem; /* Adjust margins */
-    line-height: 2.3rem;
+  .card h3 {
+    margin: 0.5rem 1rem 0.5rem 0rem;
+    line-height: 3.25rem;
   }
 
   h4 {
@@ -209,10 +190,6 @@ h5 {
     margin-left: 1rem; /* Remove left margin */
   }
 
-  .skill {
-    width: 100%; /* Make skills take up full width */
-    text-align: center; /* Center the text */
-  }
 }
 
 /* Media Query for screens 600px or smaller */

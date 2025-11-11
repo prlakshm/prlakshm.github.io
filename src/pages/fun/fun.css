@@ -66,61 +66,71 @@
 
 /*------------------------ Media Queries --------------------------*/
 
-/* Media Query for screens 1024px or smaller */
-@media screen and (max-width: 1024px) {
-  .fun h3 {
-    font-size: 2.05rem;
+@media screen and (max-width: 1440px) {
+  .fun h1 {
+    font-size: 3.25rem;
   }
 
-  .fun h4 {
-    font-size: 1.125rem;
-  }
-
-  .fun .preview-image {
-    height: 43.5vh;
+  .fun h2 {
+    font-size: 1.1rem;
   }
 
 }
 
-/* Media Query for screens 768px or smaller */
+
 @media screen and (max-width: 768px) {
-  .fun .fun-cards {
-    gap: 1.25rem;
+
+  .fun {
+    padding: 0rem 2.5rem 2rem 2.5rem;
   }
 
-  .fun .card {
-    width: 45vw;
+  .fun .grid {
+    gap: 0rem 2.5rem;
+  }
+
+  .cutout-text {
+    font-size: 2.4rem;
+  }
+
+
+  .fun-cards {
+    padding: 0;
+  }
+
+  .card {
+    width: 42.5vw;
     margin-bottom: 1rem; /* Add space between stacked cards */
   }
 
   .fun .preview-image {
-    height: 38.5vh;
+    height: auto;
   }
 
-
-  .fun h3 {
-    font-size: 2rem; /* Reduce font size for smaller screens */
-    margin: 0rem 1rem; /* Adjust margins */
-    line-height: 2.6rem;
+  .preview-image img {
+    width: 22rem;
   }
 
-  .fun h4 {
-    font-size: 1.05rem; /* Reduce font size */
+  .card h3 {
+    margin: 0.5rem 1rem 0.5rem 0rem;
+    line-height: 3.25rem;
+  }
+
+  h4 {
+    font-size: 1.1rem; /* Reduce font size */
     margin: 0.5rem 1rem; /* Adjust margins */
   }
 
-  .fun h5 {
+  h5 {
     font-size: 0.9rem; /* Reduce font size */
   }
 
-  .fun .info .all-skills {
-    margin-left: 1.1rem; /* Remove left margin */
+  .info .all-skills {
+    margin-left: 1rem; /* Remove left margin */
   }
 
-  .fun .skill {
-    text-align: center; /* Center the text */
-  }
+
 }
+
 
 /* Media Query for screens 600px or smaller */
 @media screen and (max-width: 600px) {
