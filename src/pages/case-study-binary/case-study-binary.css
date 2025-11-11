@@ -178,8 +178,8 @@
 .takeaways img {
   margin: 1.8rem 0;
   width: 45vw;
-  border-radius: 4.5px;
 }
+
 
 .video-container {
   position: relative;
@@ -258,49 +258,72 @@ svg {
 
 /*------------------------ Media Queries --------------------------*/
 
-@media screen and (max-width: 1024px) {
-  .case-study-binary .main {
-    padding: 0 2rem;
-  }
-
-  .case-study-binary .overview-info {
-    width: 75vw;
-  }
-}
-
 @media screen and (max-width: 768px) {
 
-  .case-study-binary h1 {
-    font-size: 3.75rem;
+  .case-study-binary .main {
+    margin: 3.5rem 0 2rem 0;
+    padding: 0.5rem 0 0.5rem 5.5rem;
   }
-  .overview-info h3 {
-    font-size: 1.15rem; /* Reduce font size for smaller screens */
-    margin: 0rem 1rem; /* Adjust margins */
-    line-height: 2rem;
+
+  .case-study-binary .study {
+    padding-left: 15%;
   }
 
 
-  .overview img,
-  .pain-points img,
-  .takeaways img {
-    width: 60vw;
+  .case-study-binary .video-container {
+    width: 90%;
   }
 
-  video {
-    width: 75vw;
+  .case-study-binary .overview .video-container {
+    width: 85%;
   }
+
+  .case-study-binary .overview .img-caption img,
+  .case-study-binary .pain-points .img-caption img,
+  .case-study-binary .takeaways .img-caption img {
+  width: 47.5vw;
 }
 
-@media screen and (max-width: 716px) {
 .case-study-binary .overview-info {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .case-study-binary .team {
-    width: 35vw;
-  }
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
+
+.case-study-binary .all-skills {
+  width: auto;
+}
+
+.case-study-binary  h1 {
+  font-size: 3.5rem;
+  line-height: 4rem;
+}
+
+.case-study-binary  h2 {
+  font-size: 2.75rem;
+}
+
+.case-study-binary h4 {
+  font-size: 2.5rem;
+}
+
+.case-study-binary .overview-info h3 {
+  font-size: 1rem;
+}
+
+.case-study-binary .overview p,
+.case-study-binary .pain-points p,
+.case-study-binary .takeaways p, 
+.case-study-binary .app-link  {
+  font-size: 1rem;
+}
+
+.case-study-binary .overview-info p,  .case-study-binary .overview-info .app-link {
+  font-size: 0.9rem;
+}
+
+
+}
+
 
 @media screen and (max-width: 600px) {
   .case-study-binary h1 {

@@ -226,11 +226,11 @@ function CaseStudyHBOMax2() {
                         <tbody>
                         <tr>
                             <td rowSpan={2} style={{ width: "14rem" }}>
-                                Succession<br />
-                                The Lord of the Rings: The Fellowship of the Ring<br />
-                                Friends<br />
-                                The O.C.<br />
-                                Game of Thrones<br />
+                                Succession,<br />
+                                The Lord of the Rings: The Fellowship of the Ring,<br />
+                                Friends,<br />
+                                The O.C.,<br />
+                                Game of Thrones,<br />
                                 Big Bang Theory</td>
                             <td>House of the Dragon</td>
                             <td>The creators of <span className="italic">Game of Thrones</span> bring another epic series of power, politics, and family feuds. It's <span className="italic">Succession with dragons</span>.</td>

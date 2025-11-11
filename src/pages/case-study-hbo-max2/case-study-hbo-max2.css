@@ -188,7 +188,6 @@
 .pain-points img,
 .takeaways img {
   margin: 1.8rem 0;
-  border-radius: 4.5px;
 }
 
 .case-study-hbo-max2 .img-container img {
@@ -438,49 +437,86 @@
 
 /*------------------------ Media Queries --------------------------*/
 
-@media screen and (max-width: 1024px) {
-  .case-study-hbo-max2 .main {
-    padding: 0 2rem;
-  }
-
-  .case-study-hbo-max2 .overview-info {
-    width: 75vw;
-  }
-}
 
 @media screen and (max-width: 768px) {
 
-  .case-study-hbo-max2 h1 {
-    font-size: 3.75rem;
-  }
-  .overview-info h3 {
-    font-size: 1.15rem; /* Reduce font size for smaller screens */
-    margin: 0rem 1rem; /* Adjust margins */
-    line-height: 2rem;
+  .case-study-hbo-max2 .main {
+    margin: 3.5rem 0 2rem 0;
+    padding: 0.5rem 0 0.5rem 5.5rem;
   }
 
-
-  .overview img,
-  .pain-points img,
-  .takeaways img {
-    width: 60vw;
+  .case-study-hbo-max2 .study {
+    padding-left: 15%;
   }
 
-  video {
-    width: 75vw;
+  .img-caption h5 {
+    font-size: 0.9rem;
+    line-height: 1.1rem;
+    margin: 1rem 0rem 0 1rem;
+    letter-spacing: 1.0px;
+    width: 16vw;
   }
+
+  .case-study-hbo-max2 .video-container, .case-study-hbo-max2 .figma-embed {
+    width: 85%
+  }
+
+  .case-study-hbo-max2 .overview img,
+  .case-study-hbo-max2 .pain-points img,
+  .case-study-hbo-max2 .takeaways img {
+  width: 85%;
 }
 
-@media screen and (max-width: 716px) {
 .case-study-hbo-max2 .overview-info {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .case-study-hbo-max2 .team {
-    width: 35vw;
-  }
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
+
+.case-study-hbo-max2 .all-skills {
+  width: auto;
+}
+
+.case-study-hbo-max2  h1 {
+  font-size: 3.5rem;
+  line-height: 4rem;
+}
+
+.case-study-hbo-max2  h2 {
+  font-size: 2.75rem;
+}
+
+.case-study-hbo-max2  h4 {
+  font-size: 2.5rem;
+}
+
+.case-study-hbo-max2 .overview-info h3 {
+  font-size: 1rem;
+}
+
+.case-study-hbo-max2 .overview p,
+.case-study-hbo-max2 .pain-points p,
+.case-study-hbo-max2 .takeaways p, 
+.case-study-hbo-max2 .app-link  {
+  font-size: 1rem;
+}
+
+.case-study-hbo-max2 .overview-info p, .overview-info .app-link {
+  font-size: 0.9rem;
+}
+
+.results-table th, .findings-table th {
+  font-size: 1rem;
+}
+
+.results-table td, .findings-table td {
+  font-size: 0.9rem;
+  line-height: 1.5rem;
+}
+
+
+}
+
+
 
 @media screen and (max-width: 600px) {
   .case-study-hbo-max2 h1 {

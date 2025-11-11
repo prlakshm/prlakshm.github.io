@@ -179,7 +179,6 @@
 .takeaways img {
   margin: 1.8rem 0;
   width: 45vw;
-  border-radius: 4.5px;
 }
 
 .video-container {
@@ -259,48 +258,82 @@ svg {
 
 /*------------------------ Media Queries --------------------------*/
 
-@media screen and (max-width: 1024px) {
-  .case-study-dreamer .main {
-    padding: 0 2rem;
-  }
-
-  .case-study-dreamer .overview-info {
-    width: 75vw;
-  }
-}
-
 @media screen and (max-width: 768px) {
 
-  .case-study-dreamer h1 {
-    font-size: 3.75rem;
-  }
-  .overview-info h3 {
-    font-size: 1.15rem; /* Reduce font size for smaller screens */
-    margin: 0rem 1rem; /* Adjust margins */
-    line-height: 2rem;
+  .case-study-dreamer .main {
+    margin: 3.5rem 0 2rem 0;
+    padding: 0.5rem 0 0.5rem 5.5rem;
   }
 
-
-  .overview img,
-  .pain-points img,
-  .takeaways img {
-    width: 60vw;
+  .case-study-dreamer .study {
+    padding-left: 15%;
   }
 
-  video {
-    width: 75vw;
+  .img-caption h5 {
+    font-size: 0.9rem;
+    line-height: 1.1rem;
+    margin: 1rem 0rem 0 1rem;
+    letter-spacing: 1.0px;
+    width: 16vw;
   }
+
+  .case-study-binary .video-container, .case-study-binary .figma-embed {
+    width: 85%
+  }
+
+.overview .img-caption img,
+.pain-points .img-caption img,
+.takeaways .img-caption img {
+  width: 47.5vw;
 }
 
-@media screen and (max-width: 716px) {
 .case-study-dreamer .overview-info {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-  }
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
 
-  .case-study-dreamer .team {
-    width: 35vw;
-  }
+.case-study-dreamer .all-skills {
+  width: auto;
+}
+
+.case-study-dreamer  h1 {
+  font-size: 3.5rem;
+  line-height: 4rem;
+}
+
+.case-study-dreamer  h2 {
+  font-size: 2.75rem;
+}
+
+.case-study-dreamer h4 {
+  font-size: 2.5rem;
+}
+
+.case-study-dreamer .overview-info {
+  display: flex;
+  
+}
+
+.case-study-dreamer .overview-info h3 {
+  font-size: 1rem;
+}
+
+.case-study-dreamer .video-container {
+  width: 85%
+}
+
+.case-study-dreamer .overview p,
+.case-study-dreamer .pain-points p,
+.case-study-dreamer .takeaways p, 
+.case-study-dreamer .app-link  {
+  font-size: 1rem;
+}
+
+.case-study-dreamer .overview-info p, .case-study-dreamer .overview-info .app-link {
+  font-size: 0.9rem;
+}
+
+
 }
 
 @media screen and (max-width: 600px) {

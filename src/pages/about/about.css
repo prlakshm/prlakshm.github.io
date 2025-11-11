@@ -66,22 +66,21 @@
 
   /*------------------------ Media Queries --------------------------*/
 
-/* Media Query for screens 1024px or smaller */
-@media screen and (max-width: 1024px) {
-
-  .about .main p {
-    width: 70vw;
-    font-size: 1.1rem; 
-  }
-}
 
 @media screen and (max-width: 768px) {
 
-  .about .main {
-  }
-
   .about .main p {
     font-size: 1rem; 
+  }
+
+  .image-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+  }
+
+  .image-row img {
+    width: 24.25vw;
   }
 }
 
