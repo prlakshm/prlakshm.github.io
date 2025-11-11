@@ -13,21 +13,17 @@ function Home() {
       <div className="landing-page">
         <div className="title">
         <h1 className="cutout-text">
-        <span>H</span>
-        <span>I</span>
-        <span>,</span>
-        {" "}
-        <span>I</span>
-        <span>'</span>
-        <span>M</span>
-        {" "}
-        <span>P</span>
-        <span>R</span>
-        <span>A</span>
-        <span>N</span>
-        <span>A</span>
-        <span>V</span>
-        <span>I</span>
+        <span className="word">
+          <span>H</span><span>I</span><span>,</span>
+        </span>
+        <span className="word">
+          {" "}
+          <span>I</span><span>'</span><span>M</span>
+        </span>
+        <span className="word">
+          {" "}
+          <span>P</span><span>R</span><span>A</span><span>N</span><span>A</span><span>V</span><span>I</span>
+        </span>
       </h1>
           {/* <div className="name-image">
           <img

@@ -14,15 +14,20 @@ function About() {
     <div className="about">
         <div className="main">
         <h1 className="cutout-text">
-        <span>A</span>
-        <span style={{transform: "translateY(-3px)"}}>B</span>
-        <span>O</span>
-        <span>U</span>
-        <span>T</span>
+        <span className="word">
+          <span>A</span>
+          <span style={{ transform: "translateY(-3px)" }}>B</span>
+          <span>O</span>
+          <span>U</span>
+          <span>T</span>
+        </span>
         {" "}
-        <span>M</span>
-        <span>E</span>
+        <span className="word">
+          <span>M</span>
+          <span>E</span>
+        </span>
       </h1>
+
           <div className="about-me">
               <p>
                 I’m Pranavi 👋 , a product designer and multimedia artist at

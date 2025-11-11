@@ -15,17 +15,22 @@ function Fun() {
 
   return (
     <div className="fun">
-      <h1 className="cutout-text">
-        <span>F</span>
-        <span>U</span>
-        <span>N</span>
+        <h1 className="cutout-text">
+        <span className="word">
+          <span>F</span>
+          <span>U</span>
+          <span>N</span>
+        </span>
         {" "}
-        <span>S</span>
-        <span>T</span>
-        <span>U</span>
-        <span>F</span>
-        <span>F</span>
+        <span className="word">
+          <span>S</span>
+          <span>T</span>
+          <span>U</span>
+          <span>F</span>
+          <span>F</span>
+        </span>
       </h1>
+
       <h2>Screenplay, movie ideas, and more...</h2>
       <div className="grid">
       {funData.map(

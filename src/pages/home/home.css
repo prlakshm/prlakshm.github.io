@@ -59,6 +59,12 @@ h1 {
   color: #2b2b2b;
 }
 
+.cutout-text .word {
+  display: inline-block;  /* shrink-wrap the word */
+  white-space: nowrap;    /* prevent breaks inside the word */
+  margin-right: 0.25rem;  /* optional spacing between words */
+}
+
 .cutout-text span {
   display: inline-block;
   transform: rotate(calc(-3deg + 6deg * var(--r))) translateY(calc(-3px + 7px * var(--y)));
@@ -129,6 +135,14 @@ svg {
 }
 
 /*------------------------ Media Queries --------------------------*/
+
+
+@media screen and (max-width: 1440px) {
+  h1 {
+    font-size: 3.25rem;
+  }
+
+}
 
 @media screen and (max-width: 768px) {
   h1 {
