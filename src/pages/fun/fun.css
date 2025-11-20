@@ -97,7 +97,7 @@
     padding: 0;
   }
 
-  .card {
+  .fun .card {
     width: 42.5vw;
     margin-bottom: 1rem; /* Add space between stacked cards */
   }
@@ -177,7 +177,12 @@
   }
 }
 
-@media screen and (max-width: 425px) {
+@media screen and (max-width: 426px) {
+
+  .fun .card{
+    width: 90vw;
+  }
+
   .fun .preview-image {
     height: 31.75vh; /* Adjust image height */
   }

@@ -173,14 +173,54 @@ svg {
   h1 {
     font-size: 2.75rem;
   }
+
+  .home {
+    display: flex;  
+    padding: 4rem auto;  
+    justify-content: center; 
+    align-items: center; 
+  }
 }
 
-@media screen and (max-width: 444px) {
-    .contact img {
-        width: 1.6rem;
+
+  @media screen and (max-width: 426px) {
+
+    .title {
+      padding: 2rem 0 0.5rem 0; 
+      text-align: center;
     }
 
+    .title h2 {
+      text-align: center;
+    }
+  
+    h1 {
+      font-size: 2.5rem;
+    }
+  
+    h2 {
+      font-size: 0.9rem;
+      line-height: 1.45rem;
+    }
+
+    .contact {
+      margin-top: 1rem;
+    }
+  
+    .contact img {
+      width: 1.75rem;
+    }
+  
     .contact a {
-        padding: 0 0.5rem;
+      padding: 0 0.5rem;
+    }
+  
+    .name-image img {
+      height: 5.2rem;
+    }
+  
+    .name-image .profile {
+      height: 7rem;
     }
   }
+  

@@ -199,7 +199,8 @@ h5 {
   }
 
   .project-cards {
-    margin-top: 1rem; /* Reduce top margin */
+    width: fit-content;
+    margin-top: 1.6rem; /* Reduce top margin */
   }
 
   .card {
@@ -246,7 +247,16 @@ h5 {
   }
 }
 
-@media screen and (max-width: 425px) {
+@media screen and (max-width: 426px) {
+
+  .card-content {
+    width: fit-content;
+  }
+
+  .card{
+    width: 85vw;
+  }
+
   .preview-image {
     height: 12rem;
   }
