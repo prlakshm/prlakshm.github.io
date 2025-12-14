@@ -1,18 +1,10 @@
 [
-    {
-        "name": "Scrabble My Heart",
-        "color": "#f8d6d8",
-        "skills": ["Adventure", "Wordplay"],
-        "logline": "Two unsuspecting college students get thrown into a hunt for the treasure of a legendary 1950s Scrabble player.",
-        "image": "/fun/scrabble-cover-art.png",
-        "link": "/docs/Scrabble_My_Heart.pdf"
-    },
         {
-        "name": "This is Not the Matrix",
+        "name": "Force of Nature",
         "color": "#f8d6d8",
-        "skills": ["Sci-fi", "Coming-of-age"],
+        "skills": ["LGBTQ+", "Coming-of-age"],
         "logline": "Reality is a simulation and our lives are AI-generated. A teenage girl hacks the system to try to get her best friend back.",
-        "image": "/fun/matrix-cover-art1.png",
+        "image": "/fun/force-of-nature-cover-art2.png",
         "link": "/docs/This_is_Not_the_Matrix.pdf"
     },
     {
@@ -22,5 +14,13 @@
         "logline": "Two girls steal their friend’s ashes and embark on a road trip to fulfill their promise of sprinkling her ashes in the ocean.",
         "image": "/fun/dear-abby-cover-art.png",
         "link": "/docs/Dear_Abby.pdf"
+    },
+    {
+        "name": "Scrabble My Heart",
+        "color": "#f8d6d8",
+        "skills": ["Adventure", "Wordplay"],
+        "logline": "Two unsuspecting college students get thrown into a hunt for the treasure of a legendary 1950s Scrabble player.",
+        "image": "/fun/scrabble-cover-art.png",
+        "link": "/docs/Scrabble_My_Heart.pdf"
     }
 ]
