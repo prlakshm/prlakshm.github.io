@@ -6,7 +6,6 @@ html {
   margin: 0;
   padding: 0;
   background-color: #fff9f3;
-  /* background-color: #fedfd1; */
 }
 
 .header {
@@ -50,41 +49,26 @@ html {
   position: absolute;
   top: 60px;
   right: 10px;
-  background-color:  rgba(248, 220, 255, 95%);
+  background-color: rgba(255, 244, 239, 0.98);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   border-radius: 2px;
-  z-index: 1;
+  z-index: 1000;
 }
+
 
 .header .dropdown-menu a {
   padding: 0.35rem 2.5rem;
   text-align: center;
-  color: #5b137d !important;
+  color: rgba(43, 43, 43, 0.85);
   text-decoration: none;
-  border: 1px solid rgba(91, 19, 125, 50%);
+  border: 1px solid  rgba(43, 43, 43, 0.45);
 }
 
 .dropdown-menu a:hover {
-  background-color: rgba(241, 186, 255, 0.95);
+  background-color: rgba(248, 214, 216, 0.9);
+  text-decoration: underline;
 }
 
-.dropdown-menu a:last-child {
-  border-bottom: none;
-}
-
-/* Dark mode specific styles */
-.header.dark-mode a {
-  color: #f8dcff; /* Override with dark mode text color */
-}
-
-.dark-mode.visible-color {
-  background-color: rgba(
-    47,
-    32,
-    91,
-    90%
-  ); /* Adjust to solid color for dark mode */
-}
 
 .footer {
   display: flex;
@@ -95,9 +79,6 @@ html {
   width: inherit;
 }
 
-.footer.dark-mode {
-  color: #f8dcff;
-}
 
 .header img {
   width: 4rem;
@@ -144,7 +125,7 @@ a {
   font-size: 1.2rem;
   letter-spacing: 1.05px;
   line-height: 1.6rem;
-  color: rgba(43, 43, 43, 0.85);;
+  color: rgba(43, 43, 43, 0.85);
   text-decoration: none;
 }
 
