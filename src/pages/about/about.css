@@ -2,7 +2,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    margin-top: 4rem;
+    margin-top: 6rem;
     overflow: clip;
     
 }
@@ -12,7 +12,8 @@
   flex-direction: column;
   padding-top: 0;
   align-items: center;
-  padding: 2.5rem 6rem 1.5rem 6rem;
+  justify-content: center;
+  padding: 2.5rem auto 1.5rem auto;
 }
 
 
@@ -69,8 +70,13 @@
 
 @media screen and (max-width: 768px) {
 
+  .about .main h1 {
+    font-size: 3.25rem;
+  }
+
   .about .main p {
     font-size: 1rem; 
+    width: 70vw;
   }
 
   .image-row {
@@ -86,13 +92,14 @@
 
 /* Media Query for screens 600px or smaller */
 @media screen and (max-width: 672px) {
-  .about-me {
+  .about {
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .about .main {
   width: 95vw;
-  margin-top: 2rem;
 }
 
 .about .text {
@@ -102,53 +109,36 @@
 }
 
 .about .main h1 {
-  font-size: 2.25rem;
+  font-size: 2.75rem;
 }
 .about .main p {
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   text-align: center; 
 }
 
-.about .photo img {
-  width: 25vw;
-}
-
-.about .calendar-container {
-  margin-top: 2.3rem;
-  margin-bottom: 4.6rem;
-}
 
 }
 
+@media screen and (max-width: 426px) {
 
-@media screen and (max-width: 400px) {
   .about .main {
-    margin-top: 4rem;
+    margin-top: 0rem;;
+    padding-top: 0.25rem;
   }
 
-  .about .photo img {
-    width: 30vw;
+  .about .main p {
+ width: 75vw;
   }
+
+  .image-row {
+    margin-top: 2.5rem;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .image-row img {
+    width: 49.5vw;
+  }
+  
+
 }
 
-@media screen and (max-width: 370px) {
-  .about .calendar-container {
-    margin-top: 3.3rem;
-    margin-bottom: 6.6rem;
-  }
-}
-
-@media screen and (max-width: 330px) {
-  .about .main {
-    margin-top: 7.5rem;
-  }
-
-  .about .photo img {
-    width: 35vw;
-  }
-
-  .about .calendar-container {
-    margin-top: 7.3rem;
-    margin-bottom: 7.6rem;
-  }
-}
