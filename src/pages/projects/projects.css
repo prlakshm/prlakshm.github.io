@@ -187,7 +187,7 @@ h5 {
   }
 
   .info .all-skills {
-    margin-left: 1rem; /* Remove left margin */
+    margin-left: 1rem; 
   }
 
 }
@@ -217,7 +217,7 @@ h5 {
   }
 
   .all-skills {
-    row-gap: 0.5rem; /* Add space between skills */
+    row-gap: 0.5rem; 
   }
 
   .info .all-skills {
@@ -226,28 +226,37 @@ h5 {
   }
 
   h3 {
-    font-size: 1.8rem; /* Further reduce font size */
-    margin: 0 0.75rem; /* Adjust margins */
+    font-size: 1.8rem; 
+    margin: 0 0.75rem; 
   }
 
   h4 {
-    font-size: 0.9rem; /* Further reduce font size */
-    margin: 0.2rem 0.75rem; /* Adjust margins */
+    font-size: 0.9rem; 
+    margin: 0.2rem 0.75rem; 
     margin-bottom: 0.35rem;
   }
 
   h5 {
-    font-size: 0.9rem; /* Further reduce font size */
-    margin: 0.3rem 0.4rem; /* Adjust margins */
+    font-size: 0.9rem;
+    margin: 0.3rem 0.4rem; 
   }
 
   .skill {
-    width: 100%; /* Make skills take up full width */
-    text-align: center; /* Center the text */
+    width: 100%; 
+    text-align: center; 
   }
 }
 
 @media screen and (max-width: 426px) {
+
+  .skill {
+    width: fit-content
+  }
+
+  .info .all-skills {
+    margin-left: 0rem;
+    justify-content: center;
+  }
 
   .card-content {
     width: fit-content;
@@ -265,12 +274,3 @@ h5 {
   }
 }
 
-@media screen and (max-width: 375px) {
-  .preview-image {
-    height: 10rem;
-  }
-
-  .preview-image img {
-    width: 16rem;
-  }
-}

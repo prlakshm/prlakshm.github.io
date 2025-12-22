@@ -3,15 +3,15 @@
         "name": "Force of Nature",
         "color": "#f8d6d8",
         "skills": ["LGBTQ+", "Coming-of-age"],
-        "logline": "Reality is a simulation and our lives are AI-generated. A teenage girl hacks the system to try to get her best friend back.",
+        "logline": "A float competition forces three best friends to face their fears of high school crushes, rivalries, and identities.",
         "image": "/fun/force-of-nature-cover-art2.png",
-        "link": "/docs/This_is_Not_the_Matrix.pdf"
+        "link": "/docs/Force of Nature Final Draft.pdf"
     },
     {
         "name": "Dear Abby",
         "color": "#f8d6d8",
         "skills": ["Friendship", "Comedy"],
-        "logline": "Two girls steal their friend’s ashes and embark on a road trip to fulfill their promise of sprinkling her ashes in the ocean.",
+        "logline": "Two girls steal their friend’s urn and embark on a road trip to fulfill their promise of sprinkling her ashes in the ocean.",
         "image": "/fun/dear-abby-cover-art.png",
         "link": "/docs/Dear_Abby.pdf"
     },

@@ -93,7 +93,7 @@ h3 {
 }
 
 .home h2 a {
-  display: inline-flex;
+  display: inline;
   color: #de7e5d;
   font-weight: 625;
   text-decoration: none;
@@ -185,6 +185,10 @@ svg {
 
   @media screen and (max-width: 426px) {
 
+    .home {
+      padding: 4rem 2rem;  
+    }
+
     .title {
       padding: 2rem 0 0.5rem 0; 
       text-align: center;
@@ -215,12 +219,5 @@ svg {
       padding: 0 0.5rem;
     }
   
-    .name-image img {
-      height: 5.2rem;
-    }
-  
-    .name-image .profile {
-      height: 7rem;
-    }
   }
   
