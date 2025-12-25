@@ -53,6 +53,7 @@ html {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   border-radius: 2px;
   z-index: 1000;
+  animation: dropdownFadeIn 1s ease;
 }
 
 
@@ -67,6 +68,15 @@ html {
 .dropdown-menu a:hover {
   background-color: rgba(248, 214, 216, 0.9);
   text-decoration: underline;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 
