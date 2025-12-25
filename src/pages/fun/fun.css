@@ -139,10 +139,15 @@
   .fun .grid {
     display: flex;
     flex-direction: column;
+    margin-top: 0rem;
 }
 
 .fun .card {
-    width: fit-content;
+  width: 80vw;
+}
+
+.fun .preview-image img {
+  width: 100%;
 }
 
 
