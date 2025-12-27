@@ -176,7 +176,6 @@ function CaseStudyHBOMax1() {
                             <h5 style={{transform: "translateY(-1.5rem)"}}>Based on the subpage, the descriptor would appeal to the content focus and theme.</h5>
                             </div>
                         </div>
-                        <p></p>
                         
                         <h2 ref={iterationsRef}>What will it look like?</h2>
                         <p>My first iteration of the tile was a <span className="bold">film-reel design with tiles placed randomly</span> on the page.</p>

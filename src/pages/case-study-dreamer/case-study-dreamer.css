@@ -332,19 +332,62 @@ svg {
 .case-study-dreamer .overview-info p, .case-study-dreamer .overview-info .app-link {
   font-size: 0.9rem;
 }
-
-
 }
 
+
+
+
 @media screen and (max-width: 600px) {
+
+  .case-study-dreamer .main {
+    margin: 3.5rem 0 0rem 0;
+    padding-right: 0;
+  }
+
+  .case-study-dreamer .video-container, .case-study-dreamer .figma-embed {
+    width: 100%;
+}
+
+
   .case-study-dreamer h1 {
     font-size: 3rem;
     margin-left: 0;
     margin-right: 0;
   }
+
+  .overview .img-caption img, .pain-points .img-caption img, .takeaways .img-caption img {
+    width: 70vw;
+  }
+
+  .img-caption h5 {
+    width: 65vw;
+    margin-top: 1rem;
+  }
+  
+  .case-study-dreamer .overview-info {
+    width: 100%;
+    margin-bottom: 0;
 }
 
-@media screen and (max-width: 550px) {
+.case-study-dreamer .overview p, .case-study-dreamer .pain-points p, .case-study-dreamer .takeaways p, .case-study-dreamer .app-link {
+  width: 100%;
+}
+}
+
+
+@media screen and (max-width: 426px) {
+  .case-study-dreamer h1 {
+    padding-left: 1.25rem;
+  }
+
+  .case-study-dreamer .overview-info {
+    gap: 0 0.5rem;
+}
+
+  .overview-info h3 {
+    line-height: 1.15rem;
+  }
+
   .case-study-dreamer .main {
     padding: 0 1rem;
   }
@@ -363,25 +406,3 @@ svg {
   }
 }
 
-@media screen and (max-width: 426px) {
-  .case-study-dreamer h1 {
-    padding-left: 1.25rem;
-  }
-
-  .overview-info h3 {
-    line-height: 1.15rem;
-  }
-}
-
-@media screen and (max-width: 396px) {
-  .case-study-dreamer .main {
-    padding: 0 0.5rem;
-  }
-  .case-study-dreamer h1 {
-    font-size: 2.25rem;
-    padding-left: 1.25rem;
-  }
-  .case-study-dreamer .overview-info {
-    width: 82vw;
-  }
-}

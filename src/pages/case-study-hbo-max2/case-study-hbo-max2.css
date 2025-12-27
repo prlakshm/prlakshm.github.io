@@ -519,14 +519,56 @@
 
 
 @media screen and (max-width: 600px) {
+
+  .case-study-hbo-max2 .main {
+    margin: 3.5rem 0 0rem 0;
+    padding-right: 0;
+  }
+
+  .case-study-hbo-max2 .video-container, .case-study-hbo-max2 .figma-embed {
+    width: 100%;
+}
+
+
   .case-study-hbo-max2 h1 {
     font-size: 3rem;
     margin-left: 0;
     margin-right: 0;
   }
+
+  .overview .img-caption img, .pain-points .img-caption img, .takeaways .img-caption img {
+    width: 70vw;
+  }
+
+  .img-caption h5 {
+    width: 65vw;
+    margin-top: 1rem;
+  }
+  
+  .case-study-hbo-max2 .overview-info {
+    width: 100%;
+    margin-bottom: 0;
 }
 
-@media screen and (max-width: 550px) {
+.case-study-hbo-max2 .overview p, .case-study-hbo-max2 .pain-points p, .case-study-hbo-max2 .takeaways p, .case-study-hbo-max2 .app-link {
+  width: 100%;
+}
+}
+
+
+@media screen and (max-width: 426px) {
+  .case-study-hbo-max2 h1 {
+    padding-left: 1.25rem;
+  }
+
+  .case-study-hbo-max2 .overview-info {
+    gap: 0 0.5rem;
+}
+
+  .overview-info h3 {
+    line-height: 1.15rem;
+  }
+
   .case-study-hbo-max2 .main {
     padding: 0 1rem;
   }
@@ -545,25 +587,3 @@
   }
 }
 
-@media screen and (max-width: 426px) {
-  .case-study-hbo-max2 h1 {
-    padding-left: 1.25rem;
-  }
-
-  .overview-info h3 {
-    line-height: 1.15rem;
-  }
-}
-
-@media screen and (max-width: 396px) {
-  .case-study-hbo-max2 .main {
-    padding: 0 0.5rem;
-  }
-  .case-study-hbo-max2 h1 {
-    font-size: 2.25rem;
-    padding-left: 1.25rem;
-  }
-  .case-study-hbo-max2 .overview-info {
-    width: 82vw;
-  }
-}
