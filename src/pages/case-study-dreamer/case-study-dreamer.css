@@ -277,9 +277,6 @@ svg {
     width: 16vw;
   }
 
-  .case-study-binary .video-container, .case-study-binary .figma-embed {
-    width: 85%
-  }
 
 .overview .img-caption img,
 .pain-points .img-caption img,

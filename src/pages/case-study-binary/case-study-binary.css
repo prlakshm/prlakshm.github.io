@@ -354,7 +354,7 @@ svg {
   }
 
   .case-study-binary .video-container, .case-study-binary .figma-embed {
-    width: 85vw;
+    width: 100%;
 }
 
 .img-caption {
