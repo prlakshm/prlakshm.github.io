@@ -15,12 +15,15 @@
 .case-study-hbo-max1 .content {
   display: flex;
   flex-direction: row;
-  width: max-content;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 
 .case-study-hbo-max1 .side-nav {
   position: fixed;
   top: 15.5%;
+  left: 2.5%;
   padding-left: 4.75%;
   padding-right: 4rem;
   font-size: 1.1rem;
@@ -52,7 +55,7 @@
   justify-content: center;
   align-items: left;
   padding-left: 18.5%;
-  width: max-content;
+  width: 100%;
 }
 
 .case-study-hbo-max1 .main {
@@ -371,13 +374,33 @@ svg {
 
 @media screen and (max-width: 600px) {
 
+  .case-study-hbo-max1 {
+    width: 100vw;
+    align-items: center;
+  }
+
+  .case-study-hbo-max1 .side-nav {
+    display: none;
+  }
+
+
+  .case-study-hbo-max1 .study {
+    padding-left: 0%;
+    align-items: center;
+}
+
   .case-study-hbo-max1 .main {
     margin: 3.5rem 0 0rem 0;
-    padding-right: 0;
+    padding: 0.5rem 0;
   }
 
   .case-study-hbo-max1 .video-container, .case-study-hbo-max1 .figma-embed {
-    width: 100%;
+    width: 95%;
+}
+
+.img-caption {
+  flex-direction: column;
+  align-items: start;
 }
 
 
@@ -385,15 +408,17 @@ svg {
     font-size: 3rem;
     margin-left: 0;
     margin-right: 0;
+    padding-left: 0;
   }
 
   .overview .img-caption img, .pain-points .img-caption img, .takeaways .img-caption img {
-    width: 70vw;
+    width: 85vw;
   }
 
   .img-caption h5 {
-    width: 65vw;
+    width: 85vw;
     margin-top: 1rem;
+    margin-left: 0rem;
   }
   
   .case-study-hbo-max1 .overview-info {
@@ -408,9 +433,6 @@ svg {
 
 
 @media screen and (max-width: 426px) {
-  .case-study-hbo-max1 h1 {
-    padding-left: 1.25rem;
-  }
 
   .case-study-hbo-max1 .overview-info {
     gap: 0 0.5rem;
