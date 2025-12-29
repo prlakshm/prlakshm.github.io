@@ -483,6 +483,7 @@
 
 .case-study-hbo-max2  h2 {
   font-size: 2.75rem;
+  line-height: 3.1rem;
 }
 
 .case-study-hbo-max2  h4 {
@@ -526,6 +527,10 @@
     align-items: center;
   }
 
+  .case-study-hbo-max2 .content {
+    width: 100%;
+  }
+
   .case-study-hbo-max2 .side-nav {
     display: none;
   }
@@ -534,11 +539,13 @@
   .case-study-hbo-max2 .study {
     padding-left: 0%;
     align-items: center;
+    width: 100vw;
 }
 
   .case-study-hbo-max2 .main {
     margin: 3.5rem 0 0rem 0;
     padding: 0.5rem 0;
+    width: 85vw;
   }
 
   .case-study-hbo-max2 .video-container, .case-study-hbo-max2 .figma-embed {
@@ -576,6 +583,13 @@
 .case-study-hbo-max2 .overview p, .case-study-hbo-max2 .pain-points p, .case-study-hbo-max2 .takeaways p, .case-study-hbo-max2 .app-link {
   width: 100%;
 }
+
+.findings-heading {
+  flex-direction: column;
+}
+
+  
+
 }
 
 
