@@ -212,8 +212,7 @@ function CaseStudyHBOMax2() {
                                 alt="Prompt breakdown with basic specs, core tenents, and good/bad examples"
                             />
                         </div>
-
-
+                        <div className="table-scroll">
                         <table className="results-table">
                         <thead>
                         <tr>
@@ -243,6 +242,7 @@ function CaseStudyHBOMax2() {
                         </tr>
                         </tbody>
                     </table>
+                    </div>
                         
                         <h2>Modifying Inputs</h2>
 
@@ -266,6 +266,7 @@ function CaseStudyHBOMax2() {
 
                         <p> I also tested different <span className="bold">temperatures, character lengths, and external sources</span> to evaluate their impact on blurb writing.</p>
 
+                        <div className="table-scroll">
                         <table className="results-table">
                         <thead>
                             <tr>
@@ -296,6 +297,7 @@ function CaseStudyHBOMax2() {
                             </tr>
                         </tbody>
                         </table>
+                        </div>
 
                         <h4>More Agents...</h4>
 
