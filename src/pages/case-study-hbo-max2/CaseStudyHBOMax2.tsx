@@ -412,6 +412,7 @@ function CaseStudyHBOMax2() {
                                 <span className="app-link">Anna Ho</span>
                             </a> from UX Research, I <span className="bold">extracted key insights from the user feedback</span>. Participants repeatedly highlighted that the RTW descriptions stood out because they:</p>
                         
+                        <div className="table-scroll">
                             <table className="findings-table">
                         <thead>
                         <tr>
@@ -433,6 +434,7 @@ function CaseStudyHBOMax2() {
                         </tr>
                         </tbody>
                     </table>
+                    </div>
 
                         <p>The POC was sucessful in validating the impact of RTW, and the team is <span className="bold">now identifying touchpoints to bring these personalized descriptions into the HBO Max product experience</span>.
                         </p>

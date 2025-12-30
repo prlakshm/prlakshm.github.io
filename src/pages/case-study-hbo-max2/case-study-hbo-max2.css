@@ -386,7 +386,7 @@
 .findings-table {
   width: 65vw;
   border-collapse: collapse;
-  margin: 2rem 0 0.5rem 0;
+  margin: 1.5rem 0 0.5rem 0;
 }
 
 
@@ -586,7 +586,14 @@
 
 .findings-heading {
   flex-direction: column;
+  font-size: 0.9rem;
+  line-height: 1.2;
 }
+
+.findings-table {
+  margin-top: 1rem;
+}
+
 
 .results-table th {
   font-size: 0.9rem;
