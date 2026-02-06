@@ -5,7 +5,8 @@ body,
 html {
   margin: 0;
   padding: 0;
-  background-color: #fff9f3;
+  min-height: 100vh;
+  background: linear-gradient(to bottom right, #fff7ed, #ffe4e6, #fff7ed);
 }
 
 .header {

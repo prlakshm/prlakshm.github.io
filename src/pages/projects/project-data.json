@@ -6,7 +6,7 @@
         "logline": "Designing an AI-powered rail for the HBO Max streaming app",
         "image": "/projects/surprise-rail-overview.mp4",
         "link": "#/hbo-max-surprise",
-        "locked": true
+        "locked": false
     },
     {
         "name": "RichDreamer Text-to-3D",
@@ -24,7 +24,7 @@
         "logline": "Prototyping a personalized content discovery feature for HBO Max",
         "image": "/projects/rtw-overview2.mp4",
         "link": "#/hbo-max-rtw",
-        "locked": true
+        "locked": false
     },
     {
         "name": "Binary Escape",
