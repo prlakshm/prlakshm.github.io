@@ -7,7 +7,6 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  overflow-x: clip;
   margin-top: 6rem;
 }
 
@@ -16,7 +15,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 2.5rem;
-  padding: 2.2rem 6rem;
+  padding: 1.7rem 5rem 0rem 5rem;
 }
 
 .fun .grid > :nth-child(1) {
@@ -49,19 +48,19 @@
     font-size: 3.75rem;
     letter-spacing: 0.05cap;
     margin-top: 0.9rem;
-    margin-bottom: 0.9rem;
+    margin-bottom: 1.4rem;
     padding: 0;
     text-align: center;
-    color: #2b2b2b;
+    color: #18181b;
 }
 
 .fun h2 {
   font-family: "forma-djr-text", sans-serif;
-  color: rgba(43, 43, 43, 0.75);
-  font-size: 1.15rem;
-  font-weight: 625;
-  line-height: 1.5rem;
+  font-weight: 425;
+  font-size: 1.1rem;
+  line-height: 1.8rem;
   letter-spacing: 1.5px;
+  color: #4e4e54;
   margin: 0rem 1.05rem;
   text-align: center;
 }
