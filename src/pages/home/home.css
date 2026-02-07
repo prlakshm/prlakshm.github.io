@@ -8,8 +8,8 @@
   flex-direction: column;
   column-count: 2;
   column-gap: 4rem;
-  flex-wrap: wrap;
   overflow-x: clip;
+  break-inside: avoid;
   padding: 2.5rem 6rem;
   padding-top: 3rem;
 }
