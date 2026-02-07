@@ -35,6 +35,12 @@ html {
   top: 0;
   transform: translateY(0);
   background-color: rgba(255, 254, 253, 0.8);
+  backdrop-filter: blur(12px);
+}
+
+.header.visible-color a:hover,  .header.visible-color a:active{
+  background-color: none;
+  backdrop-filter: none;
 }
 
 /* Dropdown menu styles*/
@@ -102,7 +108,7 @@ html {
   justify-content: flex-start;
   align-items: center;
   font-family: "Krub";
-  color: #1b1b18;
+  color: #27272a;
   font-weight: 425;
   font-size: 1rem;
   line-height: 1.8rem;
@@ -113,7 +119,7 @@ html {
 .right {
   display: flex;
   align-items: center;
-  margin: 2.52rem 2.7rem 1.8rem 0rem;
+  margin: 2.52rem 3.25rem 1.8rem 0rem;
 }
 
 .footer .left {
@@ -132,19 +138,22 @@ a {
 }
 
 .header a {
-  padding: 0 1.35rem;
+  padding: 0 1.5rem;
   font-family:  "forma-djr-text", sans-serif;
   font-weight: 625;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   letter-spacing: 1.05px;
   line-height: 1.6rem;
-  color: rgba(43, 43, 43, 0.85);
+  color: #27272a;
   text-decoration: none;
+  transition: all 0.2s;
 }
 
 .header a:hover,
 .header a:active {
+  color: #e11d48;
   text-decoration: underline;
+  text-decoration-color: #f43f5e;
 }
 
 /*------------------------ Media Queries --------------------------*/
