@@ -4,7 +4,7 @@
 .case-study-binary {
   position: relative;
   font-family: "forma-djr-text", sans-serif;
-  color: rgba(43, 43, 43, 0.8);
+  color: #4e4e54;
   z-index: 1;
   display: flex;
   flex-direction: column;
@@ -20,28 +20,26 @@
 .case-study-binary .side-nav {
   position: fixed;
   top: 15.5%;
+  left: 2.5%;
   padding-left: 4.75%;
   padding-right: 4rem;
+}
+
+.case-study-binary .side-nav p {
+  transition: all 0.2s;
   font-size: 1.1rem;
   font-weight: 525;
-  color: rgba(43, 43, 43, 0.75);;
+  color: #f43f5e;
   letter-spacing: 1px;
   line-height: 1.6rem;
+  text-decoration: underline;
+  text-decoration-color: #fda4af;
 }
 
 .case-study-binary .side-nav p:hover {
+  color: #e11d48;
   text-decoration: underline;
-}
-
-.case-study-binary .side-nav img {
-  width: 7px;
-  height: auto;
-  opacity: 55%;
-  margin: 0 1px -0.5px 0;
-}
-
-.case-study-binary .side-nav img:hover {
-  text-decoration: underline;
+  text-decoration-color: #f43f5e;
 }
 
 
@@ -81,6 +79,7 @@
   margin: 1.5rem 2.7rem 1rem 0rem;
   letter-spacing: 1.1px;
   text-align: left;
+  color: #18181b;
 }
 
 
@@ -126,7 +125,6 @@
 
 .case-study-binary .overview-info h3 {
   font-family: "forma-djr-text", sans-serif;
-  color: rgba(43, 43, 43, 0.75);
   font-size: 1.15rem;
   font-weight: 625;
   margin: 0;
@@ -212,30 +210,25 @@
   font-weight: 625;
 }
 
-.arrow {
-  font-weight: 800;
-  font-size: 1.4rem;
-  color: rgba(43, 43, 43, 0.8);
-}
 
 .case-study-binary .app-link {
   font-size: 1.1rem;
-  color: #de7e5d;
+  color: #f43f5e;;
   font-weight: 550;
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: #fda4af;
   letter-spacing: 1px;
   line-height: 1.6rem;
+  transition: all 0.2s;
 }
 
-.team a {
-  text-decoration: none;
-
-}
 
 .case-study-binary .app-link:hover {
   font-size: 1.1rem;
   font-weight: 625;
   text-decoration: underline;
+  text-decoration-color: #f43f5e;
+  color: #e11d48;
 }
 
 .seperator {
