@@ -75,7 +75,15 @@ function CaseStudyBinary() {
                         <div className="skills">
                             <h3>Skills</h3>
                             <div className="all-skills">
-                                    <p>Game Development ● <br /> 3D Animation ● Javascript</p>
+                                    <div className="skill">
+                                    <h5>Game Development</h5>
+                                    </div>
+                                    <div className="skill">
+                                    <h5>3D Animation</h5>
+                                    </div>
+                                    <div className="skill">
+                                    <h5>Javascript</h5>
+                                    </div>
                             </div>
                         </div>
                     </div>

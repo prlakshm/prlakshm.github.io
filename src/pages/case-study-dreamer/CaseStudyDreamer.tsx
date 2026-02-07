@@ -64,7 +64,15 @@ function CaseStudyDreamer() {
                         <div className="skills">
                             <h3>Skills</h3>
                             <div className="all-skills">
-                                    <p>ML/GenAI ● Prompt Engineering ●<br /> Python</p>
+                                    <div className="skill">
+                                    <h5>ML/ Gen AI</h5>
+                                    </div>
+                                    <div className="skill">
+                                    <h5>Prompt Engineering</h5>
+                                    </div>
+                                    <div className="skill">
+                                    <h5>Python</h5>
+                                    </div>
                             </div>
                         </div>
                     </div>

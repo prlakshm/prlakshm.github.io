@@ -83,7 +83,16 @@ function CaseStudyHBOMax1() {
                         <div className="skills">
                             <h3>Skills</h3>
                             <div className="all-skills">
-                                    <p>Human-AI Interaction ● <br /> Visual Design ● Figma</p>
+                                <div className="skill">
+                                    <h5>Human-AI Interaction</h5>
+                                    </div>
+                                    <div className="skill">
+                                    <h5>Visual Design</h5>
+                                    </div>
+                                    <div className="skill">
+                                    <h5>Figma</h5>
+                                    </div>
+                                    
                             </div>
                         </div>
                     </div>
