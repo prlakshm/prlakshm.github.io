@@ -55,9 +55,6 @@ function Fun() {
                 )}
         </div>
         </div>
-      <div>
-      <Footer />
-    </div>
     </div>
   );
 }

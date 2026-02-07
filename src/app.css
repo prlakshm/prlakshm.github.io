@@ -56,9 +56,9 @@ html {
   position: absolute;
   top: 60px;
   right: 10px;
-  background-color: rgba(255, 244, 239, 0.98);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  border-radius: 2px;
+  background-color: rgba(255, 228, 230, 0.98);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  border-radius: 4px;
   z-index: 1000;
   animation: dropdownFadeIn 1s ease;
 }
@@ -66,15 +66,17 @@ html {
 
 .header .dropdown-menu a {
   padding: 0.35rem 2.5rem;
-  text-align: center;
-  color: rgba(43, 43, 43, 0.85);
+  text-align: center; 
+  color: #27272a;
   text-decoration: none;
-  border: 1px solid  rgba(43, 43, 43, 0.45);
+  border: 1px solid  #4e4e5433;
+  transition: all 0.2s;
 }
 
 .dropdown-menu a:hover {
-  background-color: rgba(248, 214, 216, 0.9);
+  color: #e11d48;
   text-decoration: underline;
+  text-decoration-color: #f43f5e;
 }
 
 @keyframes dropdownFadeIn {
@@ -93,7 +95,7 @@ html {
   align-items: center;
   margin-top: 0.5rem;
   padding: 0 0 0 1.5rem;
-  width: 98%;
+  width: inherit;
 }
 
 
@@ -185,6 +187,10 @@ a {
     display: none; /* Hide by default on small screens */
   }
 
+  .header a {
+    font-size: 1rem;
+  }
+
   .left {
     margin: 1.125rem 0rem;
     width: 50vw;
@@ -200,6 +206,8 @@ a {
     width: 45vw;
     font-size: 0.9rem;
   }
+
+
 }
 
 

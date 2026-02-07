@@ -1,5 +1,6 @@
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header.js';
+import Footer from './components/Footer.js';
 import Home from './pages/home/Home.js';
 import CaseStudyHBOMax1 from './pages/case-study-hbo-max1/CaseStudyHBOMax1.js';
 import CaseStudyHBOMax2 from './pages/case-study-hbo-max2/CaseStudyHBOMax2.js';
@@ -26,6 +27,7 @@ function App() {
           <Route path="/richdreamer" element={<CaseStudyDreamer />} />
           <Route path="/about" element={<About />} />
         </Routes>
+      <Footer />
     </Router>
   );
 }

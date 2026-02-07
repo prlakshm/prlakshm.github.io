@@ -206,6 +206,7 @@ h3 {
     .title h2 {
       text-align: center;
     }
+
   
     h1 {
       font-size: 2.5rem;
@@ -217,7 +218,9 @@ h3 {
     }
 
     .contact {
+      justify-content: center;
       margin-top: 1rem;
+      gap: 1rem;
     }
   
     .contact img {

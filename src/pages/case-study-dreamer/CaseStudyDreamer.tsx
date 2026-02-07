@@ -198,7 +198,6 @@ function CaseStudyDreamer() {
                
             </div>
             </div>
-            <Footer />
         </div>
     );
 }

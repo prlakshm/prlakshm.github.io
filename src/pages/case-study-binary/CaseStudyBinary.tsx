@@ -186,7 +186,6 @@ function CaseStudyBinary() {
                 </div>
                 </div>
             </div>
-            <Footer />
         </div>
     );
 }

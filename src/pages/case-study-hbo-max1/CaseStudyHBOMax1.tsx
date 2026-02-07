@@ -284,7 +284,7 @@ function CaseStudyHBOMax1() {
                 </div>
             </div>
             </div>
-            <Footer />
+            
         </div>
     );
 }
