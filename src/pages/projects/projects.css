@@ -6,7 +6,15 @@
   margin-top: 1.8rem;
   padding: 0;
   z-index: 1;
-  color: #4e4e54;
+  color: #4e4e54; 
+}
+
+.project-cards {
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
+  display: inline-block;
+  width: 100%;
 }
 
 .fun .project-cards {
