@@ -28,7 +28,7 @@ function CaseStudyHBOMax1() {
         <div className="case-study-hbo-max1" ref={topRef}>
             <div className="content">
             <div className="side-nav">
-                <p onClick={() => scrollToSection(topRef)}>(<img src="/icons/up-arrow.png" alt="up arrow icon"/>) Top</p>
+                <p onClick={() => scrollToSection(topRef)}>Overview</p>
                     <p onClick={() => scrollToSection(problemRef)}>Problem</p>
                     <p onClick={() => scrollToSection(researchRef)}>Research</p>
                     <p onClick={() => scrollToSection(iterationsRef)}>Iterations</p>
@@ -213,7 +213,7 @@ function CaseStudyHBOMax1() {
                                 src="/case-study-hbo-max1/name-options.png"
                                 alt="solid black vs. frosted glass tile designs'"
                             />
-                            <h5 style={{transform: "translateY(-1.5rem)"}}>Younger ages 18-25 understood the play on <span className="italic">blind date</span>, but older ages took it more literal and thought it involved romance.</h5>
+                            <h5 style={{transform: "translateY(-1.5rem)"}}>Younger ages 18-25 understood the play on <span className="italic">"blind date"</span>, but older ages took it more literal and thought it involved romance.</h5>
                             </div>
 
                             <p>As per advice from our UX writer, I decided on <span className="bold">"Surprise [theme]"</span> because it <span className="bold">clearly communicated the concept and was the most straightforward</span>. </p>
