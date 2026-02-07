@@ -3,15 +3,17 @@
 @import url("https://use.typekit.net/ovs8xoo.css");
 
 
+
+
 .home {
   display: block;
   flex-direction: column;
   column-count: 2;
   column-gap: 4rem;
   overflow-x: clip;
-  break-inside: avoid;
-  padding: 2.5rem 6rem;
-  padding-top: 3rem;
+  padding: 0rem 6rem 2.5rem 6rem;
+  margin-top: 2.5rem;
+
 }
 
 
@@ -27,7 +29,7 @@
   justify-content: center;
   align-items: left;
   padding-left: 3rem;
-  padding-top: 5rem;
+  padding-top: 5.75rem;
   padding-bottom: 0.25rem;
 }
 
@@ -156,7 +158,8 @@ h3 {
 @media screen and (max-width: 768px) {
 
     .home {
-      padding: 5rem 2.5rem 2rem 2.5rem;
+      padding: 0rem 2.5rem 2rem 2.5rem;
+      margin-top: 5rem;
       column-gap: 2rem;
     }
   
