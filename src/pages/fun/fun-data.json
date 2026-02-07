@@ -13,13 +13,13 @@
         "skills": ["Friendship", "Comedy"],
         "logline": "Two girls steal their friend’s urn and embark on a road trip to fulfill their promise of sprinkling her ashes in the ocean.",
         "image": "/fun/dear-abby-cover-art.png",
-        "link": "/docs/Dear_Abby.pdf"
+        "link": "/docs/Dear Abby.pdf"
     },
     {
         "name": "Scrabble My Heart",
         "color": "#f8d6d8",
         "skills": ["Adventure", "Wordplay"],
-        "logline": "Two unsuspecting college students get thrown into a hunt for the treasure of a legendary 1950s Scrabble player.",
+        "logline": "Two unsuspecting college students get thrown into a hunt for the treasure of a legendary 1950s Scrabble player",
         "image": "/fun/scrabble-cover-art.png",
         "link": "/docs/Scrabble_My_Heart.pdf"
     }

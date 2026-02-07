@@ -52,7 +52,7 @@ function Header() {
   return (
     <div className={`header ${headerClass}`}>
       <div className="left">
-        <a href="" onClick={() => handleLinkClick('')}>
+        <a href="" onClick={() => handleLinkClick('')} title="Go Back Home!">
           <img
             src="./icons/punch-holes-favicon-inverted.png"
             alt="P.L. Home icon takes you back to landing page when clicked"
