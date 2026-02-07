@@ -202,7 +202,7 @@ function CaseStudyHBOMax1() {
                                 src="/case-study-hbo-max1/tile-testing-options.png"
                                 alt="solid black vs. frosted glass tile designs'"
                             />
-                            <h5 style={{transform: "translateY(-2.25rem)"}}>Participants preferred the frosted glass design because it was more visually engaging and indicated that there was something behind the tile.</h5>
+                            <h5 style={{transform: "translateY(-2.25rem)"}}>Participants preferred the frosted glass design because it was visually engaging and indicated something behind the tile.</h5>
                             </div>
 
                             <p>I narrowed down to two names: <span className="bold">"Blind Date with a [theme]" and "Surprise [theme]."</span> The title changes based on the subpage to indicate how the AI results change based on the point of the user journey.</p>

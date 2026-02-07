@@ -29,7 +29,7 @@ function CaseStudyHBOMax2() {
         <div className="case-study-hbo-max2">
             <div className="content">
             <div className="side-nav">
-                <p onClick={() => scrollToSection(topRef)}>(<img src="/icons/up-arrow.png" alt="up arrow icon"/>) Top</p>
+                <p onClick={() => scrollToSection(topRef)}>Overview</p>
                 <p onClick={() => scrollToSection(contextRef)}>Context</p>
                     <p onClick={() => scrollToSection(problemRef)}>Problem</p>
                     <p onClick={() => scrollToSection(iterationsRef)}>Iterations</p>
