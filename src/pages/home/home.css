@@ -3,17 +3,19 @@
 @import url("https://use.typekit.net/ovs8xoo.css");
 
 
-
+.app {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: clip;
+}
 
 .home {
   display: block;
-  flex-direction: column;
   column-count: 2;
-  column-gap: 4rem;
-  overflow-x: clip;
-  padding: 0rem 6rem 2.5rem 6rem;
+  column-gap: 2.5rem;
+  margin: 0rem 7.5rem 2.5rem 7.5rem;
   margin-top: 3.8rem;
-
 }
 
 
@@ -28,6 +30,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: left;
+  padding: 4.5rem 0.75rem 0.25rem 3rem;
   padding-left: 3rem;
   padding-top: 4.5rem;
   padding-bottom: 0.25rem;
@@ -187,7 +190,8 @@ h3 {
   }
 
   .home {
-    display: flex;  
+    display: flex; 
+    flex-direction: column; 
     padding: 4rem 1.5rem; 
     margin-top: 0rem; 
     justify-content: center; 
