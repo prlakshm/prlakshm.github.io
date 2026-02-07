@@ -29,7 +29,7 @@ function CaseStudyHBOMax2() {
         <div className="case-study-hbo-max2">
             <div className="content">
             <div className="side-nav">
-                <p onClick={() => scrollToSection(topRef)}>(<img src="/icons/up-arrow.png" alt="up arrow icon"/>) Top</p>
+                <p onClick={() => scrollToSection(topRef)}>Overview</p>
                 <p onClick={() => scrollToSection(contextRef)}>Context</p>
                     <p onClick={() => scrollToSection(problemRef)}>Problem</p>
                     <p onClick={() => scrollToSection(iterationsRef)}>Iterations</p>
@@ -85,7 +85,16 @@ function CaseStudyHBOMax2() {
                         <div className="skills">
                             <h3>Skills</h3>
                             <div className="all-skills">
-                                    <p>ML/Gen AI ● <br /> Prompt Engineering ● Prototyping</p>
+                                <div className="skill">
+                                    <h5>ML/ Gen AI</h5>
+                                    </div>
+                                <div className="skill">
+                                    <h5>Prompt Engineering</h5>
+                                    </div>
+                                <div className="skill">
+                                    <h5>Prototyping</h5>
+                                    </div>
+                                    
                             </div>
                         </div>
                     </div>

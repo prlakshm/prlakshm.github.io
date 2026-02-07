@@ -28,7 +28,7 @@ function CaseStudyHBOMax1() {
         <div className="case-study-hbo-max1" ref={topRef}>
             <div className="content">
             <div className="side-nav">
-                <p onClick={() => scrollToSection(topRef)}>(<img src="/icons/up-arrow.png" alt="up arrow icon"/>) Top</p>
+                <p onClick={() => scrollToSection(topRef)}>Overview</p>
                     <p onClick={() => scrollToSection(problemRef)}>Problem</p>
                     <p onClick={() => scrollToSection(researchRef)}>Research</p>
                     <p onClick={() => scrollToSection(iterationsRef)}>Iterations</p>
@@ -83,7 +83,16 @@ function CaseStudyHBOMax1() {
                         <div className="skills">
                             <h3>Skills</h3>
                             <div className="all-skills">
-                                    <p>Human-AI Interaction ● <br /> Visual Design ● Figma</p>
+                                <div className="skill">
+                                    <h5>Human-AI Interaction</h5>
+                                    </div>
+                                    <div className="skill">
+                                    <h5>Visual Design</h5>
+                                    </div>
+                                    <div className="skill">
+                                    <h5>Figma</h5>
+                                    </div>
+                                    
                             </div>
                         </div>
                     </div>
@@ -202,7 +211,7 @@ function CaseStudyHBOMax1() {
                                 src="/case-study-hbo-max1/tile-testing-options.png"
                                 alt="solid black vs. frosted glass tile designs'"
                             />
-                            <h5 style={{transform: "translateY(-2.25rem)"}}>Participants preferred the frosted glass design because it was more visually engaging and indicated that there was something behind the tile.</h5>
+                            <h5 style={{transform: "translateY(-2.25rem)"}}>Participants preferred the frosted glass design because it was visually engaging and indicated something behind the tile.</h5>
                             </div>
 
                             <p>I narrowed down to two names: <span className="bold">"Blind Date with a [theme]" and "Surprise [theme]."</span> The title changes based on the subpage to indicate how the AI results change based on the point of the user journey.</p>
@@ -213,7 +222,7 @@ function CaseStudyHBOMax1() {
                                 src="/case-study-hbo-max1/name-options.png"
                                 alt="solid black vs. frosted glass tile designs'"
                             />
-                            <h5 style={{transform: "translateY(-1.5rem)"}}>Younger ages 18-25 understood the play on <span className="italic">blind date</span>, but older ages took it more literal and thought it involved romance.</h5>
+                            <h5 style={{transform: "translateY(-1.5rem)"}}>Younger ages 18-25 understood the play on <span className="italic">"blind date"</span>, but older ages took it more literal and thought it involved romance.</h5>
                             </div>
 
                             <p>As per advice from our UX writer, I decided on <span className="bold">"Surprise [theme]"</span> because it <span className="bold">clearly communicated the concept and was the most straightforward</span>. </p>

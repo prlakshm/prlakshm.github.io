@@ -4,7 +4,7 @@
 .case-study-hbo-max1 {
   position: relative;
   font-family: "forma-djr-text", sans-serif;
-  color: rgba(43, 43, 43, 0.8);
+  color: #4e4e54;
   z-index: 1;
   display: flex;
   flex-direction: column;
@@ -26,28 +26,24 @@
   left: 2.5%;
   padding-left: 4.75%;
   padding-right: 4rem;
+}
+
+.case-study-hbo-max1 .side-nav p {
+  transition: all 0.2s;
   font-size: 1.1rem;
   font-weight: 525;
-  color: rgba(43, 43, 43, 0.75);;
+  color: #f43f5e;
   letter-spacing: 1px;
   line-height: 1.6rem;
+  text-decoration: underline;
+  text-decoration-color: #fda4af;
 }
 
 .case-study-hbo-max1 .side-nav p:hover {
+  color: #e11d48;
   text-decoration: underline;
+  text-decoration-color: #f43f5e;
 }
-
-.case-study-hbo-max1 .side-nav img {
-  width: 7px;
-  height: auto;
-  opacity: 55%;
-  margin: 0 1px -0.5px 0;
-}
-
-.case-study-hbo-max1 .side-nav img:hover {
-  text-decoration: underline;
-}
-
 
 .case-study-hbo-max1 .study {
   display: flex;
@@ -86,6 +82,7 @@
   margin: 2rem 2.7rem 1rem 0rem;
   letter-spacing: 1.1px;
   text-align: left;
+  color: #18181b;
 }
 
 .case-study-hbo-max1 h4 {
@@ -95,7 +92,7 @@
   margin: 1rem 0 0 0;
   letter-spacing: 1.1px;
   text-align: left;
-  color: #2b2b2b;
+  color: #18181b;
   
 }
 
@@ -142,7 +139,6 @@
 
 .case-study-hbo-max1 .overview-info h3 {
   font-family: "forma-djr-text", sans-serif;
-  color: rgba(43, 43, 43, 0.75);
   font-size: 1.15rem;
   font-weight: 625;
   margin: 0;
@@ -159,11 +155,17 @@
 
 .case-study-hbo-max1 .all-skills {
   width: 15vw;
-  justify-content: center; /* center the grid as a whole */
+  justify-content: center; 
+  align-items: center;
   margin: 0rem;
+  margin-top: 1.1rem;
 }
 
-
+.case-study-hbo-max1 .skill {
+  box-shadow:
+    0 0 12px rgba(255, 255, 255, 0.25),   /* soft white glow */
+    0 4px 6px rgba(0, 0, 0, 0.07);        /* normal depth shadow */
+}
 
 .overview,
 .pain-points,
@@ -223,15 +225,14 @@
 }
 
 .img-caption h5 {
-  font-family: "adobe-text-pro", serif;
-  font-weight: 500;
-  font-size: 1.35rem;
-  line-height: 1.5rem;
+  font-family: "forma-djr-text", sans-serif;
   margin: 1rem 0rem 0 1.8rem;
-  letter-spacing: 1.0px;
-  text-align: left;
-  color: #2b2b2b;
   width: 18vw;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-align: left;
+  letter-spacing: 1px;
+  line-height: 1.6rem;
 }
 
 .bold {
@@ -247,34 +248,29 @@
 }
 
 .img-border {
-  box-shadow: 0px 0px 3px #2b2b2b;
+  box-shadow: 0px 0px 3px #18181b;
   
 }
 
-.arrow {
-  font-weight: 800;
-  font-size: 1.4rem;
-  color: rgba(43, 43, 43, 0.8);
-}
 
 .case-study-hbo-max1 .app-link {
   font-size: 1.1rem;
-  color: #de7e5d;
+  color: #f43f5e;;
   font-weight: 550;
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: #fda4af;
   letter-spacing: 1px;
   line-height: 1.6rem;
+  transition: all 0.2s;
 }
 
-.team a {
-  text-decoration: none;
-
-}
 
 .case-study-hbo-max1 .app-link:hover {
   font-size: 1.1rem;
   font-weight: 625;
   text-decoration: underline;
+  text-decoration-color: #f43f5e;
+  color: #e11d48;
 }
 
 .seperator {

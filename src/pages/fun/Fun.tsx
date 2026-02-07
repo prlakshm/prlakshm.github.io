@@ -14,6 +14,7 @@ function Fun() {
 
 
   return (
+    <div className="app">
     <div className="fun">
         <h1 className="cutout-text">
         <span className="word">
@@ -52,6 +53,7 @@ function Fun() {
                     </div>
                   )
                 )}
+        </div>
         </div>
       <div>
       <Footer />

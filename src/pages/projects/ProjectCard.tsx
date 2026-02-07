@@ -26,7 +26,7 @@ export default function ProjectCard(props: {
 
  return (
    <div className="card-content">
-     <div className="card" style={{ backgroundColor: props.color }}>
+     <div className="card">
          {isVideo ? (
           <div className="preview-video">
            <video src={props.image} autoPlay loop muted playsInline>
@@ -41,7 +41,7 @@ export default function ProjectCard(props: {
        <div className="info">
          <div className="all-skills">
            {props.skills.map((skill, index) => (
-             <div className="skill" style={{ backgroundColor: rgbaColor }} key={index}>
+             <div className="skill" key={index}>
                <h5>{skill}</h5>
              </div>
            ))}

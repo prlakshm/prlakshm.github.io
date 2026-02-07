@@ -54,7 +54,7 @@ function Header() {
       <div className="left">
         <a href="" onClick={() => handleLinkClick('')}>
           <img
-            src="./icons/punch-holes-favicon-light.png"
+            src="./icons/punch-holes-favicon-inverted.png"
             alt="P.L. Home icon takes you back to landing page when clicked"
           />
         </a>
@@ -75,7 +75,7 @@ function Header() {
             About
           </a>
           <a
-            href="/docs/Pranavi Lakshminarayanan New Grad 2026 Resume.pdf"
+            href="/docs/Pranavi Lakshminarayanan Resume 2026.pdf"
             target="_blank"
             rel="noopener noreferrer"
           >

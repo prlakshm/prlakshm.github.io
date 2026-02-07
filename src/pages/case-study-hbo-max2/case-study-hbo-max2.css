@@ -4,7 +4,7 @@
 .case-study-hbo-max2 {
   position: relative;
   font-family: "forma-djr-text", sans-serif;
-  color: rgba(43, 43, 43, 0.8);
+  color: #4e4e54;
   z-index: 1;
   display: flex;
   flex-direction: column;
@@ -20,28 +20,26 @@
 .case-study-hbo-max2 .side-nav {
   position: fixed;
   top: 15.5%;
+  left: 2.5%;
   padding-left: 4.75%;
   padding-right: 4rem;
+}
+
+.case-study-hbo-max2 .side-nav p {
+  transition: all 0.2s;
   font-size: 1.1rem;
   font-weight: 525;
-  color: rgba(43, 43, 43, 0.75);;
+  color: #f43f5e;
   letter-spacing: 1px;
   line-height: 1.6rem;
+  text-decoration: underline;
+  text-decoration-color: #fda4af;
 }
 
 .case-study-hbo-max2 .side-nav p:hover {
+  color: #e11d48;
   text-decoration: underline;
-}
-
-.case-study-hbo-max2 .side-nav img {
-  width: 7px;
-  height: auto;
-  opacity: 55%;
-  margin: 0 1px -0.5px 0;
-}
-
-.case-study-hbo-max2 .side-nav img:hover {
-  text-decoration: underline;
+  text-decoration-color: #f43f5e;
 }
 
 
@@ -81,6 +79,7 @@
   margin: 1.5rem 2.7rem 1rem 0rem;
   letter-spacing: 1.1px;
   text-align: left;
+  color: #18181b;
 }
 
 
@@ -131,13 +130,12 @@
   margin: 1rem 0 0 0;
   letter-spacing: 1.1px;
   text-align: left;
-  color: #2b2b2b;
+  color: #18181b;
   
 }
 
 .case-study-hbo-max2 .overview-info h3 {
   font-family: "forma-djr-text", sans-serif;
-  color: rgba(43, 43, 43, 0.75);
   font-size: 1.15rem;
   font-weight: 625;
   margin: 0;
@@ -155,7 +153,15 @@
 .case-study-hbo-max2 .all-skills {
   width: 15vw;
   justify-content: center; /* center the grid as a whole */
+  align-items: center;
   margin: 0rem;
+  margin-top: 1.1rem;
+}
+
+.case-study-hbo-max2 .skill {
+  box-shadow:
+    0 0 12px rgba(255, 255, 255, 0.25),   /* soft white glow */
+    0 4px 6px rgba(0, 0, 0, 0.07);        /* normal depth shadow */
 }
 
 
@@ -240,30 +246,26 @@
   font-weight: 625;
 }
 
-.arrow {
-  font-weight: 800;
-  font-size: 1.4rem;
-  color: rgba(43, 43, 43, 0.8);
-}
+
 
 .case-study-hbo-max2 .app-link {
   font-size: 1.1rem;
-  color: #de7e5d;
+  color: #f43f5e;;
   font-weight: 550;
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: #fda4af;
   letter-spacing: 1px;
   line-height: 1.6rem;
+  transition: all 0.2s;
 }
 
-.team a {
-  text-decoration: none;
-
-}
 
 .case-study-hbo-max2 .app-link:hover {
   font-size: 1.1rem;
   font-weight: 625;
   text-decoration: underline;
+  text-decoration-color: #f43f5e;
+  color: #e11d48;
 }
 
 .seperator {
@@ -304,13 +306,13 @@
 }
 
 .case-study-hbo-max2 .pain-points .description-section  p {
-  color: rgba(43, 43, 43, 0.6);
+  color: #4e4e54;
   width: 28rem;
   
 }
 
 .case-study-hbo-max2 .pain-points .segment p {
-  color: rgba(43, 43, 43, 0.6);
+  color: #4e4e54;
   width: 30rem;
 }
 
@@ -338,8 +340,8 @@
   text-align: center;
   font-weight: 700;
   color: #9fafbe;
-  border-bottom: 2px solid rgba(43, 43, 43, 0.1);
-  border-right: 2px solid rgba(43, 43, 43, 0.1);
+  border-bottom: 2px solid #4e4e5433;
+  border-right: 2px solid #4e4e5433;
   padding: 0.75rem 1rem;
   letter-spacing: 1px;
   line-height: 1.6rem;
@@ -348,11 +350,11 @@
 
 .results-table td  {
   text-align: left;
-  color: rgba(43, 43, 43, 0.6);
+  color: #4e4e54cc;
   vertical-align: top;
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid rgba(43, 43, 43, 0.1);
-  border-right: 1px solid rgba(43, 43, 43, 0.1);
+  border-bottom: 2px solid #4e4e5433;
+  border-right: 2px solid #4e4e5433;
   letter-spacing: 1px;
   line-height: 1.6rem;
 }
@@ -377,7 +379,7 @@
 /* Style merged watch history cell */
 .results-table td[rowspan] {
   font-weight: 600;
-  color: rgba(43, 43, 43, 0.8);
+  color: #4e4e54cc;
   width: 15rem;
   border-bottom: none;
 }
@@ -422,7 +424,7 @@
 
 .findings-table td {
   text-align: center;
-  color: rgba(43, 43, 43, 0.6);
+  color: #4e4e54cc;
   vertical-align: top;
   padding: 0.75rem 1rem;
   line-height: 1.5rem;
