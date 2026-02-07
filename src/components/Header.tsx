@@ -75,7 +75,7 @@ function Header() {
             About
           </a>
           <a
-            href="/docs/Pranavi Lakshminarayanan New Grad 2026 Resume.pdf"
+            href="/docs/Pranavi Lakshminarayanan Resume 2026.pdf"
             target="_blank"
             rel="noopener noreferrer"
           >
