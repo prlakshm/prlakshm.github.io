@@ -61,8 +61,42 @@ function Header() {
       </div>
       {isMobile ? (
         <div className="menu-icon" onClick={handleMenuToggle}>
-          <img src="./icons/menu-icon.svg" alt="Menu" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 220 170"
+            className="icon"
+            aria-label="Menu Icon"
+          >
+            <line
+              x1="210"
+              y1="85"
+              x2="10"
+              y2="85"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeWidth="20"
+            />
+            <line
+              x1="210"
+              y1="10"
+              x2="10"
+              y2="10"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeWidth="20"
+            />
+            <line
+              x1="10"
+              y1="160"
+              x2="210"
+              y2="160"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeWidth="20"
+            />
+          </svg>
         </div>
+
       ) : (
         <div className="right">
           <a href="/#projects" onClick={() => handleLinkClick('#projects')}>
