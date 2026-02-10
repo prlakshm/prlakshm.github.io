@@ -104,9 +104,10 @@ html {
 }
 
 .header .menu-icon svg {
+  display: flex;
   padding: 0 1.5rem;
   position: relative;
-  width: 2.5rem;
+  width: 2.3rem;
   height: 2.5rem;
   color: #27272a;
   filter: drop-shadow(0 1px 2px rgba(0,0,0,0.05));
