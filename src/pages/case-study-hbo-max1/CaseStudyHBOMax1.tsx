@@ -98,7 +98,7 @@ function CaseStudyHBOMax1() {
                     </div>
                     <div className="overview">
                         <p>
-                        The Surprise Rail is an <span className="bold">AI-powered feature </span> for the HBO Max streaming app
+                        The Surprise Rail is an <span className="bold">AI-powered tile carousel </span> for the HBO Max streaming app
                         that hides keyart and replaces it with teaser descriptors. It's designed to  {" "}
                             <span className="bold">
                             spark curiosity and increase traffic on subpages

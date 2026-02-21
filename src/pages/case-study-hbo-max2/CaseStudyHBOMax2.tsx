@@ -100,7 +100,7 @@ function CaseStudyHBOMax2() {
                     </div>
                     <div className="overview">
                         <p>                      
-                        Reasons to Watch (RTW) is a new description that appears when a user focuses on an existing recommendation. It <span className="bold">explains why the title is relevant based on their preferred themes and moods</span>. 
+                        Reasons to Watch (RTW) is a new description that <span className="bold">appears when users focus on a watch recommendation</span>. It's designed to help users <span className="bold">discover content</span> and explains why the title is relevant based on their preferences. 
                         
                         <br />
                         <br />                        

@@ -3,7 +3,7 @@
         "name": "Surprise Rail",
         "color": "#f8d6d8",
         "skills": ["Human-AI Interaction", "UX Research", "Figma"],
-        "logline": "Designing an AI-powered rail for the HBO Max streaming app",
+        "logline": "Designing an AI-powered tile carousel for HBO Max streaming app",
         "image": "/projects/surprise-rail-overview.mp4",
         "link": "#/hbo-max-surprise",
         "locked": false
@@ -21,7 +21,7 @@
         "name": "Reasons to Watch LLM",
         "color": "#f8d6d8",
         "skills": ["ML/Gen AI", "Prompt Engineering", "Prototyping"],
-        "logline": "Prototyping a personalized content discovery feature for HBO Max",
+        "logline": "Prototyping agents for a content discovery feature on HBO Max",
         "image": "/projects/rtw-overview2.mp4",
         "link": "#/hbo-max-rtw",
         "locked": false
@@ -30,7 +30,7 @@
         "name": "Binary Escape",
         "color": "#f8d6d8",
         "skills": ["Game Development", "3D Animation", "Javascript"],
-        "logline": "Building rounds and modelling 3D characters for a puzzle game",
+        "logline": "Building worlds and modeling 3D characters for a puzzle game",
         "image": "/projects/binary-escape-preview.mp4",
         "link": "#/binary-escape",
         "locked": false
