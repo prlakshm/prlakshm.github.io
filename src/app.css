@@ -244,6 +244,15 @@ a {
 }
 
 
+/*------------------------ Case Study Skill Chips --------------------------*/
+
+.case-study-hbo-max1 .skill,
+.case-study-hbo-max2 .skill,
+.case-study-binary .skill,
+.case-study-dreamer .skill {
+  border-color: #fda4af;
+}
+
 /*------------------------ Global Pink Link Glow --------------------------*/
 
 .app-link:hover,
