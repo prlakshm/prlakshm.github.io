@@ -2,7 +2,7 @@ function Footer() {
   return (
     <div className="footer">
       <div className="left">
-        © 2024 Coded with 💖 by Pranavi Lakshminarayanan
+        © 2026 Coded with 💖 by urs truly
       </div>
       <div className="right">
             <div className="contact">
