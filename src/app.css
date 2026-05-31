@@ -90,6 +90,8 @@ html {
   background-color: #fff1f2;
   text-decoration: underline;
   text-decoration-color: #f43f5e;
+  transform: translateY(-1px);
+  text-shadow: 0 3px 8px rgba(225, 29, 72, 0.18);
 }
 
 @keyframes dropdownFadeIn {
@@ -186,6 +188,8 @@ a {
   color: #e11d48;
   text-decoration: underline;
   text-decoration-color: #f43f5e;
+  transform: translateY(-2px);
+  text-shadow: 0 4px 10px rgba(225, 29, 72, 0.2);
 }
 
 /*------------------------ Media Queries --------------------------*/

@@ -8,7 +8,7 @@
   justify-content: center;
   align-items: center;
   overflow-x: clip;
-  animation: pageEnter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: fadeIn 0.35s ease both;
 }
 
 .home {
@@ -111,10 +111,16 @@ h3 {
   transition: all 0.2s;
 }
 
+.home h2 a {
+  display: inline-block;
+}
+
 .home h2 a:hover,
 .home h2 a:active {
   color: #e11d48;
   text-decoration-color: #f43f5e;
+  transform: translateY(-2px);
+  text-shadow: 0 4px 12px rgba(225, 29, 72, 0.25);
 }
 
 .home h2 a img {
