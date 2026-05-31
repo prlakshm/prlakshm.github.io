@@ -8,6 +8,7 @@
   justify-content: center;
   align-items: center;
   overflow-x: clip;
+  animation: fadeIn 0.4s ease forwards;
 }
 
 .home {
@@ -64,6 +65,7 @@ h1 {
   margin-bottom: 1.4rem;
   padding: 0;
   color: #18181b;
+  animation: pageEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
 }
 
 .cutout-text .word {
@@ -93,6 +95,7 @@ h2 {
   margin: 0;
   padding: 0;
   z-index: 2;
+  animation: pageEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
 }
 
 h3 {
@@ -112,6 +115,7 @@ h3 {
 .home h2 a:active {
   color: #e11d48;
   text-decoration-color: #f43f5e;
+  text-shadow: 0 2px 8px rgba(225, 29, 72, 0.125);
 }
 
 .home h2 a img {
@@ -124,6 +128,7 @@ h3 {
   align-items: center;
   gap: 1.8rem;
   margin: 1.5rem 0 1.5rem 0;
+  animation: pageEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
 }
 
 .contact a {

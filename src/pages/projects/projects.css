@@ -6,7 +6,9 @@
   margin-top: 1.8rem;
   padding: 0;
   z-index: 1;
-  color: #4e4e54; 
+  color: #4e4e54;
+  animation: pageEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(0.3s + var(--card-index, 0) * 0.18s);
 }
 
 .project-cards {
@@ -134,7 +136,7 @@
 
 .skill {
   border-radius: 9999px;
-  border: 1px solid #fecdd3;
+  border: 1px solid #fdb8c1;
   margin-right: 0.54rem;
   color: #be123c;
   background: #ffe4e6;

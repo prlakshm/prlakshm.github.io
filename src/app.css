@@ -90,6 +90,7 @@ html {
   background-color: #fff1f2;
   text-decoration: underline;
   text-decoration-color: #f43f5e;
+  text-shadow: 0 1px 5px rgba(225, 29, 72, 0.1);
 }
 
 @keyframes dropdownFadeIn {
@@ -186,6 +187,8 @@ a {
   color: #e11d48;
   text-decoration: underline;
   text-decoration-color: #f43f5e;
+  transform: translateY(-0.5px);
+  text-shadow: 0 2px 6px rgba(225, 29, 72, 0.1);
 }
 
 /*------------------------ Media Queries --------------------------*/
@@ -240,6 +243,43 @@ a {
 
 }
 
+
+/*------------------------ Case Study Skill Chips --------------------------*/
+
+.case-study-hbo-max1 .skill,
+.case-study-hbo-max2 .skill,
+.case-study-binary .skill,
+.case-study-dreamer .skill {
+  border-color: #fdb8c1;
+  box-shadow:
+    0 0 9px rgba(255, 255, 255, 0.19),
+    0 0 5px rgba(0, 0, 0, 0.05);
+}
+
+/*------------------------ Global Pink Link Glow --------------------------*/
+
+.app-link:hover,
+.side-nav p:hover {
+  text-shadow: 0 2px 8px rgba(225, 29, 72, 0.125);
+}
+
+/*------------------------ Page Transitions --------------------------*/
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
 
 /*------------------------ Master Fonts --------------------------*/
 

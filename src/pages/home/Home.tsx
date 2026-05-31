@@ -83,7 +83,7 @@ function Home() {
             project,
             index
           ) => (
-            <div className="project-cards">
+            <div className="project-cards" style={{ '--card-index': index } as React.CSSProperties}>
               <a href={project.link} key={index}
                 onClick={(e) => {
                   if (project.locked) {
