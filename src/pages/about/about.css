@@ -4,7 +4,7 @@
     flex-direction: column;
     margin-top: 6.5rem;
     overflow: clip;
-    
+    animation: pageEnter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .about .main {
@@ -38,8 +38,13 @@
   letter-spacing: 1px;
   line-height: 1.8rem;
   color: #4e4e54;
-
+  animation: pageEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+
+.about .main p:nth-child(1) { animation-delay: 0.15s; }
+.about .main p:nth-child(2) { animation-delay: 0.22s; }
+.about .main p:nth-child(3) { animation-delay: 0.29s; }
+.about .main p:nth-child(4) { animation-delay: 0.36s; }
 
 .about .main a {
   text-decoration: none;
@@ -61,10 +66,28 @@
 }
 
 .image-row img {
-  width: 12vw; /* 100 / 8 = 12.5 */
+  width: 12vw;
   height: auto;
   object-fit: cover;
+  animation: pageEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), filter 0.35s ease;
 }
+
+.image-row img:hover {
+  transform: scale(1.06) translateY(-4px);
+  filter: brightness(1.05);
+  z-index: 1;
+  position: relative;
+}
+
+.image-row img:nth-child(1) { animation-delay: 0.4s; }
+.image-row img:nth-child(2) { animation-delay: 0.46s; }
+.image-row img:nth-child(3) { animation-delay: 0.52s; }
+.image-row img:nth-child(4) { animation-delay: 0.58s; }
+.image-row img:nth-child(5) { animation-delay: 0.64s; }
+.image-row img:nth-child(6) { animation-delay: 0.70s; }
+.image-row img:nth-child(7) { animation-delay: 0.76s; }
+.image-row img:nth-child(8) { animation-delay: 0.82s; }
 
   /*------------------------ Media Queries --------------------------*/
 

@@ -6,7 +6,9 @@
   margin-top: 1.8rem;
   padding: 0;
   z-index: 1;
-  color: #4e4e54; 
+  color: #4e4e54;
+  animation: pageEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(0.3s + var(--card-index, 0) * 0.1s);
 }
 
 .project-cards {
@@ -104,12 +106,22 @@
   width: 105%;
   margin-bottom: 0;
   border-radius: 0rem;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card:hover .preview-video video {
+  transform: scale(1.04);
 }
 
 .preview-image img {
   width: 105%;
   margin-bottom: 0;
   border-radius: 0rem;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card:hover .preview-image img {
+  transform: scale(1.04);
 }
 
 .project-cards .info {
