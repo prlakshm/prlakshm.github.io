@@ -244,6 +244,13 @@ a {
 }
 
 
+/*------------------------ Global Pink Link Glow --------------------------*/
+
+.app-link:hover,
+.side-nav p:hover {
+  text-shadow: 0 2px 8px rgba(225, 29, 72, 0.125);
+}
+
 /*------------------------ Page Transitions --------------------------*/
 
 @keyframes pageEnter {
