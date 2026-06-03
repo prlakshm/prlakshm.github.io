@@ -36,11 +36,15 @@ function Home() {
                 alt="Hi, I'm Pranavi in vine font"
             /></div> */}
             <h2>
-              I'm a product designer bringing ideas to life with story-based design and GenAI.
-              You might know me from{" "}
-              <a href="https://www.brown.edu" target="_blank">Brown University</a>, {" "}
-              <a href="https://www.wbd.com/" target="_blank">Warner Bros</a>, or{" "}
-              <a href="https://www.emmabowenfoundation.org/" target="_blank">Emma Bowen Foundation</a>.
+              A product designer with so many ideas that I coded them myself. {" "}
+              <span style={{ whiteSpace: "nowrap" }}>I turn</span> story into strategy, strategy into products. You might know me from{" "}
+              <a href="https://www.brown.edu" target="_blank" rel="noreferrer">
+                <span style={{ whiteSpace: "nowrap" }}>Brown University</span>
+              </a>{" "}
+              or{" "}
+              <a href="https://www.wbd.com/" target="_blank" rel="noreferrer">
+                <span style={{ whiteSpace: "nowrap" }}>Warner Bros</span>
+              </a>.
             </h2>
             <div className="contact">
               <a href="mailto:pranavi_lakshminarayanan@brown.edu" target="_blank">

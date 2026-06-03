@@ -30,7 +30,7 @@ function About() {
 
           <div className="about-me">
               <p>
-                I’m Pranavi 👋 , a product designer and multimedia artist at
+                I’m Pranavi 👋 , a product designer and multimedia artist who recently graduated from
                 Brown University. I create worlds through computer
                 interfaces, animations, screenplays, and more, telling stories
                 both on the page and on the screen.
