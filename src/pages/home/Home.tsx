@@ -36,7 +36,7 @@ function Home() {
                 alt="Hi, I'm Pranavi in vine font"
             /></div> */}
             <h2>
-              A design engineer with so many ideas that I coded them myself. Previously prototyping AI experiences for HBO Max. You might know me from {" "}
+              A design engineer with so many ideas that I coded them myself. Previously prototyping AI experiences @ HBO Max. You might know me from {" "}
               <a href="https://www.brown.edu" target="_blank" rel="noreferrer">
                 <span style={{ whiteSpace: "nowrap" }}>Brown University</span>
               </a>{" "}
