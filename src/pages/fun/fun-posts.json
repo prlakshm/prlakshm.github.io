@@ -1,0 +1,340 @@
+[
+  {
+    "id": "2074143950701494659",
+    "url": "https://x.com/pranavibuilds/status/2074143950701494659",
+    "name": "pranaviln",
+    "handle": "pranavibuilds",
+    "avatar": "/fun/avatar.png",
+    "text": "Hey X \ud83d\udc4b\n\nIf we haven't met, I'm pranavi (pronounced pren-uh-vee).\n\nI'm building Mixr, an iOS DJ app, with Cursor and documenting everything I learn in my Designing by Building \ud83c\udfa7 series.\n\nIf you're into music, mixing, or building software, I'd love to connect!\n\n#buildinpublic #DesignEngineering",
+    "createdAt": "Mon Jul 06 14:50:28 +0000 2026",
+    "media": [
+      {
+        "type": "video",
+        "src": "/fun/posts/2074143950701494659_1.mp4",
+        "poster": "/fun/posts/2074143950701494659_0_poster.jpg"
+      }
+    ],
+    "layout": {
+      "x": 1,
+      "y": 2,
+      "z": 20
+    },
+    "mobileLayout": {
+      "x": -8,
+      "y": 2,
+      "z": 20
+    }
+  },
+  {
+    "id": "2072424754389131332",
+    "url": "https://x.com/pranavibuilds/status/2072424754389131332",
+    "name": "pranaviln",
+    "handle": "pranavibuilds",
+    "avatar": "/fun/avatar.png",
+    "text": "I'm a product designer who knows how to code.\n\nSomewhere along the way, I realized I was making better design decisions in SwiftUI than I ever was in Figma.\n\nSo I'm starting an experiement.\n\nInstead of treating code as the final step of design, I'm making it the design process.\n\nI'm building an app from scratch and documenting every design decision along the way.\n\nI'm calling it Designing by Building. \ud83c\udfa7",
+    "createdAt": "Wed Jul 01 20:58:59 +0000 2026",
+    "media": [],
+    "layout": {
+      "x": 22,
+      "y": 6,
+      "z": 8
+    },
+    "mobileLayout": {
+      "x": 28,
+      "y": 8,
+      "z": 8
+    }
+  },
+  {
+    "id": "2072429287093776625",
+    "url": "https://x.com/pranavibuilds/status/2072429287093776625",
+    "name": "pranaviln",
+    "handle": "pranavibuilds",
+    "avatar": "/fun/avatar.png",
+    "text": "I've want to learn how to DJ, but the problem is...\n\nI don't know music theory. \nI can't play an instrument. \nAnd I've never mixed a song before.\n\nBut I do know how to code.\n\nSo instead of buying a DJ set, I started building an app.\n\nI've landed on Mixr, an iOS DJ app that makes remixing songs easy for beginners.\n\nMore accessible? Definitely. Less expensive? Let's see how many Cursor credits I use and find out. \n\nThis is Designing by Building. \ud83c\udfa7",
+    "createdAt": "Wed Jul 01 21:17:00 +0000 2026",
+    "media": [],
+    "layout": {
+      "x": 44,
+      "y": 1,
+      "z": 12
+    },
+    "mobileLayout": {
+      "x": -4,
+      "y": 28,
+      "z": 12
+    }
+  },
+  {
+    "id": "2072696647054659850",
+    "url": "https://x.com/pranavibuilds/status/2072696647054659850",
+    "name": "pranaviln",
+    "handle": "pranavibuilds",
+    "avatar": "/fun/avatar.png",
+    "text": "Day 1 \ud83c\udfa7 Designing by Building \n\nI stopped spending weeks perfecting Figma files and instead started designing directly in SwiftUI.\n\nEvery component starts as running code, not a mockup.\n\nThis was the first thing I built: a design system to validate every color, typography style, glass material, button, and waveform before touching the actual app.\n\nIt's not glamorous, but it's the foundation for everything that'll come after.\n\nOver the next few weeks I'll be sharing how Mixr will evolve from this screen into a real iPhone app.",
+    "createdAt": "Thu Jul 02 14:59:24 +0000 2026",
+    "media": [
+      {
+        "type": "image",
+        "src": "/fun/posts/2072696647054659850_0.jpg"
+      },
+      {
+        "type": "image",
+        "src": "/fun/posts/2072696647054659850_1.jpg"
+      }
+    ],
+    "layout": {
+      "x": 64,
+      "y": 8,
+      "z": 9
+    },
+    "mobileLayout": {
+      "x": 22,
+      "y": 36,
+      "z": 9
+    }
+  },
+  {
+    "id": "2073059304148521334",
+    "url": "https://x.com/pranavibuilds/status/2073059304148521334",
+    "name": "pranaviln",
+    "handle": "pranavibuilds",
+    "avatar": "/fun/avatar.png",
+    "text": "#buildinpublic AI can generate, but taste refines. That's where the premium look comes from.\n\nLeft: first AI pass \nRight: After 5+ iterations\n\nHow did I do?",
+    "createdAt": "Fri Jul 03 15:00:28 +0000 2026",
+    "media": [
+      {
+        "type": "image",
+        "src": "/fun/posts/2073059304148521334_0.jpg"
+      },
+      {
+        "type": "image",
+        "src": "/fun/posts/2073059304148521334_1.png"
+      },
+      {
+        "type": "image",
+        "src": "/fun/posts/2073059304148521334_2.jpg"
+      }
+    ],
+    "layout": {
+      "x": 6,
+      "y": 34,
+      "z": 7
+    },
+    "mobileLayout": {
+      "x": -10,
+      "y": 54,
+      "z": 7
+    }
+  },
+  {
+    "id": "2073404378073977297",
+    "url": "https://x.com/pranavibuilds/status/2073404378073977297",
+    "name": "pranaviln",
+    "handle": "pranavibuilds",
+    "avatar": "/fun/avatar.png",
+    "text": "Designing by Building \ud83c\udfa7 Update:\n\nSong chips!\n\nThey'll eventually become album covers once I add importing, but iykyk \ud83d\ude0c\n\nLeft: First AI pass\n Right: ~10 iterations later (needed to be super shiny)\n\nI used Chat  to mock up ideas, fed my favorite into Cursor, then iterated to my liking.\n\nAI is great at exploring, but it's your job is deciding what's worth keeping!",
+    "createdAt": "Sat Jul 04 13:51:40 +0000 2026",
+    "media": [
+      {
+        "type": "image",
+        "src": "/fun/posts/2073404378073977297_0.jpg"
+      },
+      {
+        "type": "image",
+        "src": "/fun/posts/2073404378073977297_1.jpg"
+      }
+    ],
+    "layout": {
+      "x": 28,
+      "y": 30,
+      "z": 14
+    },
+    "mobileLayout": {
+      "x": 30,
+      "y": 60,
+      "z": 14
+    }
+  },
+  {
+    "id": "2073787144288510109",
+    "url": "https://x.com/pranavibuilds/status/2073787144288510109",
+    "name": "pranaviln",
+    "handle": "pranavibuilds",
+    "avatar": "/fun/avatar.png",
+    "text": "Bet you couldn't tell each effects card has a different glow value.\n\nReverb and Echo have stronger glows because they're darker.\n\nAuto has the strongest glow because I want people to click it.\n\nSame number values \u2260 same visual weight.\ud83e\udd2f",
+    "createdAt": "Sun Jul 05 15:12:38 +0000 2026",
+    "media": [
+      {
+        "type": "image",
+        "src": "/fun/posts/2073787144288510109_0.jpg"
+      },
+      {
+        "type": "video",
+        "src": "/fun/posts/2073787144288510109_2.mp4",
+        "poster": "/fun/posts/2073787144288510109_1_poster.jpg"
+      }
+    ],
+    "layout": {
+      "x": 50,
+      "y": 36,
+      "z": 11
+    },
+    "mobileLayout": {
+      "x": -6,
+      "y": 78,
+      "z": 11
+    }
+  },
+  {
+    "id": "2073788809754382413",
+    "url": "https://x.com/pranavibuilds/status/2073788809754382413",
+    "name": "pranaviln",
+    "handle": "pranavibuilds",
+    "avatar": "/fun/avatar.png",
+    "text": "Day 4 \ud83c\udfa7 Designing by Building\n\nSpent the last two days designing these effects cards, but it was worth it cause they're my favorite part of the app\ud83d\ude2d\n\nI was at HBO Max during the HBO -> HBO Max redesign. A design trick I learned:\n\nNever make glass perfectly uniform.\n\n\u2728 Slightly different highlights.\n\u2728 Different bubble locations each card.\n\u2728 Glow that reflects onto neighboring cards.\n\nTiny imperfections make the glass feel more dynamic and alive.",
+    "createdAt": "Sun Jul 05 15:19:16 +0000 2026",
+    "media": [
+      {
+        "type": "image",
+        "src": "/fun/posts/2073788809754382413_0.jpg"
+      },
+      {
+        "type": "image",
+        "src": "/fun/posts/2073788809754382413_2.jpg"
+      },
+      {
+        "type": "video",
+        "src": "/fun/posts/2073788809754382413_1.mp4",
+        "poster": "/fun/posts/2073788809754382413_0_poster.jpg"
+      }
+    ],
+    "layout": {
+      "x": 70,
+      "y": 28,
+      "z": 15
+    },
+    "mobileLayout": {
+      "x": 26,
+      "y": 86,
+      "z": 15
+    }
+  },
+  {
+    "id": "2074139131173634173",
+    "url": "https://x.com/pranavibuilds/status/2074139131173634173",
+    "name": "pranaviln",
+    "handle": "pranavibuilds",
+    "avatar": "/fun/avatar.png",
+    "text": "Day 5 \ud83c\udfa7 Designing by Building\n\nHooked up song importing today \ud83c\udf89\n\nThe rest updated itself: song chips, waveforms, metadata values.\n\nMy favorite Cursor moment because it connected related UI without me asking. It understood how my app should behave. \n\nThat's when the app started feeling like a product and not a collection of screens.\n\n#buildinpublic",
+    "createdAt": "Mon Jul 06 14:31:19 +0000 2026",
+    "media": [
+      {
+        "type": "video",
+        "src": "/fun/posts/2074139131173634173_1.mp4",
+        "poster": "/fun/posts/2074139131173634173_0_poster.jpg"
+      }
+    ],
+    "layout": {
+      "x": 10,
+      "y": 62,
+      "z": 6
+    },
+    "mobileLayout": {
+      "x": -12,
+      "y": 104,
+      "z": 6
+    }
+  },
+  {
+    "id": "2074510221326598318",
+    "url": "https://x.com/pranavibuilds/status/2074510221326598318",
+    "name": "pranaviln",
+    "handle": "pranavibuilds",
+    "avatar": "/fun/avatar.png",
+    "text": "Designing by Building \ud83c\udfa7 Design Decision:\n\nI had 2 options for the Auto effects card: Pearl White and Rainbow Iridescent\n\n\u2728White = the absence of color.\n\n\ud83c\udf08Rainbow = all the colors.\n\nSince Auto combines multiple effects, rainbow iridescent felt more intuitive (and prettier).\n\n#buildinpublic #DesignEngineering",
+    "createdAt": "Tue Jul 07 15:05:53 +0000 2026",
+    "media": [
+      {
+        "type": "image",
+        "src": "/fun/posts/2074510221326598318_0.jpg"
+      }
+    ],
+    "layout": {
+      "x": 32,
+      "y": 58,
+      "z": 16
+    },
+    "mobileLayout": {
+      "x": 24,
+      "y": 112,
+      "z": 16
+    }
+  },
+  {
+    "id": "2074919345927401783",
+    "url": "https://x.com/pranavibuilds/status/2074919345927401783",
+    "name": "pranaviln",
+    "handle": "pranavibuilds",
+    "avatar": "/fun/avatar.png",
+    "text": "Day 7 \ud83c\udfa7 Designing by Building\n\nAdded:\n\n\u2702\ufe0f Split\n\ud83d\udcc4 Duplicate\n\ud83d\uddd1\ufe0f Delete\n\ud83e\udd0f Drag & drop\n\nThe hard part was deciding how they should behave. Drag & drop behavior was the hardest design decision I had to make.\n\nWhen a clip is dropped in the middle of others, do the neighbors shift left or right? At what threshold is the direction decided?\n\nAfter two days, it clicked.\n\nDrop it in the middle of a clip \u2192 split clip \u2192 sandwich between old one\ud83e\udd2f\n\nCould I have figured this out in five minutes by looking at other apps?\n\nAbsolutely.\n\nThat's why we do competitive analysis, folks.",
+    "createdAt": "Wed Jul 08 18:11:36 +0000 2026",
+    "media": [
+      {
+        "type": "video",
+        "src": "/fun/posts/2074919345927401783_1.mp4",
+        "poster": "/fun/posts/2074919345927401783_0_poster.jpg"
+      }
+    ],
+    "layout": {
+      "x": 54,
+      "y": 66,
+      "z": 18
+    },
+    "mobileLayout": {
+      "x": -4,
+      "y": 130,
+      "z": 18
+    }
+  },
+  {
+    "id": "2074948549867864103",
+    "url": "https://x.com/pranavibuilds/status/2074948549867864103",
+    "name": "pranaviln",
+    "handle": "pranavibuilds",
+    "avatar": "/fun/avatar.png",
+    "text": "\ud83c\udfb6 \"More than a Feeling\"\n\nCursor helps me move fast, but real design work still happens in a loop:  \n\nbuild \u2192 run \u2192 feel \u2192 adjust  \n\ntbh \"feel coding\" makes more sense than \"vibe coding.\" what even are vibes? petition to have it changed!",
+    "createdAt": "Wed Jul 08 20:07:39 +0000 2026",
+    "media": [],
+    "layout": {
+      "x": 74,
+      "y": 54,
+      "z": 5
+    },
+    "mobileLayout": {
+      "x": 28,
+      "y": 140,
+      "z": 5
+    }
+  },
+  {
+    "id": "2075954253965722067",
+    "url": "https://x.com/pranavibuilds/status/2075954253965722067",
+    "name": "pranaviln",
+    "handle": "pranavibuilds",
+    "avatar": "/fun/avatar.png",
+    "text": "Designing by Building Tip: Get closer to the material.  \n\nApple's glass materials behave differently when they're real. I didn't fully understand until I built with SwiftUI. Motion and interaction exposed design flaws earlier than mockups.  \n\nWhat's something you only noticed when you started building your designs?",
+    "createdAt": "Sat Jul 11 14:43:58 +0000 2026",
+    "media": [],
+    "layout": {
+      "x": 58,
+      "y": 44,
+      "z": 4
+    },
+    "mobileLayout": {
+      "x": -8,
+      "y": 158,
+      "z": 4
+    }
+  }
+]

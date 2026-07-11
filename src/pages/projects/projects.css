@@ -48,12 +48,16 @@
   width: 40vw;
   background-color: white;
   box-sizing: border-box;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  box-shadow:
+    0 1px 2px rgba(24, 24, 27, 0.06),
+    0 8px 20px rgba(24, 24, 27, 0.08);
   transition: all 0.3s;
 }
 
 .card:hover, .card:active {
-  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+  box-shadow:
+    0 4px 8px rgba(24, 24, 27, 0.08),
+    0 18px 36px rgba(24, 24, 27, 0.14);
   transform: translateY(-4px);
 }
 
@@ -299,4 +303,3 @@ h5 {
     width: 18rem;
   }
 }
-

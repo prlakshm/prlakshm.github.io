@@ -1,162 +1,438 @@
-@import url('https://fonts.googleapis.com/css2?family=Krub:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+/* Fun corkboard — X-style post collage */
 
-.fun {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin-top: 6.5rem;
+.fun-app {
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: clip;
   animation: fadeIn 0.4s ease forwards;
 }
 
+.fun-board {
+  position: relative;
+  width: 100%;
+  /* Centered collage zone — clear of sticky header + footer */
+  min-height: calc(100vh - 5.5rem);
+  height: 165vh;
+  margin-top: 5.5rem;
+  margin-bottom: 3rem;
+  padding: 1.5rem 2vw 4rem;
+  box-sizing: border-box;
+  overflow: visible;
+  user-select: none;
+}
 
-.fun .grid {
+/* —— X post card (flat case-study chrome) —— */
+
+.x-post-card {
+  position: absolute;
+  /* ~30%+ viewport, same size for every card */
+  width: min(32vw, 28rem);
+  min-width: 20rem;
+  background: #fff;
+  border: 1px solid rgba(24, 24, 27, 0.06);
+  border-radius: 0;
+  box-shadow:
+    0 1px 2px rgba(24, 24, 27, 0.06),
+    0 8px 20px rgba(24, 24, 27, 0.08);
+  padding: 1rem 1.1rem 0.55rem;
+  box-sizing: border-box;
+  cursor: grab;
+  transform: none;
+  touch-action: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  color: #0f1419;
+  transition: box-shadow 0.2s ease;
+}
+
+.x-post-card:active {
+  cursor: grabbing;
+  box-shadow:
+    0 4px 8px rgba(24, 24, 27, 0.08),
+    0 18px 36px rgba(24, 24, 27, 0.14);
+}
+
+.x-post-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.x-header-main {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  min-width: 0;
+  flex: 1;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.x-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  flex-shrink: 0;
+  margin-top: -0.15rem;
+}
+
+.x-avatar-wrap {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #eee;
+}
+
+.x-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 40%;
+  display: block;
+  pointer-events: none;
+}
+
+.x-meta {
+  min-width: 0;
+  flex: 1;
+  padding-top: 0.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+.x-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.x-name {
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: #0f1419;
+}
+
+.x-verified {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
+  display: block;
+}
+
+.x-handle {
+  color: #536471;
+  font-size: 0.95rem;
+  line-height: 1.25;
+}
+
+.x-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 9999px;
+  color: #536471;
+  cursor: default;
+}
+
+.x-icon-btn svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.x-icon-btn:hover {
+  color: #1d9bf0;
+  background: rgba(29, 155, 240, 0.1);
+}
+
+.x-body {
+  margin-top: 0.85rem;
+  cursor: pointer;
+}
+
+.x-body p {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: #0f1419;
+}
+
+.x-entity {
+  color: #1d9bf0;
+}
+
+.x-timestamp {
+  margin-top: 0.95rem;
+  color: #536471;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  cursor: pointer;
+}
+
+.x-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+  padding: 0.55rem 0.15rem 0.35rem;
+  border-top: 1px solid #eff3f4;
+  color: #536471;
+}
+
+.x-action.reply:hover,
+.x-action.share:hover,
+.x-action.bookmark:hover {
+  color: #1d9bf0;
+  background: rgba(29, 155, 240, 0.1);
+}
+
+.x-action.repost:hover {
+  color: #00ba7c;
+  background: rgba(0, 186, 124, 0.1);
+}
+
+.x-action.like:hover {
+  color: #f91880;
+  background: rgba(249, 24, 128, 0.1);
+}
+
+.x-media {
+  margin-top: 0.85rem;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2.5rem;
-  padding: 1.7rem 5rem 0rem 5rem;
+  gap: 2px;
+  overflow: hidden;
+  border: 1px solid rgba(24, 24, 27, 0.08);
+  border-radius: 1rem;
+  background: #000;
 }
 
-.fun .grid > :nth-child(1) {
-  grid-row: 1;
-  grid-column: 1;
+.x-media-count-1 {
+  grid-template-columns: 1fr;
 }
 
-.fun .grid > :nth-child(2) {
-  grid-row: 2;
-  grid-column: 1;
+.x-media-count-2 {
+  grid-template-columns: 1fr 1fr;
 }
 
-.fun .grid > :nth-child(3) {
-  grid-row: 1;
-  grid-column: 2;
+.x-media-count-3,
+.x-media-count-4 {
+  grid-template-columns: 1fr 1fr;
 }
 
-.fun .grid > :nth-child(1){
-  padding-bottom: 0;
+.x-media-item {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: #111;
+  cursor: zoom-in;
+  overflow: hidden;
+  min-height: 10rem;
+  max-height: 18rem;
 }
 
-.fun .grid > :nth-child(2){
-  padding-top: 0;
-  margin-top: 0rem;
+.x-media-count-1 .x-media-item {
+  max-height: 20rem;
 }
 
-.fun h1 {
-    font-family: "punch-holes";
-    font-weight: 400;
-    font-size: 3.75rem;
-    letter-spacing: 0.05cap;
-    margin-top: 0.9rem;
-    margin-bottom: 1.5rem;
-    padding: 0;
-    text-align: center;
-    color: #18181b;
-    animation: pageEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+.x-media-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  min-height: 10rem;
+  max-height: inherit;
+  pointer-events: none;
 }
 
-.fun h2 {
-  font-family: "forma-djr-text", sans-serif;
-  font-weight: 425;
-  font-size: 1.1rem;
-  line-height: 1.8rem;
-  letter-spacing: 1.5px;
-  color: #4e4e54;
-  margin: 0rem 1.05rem;
-  text-align: center;
-  animation: pageEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+.x-play {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  background: rgba(15, 20, 25, 0.55);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  pointer-events: none;
+  padding-left: 0.15rem;
 }
 
-.fun .grid > :nth-child(1) { animation: pageEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both; }
-.fun .grid > :nth-child(2) { animation: pageEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both; }
-.fun .grid > :nth-child(3) { animation: pageEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
-
-/*------------------------ Media Queries --------------------------*/
-
-@media screen and (max-width: 1440px) {
-  .fun h1 {
-    font-size: 3.25rem;
-  }
-
-  .fun h2 {
-    font-size: 1.1rem;
-  }
-
+/* X engagement row */
+.x-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.35rem;
+  padding: 0.15rem 0.15rem 0.35rem;
+  color: #536471;
 }
 
+.x-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 9999px;
+  cursor: default;
+}
+
+.x-action svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.x-action:hover {
+  color: #1d9bf0;
+  background: rgba(29, 155, 240, 0.1);
+}
+
+.x-action:nth-child(2):hover {
+  color: #00ba7c;
+  background: rgba(0, 186, 124, 0.1);
+}
+
+.x-action:nth-child(3):hover {
+  color: #f91880;
+  background: rgba(249, 24, 128, 0.1);
+}
+
+/* —— Lightbox: fill the viewport —— */
+
+.fun-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.fun-lightbox-stage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3.5rem 4rem;
+  box-sizing: border-box;
+}
+
+.fun-lightbox-stage img,
+.fun-lightbox-stage video {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(96vw, 1400px);
+  max-height: calc(100dvh - 4rem);
+  object-fit: contain;
+  background: #000;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
+}
+
+.fun-lightbox-close {
+  position: absolute;
+  top: 0.75rem;
+  left: 1rem;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 1.75rem;
+  line-height: 1;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.fun-lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 2rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.fun-lightbox-nav.prev {
+  left: 0.85rem;
+}
+
+.fun-lightbox-nav.next {
+  right: 0.85rem;
+}
+
+/* —— Mobile —— */
 
 @media screen and (max-width: 768px) {
-
-  .fun {
-    padding: 0rem 2.5rem 2rem 2.5rem;
-  }
-
-  .fun .grid {
-    gap: 0rem 2.5rem;
-  }
-
-  .cutout-text {
-    font-size: 2.4rem;
-  }
-
-
-  .fun-cards {
-    padding: 0;
-  }
-
-  .fun .card {
-    width: 42.5vw;
-    margin-bottom: 1rem; /* Add space between stacked cards */
-  }
-
-  .fun .preview-image {
+  .fun-board {
     height: auto;
+    min-height: 320vh;
+    margin-top: 4.25rem;
+    padding: 1rem 0 5rem;
   }
 
-  .preview-image img {
-    width: 22rem;
+  .x-post-card {
+    width: min(86vw, 24rem);
+    min-width: 0;
   }
 
-  .card h3 {
-    margin: 0.5rem 1rem 0.5rem 0rem;
-    line-height: 3.25rem;
+  .x-avatar-wrap {
+    width: 2.65rem;
+    height: 2.65rem;
   }
 
-  h4 {
-    font-size: 1.1rem; /* Reduce font size */
-    margin: 0.5rem 1rem; /* Adjust margins */
+  .x-body p {
+    font-size: 0.98rem;
   }
 
-  h5 {
-    font-size: 0.9rem; /* Reduce font size */
+  .x-name {
+    font-size: 0.98rem;
   }
 
-  .fun .info .all-skills {
-    margin-left: 1rem; /* Remove left margin */
+  .fun-lightbox-stage {
+    padding: 3rem 0.75rem;
   }
 
-
+  .fun-lightbox-stage img,
+  .fun-lightbox-stage video {
+    max-width: 100vw;
+    max-height: calc(100dvh - 3rem);
+  }
 }
-
-
-@media screen and (max-width: 600px) {
-
-  .fun .grid {
-    display: flex;
-    flex-direction: column;
-    margin-top: 0rem;
-}
-
-.fun .card {
-  width: 80vw;
-}
-
-.fun .preview-image img {
-  width: 100%;
-}
-
-
-}
-
-
