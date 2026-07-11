@@ -5,6 +5,7 @@ import { formatPostTimestamp, linkifyText } from "./funTypes";
 type Props = {
   post: FunPost;
   style: CSSProperties;
+  isRevealed: boolean;
   isBottomBouncing: boolean;
   onPointerDown: (e: ReactPointerEvent<HTMLElement>) => void;
   onOpenMedia: (index: number) => void;
@@ -49,6 +50,7 @@ function IconBtn({
 export default function XPostCard({
   post,
   style,
+  isRevealed,
   isBottomBouncing,
   onPointerDown,
   onOpenMedia,
@@ -58,7 +60,8 @@ export default function XPostCard({
 
   return (
     <article
-      className={`x-post-card${isBottomBouncing ? " is-bottom-bouncing" : ""}`}
+      className={`x-post-card ${isRevealed ? "is-revealed" : "is-reveal-pending"}${isBottomBouncing ? " is-bottom-bouncing" : ""}`}
+      data-post-id={post.id}
       style={style}
       onPointerDown={onPointerDown}
     >

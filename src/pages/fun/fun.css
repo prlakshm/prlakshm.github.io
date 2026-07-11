@@ -8,7 +8,7 @@
 }
 
 .fun-app + .footer {
-  margin-top: 30rem;
+  margin-top: 0rem;
 }
 
 .fun-board {
@@ -29,9 +29,8 @@
 
 .x-post-card {
   position: absolute;
-  /* 10% larger than the structured grid iteration. */
-  width: min(33vw, 33rem);
-  min-width: 22rem;
+  width: min(30vw, 30rem);
+  min-width: 20rem;
   background: #fff;
   border: 1px solid rgba(24, 24, 27, 0.06);
   border-radius: 0;
@@ -46,7 +45,21 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
   color: #0f1419;
-  transition: box-shadow 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    opacity 0.56s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+    transform 0.56s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
+}
+
+.x-post-card.is-reveal-pending {
+  opacity: 0;
+  transform: translateY(28px);
+  pointer-events: none;
+}
+
+.x-post-card.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .x-post-card:active {
@@ -420,7 +433,7 @@
 
 @media screen and (max-width: 768px) {
   .fun-app + .footer {
-    margin-top: 12rem;
+    margin-top: 3rem;
   }
 
   .fun-board {
@@ -432,7 +445,7 @@
   }
 
   .x-post-card {
-    width: min(92vw, 28.8rem);
+    width: min(82.8vw, 25.92rem);
     min-width: 0;
   }
 
@@ -468,6 +481,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .x-post-card.is-reveal-pending,
+  .x-post-card.is-revealed {
+    opacity: 1;
+    transform: none;
+    transition: box-shadow 0.2s ease;
+  }
+
   .x-post-card.is-bottom-bouncing {
     animation: none;
   }

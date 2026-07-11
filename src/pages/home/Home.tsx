@@ -1,17 +1,90 @@
+import { useEffect, useRef, useState } from "react";
 import "./home.css";
 import ProjectCard from "../projects/ProjectCard.js";
 import projectData from "../projects/project-data.json";
 import "../projects/projects.css";
 
 function Home() {
+  const homeRef = useRef<HTMLDivElement>(null);
+  const revealedProjectsRef = useRef(new Set<string>());
+  const [revealDelays, setRevealDelays] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    const home = homeRef.current;
+    if (!home) return;
+
+    const cards = Array.from(
+      home.querySelectorAll<HTMLElement>(".project-cards[data-project-id]")
+    );
+    const revealAll = () => {
+      const next = Object.fromEntries(
+        cards.map((card) => [card.dataset.projectId as string, 0])
+      );
+      cards.forEach((card) => {
+        if (card.dataset.projectId) {
+          revealedProjectsRef.current.add(card.dataset.projectId);
+        }
+      });
+      setRevealDelays(next);
+    };
+
+    if (
+      typeof IntersectionObserver === "undefined" ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      revealAll();
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entering = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => {
+            const topDifference = a.boundingClientRect.top - b.boundingClientRect.top;
+            return topDifference || a.boundingClientRect.left - b.boundingClientRect.left;
+          });
+        const newlyRevealed: Array<{ id: string; delay: number }> = [];
+
+        entering.forEach((entry, index) => {
+          const card = entry.target as HTMLElement;
+          const id = card.dataset.projectId;
+          if (!id || revealedProjectsRef.current.has(id)) return;
+
+          revealedProjectsRef.current.add(id);
+          newlyRevealed.push({ id, delay: index * 70 });
+          observer.unobserve(card);
+        });
+
+        if (newlyRevealed.length > 0) {
+          setRevealDelays((previous) => {
+            const next = { ...previous };
+            newlyRevealed.forEach(({ id, delay }) => {
+              next[id] = delay;
+            });
+            return next;
+          });
+        }
+      },
+      { rootMargin: "10000px 0px -12% 0px", threshold: 0.01 }
+    );
+
+    cards.forEach((card) => observer.observe(card));
+    return () => observer.disconnect();
+  }, []);
+
   const renderProject = (
     project: (typeof projectData)[number],
     index: number
   ) => (
     <div
-      className="project-cards"
+      className={`project-cards ${project.link in revealDelays ? "is-revealed" : "is-reveal-pending"}`}
       key={project.link}
-      style={{ "--card-index": index } as React.CSSProperties}
+      data-project-id={project.link}
+      style={{
+        "--card-index": index,
+        "--reveal-delay": `${revealDelays[project.link] ?? 0}ms`,
+      } as React.CSSProperties}
     >
       <a
         href={project.link}
@@ -41,7 +114,7 @@ function Home() {
 
   return (
     <div className="app">
-      <div className="home">
+      <div className="home" ref={homeRef}>
         <div className="home-column home-column-left">
           <div className="landing-page">
             <div className="title">

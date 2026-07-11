@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import funPosts from "./fun-posts.json";
 import type { FunPost } from "./funTypes";
@@ -13,8 +13,8 @@ const posts = funPosts as FunPost[];
 /** Loosely staggered collage: readable structure with intentional overlap. */
 const DESKTOP_LAYOUTS: Pos[] = [
   { x: 2.03, y: 2, z: 12 },
-  { x: 14.59, y: 20.26, z: 22 },
-  { x: 66.3, y: 0.9, z: 14 },
+  { x: 13.39, y: 20.86, z: 22 },
+  { x: 66.3, y: 1.8, z: 14 },
   { x: 34.14, y: 3.01, z: 20 },
   { x: 65.8, y: 20.04, z: 18 },
   { x: 34.38, y: 35.96, z: 8 },
@@ -29,6 +29,18 @@ const DESKTOP_LAYOUTS: Pos[] = [
 
 const BOUNCE_DURATION = 420;
 const BOTTOM_SPRING_RISE = 70;
+const REVEAL_STAGGER = 70;
+
+const DESKTOP_COLUMNS = [
+  [0, 5, 6, 10],
+  [3, 1, 7, 9],
+  [2, 4, 8, 11, 12],
+];
+const DESKTOP_COLUMN_X = [5.42, 35.76, 66.15];
+const DESKTOP_COLUMN_TOP = [46, 69, 41];
+const MOBILE_STACK_ORDER = [0, 3, 2, 1, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+const CARD_GAPS = [0, 72, 0, 0, 84, 56, 76, 64, 88, 60, 52, 92, 68];
+const STACK_BOTTOM_PADDING = 80;
 
 const MOBILE_LAYOUTS: Pos[] = [
   { x: -2, y: 3, z: 20 },
@@ -64,6 +76,9 @@ function Fun() {
   const topZ = useRef(30);
   const positionsRef = useRef<Record<string, Pos>>({});
   const bounceTimerRef = useRef<number | null>(null);
+  const [boardHeight, setBoardHeight] = useState<number | null>(null);
+  const revealedIdsRef = useRef(new Set<string>());
+  const [revealDelays, setRevealDelays] = useState<Record<string, number>>({});
   const [bottomBounce, setBottomBounce] = useState<{
     id: string;
     releaseOffset: number;
@@ -73,7 +88,12 @@ function Fun() {
     const layouts = isMobile ? MOBILE_LAYOUTS : DESKTOP_LAYOUTS;
     const map: Record<string, Pos> = {};
     posts.forEach((p, i) => {
-      map[p.id] = { ...(layouts[i] || layouts[0]) };
+      const layout = layouts[i] || layouts[0];
+      map[p.id] = {
+        ...layout,
+        // Spread the inset collage 5% around the cards' horizontal centers.
+        x: isMobile ? 5.87 + layout.x * 0.42 : 3.5 + layout.x * 0.945,
+      };
     });
     return map;
   }, [isMobile]);
@@ -81,16 +101,151 @@ function Fun() {
   const [positions, setPositions] = useState<Record<string, Pos>>(initialPositions);
 
   useEffect(() => {
-    setPositions(initialPositions);
-    positionsRef.current = initialPositions;
-  }, [initialPositions]);
-
-  useEffect(() => {
     positionsRef.current = positions;
   }, [positions]);
 
+  useLayoutEffect(() => {
+    const board = boardRef.current;
+    if (!board) return;
+
+    const cards = Array.from(
+      board.querySelectorAll<HTMLElement>(".x-post-card[data-post-id]")
+    );
+    let frame = 0;
+
+    const calculateStack = () => {
+      const heights = new Map(
+        cards.map((card) => [
+          card.dataset.postId as string,
+          card.getBoundingClientRect().height,
+        ])
+      );
+      const pixelPositions: Record<string, Pos> = {};
+      let tallestColumn = 0;
+
+      if (isMobile) {
+        let cursor = 24;
+        MOBILE_STACK_ORDER.forEach((index, stackIndex) => {
+          const post = posts[index];
+          if (stackIndex > 0) cursor += Math.max(32, CARD_GAPS[index] * 0.65);
+          pixelPositions[post.id] = {
+            x: 8.6,
+            y: cursor,
+            z: MOBILE_LAYOUTS[index]?.z ?? 10,
+          };
+          cursor += heights.get(post.id) ?? 0;
+        });
+        tallestColumn = cursor;
+      } else {
+        DESKTOP_COLUMNS.forEach((column, columnIndex) => {
+          let cursor = DESKTOP_COLUMN_TOP[columnIndex];
+          column.forEach((index, stackIndex) => {
+            const post = posts[index];
+            if (stackIndex > 0) cursor += CARD_GAPS[index];
+            pixelPositions[post.id] = {
+              x: DESKTOP_COLUMN_X[columnIndex],
+              y: cursor,
+              z: DESKTOP_LAYOUTS[index]?.z ?? 10,
+            };
+            cursor += heights.get(post.id) ?? 0;
+          });
+          tallestColumn = Math.max(tallestColumn, cursor);
+        });
+      }
+
+      const nextBoardHeight = Math.ceil(tallestColumn + STACK_BOTTOM_PADDING);
+      const nextPositions = Object.fromEntries(
+        Object.entries(pixelPositions).map(([id, pos]) => [
+          id,
+          { ...pos, y: (pos.y / nextBoardHeight) * 100 },
+        ])
+      );
+
+      setBoardHeight(nextBoardHeight);
+      setPositions(nextPositions);
+      positionsRef.current = nextPositions;
+    };
+
+    const scheduleStack = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(calculateStack);
+    };
+    const resizeObserver = new ResizeObserver(scheduleStack);
+    cards.forEach((card) => resizeObserver.observe(card));
+    scheduleStack();
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
+    };
+  }, [isMobile]);
+
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    const board = boardRef.current;
+    if (!board) return;
+
+    const cards = Array.from(
+      board.querySelectorAll<HTMLElement>(".x-post-card[data-post-id]")
+    );
+    const revealAll = () => {
+      const next = Object.fromEntries(
+        cards.map((card) => [card.dataset.postId as string, 0])
+      );
+      cards.forEach((card) => {
+        if (card.dataset.postId) revealedIdsRef.current.add(card.dataset.postId);
+      });
+      setRevealDelays(next);
+    };
+
+    if (
+      typeof IntersectionObserver === "undefined" ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      revealAll();
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entering = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => {
+            const topDifference = a.boundingClientRect.top - b.boundingClientRect.top;
+            return topDifference || a.boundingClientRect.left - b.boundingClientRect.left;
+          });
+
+        if (entering.length === 0) return;
+
+        const newlyRevealed: Array<{ id: string; delay: number }> = [];
+        entering.forEach((entry, index) => {
+          const card = entry.target as HTMLElement;
+          const id = card.dataset.postId;
+          if (!id || revealedIdsRef.current.has(id)) return;
+
+          revealedIdsRef.current.add(id);
+          newlyRevealed.push({ id, delay: index * REVEAL_STAGGER });
+          observer.unobserve(card);
+        });
+
+        if (newlyRevealed.length > 0) {
+          setRevealDelays((previous) => {
+            const next = { ...previous };
+            newlyRevealed.forEach(({ id, delay }) => {
+              next[id] = delay;
+            });
+            return next;
+          });
+        }
+      },
+      { rootMargin: "10000px 0px -12% 0px", threshold: 0.01 }
+    );
+
+    cards.forEach((card) => observer.observe(card));
+    return () => observer.disconnect();
   }, []);
 
   const dragRef = useRef<{
@@ -103,7 +258,6 @@ function Fun() {
     pointerId: number;
     maxY: number;
   } | null>(null);
-  const didDragRef = useRef(false);
 
   const [lightbox, setLightbox] = useState<{
     postId: string;
@@ -128,7 +282,6 @@ function Fun() {
     const dy = e.clientY - drag.startY;
     if (!drag.moved && Math.hypot(dx, dy) < 5) return;
     drag.moved = true;
-    didDragRef.current = true;
     e.preventDefault();
 
     const rect = board.getBoundingClientRect();
@@ -224,7 +377,6 @@ function Fun() {
         return next;
       });
 
-      didDragRef.current = false;
       const cardHeight = e.currentTarget.getBoundingClientRect().height;
       const boardRect = board.getBoundingClientRect();
       const footerBottom = document.querySelector(".footer")?.getBoundingClientRect().bottom;
@@ -262,7 +414,6 @@ function Fun() {
   }, [onPointerMove, onPointerUp]);
 
   const openMedia = (post: FunPost, index: number) => {
-    if (didDragRef.current) return;
     setLightbox({ postId: post.id, index });
   };
 
@@ -273,13 +424,20 @@ function Fun() {
 
   return (
     <div className="fun-app">
-      <div className="fun-board" ref={boardRef}>
+      <div
+        className="fun-board"
+        ref={boardRef}
+        style={boardHeight ? { height: `${boardHeight}px` } : undefined}
+      >
         {posts.map((post) => {
           const pos = positions[post.id] || post.layout;
           const style: CSSProperties = {
             left: `${pos.x}%`,
             top: `${pos.y}%`,
             zIndex: pos.z,
+            ...({
+              "--reveal-delay": `${revealDelays[post.id] ?? 0}ms`,
+            } as CSSProperties),
             ...(bottomBounce?.id === post.id
               ? ({ "--bounce-release-offset": `${bottomBounce.releaseOffset}px` } as CSSProperties)
               : {}),
@@ -289,6 +447,7 @@ function Fun() {
               key={post.id}
               post={post}
               style={style}
+              isRevealed={post.id in revealDelays}
               isBottomBouncing={bottomBounce?.id === post.id}
               onPointerDown={(e) => onPointerDown(post.id, e)}
               onOpenMedia={(i) => openMedia(post, i)}
