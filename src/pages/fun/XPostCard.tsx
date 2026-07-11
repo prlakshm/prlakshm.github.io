@@ -7,7 +7,6 @@ type Props = {
   style: CSSProperties;
   onPointerDown: (e: ReactPointerEvent<HTMLElement>) => void;
   onOpenMedia: (index: number) => void;
-  onOpenPost: () => void;
 };
 
 function VerifiedBadge() {
@@ -15,17 +14,12 @@ function VerifiedBadge() {
     <svg
       className="x-verified"
       viewBox="0 0 22 22"
+      width="18"
+      height="18"
       aria-label="Verified"
       role="img"
     >
-      <path
-        fill="#1d9bf0"
-        d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.878-1.683-.44-.464-1.002-.8-1.634-.972-.633-.172-1.294-.15-1.9.07-.46-.588-1.068-1.05-1.76-1.34C11.675 1.74 10.85 1.5 10 1.5s-1.675.24-2.356.676c-.692.29-1.3.752-1.76 1.34-.606-.22-1.267-.242-1.9-.07-.632.172-1.194.508-1.634.972-.441.465-.747 1.05-.878 1.683-.13.633-.083 1.29.14 1.897-.586.274-1.084.706-1.438 1.246-.355.541-.552 1.17-.57 1.816.018.646.215 1.275.57 1.816.354.54.852.972 1.438 1.246-.223.607-.27 1.264-.14 1.897.131.634.437 1.218.878 1.683.44.464 1.002.8 1.634.972.633.172 1.294.15 1.9-.07.46.588 1.068 1.05 1.76 1.34.681.436 1.506.676 2.356.676s1.675-.24 2.356-.676c.692-.29 1.3-.752 1.76-1.34.606.22 1.267.242 1.9.07.632-.172 1.194-.508 1.634-.972.441-.465.747-1.05.878-1.683.13-.633.083-1.29-.14-1.897.586-.274 1.084-.706 1.438-1.246.355-.541.552-1.17.57-1.816z"
-      />
-      <path
-        fill="#fff"
-        d="M9.57 15.5L5.75 11.68l1.41-1.41 2.41 2.41 5.3-5.3 1.41 1.42z"
-      />
+      <path d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z" />
     </svg>
   );
 }
@@ -40,7 +34,12 @@ function IconBtn({
   className?: string;
 }) {
   return (
-    <span className={`x-icon-btn ${className}`.trim()} aria-label={label} title={label}>
+    <span
+      className={`x-icon-btn ${className}`.trim()}
+      aria-label={label}
+      role="img"
+      title={label}
+    >
       {children}
     </span>
   );
@@ -51,9 +50,9 @@ export default function XPostCard({
   style,
   onPointerDown,
   onOpenMedia,
-  onOpenPost,
 }: Props) {
   const mediaCount = post.media.length;
+  const profileUrl = "https://x.com/pranavibuilds";
 
   return (
     <article
@@ -62,24 +61,49 @@ export default function XPostCard({
       onPointerDown={onPointerDown}
     >
       <header className="x-post-header">
-        <button type="button" className="x-header-main" onClick={onOpenPost}>
-          <span className="x-avatar-wrap">
-            <img className="x-avatar" src={post.avatar} alt="" draggable={false} />
-          </span>
+        <div className="x-header-main">
+          <a
+            className="x-avatar-link"
+            href={profileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="View pranaviln on X"
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <span className="x-avatar-wrap">
+              <img
+                className="x-avatar"
+                src="/fun/avatar-x.jpg"
+                alt=""
+                draggable={false}
+              />
+            </span>
+          </a>
           <div className="x-meta">
             <div className="x-name-row">
-              <span className="x-name">{post.name}</span>
+              <a
+                className="x-name-link"
+                href={profileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onPointerDown={(e) => e.stopPropagation()}
+              >
+                <span className="x-name">pranaviln</span>
+              </a>
               <VerifiedBadge />
             </div>
-            <span className="x-handle">@{post.handle}</span>
+            <span className="x-handle">@pranavibuilds</span>
           </div>
-        </button>
+        </div>
         <div className="x-header-actions" onPointerDown={(e) => e.stopPropagation()}>
-          <IconBtn label="Not interested">
+          <IconBtn label="Grok">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path
-                fill="currentColor"
-                d="M12 3.75c-4.56 0-8.25 3.69-8.25 8.25s3.69 8.25 8.25 8.25 8.25-3.69 8.25-8.25S16.56 3.75 12 3.75zM1.75 12C1.75 6.34 6.34 1.75 12 1.75S22.25 6.34 22.25 12 17.66 22.25 12 22.25 1.75 17.66 1.75 12zm7.47-2.78l2.78 2.78-2.78 2.78 1.41 1.41L13.41 13.41l2.78 2.78 1.41-1.41-2.78-2.78 2.78-2.78-1.41-1.41L13.41 10.59 10.63 7.81 9.22 9.22z"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeWidth="2"
+                d="M4.9 19.1 19.1 4.9M7.6 5.6A8.2 8.2 0 0 1 18.4 16.4M16.4 18.4A8.2 8.2 0 0 1 5.6 7.6"
               />
             </svg>
           </IconBtn>
@@ -94,7 +118,7 @@ export default function XPostCard({
         </div>
       </header>
 
-      <div className="x-body" onClick={onOpenPost}>
+      <div className="x-body">
         <p>{linkifyText(post.text)}</p>
       </div>
 
@@ -105,6 +129,7 @@ export default function XPostCard({
               type="button"
               className="x-media-item"
               key={`${post.id}-media-${i}`}
+              aria-label={`Open attachment ${i + 1} of ${mediaCount}`}
               onClick={(e) => {
                 e.stopPropagation();
                 onOpenMedia(i);
@@ -126,16 +151,22 @@ export default function XPostCard({
         </div>
       )}
 
-      <div className="x-timestamp" onClick={onOpenPost}>
+      <a
+        className="x-timestamp"
+        href={post.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        onPointerDown={(e) => e.stopPropagation()}
+      >
         {formatPostTimestamp(post.createdAt)}
-      </div>
+      </a>
 
       <div className="x-actions" onPointerDown={(e) => e.stopPropagation()}>
         <IconBtn label="Reply" className="x-action reply">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path
               fill="currentColor"
-              d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.96-1.607 5.68-4.196 7.11l-8.054 4.46v-3.69h-.167C5.335 18.01 1.751 14.42 1.751 10zm8.005-6c-3.317 0-6.005 2.69-6.005 6 0 3.37 2.77 6.08 6.138 6.01l.351-.01h1.761v2.3l5.087-2.81c1.951-1.08 3.163-3.13 3.163-5.36 0-3.39-2.744-6.13-6.129-6.13H9.756z"
+              d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.96-1.607 5.68-4.196 7.11l-8.054 4.46v-3.69h-.067c-4.49.1-8.183-3.51-8.183-8.01zm8.005-6c-3.317 0-6.005 2.69-6.005 6 0 3.37 2.77 6.08 6.138 6.01l.351-.01h1.761v2.3l5.087-2.81c1.951-1.08 3.163-3.13 3.163-5.36 0-3.39-2.744-6.13-6.129-6.13H9.756z"
             />
           </svg>
         </IconBtn>
@@ -151,7 +182,7 @@ export default function XPostCard({
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path
               fill="currentColor"
-              d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.43 4.82 1.155 2.22 3.615 4.61 6.15 7.02 2.535-2.41 4.995-4.8 6.15-7.02 1.063-2.04.982-3.7.431-4.82-.561-1.13-1.667-1.84-2.91-1.91zm4.187 7.69c-1.351 2.6-4.025 5.24-6.884 7.81l-1 1.02-1-1.02c-2.859-2.57-5.533-5.21-6.884-7.81-1.412-2.71-1.645-5.07-.831-7.11.736-1.84 2.397-3.03 4.37-3.14 1.402-.08 2.905.46 4.127 1.66L12 6.35l.918-.94c1.222-1.2 2.725-1.74 4.127-1.66 1.973.11 3.634 1.3 4.37 3.14.814 2.04.581 4.4-.831 7.11z"
+              d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91zm4.187 7.69c-1.351 2.48-4.001 5.12-8.379 7.67l-.503.3-.504-.3c-4.379-2.55-7.029-5.19-8.382-7.67-1.36-2.5-1.41-4.86-.514-6.67.887-1.79 2.647-2.91 4.601-3.01 1.651-.09 3.368.56 4.798 2.01 1.429-1.45 3.146-2.1 4.796-2.01 1.954.1 3.714 1.22 4.601 3.01.896 1.81.846 4.17-.514 6.67z"
             />
           </svg>
         </IconBtn>

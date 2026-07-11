@@ -10,37 +10,37 @@ type Pos = { x: number; y: number; z: number };
 
 const posts = funPosts as FunPost[];
 
-/** Centered collage seeds — keep clear of header (~5.5rem) and footer */
+/** Loosely staggered collage: readable structure with intentional overlap. */
 const DESKTOP_LAYOUTS: Pos[] = [
-  { x: 8, y: 6, z: 20 },
-  { x: 38, y: 4, z: 8 },
-  { x: 62, y: 8, z: 12 },
-  { x: 18, y: 22, z: 9 },
-  { x: 48, y: 20, z: 14 },
-  { x: 28, y: 36, z: 7 },
-  { x: 58, y: 34, z: 15 },
-  { x: 12, y: 48, z: 11 },
-  { x: 42, y: 46, z: 16 },
-  { x: 66, y: 50, z: 6 },
-  { x: 22, y: 62, z: 18 },
-  { x: 52, y: 60, z: 5 },
-  { x: 36, y: 54, z: 10 },
+  { x: 2, y: 2, z: 20 },
+  { x: 2, y: 22, z: 8 },
+  { x: 66, y: 1, z: 14 },
+  { x: 34, y: 3, z: 11 },
+  { x: 66, y: 18, z: 18 },
+  { x: 34, y: 21, z: 7 },
+  { x: 2, y: 38, z: 16 },
+  { x: 34, y: 41, z: 12 },
+  { x: 66, y: 38, z: 19 },
+  { x: 2, y: 57, z: 6 },
+  { x: 66, y: 56, z: 15 },
+  { x: 34, y: 70, z: 9 },
+  { x: 2, y: 76, z: 10 },
 ];
 
 const MOBILE_LAYOUTS: Pos[] = [
-  { x: -4, y: 4, z: 20 },
-  { x: 22, y: 10, z: 8 },
-  { x: -2, y: 28, z: 12 },
-  { x: 18, y: 36, z: 9 },
-  { x: -6, y: 52, z: 14 },
-  { x: 20, y: 60, z: 7 },
-  { x: -4, y: 76, z: 15 },
-  { x: 18, y: 86, z: 11 },
-  { x: -8, y: 102, z: 16 },
-  { x: 16, y: 112, z: 6 },
-  { x: -2, y: 128, z: 18 },
-  { x: 20, y: 138, z: 5 },
-  { x: 6, y: 120, z: 10 },
+  { x: -2, y: 3, z: 20 },
+  { x: 18, y: 8, z: 8 },
+  { x: 0, y: 22, z: 14 },
+  { x: 16, y: 28, z: 11 },
+  { x: -4, y: 40, z: 18 },
+  { x: 14, y: 46, z: 7 },
+  { x: -2, y: 58, z: 16 },
+  { x: 16, y: 66, z: 12 },
+  { x: -6, y: 78, z: 19 },
+  { x: 12, y: 86, z: 6 },
+  { x: 0, y: 98, z: 15 },
+  { x: 14, y: 106, z: 9 },
+  { x: 4, y: 72, z: 10 },
 ];
 
 function useIsMobile(breakpoint = 768) {
@@ -203,15 +203,15 @@ function Fun() {
     };
   }, [onPointerMove, onPointerUp]);
 
-  const openPost = (post: FunPost) => {
-    if (didDragRef.current) return;
-    window.open(post.url, "_blank", "noopener,noreferrer");
-  };
-
   const openMedia = (post: FunPost, index: number) => {
     if (didDragRef.current) return;
     setLightbox({ postId: post.id, index });
   };
+
+  const closeLightbox = useCallback(() => setLightbox(null), []);
+  const changeLightboxIndex = useCallback((index: number) => {
+    setLightbox((prev) => (prev ? { ...prev, index } : prev));
+  }, []);
 
   return (
     <div className="fun-app">
@@ -230,7 +230,6 @@ function Fun() {
               style={style}
               onPointerDown={(e) => onPointerDown(post.id, e)}
               onOpenMedia={(i) => openMedia(post, i)}
-              onOpenPost={() => openPost(post)}
             />
           );
         })}
@@ -240,10 +239,8 @@ function Fun() {
         <MediaLightbox
           items={lightboxPost.media}
           startIndex={lightbox.index}
-          onClose={() => setLightbox(null)}
-          onIndexChange={(index) =>
-            setLightbox((prev) => (prev ? { ...prev, index } : prev))
-          }
+          onClose={closeLightbox}
+          onIndexChange={changeLightboxIndex}
         />
       )}
     </div>
