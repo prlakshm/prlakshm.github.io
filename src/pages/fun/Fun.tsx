@@ -12,20 +12,23 @@ const posts = funPosts as FunPost[];
 
 /** Loosely staggered collage: readable structure with intentional overlap. */
 const DESKTOP_LAYOUTS: Pos[] = [
-  { x: 2, y: 2, z: 20 },
-  { x: 2, y: 22, z: 8 },
-  { x: 66, y: 1, z: 14 },
-  { x: 34, y: 3, z: 11 },
-  { x: 66, y: 18, z: 18 },
-  { x: 34, y: 21, z: 7 },
-  { x: 2, y: 38, z: 16 },
-  { x: 34, y: 41, z: 12 },
-  { x: 66, y: 38, z: 19 },
-  { x: 2, y: 57, z: 6 },
-  { x: 66, y: 56, z: 15 },
-  { x: 34, y: 70, z: 9 },
-  { x: 2, y: 76, z: 10 },
+  { x: 2.03, y: 2, z: 12 },
+  { x: 14.59, y: 20.26, z: 22 },
+  { x: 66.3, y: 1.03, z: 14 },
+  { x: 34.14, y: 3.01, z: 20 },
+  { x: 65.8, y: 20.04, z: 18 },
+  { x: 34.38, y: 35.96, z: 8 },
+  { x: 1.81, y: 33.47, z: 16 },
+  { x: 34.42, y: 64.6, z: 13 },
+  { x: 1.61, y: 87.3, z: 19 },
+  { x: 3.91, y: 58, z: 17 },
+  { x: 66.04, y: 74.6, z: 10 },
+  { x: 36, y: 99.6, z: 15 },
+  { x: 66.04, y: 57, z: 21 },
 ];
+
+const BOUNCE_DURATION = 420;
+const BOTTOM_SPRING_RISE = 70;
 
 const MOBILE_LAYOUTS: Pos[] = [
   { x: -2, y: 3, z: 20 },
@@ -60,6 +63,11 @@ function Fun() {
   const boardRef = useRef<HTMLDivElement>(null);
   const topZ = useRef(30);
   const positionsRef = useRef<Record<string, Pos>>({});
+  const bounceTimerRef = useRef<number | null>(null);
+  const [bottomBounce, setBottomBounce] = useState<{
+    id: string;
+    releaseOffset: number;
+  } | null>(null);
 
   const initialPositions = useMemo(() => {
     const layouts = isMobile ? MOBILE_LAYOUTS : DESKTOP_LAYOUTS;
@@ -93,6 +101,7 @@ function Fun() {
     originY: number;
     moved: boolean;
     pointerId: number;
+    maxY: number;
   } | null>(null);
   const didDragRef = useRef(false);
 
@@ -124,7 +133,11 @@ function Fun() {
 
     const rect = board.getBoundingClientRect();
     const nextX = drag.originX + (dx / rect.width) * 100;
-    const nextY = drag.originY + (dy / rect.height) * 100;
+    const rawY = drag.originY + (dy / rect.height) * 100;
+    const overflow = Math.max(0, rawY - drag.maxY);
+    const nextY = overflow > 0
+      ? drag.maxY + Math.min(2.25, overflow * 0.22)
+      : rawY;
 
     setPositions((prev) => {
       const next = {
@@ -144,6 +157,40 @@ function Fun() {
     (e: PointerEvent) => {
       const drag = dragRef.current;
       if (!drag || e.pointerId !== drag.pointerId) return;
+
+      const current = positionsRef.current[drag.id];
+      if (current && current.y > drag.maxY) {
+        const boardHeight = boardRef.current?.clientHeight ?? 0;
+        const overflowOffset = Math.max(
+          0,
+          ((current.y - drag.maxY) / 100) * boardHeight
+        );
+        const targetY = Math.max(
+          0,
+          drag.maxY - (BOTTOM_SPRING_RISE / boardHeight) * 100
+        );
+        const springRise = ((drag.maxY - targetY) / 100) * boardHeight;
+        setPositions((prev) => {
+          const next = {
+            ...prev,
+            [drag.id]: { ...prev[drag.id], y: targetY },
+          };
+          positionsRef.current = next;
+          return next;
+        });
+        setBottomBounce({
+          id: drag.id,
+          releaseOffset: overflowOffset + springRise,
+        });
+        if (bounceTimerRef.current !== null) {
+          window.clearTimeout(bounceTimerRef.current);
+        }
+        bounceTimerRef.current = window.setTimeout(() => {
+          setBottomBounce(null);
+          bounceTimerRef.current = null;
+        }, BOUNCE_DURATION);
+      }
+
       endDrag();
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
@@ -178,6 +225,13 @@ function Fun() {
       });
 
       didDragRef.current = false;
+      const cardHeight = e.currentTarget.getBoundingClientRect().height;
+      const boardRect = board.getBoundingClientRect();
+      const footerBottom = document.querySelector(".footer")?.getBoundingClientRect().bottom;
+      const bottomBoundary = footerBottom === undefined
+        ? board.clientHeight
+        : footerBottom - boardRect.top;
+      const maxTop = Math.max(0, bottomBoundary - cardHeight);
       dragRef.current = {
         id,
         startX: e.clientX,
@@ -186,6 +240,7 @@ function Fun() {
         originY: pos.y,
         moved: false,
         pointerId: e.pointerId,
+        maxY: (maxTop / board.clientHeight) * 100,
       };
 
       window.addEventListener("pointermove", onPointerMove, { passive: false });
@@ -200,6 +255,9 @@ function Fun() {
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointercancel", onPointerUp);
+      if (bounceTimerRef.current !== null) {
+        window.clearTimeout(bounceTimerRef.current);
+      }
     };
   }, [onPointerMove, onPointerUp]);
 
@@ -222,12 +280,16 @@ function Fun() {
             left: `${pos.x}%`,
             top: `${pos.y}%`,
             zIndex: pos.z,
+            ...(bottomBounce?.id === post.id
+              ? ({ "--bounce-release-offset": `${bottomBounce.releaseOffset}px` } as CSSProperties)
+              : {}),
           };
           return (
             <XPostCard
               key={post.id}
               post={post}
               style={style}
+              isBottomBouncing={bottomBounce?.id === post.id}
               onPointerDown={(e) => onPointerDown(post.id, e)}
               onOpenMedia={(i) => openMedia(post, i)}
             />

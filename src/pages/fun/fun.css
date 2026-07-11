@@ -7,15 +7,19 @@
   animation: fadeIn 0.4s ease forwards;
 }
 
+.fun-app + .footer {
+  margin-top: 30rem;
+}
+
 .fun-board {
   position: relative;
   width: 100%;
-  /* Centered collage zone — clear of sticky header + footer */
+  /* Collage zone — clear of sticky header; footer uses global top spacing */
   min-height: calc(100vh - 5.5rem);
-  height: 360vh;
+  height: 255vh;
   margin-top: 5.5rem;
-  margin-bottom: 3rem;
-  padding: 1.5rem 2vw 4rem;
+  margin-bottom: 0;
+  padding: 1.5rem 2vw 0;
   box-sizing: border-box;
   overflow: visible;
   user-select: none;
@@ -50,6 +54,20 @@
   box-shadow:
     0 4px 8px rgba(24, 24, 27, 0.08),
     0 18px 36px rgba(24, 24, 27, 0.14);
+}
+
+.x-post-card.is-bottom-bouncing {
+  animation: fun-card-bottom-bounce 0.42s cubic-bezier(0.2, 0.75, 0.3, 1);
+}
+
+@keyframes fun-card-bottom-bounce {
+  0% {
+    transform: translateY(var(--bounce-release-offset, 0px));
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 .x-post-header {
@@ -401,11 +419,16 @@
 /* —— Mobile —— */
 
 @media screen and (max-width: 768px) {
+  .fun-app + .footer {
+    margin-top: 12rem;
+  }
+
   .fun-board {
     height: auto;
-    min-height: 320vh;
+    min-height: 240vh;
     margin-top: 4.25rem;
-    padding: 1rem 0 5rem;
+    margin-bottom: 0;
+    padding: 1rem 0 0;
   }
 
   .x-post-card {
@@ -441,5 +464,11 @@
     top: auto;
     bottom: 0.75rem;
     transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .x-post-card.is-bottom-bouncing {
+    animation: none;
   }
 }
