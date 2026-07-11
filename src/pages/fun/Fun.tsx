@@ -14,7 +14,7 @@ const posts = funPosts as FunPost[];
 const DESKTOP_LAYOUTS: Pos[] = [
   { x: 2.03, y: 2, z: 12 },
   { x: 14.59, y: 20.26, z: 22 },
-  { x: 66.3, y: 1.03, z: 14 },
+  { x: 66.3, y: 0.9, z: 14 },
   { x: 34.14, y: 3.01, z: 20 },
   { x: 65.8, y: 20.04, z: 18 },
   { x: 34.38, y: 35.96, z: 8 },

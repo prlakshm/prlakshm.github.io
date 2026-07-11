@@ -17,7 +17,7 @@
   /* Collage zone — clear of sticky header; footer uses global top spacing */
   min-height: calc(100vh - 5.5rem);
   height: 255vh;
-  margin-top: 5.5rem;
+  margin-top: 5.8rem;
   margin-bottom: 0;
   padding: 1.5rem 2vw 0;
   box-sizing: border-box;
