@@ -3,7 +3,7 @@
         "name": "Surprise Rail",
         "color": "#f8d6d8",
         "skills": ["Human-AI Interaction", "UX Research", "Figma"],
-        "logline": "Designing an AI-powered tile carousel for HBO Max streaming app",
+        "logline": "Designing an AI-powered tile carousel for TV, desktop, mobile",
         "image": "/projects/surprise-rail-overview.mp4",
         "link": "#/hbo-max-surprise",
         "locked": false
