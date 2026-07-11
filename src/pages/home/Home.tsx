@@ -1,17 +1,50 @@
-import { useEffect, useRef } from "react";
 import "./home.css";
-import Footer from "../../components/Footer.js";
 import ProjectCard from "../projects/ProjectCard.js";
 import projectData from "../projects/project-data.json";
 import "../projects/projects.css";
 
 function Home() {
+  const renderProject = (
+    project: (typeof projectData)[number],
+    index: number
+  ) => (
+    <div
+      className="project-cards"
+      key={project.link}
+      style={{ "--card-index": index } as React.CSSProperties}
+    >
+      <a
+        href={project.link}
+        onClick={(event) => {
+          if (project.locked) {
+            event.preventDefault();
+            const password = prompt("Enter password to view this case study:");
+            if (password === "warbros21") {
+              window.location.href = project.link;
+            } else if (password !== null) {
+              alert("Incorrect password.");
+            }
+          }
+        }}
+      >
+        <ProjectCard
+          name={project.name}
+          color={project.color}
+          skills={project.skills}
+          logline={project.logline}
+          image={project.image}
+          alphaColor={0.9}
+        />
+      </a>
+    </div>
+  );
 
   return (
     <div className="app">
       <div className="home">
-        <div className="landing-page">
-          <div className="title">
+        <div className="home-column home-column-left">
+          <div className="landing-page">
+            <div className="title">
             <h1 className="cutout-text">
               <span className="word">
                 <span>H</span><span>I</span><span>,</span>
@@ -78,41 +111,35 @@ function Home() {
                   <path fill="currentColor" d="M0,198c0-51.69,0-103.38.34-155.71C4.17,24.22,13.89,11.6,30.08,4.22c4.1-1.87,8.6-2.84,12.92-4.22,51.02,0,102.04,0,153.72.34,17.91,3.1,30.45,12.42,38.16,27.98,2.28,4.61,3.44,9.77,5.12,14.68,0,51.35,0,102.71-.34,154.71-4.37,20.06-15.65,33.2-34.36,39.86-2.71.97-5.53,1.63-8.31,2.43-51.35,0-102.71,0-154.71-.34-20.06-4.37-33.19-15.67-39.89-34.36C1.54,202.89.8,200.43,0,198M100,96.5v93.23h30c0-18.06-.23-35.86.14-53.65.11-5.18,1.07-10.72,3.2-15.39,3.45-7.54,10-11.39,18.58-10.81,8.28.56,13.53,5.38,16.03,12.89,1.34,4.02,1.88,8.46,1.95,12.72.23,14.49.09,28.98.09,43.47,0,3.6,0,7.21,0,10.75h29.88c0-24.23.77-48.22-.2-72.15-1.17-29.07-25.6-45.03-51.96-34.4-6.57,2.65-12.09,7.94-17.95,11.91v-14.81h-29.78v16.21M80,99.5v-19.21h-29.71v109.42h29.71v-90.21M50.01,40.7c-3.76,7.84-3.08,15.28,2.15,20.86,5.02,5.36,11.22,6.94,18.21,4.75,7.36-2.31,12.02-8.89,12.04-16.58.03-7.36-4.64-14.14-11.43-16.61-7.54-2.74-14.8-.31-20.97,7.58Z" />
                 </svg>
               </a>
-            </div>
-          </div>
-        </div>
-        {projectData.map(
-          (
-            project,
-            index
-          ) => (
-            <div className="project-cards" style={{ '--card-index': index } as React.CSSProperties}>
-              <a href={project.link} key={index}
-                onClick={(e) => {
-                  if (project.locked) {
-                    e.preventDefault();
-                    const password = prompt("Enter password to view this case study:");
-                    if (password === "warbros21") {
-                      window.location.href = project.link;
-                    } else if (password !== null) {
-                      alert("Incorrect password.");
-                    }
-                  }
-                }}
-
+              <a
+                href="https://x.com/pranavibuilds"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <ProjectCard
-                  name={project.name}
-                  color={project.color}
-                  skills={project.skills}
-                  logline={project.logline}
-                  image={project.image}
-                  alphaColor={0.9}
-                /> {/* project card component*/}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  className="icon"
+                  aria-label="Pranavi on X"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zM17.35 19.77h1.2L6.9 4.126H5.75z"
+                  />
+                </svg>
               </a>
             </div>
-          )
-        )}
+            </div>
+          </div>
+          {projectData.map((project, index) =>
+            index % 2 === 0 ? renderProject(project, index) : null
+          )}
+        </div>
+        <div className="home-column home-column-right">
+          {projectData.map((project, index) =>
+            index % 2 === 1 ? renderProject(project, index) : null
+          )}
+        </div>
       </div>
     </div>
   );

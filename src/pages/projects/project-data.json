@@ -9,15 +9,6 @@
         "locked": false
     },
     {
-        "name": "RichDreamer Text-to-3D",
-        "color": "#f8d6d8",
-        "skills": ["ML/Gen AI", "Prompt Engineering", "Python"],
-        "logline": "Educating users on best AI prompt engineering practices",
-        "image": "/projects/dreamer.mp4",
-        "link": "#/richdreamer",
-        "locked": false
-    },
-    {
         "name": "Reasons to Watch LLM",
         "color": "#f8d6d8",
         "skills": ["ML/Gen AI", "Prompt Engineering", "Prototyping"],
@@ -25,15 +16,5 @@
         "image": "/projects/rtw-overview2.mp4",
         "link": "#/hbo-max-rtw",
         "locked": false
-    },
-    {
-        "name": "Binary Escape",
-        "color": "#f8d6d8",
-        "skills": ["Game Development", "3D Animation", "Javascript"],
-        "logline": "Building worlds and modeling 3D characters for a puzzle game",
-        "image": "/projects/binary-escape-preview.mp4",
-        "link": "#/binary-escape",
-        "locked": false
-
     }
 ]
