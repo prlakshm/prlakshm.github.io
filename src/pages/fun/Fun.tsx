@@ -36,11 +36,11 @@ const DESKTOP_COLUMNS = [
   [3, 1, 7, 9],
   [2, 4, 8, 11, 12],
 ];
-const DESKTOP_COLUMN_X = [5.42, 35.76, 66.15];
+const DESKTOP_COLUMN_GAP = 22;
 const DESKTOP_COLUMN_TOP = [46, 69, 41];
 const MOBILE_STACK_ORDER = [0, 3, 2, 1, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-const CARD_GAPS = [0, 72, 0, 0, 84, 56, 76, 64, 88, 60, 52, 92, 68];
-const STACK_BOTTOM_PADDING = 80;
+const CARD_GAPS = [0, 20, 0, 0, 42, 28, 42, 22, 50, 24, 20, 46, 38];
+const STACK_BOTTOM_PADDING = 48;
 
 const MOBILE_LAYOUTS: Pos[] = [
   { x: -2, y: 3, z: 20 },
@@ -58,20 +58,26 @@ const MOBILE_LAYOUTS: Pos[] = [
   { x: 4, y: 72, z: 10 },
 ];
 
-function useIsMobile(breakpoint = 768) {
-  const [mobile, setMobile] = useState(
-    () => typeof window !== "undefined" && window.innerWidth <= breakpoint
-  );
+function getResponsiveColumnCount() {
+  if (typeof window === "undefined") return 3;
+  if (window.innerWidth <= 768) return 1;
+  if (window.innerWidth < 1080) return 2;
+  return 3;
+}
+
+function useResponsiveColumnCount() {
+  const [columnCount, setColumnCount] = useState(getResponsiveColumnCount);
   useEffect(() => {
-    const onResize = () => setMobile(window.innerWidth <= breakpoint);
+    const onResize = () => setColumnCount(getResponsiveColumnCount());
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
-  }, [breakpoint]);
-  return mobile;
+  }, []);
+  return columnCount;
 }
 
 function Fun() {
-  const isMobile = useIsMobile();
+  const columnCount = useResponsiveColumnCount();
+  const isMobile = columnCount === 1;
   const boardRef = useRef<HTMLDivElement>(null);
   const topZ = useRef(30);
   const positionsRef = useRef<Record<string, Pos>>({});
@@ -83,6 +89,7 @@ function Fun() {
     id: string;
     releaseOffset: number;
   } | null>(null);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
 
   const initialPositions = useMemo(() => {
     const layouts = isMobile ? MOBILE_LAYOUTS : DESKTOP_LAYOUTS;
@@ -124,12 +131,15 @@ function Fun() {
       let tallestColumn = 0;
 
       if (isMobile) {
+        const cardWidth = cards[0]?.getBoundingClientRect().width ?? 0;
+        const centeredX =
+          ((board.clientWidth - cardWidth) / 2 / board.clientWidth) * 100;
         let cursor = 24;
         MOBILE_STACK_ORDER.forEach((index, stackIndex) => {
           const post = posts[index];
-          if (stackIndex > 0) cursor += Math.max(32, CARD_GAPS[index] * 0.65);
+          if (stackIndex > 0) cursor += Math.max(20, CARD_GAPS[index]);
           pixelPositions[post.id] = {
-            x: 8.6,
+            x: centeredX,
             y: cursor,
             z: MOBILE_LAYOUTS[index]?.z ?? 10,
           };
@@ -137,20 +147,58 @@ function Fun() {
         });
         tallestColumn = cursor;
       } else {
-        DESKTOP_COLUMNS.forEach((column, columnIndex) => {
-          let cursor = DESKTOP_COLUMN_TOP[columnIndex];
-          column.forEach((index, stackIndex) => {
+        const cardWidth = cards[0]?.getBoundingClientRect().width ?? 0;
+        const columnsWidth =
+          cardWidth * columnCount + DESKTOP_COLUMN_GAP * (columnCount - 1);
+        const firstColumnLeft = Math.max(0, (board.clientWidth - columnsWidth) / 2);
+        const columnX = Array.from(
+          { length: columnCount },
+          (_, columnIndex) =>
+            ((firstColumnLeft + columnIndex * (cardWidth + DESKTOP_COLUMN_GAP)) /
+              board.clientWidth) *
+            100
+        );
+
+        if (columnCount === 2) {
+          const cursors = [36, 52];
+          const cardsInColumn = [0, 0];
+
+          MOBILE_STACK_ORDER.forEach((index, orderIndex) => {
+            const columnIndex =
+              orderIndex < 2
+                ? orderIndex
+                : cursors[0] <= cursors[1]
+                  ? 0
+                  : 1;
             const post = posts[index];
-            if (stackIndex > 0) cursor += CARD_GAPS[index];
+            if (cardsInColumn[columnIndex] > 0) {
+              cursors[columnIndex] += Math.max(20, CARD_GAPS[index]);
+            }
             pixelPositions[post.id] = {
-              x: DESKTOP_COLUMN_X[columnIndex],
-              y: cursor,
+              x: columnX[columnIndex],
+              y: cursors[columnIndex],
               z: DESKTOP_LAYOUTS[index]?.z ?? 10,
             };
-            cursor += heights.get(post.id) ?? 0;
+            cursors[columnIndex] += heights.get(post.id) ?? 0;
+            cardsInColumn[columnIndex] += 1;
           });
-          tallestColumn = Math.max(tallestColumn, cursor);
-        });
+          tallestColumn = Math.max(...cursors);
+        } else {
+          DESKTOP_COLUMNS.forEach((column, columnIndex) => {
+            let cursor = DESKTOP_COLUMN_TOP[columnIndex];
+            column.forEach((index, stackIndex) => {
+              const post = posts[index];
+              if (stackIndex > 0) cursor += CARD_GAPS[index];
+              pixelPositions[post.id] = {
+                x: columnX[columnIndex],
+                y: cursor,
+                z: DESKTOP_LAYOUTS[index]?.z ?? 10,
+              };
+              cursor += heights.get(post.id) ?? 0;
+            });
+            tallestColumn = Math.max(tallestColumn, cursor);
+          });
+        }
       }
 
       const nextBoardHeight = Math.ceil(tallestColumn + STACK_BOTTOM_PADDING);
@@ -178,7 +226,7 @@ function Fun() {
       window.cancelAnimationFrame(frame);
       resizeObserver.disconnect();
     };
-  }, [isMobile]);
+  }, [columnCount, isMobile]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -241,7 +289,7 @@ function Fun() {
           });
         }
       },
-      { rootMargin: "10000px 0px -12% 0px", threshold: 0.01 }
+      { rootMargin: "10000px 0px 3% 0px", threshold: 0.01 }
     );
 
     cards.forEach((card) => observer.observe(card));
@@ -270,6 +318,7 @@ function Fun() {
 
   const endDrag = useCallback(() => {
     dragRef.current = null;
+    setDraggingId(null);
   }, []);
 
   const onPointerMove = useCallback((e: PointerEvent) => {
@@ -281,7 +330,15 @@ function Fun() {
     const dx = e.clientX - drag.startX;
     const dy = e.clientY - drag.startY;
     if (!drag.moved && Math.hypot(dx, dy) < 5) return;
-    drag.moved = true;
+    if (!drag.moved) {
+      drag.moved = true;
+      topZ.current += 1;
+      setDraggingId(drag.id);
+      setPositions((prev) => ({
+        ...prev,
+        [drag.id]: { ...prev[drag.id], z: topZ.current },
+      }));
+    }
     e.preventDefault();
 
     const rect = board.getBoundingClientRect();
@@ -362,21 +419,11 @@ function Fun() {
 
       // Don't start board-drag from interactive media / action buttons
       const target = e.target as HTMLElement;
-      if (target.closest(".x-media-item, .x-actions, a, button.x-media-item")) {
+      if (target.closest(".x-media-item, a, button.x-media-item")) {
         return;
       }
 
       e.preventDefault();
-      topZ.current += 1;
-      setPositions((prev) => {
-        const next = {
-          ...prev,
-          [id]: { ...prev[id], z: topZ.current },
-        };
-        positionsRef.current = next;
-        return next;
-      });
-
       const cardHeight = e.currentTarget.getBoundingClientRect().height;
       const boardRect = board.getBoundingClientRect();
       const footerBottom = document.querySelector(".footer")?.getBoundingClientRect().bottom;
@@ -448,6 +495,7 @@ function Fun() {
               post={post}
               style={style}
               isRevealed={post.id in revealDelays}
+              isDragging={draggingId === post.id}
               isBottomBouncing={bottomBounce?.id === post.id}
               onPointerDown={(e) => onPointerDown(post.id, e)}
               onOpenMedia={(i) => openMedia(post, i)}

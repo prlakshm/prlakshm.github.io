@@ -62,7 +62,7 @@
   transform: translateY(0);
 }
 
-.x-post-card:active {
+.x-post-card.is-dragging {
   cursor: grabbing;
   box-shadow:
     0 4px 8px rgba(24, 24, 27, 0.08),
@@ -192,7 +192,7 @@
   height: 2.1rem;
   border-radius: 9999px;
   color: #536471;
-  cursor: default;
+  cursor: grab;
 }
 
 .x-icon-btn svg {
@@ -201,9 +201,15 @@
   position: static;
 }
 
-.x-actions .x-icon-btn:hover {
-  color: #1d9bf0;
-  background: rgba(29, 155, 240, 0.1);
+.x-header-actions .x-icon-btn,
+.x-header-actions .x-icon-btn:hover,
+.x-header-actions .x-icon-btn:active,
+.x-actions .x-icon-btn,
+.x-actions .x-icon-btn:hover,
+.x-actions .x-icon-btn:active {
+  color: #536471;
+  background: transparent;
+  cursor: grab;
 }
 
 .x-body {
@@ -254,19 +260,6 @@
 .x-actions .x-icon-btn {
   width: 2.1rem;
   height: 2.1rem;
-}
-
-.x-action.reply:hover,
-.x-action.share:hover,
-.x-action.bookmark:hover {
-  color: #1d9bf0;
-  background: rgba(29, 155, 240, 0.1);
-}
-
-.x-action.repost:hover,
-.x-action.like:hover {
-  color: inherit;
-  background: transparent;
 }
 
 .x-media {
@@ -431,9 +424,16 @@
 
 /* —— Mobile —— */
 
+@media screen and (min-width: 769px) and (max-width: 1079px) {
+  .x-post-card {
+    width: min(calc((100vw - 3rem - 22px) / 2), 30rem);
+    min-width: 20rem;
+  }
+}
+
 @media screen and (max-width: 768px) {
   .fun-app + .footer {
-    margin-top: 3rem;
+    margin-top: 0;
   }
 
   .fun-board {
@@ -445,7 +445,7 @@
   }
 
   .x-post-card {
-    width: min(82.8vw, 25.92rem);
+    width: min(88vw, 30rem);
     min-width: 0;
   }
 

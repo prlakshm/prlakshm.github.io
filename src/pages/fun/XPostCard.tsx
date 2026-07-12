@@ -6,6 +6,7 @@ type Props = {
   post: FunPost;
   style: CSSProperties;
   isRevealed: boolean;
+  isDragging: boolean;
   isBottomBouncing: boolean;
   onPointerDown: (e: ReactPointerEvent<HTMLElement>) => void;
   onOpenMedia: (index: number) => void;
@@ -40,7 +41,6 @@ function IconBtn({
       className={`x-icon-btn ${className}`.trim()}
       aria-label={label}
       role="img"
-      title={label}
     >
       {children}
     </span>
@@ -51,6 +51,7 @@ export default function XPostCard({
   post,
   style,
   isRevealed,
+  isDragging,
   isBottomBouncing,
   onPointerDown,
   onOpenMedia,
@@ -60,7 +61,7 @@ export default function XPostCard({
 
   return (
     <article
-      className={`x-post-card ${isRevealed ? "is-revealed" : "is-reveal-pending"}${isBottomBouncing ? " is-bottom-bouncing" : ""}`}
+      className={`x-post-card ${isRevealed ? "is-revealed" : "is-reveal-pending"}${isDragging ? " is-dragging" : ""}${isBottomBouncing ? " is-bottom-bouncing" : ""}`}
       data-post-id={post.id}
       style={style}
       onPointerDown={onPointerDown}
@@ -100,7 +101,7 @@ export default function XPostCard({
             <span className="x-handle">@pranavibuilds</span>
           </div>
         </div>
-        <div className="x-header-actions" onPointerDown={(e) => e.stopPropagation()}>
+        <div className="x-header-actions">
           <IconBtn label="Grok">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path
@@ -166,7 +167,7 @@ export default function XPostCard({
         {formatPostTimestamp(post.createdAt)}
       </a>
 
-      <div className="x-actions" onPointerDown={(e) => e.stopPropagation()}>
+      <div className="x-actions">
         <IconBtn label="Reply" className="x-action reply">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path
