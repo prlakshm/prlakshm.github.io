@@ -50,6 +50,25 @@ html {
   width: 2.5rem;
 }
 
+.header button.menu-icon {
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0.5rem;
+  background: transparent;
+  cursor: pointer;
+}
+
+.header button.menu-icon:focus-visible {
+  outline: 3px solid #f43f5e;
+  outline-offset: 3px;
+}
+
+.header button.menu-icon[aria-expanded="true"] svg {
+  color: #e11d48;
+}
+
 .dropdown-menu {
   display: flex;
   flex-direction: column;
@@ -298,4 +317,3 @@ a {
   font-weight: 400;
   font-style: normal;
 }
-

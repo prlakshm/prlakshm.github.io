@@ -25,6 +25,9 @@ const DESKTOP_LAYOUTS: Pos[] = [
   { x: 66.04, y: 74.6, z: 10 },
   { x: 36, y: 99.6, z: 15 },
   { x: 66.04, y: 57, z: 21 },
+  { x: 8, y: 114, z: 17 },
+  { x: 38, y: 116, z: 11 },
+  { x: 68, y: 112, z: 16 },
 ];
 
 const BOUNCE_DURATION = 420;
@@ -32,14 +35,18 @@ const BOTTOM_SPRING_RISE = 70;
 const REVEAL_STAGGER = 70;
 
 const DESKTOP_COLUMNS = [
-  [0, 5, 6, 10],
-  [3, 1, 7, 9],
-  [2, 4, 8, 11, 12],
+  [0, 5, 6, 10, 15],
+  [3, 1, 7, 9, 13],
+  [2, 4, 8, 11, 12, 14],
 ];
 const DESKTOP_COLUMN_GAP = 22;
 const DESKTOP_COLUMN_TOP = [46, 69, 41];
-const MOBILE_STACK_ORDER = [0, 3, 2, 1, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-const CARD_GAPS = [0, 20, 0, 0, 42, 28, 42, 22, 50, 24, 20, 46, 38];
+const MOBILE_STACK_ORDER = [
+  0, 3, 2, 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+];
+const CARD_GAPS = [
+  0, 20, 0, 0, 42, 28, 42, 22, 50, 24, 20, 46, 38, 30, 24, 34,
+];
 const STACK_BOTTOM_PADDING = 48;
 
 const MOBILE_LAYOUTS: Pos[] = [
@@ -56,6 +63,9 @@ const MOBILE_LAYOUTS: Pos[] = [
   { x: 0, y: 98, z: 15 },
   { x: 14, y: 106, z: 9 },
   { x: 4, y: 72, z: 10 },
+  { x: -4, y: 118, z: 17 },
+  { x: 16, y: 128, z: 11 },
+  { x: 0, y: 138, z: 16 },
 ];
 
 function getResponsiveColumnCount() {

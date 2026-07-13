@@ -17,14 +17,20 @@ function Header() {
   };
 
   const handleMenuToggle = () => {
-    setIsMenuOpen(!isMenuOpen);
+    setIsMenuOpen((isOpen) => !isOpen);
   };
 
   useEffect(() => {
     setHeaderClass('visible-transparent');
 
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 600);
+      const mobile = window.innerWidth <= 600;
+      setIsMobile(mobile);
+      if (!mobile) setIsMenuOpen(false);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsMenuOpen(false);
     };
 
     const handleScroll = () => {
@@ -42,10 +48,12 @@ function Header() {
 
     window.addEventListener("scroll", handleScroll);
     window.addEventListener("resize", handleResize);
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [scrollDirection]);
 
@@ -60,12 +68,20 @@ function Header() {
         </a>
       </div>
       {isMobile ? (
-        <div className="menu-icon" onClick={handleMenuToggle}>
+        <button
+          type="button"
+          className="menu-icon"
+          onClick={handleMenuToggle}
+          aria-label={isMenuOpen ? "Close navigation" : "Open navigation"}
+          aria-expanded={isMenuOpen}
+          aria-controls="mobile-navigation"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 220 170"
             className="icon"
-            aria-label="Menu Icon"
+            aria-hidden="true"
+            focusable="false"
           >
             <line
               x1="210"
@@ -95,7 +111,7 @@ function Header() {
               strokeWidth="20"
             />
           </svg>
-        </div>
+        </button>
 
       ) : (
         <div className="right">
@@ -118,7 +134,11 @@ function Header() {
         </div>
       )}
       {isMenuOpen && isMobile && (
-        <div className="dropdown-menu">
+        <nav
+          id="mobile-navigation"
+          className="dropdown-menu"
+          aria-label="Mobile navigation"
+        >
           <a href="/#projects" onClick={() => handleLinkClick('#projects')}>
             Work
           </a>
@@ -135,7 +155,7 @@ function Header() {
           >
             Resume
           </a>
-        </div>
+        </nav>
       )}
     </div>
   );

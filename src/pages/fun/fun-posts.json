@@ -323,7 +323,7 @@
     "name": "pranaviln",
     "handle": "pranavibuilds",
     "avatar": "/fun/avatar.png",
-    "text": "Designing by Building Tip: Get closer to the material.  \n\nApple's glass materials behave differently when they're real. I didn't fully understand until I built with SwiftUI. Motion and interaction exposed design flaws earlier than mockups.  \n\nWhat's something you only noticed when you started building your designs?",
+    "text": "Designing by Building 🎧 Tip: Get closer to the material.  \n\nApple's glass materials behave differently when they're real. I didn't fully understand until I built with SwiftUI. Motion and interaction exposed design flaws earlier than mockups.  \n\nWhat's something you only noticed when you started building your designs?",
     "createdAt": "Sat Jul 11 14:43:58 +0000 2026",
     "media": [],
     "layout": {
@@ -335,6 +335,78 @@
       "x": -8,
       "y": 158,
       "z": 4
+    }
+  },
+  {
+    "id": "2076321758030790873",
+    "url": "https://x.com/pranavibuilds/status/2076321758030790873",
+    "name": "pranaviln",
+    "handle": "pranavibuilds",
+    "avatar": "/fun/avatar.png",
+    "text": "Designing by Building 🎧 Me vs. AI:\n\nFor my segmented control, I only show \"beats\" on the selected option.\n\nAdding \"beats\" to every option felt cluttered. Removing it entirely made the UI confusing.\n\nIt's a tradeoff between clarity and simplicity: AI would choose one extreme or the other. Only I could find this compromise.\n\nPS: Thank you to everyone who suggested using beats instead of seconds for transitions! ❤️",
+    "createdAt": "Sun Jul 12 15:04:17 +0000 2026",
+    "media": [
+      {
+        "type": "video",
+        "src": "/fun/posts/2076321758030790873_0.mp4",
+        "poster": "/fun/posts/2076321758030790873_0_poster.jpg"
+      }
+    ],
+    "layout": {
+      "x": 8,
+      "y": 114,
+      "z": 17
+    },
+    "mobileLayout": {
+      "x": -4,
+      "y": 118,
+      "z": 17
+    }
+  },
+  {
+    "id": "2076462108921778684",
+    "url": "https://x.com/pranavibuilds/status/2076462108921778684",
+    "name": "pranaviln",
+    "handle": "pranavibuilds",
+    "avatar": "/fun/avatar.png",
+    "text": "Day 10 🎧 Designing by Building\n\nNot a lot of code today, but a lot of research for my \"Auto\" feature!\n\nI was trying to answer the questions:\n• What makes a good remix?\n• How many times should a song alternate in a mashup?\n• How should the strategy change for 1 song vs. 2 vs. 5, and how can we generalize these rules?\n\nIf anyone has suggestions on what they like to hear, let me know!",
+    "createdAt": "Mon Jul 13 00:22:00 +0000 2026",
+    "media": [
+      {
+        "type": "video",
+        "src": "/fun/posts/2076462108921778684_0.mp4",
+        "poster": "/fun/posts/2076462108921778684_0_poster.jpg"
+      }
+    ],
+    "layout": {
+      "x": 38,
+      "y": 116,
+      "z": 11
+    },
+    "mobileLayout": {
+      "x": 16,
+      "y": 128,
+      "z": 11
+    }
+  },
+  {
+    "id": "2076679629234913581",
+    "url": "https://x.com/pranavibuilds/status/2076679629234913581",
+    "name": "pranaviln",
+    "handle": "pranavibuilds",
+    "avatar": "/fun/avatar.png",
+    "text": "10 Things I've learned building Mixr:\n\n1. Building is the fastest way to improve taste.\n2. Good prompts start with good references.\n3. Design systems teach AI how the product looks. Take time to establish one.\n4. The quality of AI output is limited by the quality of your product thinking.\n5. Beginners need interfaces designed for their vocabulary, not yours.\n7. Visual alignment matters more than mathematical alignment.\n8. The smallest UI details are often the most memorable.\n9. The \"obvious\" interaction isn't obvious until you've explored five bad ones.\n6. If you can't explain it in a prompt, you haven't researched it enough.\n10. The best design decisions happen after the app runs.\n\nStart coding (it's easy with Cursor, Codex, Claude)!",
+    "createdAt": "Mon Jul 13 14:46:21 +0000 2026",
+    "media": [],
+    "layout": {
+      "x": 68,
+      "y": 112,
+      "z": 16
+    },
+    "mobileLayout": {
+      "x": 0,
+      "y": 138,
+      "z": 16
     }
   }
 ]
