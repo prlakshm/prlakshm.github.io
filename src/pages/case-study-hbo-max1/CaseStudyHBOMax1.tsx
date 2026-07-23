@@ -5,6 +5,7 @@ const figmaUrl =
   "https://www.figma.com/design/7ALenAe4ALVk0Y6FBKUl74/Surprise-Tiles-Component-Idea?node-id=6006-97068&t=Ou8IRhd2VOBNg5d9-1";
 
 const KEY_ART = "/case-study-hbo-max1/generated-v5/suburban-key-art.png";
+const KEY_ART_PORTRAIT = "/case-study-hbo-max1/suburban-cover-portrait.png";
 
 function LinkOut({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -49,14 +50,15 @@ function Tile({
   className?: string;
 }) {
   const isRevealed = variant === "art" || variant === "reveal";
+  const art = className.includes("sr4-tile--ctv") ? KEY_ART : KEY_ART_PORTRAIT;
   return (
     <figure className={`sr4-tile-wrap ${className}`}>
       {label && <figcaption className="sr4-tile-label">{label}</figcaption>}
       <div className={`sr4-tile sr4-tile--${variant}`}>
         <img
           className="sr4-tile-art"
-          src={KEY_ART}
-          alt={isRevealed ? "The Naked Kiss key art revealed under the tile" : ""}
+          src={art}
+          alt={isRevealed ? "The Naked Kiss poster revealed under the tile" : ""}
           aria-hidden={isRevealed ? undefined : true}
           loading="lazy"
         />
@@ -309,7 +311,7 @@ export default function CaseStudyHBOMax1() {
 
           <div className="sr4-comparison" data-sr-motion>
             <figure className="sr4-product-media">
-              <div className="sr4-matched-frame"><img src="/case-study-hbo-max1/film-reel-tiles.png" alt="Early concealed film-reel tiles scattered through ordinary HBO Max rows" loading="lazy" /></div>
+              <div className="sr4-matched-frame sr4-matched-frame--fill"><img src="/case-study-hbo-max1/film-reel-tiles.png" alt="Early concealed film-reel tiles scattered through ordinary HBO Max rows" loading="lazy" /></div>
               <figcaption><b>Explored</b> Scattered tiles behaved like unexplained exceptions.</figcaption>
             </figure>
             <figure className="sr4-product-media">

@@ -38,7 +38,7 @@
 .surprise-study-v4 h1,
 .surprise-study-v4 h2,
 .surprise-study-v4 h3,
-.surprise-study-v4 h4 { font-family: "forma-djr-text", sans-serif; }
+.surprise-study-v4 h4 { font-family: "forma-djr-text", sans-serif; color: var(--ink); }
 
 .surprise-study-v4 .sr4-hero h1,
 .surprise-study-v4 .sr4-reflection blockquote {
@@ -84,7 +84,7 @@
 .sr4-product-media > video,
 .sr4-matched-frame {
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: 6px;
   background: #08070b;
   box-shadow: 0 1px 0 rgba(36, 33, 38, .12);
 }
@@ -104,12 +104,14 @@
 .sr4-hero h1 { margin: 0 0 .55rem; font-size: var(--display); letter-spacing: -.055em; line-height: .92; }
 .sr4-thesis { margin-bottom: .9rem; font-size: var(--subhead); font-weight: 700; line-height: 1.2; }
 .sr4-hero-deck { margin-bottom: .9rem; color: var(--muted); }
-.sr4-hero-goal { margin-bottom: 1.5rem; font-weight: 600; }
+.sr4-hero-goal { margin-bottom: 1.5rem; color: var(--ink); }
 .sr4-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.5rem; margin-bottom: 1.1rem; padding-top: 1.25rem; border-top: 1px solid var(--line); }
 .sr4-meta span { color: var(--muted); font-size: 1rem; text-transform: uppercase; }
 .sr4-meta p { margin: .15rem 0 0; font-size: 1rem; line-height: 1.4; }
 .sr4-collaboration { margin-bottom: 1rem; color: var(--muted); font-size: 1rem; }
-.sr4-hero-media video { aspect-ratio: 16 / 9; object-fit: cover; }
+.sr4-hero-media { overflow: hidden; border-radius: 6px; }
+/* source mp4 has a thin black bar on the right edge — scale slightly to crop it out */
+.sr4-hero-media video { aspect-ratio: 16 / 9; object-fit: cover; transform: scale(1.05); }
 
 /* One reading column, then figures */
 .sr4-chapter-heading { max-width: 720px; margin-bottom: 32px; }
@@ -138,7 +140,7 @@
 .sr4-audience { max-width: 700px; margin-top: 40px; }
 .sr4-audience h3 { margin: 0 0 .75rem; font-size: var(--subhead); line-height: 1.2; }
 .sr4-audience > p:last-child { margin-bottom: 0; color: var(--muted); }
-.sr4-opportunity-line { max-width: 700px; margin: 24px 0 0; font-weight: 600; }
+.sr4-opportunity-line { max-width: 700px; margin: 24px 0 0; color: var(--muted); }
 .sr4-question { max-width: 720px; margin: 28px 0 0; font-size: var(--subhead); font-weight: 700; line-height: 1.25; }
 
 /* ---- Portrait Surprise tiles, rebuilt from the Figma layer spec ---- */
@@ -156,7 +158,7 @@
   width: 100%;
   aspect-ratio: 2 / 3;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: 6px;
   background: #08070b;
   box-shadow: 0 12px 30px rgba(36, 33, 38, .16);
 }
@@ -190,7 +192,7 @@
 .sr4-tile-caption--wide { max-width: 760px; }
 
 /* Origin: Hide (book) → Hint → Reveal, three equal tiles */
-.sr4-book-lead { max-width: 700px; margin: 20px 0 0; font-weight: 600; }
+.sr4-book-lead { max-width: 700px; margin: 20px 0 0; color: var(--muted); }
 .sr4-book-origin { margin: 20px 0 0; }
 .sr4-book-row { display: flex; align-items: center; gap: clamp(.5rem, 1.8vw, 1.25rem); }
 .sr4-book-row .sr4-tile-wrap { flex: 1 1 0; max-width: 210px; }
@@ -218,7 +220,7 @@
 .sr4-claim > p:not(.sr4-eyebrow) { margin-bottom: 12px; color: var(--muted); }
 .sr4-claim > p:last-child { margin-bottom: 0; }
 
-.sr4-placement-proof > div { position: relative; overflow: hidden; border-radius: 10px; background: #08070b; }
+.sr4-placement-proof > div { position: relative; overflow: hidden; border-radius: 6px; background: #08070b; }
 .sr4-placement-proof img { aspect-ratio: 16 / 9; object-fit: cover; }
 .sr4-placement-callout,
 .sr4-dropoff-callout { position: absolute; bottom: 7%; padding: .5rem .7rem; color: white; background: rgba(10, 8, 12, .9); font-size: 1rem; }
@@ -227,6 +229,8 @@
 .sr4-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
 .sr4-matched-frame { aspect-ratio: 16 / 10; }
 .sr4-matched-frame img { height: 100%; object-fit: contain; }
+/* full-bleed screenshot: fill the frame so there are no letterbox bars on the sides */
+.sr4-matched-frame--fill img { object-fit: cover; object-position: center; }
 .sr4-product-media figcaption b { margin-right: .35rem; color: var(--ink); }
 .sr4-takeaway { max-width: 700px; margin: 24px 0 0; font-size: var(--subhead); font-weight: 700; }
 

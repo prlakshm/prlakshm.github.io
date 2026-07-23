@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Typography Trial — Pranavi Ram Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --parchment:#F3EFE4;
+    --espresso:#302219;
+    --muted:#8A7355;
+    --line:#78644626;
+    --line-major:#7864463d;
+    --accent:#A44A24;
+    --ok:#3C6E47;
+    --bad:#9B3B34;
+
+    /* Shared type scale — identical across all three pairings.
+       Only the font FACES change between bands. */
+    --eyebrow-size:12px;   --eyebrow-track:0.16em;
+    --hero-size:clamp(48px, 6vw, 84px); --hero-track:-0.02em; --hero-weight:700;
+    --label-size:11px;     --label-track:0.14em;
+    --role-size:18px;      --role-weight:450;
+    --meta-size:12px;      --meta-track:0.04em;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{
+    background:var(--parchment);
+    color:var(--espresso);
+    font-family:'Archivo', system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    /* X-Acto cutting-mat grid: 32px minor, 128px major */
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px),
+      linear-gradient(var(--line-major) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-major) 1px, transparent 1px);
+    background-size:32px 32px, 32px 32px, 128px 128px, 128px 128px;
+  }
+
+  .mono{font-family:'Roboto Mono', ui-monospace, monospace;}
+
+  /* ---- Page frame ---- */
+  .page{max-width:1200px; margin:0 auto; padding:64px 56px 120px;}
+
+  .doc-head{display:flex; justify-content:space-between; align-items:flex-end;
+    border-bottom:1px solid var(--line-major); padding-bottom:20px; margin-bottom:8px;}
+  .doc-title{font-size:13px; letter-spacing:var(--eyebrow-track); text-transform:uppercase; color:var(--muted);}
+  .doc-sub{font-size:11px; letter-spacing:0.06em; color:var(--muted); text-align:right; line-height:18px; max-width:360px;}
+
+  /* ---- Legend / detection readout ---- */
+  .legend{display:flex; gap:10px; flex-wrap:wrap; margin:22px 0 8px;}
+  .chip{font-size:11px; letter-spacing:0.04em; color:var(--espresso);
+    border:1px solid var(--line-major); padding:7px 11px; display:flex; gap:8px; align-items:center;}
+  .dot{width:7px; height:7px; border-radius:50%; background:var(--muted); flex:0 0 auto;}
+  .dot.ok{background:var(--ok);} .dot.bad{background:var(--bad);}
+  .chip .status{color:var(--muted);}
+  .chip .status.ok{color:var(--ok);} .chip .status.bad{color:var(--bad);}
+
+  /* ---- Trial band (one per pairing) ---- */
+  .band{border-top:1px solid var(--line-major); padding:44px 0 8px; margin-top:36px;
+    display:grid; grid-template-columns:1fr 300px; gap:48px;}
+  .band:first-of-type{border-top:none;}
+
+  .band-tag{grid-column:1 / -1; display:flex; align-items:baseline; gap:16px; margin-bottom:4px;}
+  .band-letter{font-size:12px; letter-spacing:0.14em; color:var(--parchment);
+    background:var(--espresso); padding:4px 9px;}
+  .band-pair{font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);}
+
+  /* Hero composition (mirrors the live site hero) */
+  .eyebrow{font-size:var(--eyebrow-size); letter-spacing:var(--eyebrow-track);
+    text-transform:uppercase; color:var(--muted); margin-bottom:22px;}
+  .hero{font-size:var(--hero-size); font-weight:var(--hero-weight);
+    letter-spacing:var(--hero-track); line-height:1.02; margin:0 0 34px;}
+  .intro{display:grid; grid-template-columns:1fr 1fr; gap:40px; max-width:640px;}
+  .col-label{font-size:var(--label-size); letter-spacing:var(--label-track);
+    text-transform:uppercase; color:var(--muted); margin-bottom:14px;}
+  .role{font-size:var(--role-size); font-weight:var(--role-weight); line-height:1.4; margin:0 0 10px;}
+  .role .sub{color:var(--muted); font-weight:400; font-size:15px;}
+  .prev-row{display:flex; gap:12px; align-items:baseline; margin-bottom:9px;}
+  .prev-idx{font-size:var(--meta-size); letter-spacing:var(--meta-track); color:var(--accent); flex:0 0 26px;}
+  .prev-role{font-size:16px;}
+  .prev-role .co{color:var(--muted);}
+
+  /* Specimen */
+  .specimen{margin-top:34px; border-top:1px dashed var(--line-major); padding-top:20px;}
+  .specimen .big{font-size:38px; letter-spacing:-0.01em; line-height:1.15; margin:0 0 6px;}
+  .specimen .glyphs{font-size:26px; letter-spacing:0.02em; color:var(--espresso);}
+  .specimen .mono-line{font-size:14px; letter-spacing:0.02em; color:var(--muted); margin-top:12px;}
+
+  /* Right rail spec */
+  .spec{font-size:11px; letter-spacing:0.03em; color:var(--espresso); align-self:start;
+    position:sticky; top:24px;}
+  .spec .sh{color:var(--muted); text-transform:uppercase; letter-spacing:0.14em; font-size:10px;
+    display:block; margin:0 0 10px; padding-bottom:8px; border-bottom:1px solid var(--line-major);}
+  .spec dl{display:grid; grid-template-columns:74px 1fr; gap:6px 12px; margin:0 0 18px;}
+  .spec dt{color:var(--muted);} .spec dd{margin:0;}
+  .spec .face{font-size:12px;}
+  .spec .rail-glyph{font-size:22px; letter-spacing:0.01em; margin:2px 0 4px; color:var(--espresso);}
+
+  @media (max-width:860px){
+    .band{grid-template-columns:1fr;} .spec{position:static;} .intro{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="doc-head">
+    <div class="doc-title">Typography Trial · Same Hero, Seven Pairings</div>
+    <div class="doc-sub mono">Rule: only the title is sans — every subhead, label &amp; body line is mono. Dots below confirm which faces resolved locally.</div>
+  </div>
+
+  <div class="legend mono" id="legend"><!-- populated by JS --></div>
+
+  <!-- =============== A: Roboto Mono + Archivo =============== -->
+  <section class="band" style="--band-sans:'Archivo', system-ui, sans-serif; --band-mono:'Roboto Mono', ui-monospace, monospace;">
+    <div class="band-tag">
+      <span class="band-letter mono">A</span>
+      <span class="band-pair mono">Archivo &nbsp;·&nbsp; Roboto Mono &nbsp;<em style="color:var(--accent); font-style:normal;">(current)</em></span>
+    </div>
+
+    <div class="hero-block" style="font-family:var(--band-mono);">
+      <div class="eyebrow mono" style="font-family:var(--band-mono);">Design Engineer · Building in Public · Providence · RI</div>
+      <h1 class="hero" style="font-family:var(--band-sans);">hi, i&rsquo;m pranavi ram</h1>
+      <div class="intro">
+        <div>
+          <div class="col-label mono" style="font-family:var(--band-mono);">Currently</div>
+          <p class="role">Design engineer building in public at <span class="sub">@pranavibuilds</span></p>
+          <p class="role" style="font-size:16px;">Computer Science + Literary Arts <span class="sub">· Brown University</span></p>
+        </div>
+        <div>
+          <div class="col-label mono" style="font-family:var(--band-mono);">Previously</div>
+          <div class="prev-row"><span class="prev-idx mono" style="font-family:var(--band-mono);">A1</span><span class="prev-role">Design Partner <span class="co">· OpenAI</span></span></div>
+          <div class="prev-row"><span class="prev-idx mono" style="font-family:var(--band-mono);">A2</span><span class="prev-role">Product Design <span class="co">· HBO Max</span></span></div>
+        </div>
+      </div>
+      <div class="specimen">
+        <p class="big">Field notes from things I&rsquo;ve built.</p>
+        <div class="glyphs">Aa Bb Gg Rr Qq &nbsp; 0123456789 &nbsp; &amp; @ # → ⇄</div>
+        <div class="mono-line mono" style="font-family:var(--band-mono);">MIXR · IOS APP&nbsp;&nbsp;/&nbsp;&nbsp;HBO MAX · SURPRISE RAIL&nbsp;&nbsp;/&nbsp;&nbsp;500–800MS · spring(0.22, 0.61, 0.36, 1)</div>
+      </div>
+    </div>
+
+    <div class="spec mono">
+      <span class="sh">Spec A</span>
+      <dl>
+        <dt>Title</dt><dd class="face" style="font-family:var(--band-sans);">Archivo</dd>
+        <dt>Mono</dt><dd class="face" style="font-family:var(--band-mono);">Roboto Mono</dd>
+        <dt>Hero</dt><dd>700 · −0.02em</dd>
+        <dt>Body</dt><dd>450 · 1.4</dd>
+        <dt>Labels</dt><dd>mono · 0.14em</dd>
+      </dl>
+      <div class="rail-glyph" style="font-family:var(--band-sans);">Rag Quo 8&amp;</div>
+      <div class="rail-glyph mono" style="font-family:var(--band-mono);">Rag 0O1l→</div>
+    </div>
+  </section>
+
+  <!-- =============== B: Forma DJR Display + Forma DJR Mono =============== -->
+  <section class="band" style="--band-sans:'Forma DJR Display', 'Archivo', system-ui, sans-serif; --band-mono:'Forma DJR Mono', 'Roboto Mono', ui-monospace, monospace;">
+    <div class="band-tag">
+      <span class="band-letter mono">B</span>
+      <span class="band-pair mono">Forma DJR Display &nbsp;·&nbsp; Forma DJR Mono</span>
+    </div>
+
+    <div class="hero-block" style="font-family:var(--band-mono);">
+      <div class="eyebrow mono" style="font-family:var(--band-mono);">Design Engineer · Building in Public · Providence · RI</div>
+      <h1 class="hero" style="font-family:var(--band-sans);">hi, i&rsquo;m pranavi ram</h1>
+      <div class="intro">
+        <div>
+          <div class="col-label mono" style="font-family:var(--band-mono);">Currently</div>
+          <p class="role">Design engineer building in public at <span class="sub">@pranavibuilds</span></p>
+          <p class="role" style="font-size:16px;">Computer Science + Literary Arts <span class="sub">· Brown University</span></p>
+        </div>
+        <div>
+          <div class="col-label mono" style="font-family:var(--band-mono);">Previously</div>
+          <div class="prev-row"><span class="prev-idx mono" style="font-family:var(--band-mono);">A1</span><span class="prev-role">Design Partner <span class="co">· OpenAI</span></span></div>
+          <div class="prev-row"><span class="prev-idx mono" style="font-family:var(--band-mono);">A2</span><span class="prev-role">Product Design <span class="co">· HBO Max</span></span></div>
+        </div>
+      </div>
+      <div class="specimen">
+        <p class="big">Field notes from things I&rsquo;ve built.</p>
+        <div class="glyphs">Aa Bb Gg Rr Qq &nbsp; 0123456789 &nbsp; &amp; @ # → ⇄</div>
+        <div class="mono-line mono" style="font-family:var(--band-mono);">MIXR · IOS APP&nbsp;&nbsp;/&nbsp;&nbsp;HBO MAX · SURPRISE RAIL&nbsp;&nbsp;/&nbsp;&nbsp;500–800MS · spring(0.22, 0.61, 0.36, 1)</div>
+      </div>
+    </div>
+
+    <div class="spec mono">
+      <span class="sh">Spec B</span>
+      <dl>
+        <dt>Title</dt><dd class="face" style="font-family:var(--band-sans);">Forma DJR Display</dd>
+        <dt>Mono</dt><dd class="face" style="font-family:var(--band-mono);">Forma DJR Mono</dd>
+        <dt>Hero</dt><dd>700 · −0.02em</dd>
+        <dt>Body</dt><dd>450 · 1.4</dd>
+        <dt>Labels</dt><dd>mono · 0.14em</dd>
+      </dl>
+      <div class="rail-glyph" style="font-family:var(--band-sans);">Rag Quo 8&amp;</div>
+      <div class="rail-glyph mono" style="font-family:var(--band-mono);">Rag 0O1l→</div>
+    </div>
+  </section>
+
+  <!-- =============== C: Forma DJR Display + Berkeley Mono Trial =============== -->
+  <section class="band" style="--band-sans:'Forma DJR Display', 'Archivo', system-ui, sans-serif; --band-mono:'Berkeley Mono Trial', 'Roboto Mono', ui-monospace, monospace;">
+    <div class="band-tag">
+      <span class="band-letter mono">C</span>
+      <span class="band-pair mono">Forma DJR Display &nbsp;·&nbsp; Berkeley Mono Trial</span>
+    </div>
+
+    <div class="hero-block" style="font-family:var(--band-mono);">
+      <div class="eyebrow mono" style="font-family:var(--band-mono);">Design Engineer · Building in Public · Providence · RI</div>
+      <h1 class="hero" style="font-family:var(--band-sans);">hi, i&rsquo;m pranavi ram</h1>
+      <div class="intro">
+        <div>
+          <div class="col-label mono" style="font-family:var(--band-mono);">Currently</div>
+          <p class="role">Design engineer building in public at <span class="sub">@pranavibuilds</span></p>
+          <p class="role" style="font-size:16px;">Computer Science + Literary Arts <span class="sub">· Brown University</span></p>
+        </div>
+        <div>
+          <div class="col-label mono" style="font-family:var(--band-mono);">Previously</div>
+          <div class="prev-row"><span class="prev-idx mono" style="font-family:var(--band-mono);">A1</span><span class="prev-role">Design Partner <span class="co">· OpenAI</span></span></div>
+          <div class="prev-row"><span class="prev-idx mono" style="font-family:var(--band-mono);">A2</span><span class="prev-role">Product Design <span class="co">· HBO Max</span></span></div>
+        </div>
+      </div>
+      <div class="specimen">
+        <p class="big">Field notes from things I&rsquo;ve built.</p>
+        <div class="glyphs">Aa Bb Gg Rr Qq &nbsp; 0123456789 &nbsp; &amp; @ # → ⇄</div>
+        <div class="mono-line mono" style="font-family:var(--band-mono);">MIXR · IOS APP&nbsp;&nbsp;/&nbsp;&nbsp;HBO MAX · SURPRISE RAIL&nbsp;&nbsp;/&nbsp;&nbsp;500–800MS · spring(0.22, 0.61, 0.36, 1)</div>
+      </div>
+    </div>
+
+    <div class="spec mono">
+      <span class="sh">Spec C</span>
+      <dl>
+        <dt>Title</dt><dd class="face" style="font-family:var(--band-sans);">Forma DJR Display</dd>
+        <dt>Mono</dt><dd class="face" style="font-family:var(--band-mono);">Berkeley Mono Trial</dd>
+        <dt>Hero</dt><dd>700 · −0.02em</dd>
+        <dt>Body</dt><dd>450 · 1.4</dd>
+        <dt>Labels</dt><dd>mono · 0.14em</dd>
+      </dl>
+      <div class="rail-glyph" style="font-family:var(--band-sans);">Rag Quo 8&amp;</div>
+      <div class="rail-glyph mono" style="font-family:var(--band-mono);">Rag 0O1l→</div>
+    </div>
+  </section>
+
+  <!-- =============== D: Roboto + Berkeley Mono Trial =============== -->
+  <section class="band" style="--band-sans:'Roboto', 'Archivo', system-ui, sans-serif; --band-mono:'Berkeley Mono Trial', 'Roboto Mono', ui-monospace, monospace;">
+    <div class="band-tag">
+      <span class="band-letter mono">D</span>
+      <span class="band-pair mono">Roboto &nbsp;·&nbsp; Berkeley Mono Trial</span>
+    </div>
+
+    <div class="hero-block" style="font-family:var(--band-mono);">
+      <div class="eyebrow mono" style="font-family:var(--band-mono);">Design Engineer · Building in Public · Providence · RI</div>
+      <h1 class="hero" style="font-family:var(--band-sans);">hi, i&rsquo;m pranavi ram</h1>
+      <div class="intro">
+        <div>
+          <div class="col-label mono" style="font-family:var(--band-mono);">Currently</div>
+          <p class="role">Design engineer building in public at <span class="sub">@pranavibuilds</span></p>
+          <p class="role" style="font-size:16px;">Computer Science + Literary Arts <span class="sub">· Brown University</span></p>
+        </div>
+        <div>
+          <div class="col-label mono" style="font-family:var(--band-mono);">Previously</div>
+          <div class="prev-row"><span class="prev-idx mono" style="font-family:var(--band-mono);">A1</span><span class="prev-role">Design Partner <span class="co">· OpenAI</span></span></div>
+          <div class="prev-row"><span class="prev-idx mono" style="font-family:var(--band-mono);">A2</span><span class="prev-role">Product Design <span class="co">· HBO Max</span></span></div>
+        </div>
+      </div>
+      <div class="specimen">
+        <p class="big">Field notes from things I&rsquo;ve built.</p>
+        <div class="glyphs">Aa Bb Gg Rr Qq &nbsp; 0123456789 &nbsp; &amp; @ # → ⇄</div>
+        <div class="mono-line mono" style="font-family:var(--band-mono);">MIXR · IOS APP&nbsp;&nbsp;/&nbsp;&nbsp;HBO MAX · SURPRISE RAIL&nbsp;&nbsp;/&nbsp;&nbsp;500–800MS · spring(0.22, 0.61, 0.36, 1)</div>
+      </div>
+    </div>
+
+    <div class="spec mono">
+      <span class="sh">Spec D</span>
+      <dl>
+        <dt>Title</dt><dd class="face" style="font-family:var(--band-sans);">Roboto</dd>
+        <dt>Mono</dt><dd class="face" style="font-family:var(--band-mono);">Berkeley Mono Trial</dd>
+        <dt>Hero</dt><dd>700 · −0.02em</dd>
+        <dt>Body</dt><dd>450 · 1.4</dd>
+        <dt>Labels</dt><dd>mono · 0.14em</dd>
+      </dl>
+      <div class="rail-glyph" style="font-family:var(--band-sans);">Rag Quo 8&amp;</div>
+      <div class="rail-glyph mono" style="font-family:var(--band-mono);">Rag 0O1l→</div>
+    </div>
+  </section>
+
+  <!-- =============== E: Forma DJR Display (tuned) + Berkeley Mono Trial =============== -->
+  <section class="band" style="--band-sans:'Forma DJR Display', 'Archivo', system-ui, sans-serif; --band-mono:'Berkeley Mono Trial', 'Roboto Mono', ui-monospace, monospace;">
+    <div class="band-tag">
+      <span class="band-letter mono">E</span>
+      <span class="band-pair mono">Forma DJR Display <em style="color:var(--accent); font-style:normal;">(tuned title)</em> &nbsp;·&nbsp; Berkeley Mono Trial</span>
+    </div>
+
+    <div class="hero-block" style="font-family:var(--band-mono);">
+      <div class="eyebrow mono" style="font-family:var(--band-mono);">Design Engineer · Building in Public · Providence · RI</div>
+      <h1 class="hero" style="font-family:var(--band-sans); font-weight:700; letter-spacing:0em; word-spacing:0.025em; line-height:1;">hi, i&rsquo;m pranavi ram</h1>
+      <div class="intro">
+        <div>
+          <div class="col-label mono" style="font-family:var(--band-mono);">Currently</div>
+          <p class="role">Design engineer building in public at <span class="sub">@pranavibuilds</span></p>
+          <p class="role" style="font-size:16px;">Computer Science + Literary Arts <span class="sub">· Brown University</span></p>
+        </div>
+        <div>
+          <div class="col-label mono" style="font-family:var(--band-mono);">Previously</div>
+          <div class="prev-row"><span class="prev-idx mono" style="font-family:var(--band-mono);">A1</span><span class="prev-role">Design Partner <span class="co">· OpenAI</span></span></div>
+          <div class="prev-row"><span class="prev-idx mono" style="font-family:var(--band-mono);">A2</span><span class="prev-role">Product Design <span class="co">· HBO Max</span></span></div>
+        </div>
+      </div>
+      <div class="specimen">
+        <p class="big">Field notes from things I&rsquo;ve built.</p>
+        <div class="glyphs">Aa Bb Gg Rr Qq &nbsp; 0123456789 &nbsp; &amp; @ # → ⇄</div>
+        <div class="mono-line mono" style="font-family:var(--band-mono);">MIXR · IOS APP&nbsp;&nbsp;/&nbsp;&nbsp;HBO MAX · SURPRISE RAIL&nbsp;&nbsp;/&nbsp;&nbsp;500–800MS · spring(0.22, 0.61, 0.36, 1)</div>
+      </div>
+    </div>
+
+    <div class="spec mono">
+      <span class="sh">Spec E</span>
+      <dl>
+        <dt>Title</dt><dd class="face" style="font-family:var(--band-sans);">Forma DJR Display</dd>
+        <dt>Mono</dt><dd class="face" style="font-family:var(--band-mono);">Berkeley Mono Trial</dd>
+        <dt>Weight</dt><dd>700</dd>
+        <dt>Tracking</dt><dd>0em</dd>
+        <dt>Word-sp</dt><dd>0.025em</dd>
+        <dt>Leading</dt><dd>1.0</dd>
+      </dl>
+      <div class="rail-glyph" style="font-family:var(--band-sans); letter-spacing:0em; word-spacing:0.025em;">Rag Quo 8&amp;</div>
+      <div class="rail-glyph mono" style="font-family:var(--band-mono);">Rag 0O1l→</div>
+    </div>
+  </section>
+
+  <!-- =============== F: Instrument Sans + IBM Plex Mono =============== -->
+  <section class="band" style="--band-sans:'Instrument Sans', 'Archivo', system-ui, sans-serif; --band-mono:'IBM Plex Mono', 'Roboto Mono', ui-monospace, monospace;">
+    <div class="band-tag">
+      <span class="band-letter mono">F</span>
+      <span class="band-pair mono">Instrument Sans &nbsp;·&nbsp; IBM Plex Mono</span>
+    </div>
+
+    <div class="hero-block" style="font-family:var(--band-mono);">
+      <div class="eyebrow mono" style="font-family:var(--band-mono);">Design Engineer · Building in Public · Providence · RI</div>
+      <h1 class="hero" style="font-family:var(--band-sans);">hi, i&rsquo;m pranavi ram</h1>
+      <div class="intro">
+        <div>
+          <div class="col-label mono" style="font-family:var(--band-mono);">Currently</div>
+          <p class="role">Design engineer building in public at <span class="sub">@pranavibuilds</span></p>
+          <p class="role" style="font-size:16px;">Computer Science + Literary Arts <span class="sub">· Brown University</span></p>
+        </div>
+        <div>
+          <div class="col-label mono" style="font-family:var(--band-mono);">Previously</div>
+          <div class="prev-row"><span class="prev-idx mono" style="font-family:var(--band-mono);">A1</span><span class="prev-role">Design Partner <span class="co">· OpenAI</span></span></div>
+          <div class="prev-row"><span class="prev-idx mono" style="font-family:var(--band-mono);">A2</span><span class="prev-role">Product Design <span class="co">· HBO Max</span></span></div>
+        </div>
+      </div>
+      <div class="specimen">
+        <p class="big">Field notes from things I&rsquo;ve built.</p>
+        <div class="glyphs">Aa Bb Gg Rr Qq &nbsp; 0123456789 &nbsp; &amp; @ # → ⇄</div>
+        <div class="mono-line mono" style="font-family:var(--band-mono);">MIXR · IOS APP&nbsp;&nbsp;/&nbsp;&nbsp;HBO MAX · SURPRISE RAIL&nbsp;&nbsp;/&nbsp;&nbsp;500–800MS · spring(0.22, 0.61, 0.36, 1)</div>
+      </div>
+    </div>
+
+    <div class="spec mono">
+      <span class="sh">Spec F</span>
+      <dl>
+        <dt>Title</dt><dd class="face" style="font-family:var(--band-sans);">Instrument Sans</dd>
+        <dt>Mono</dt><dd class="face" style="font-family:var(--band-mono);">IBM Plex Mono</dd>
+        <dt>Hero</dt><dd>700 · −0.02em</dd>
+        <dt>Body</dt><dd>450 · 1.4</dd>
+        <dt>Labels</dt><dd>mono · 0.14em</dd>
+      </dl>
+      <div class="rail-glyph" style="font-family:var(--band-sans);">Rag Quo 8&amp;</div>
+      <div class="rail-glyph mono" style="font-family:var(--band-mono);">Rag 0O1l→</div>
+    </div>
+  </section>
+
+  <!-- =============== G: Geist Sans + Geist Mono =============== -->
+  <section class="band" style="--band-sans:'Geist', 'Archivo', system-ui, sans-serif; --band-mono:'Geist Mono', 'Roboto Mono', ui-monospace, monospace;">
+    <div class="band-tag">
+      <span class="band-letter mono">G</span>
+      <span class="band-pair mono">Geist Sans &nbsp;·&nbsp; Geist Mono</span>
+    </div>
+
+    <div class="hero-block" style="font-family:var(--band-mono);">
+      <div class="eyebrow mono" style="font-family:var(--band-mono);">Design Engineer · Building in Public · Providence · RI</div>
+      <h1 class="hero" style="font-family:var(--band-sans);">hi, i&rsquo;m pranavi ram</h1>
+      <div class="intro">
+        <div>
+          <div class="col-label mono" style="font-family:var(--band-mono);">Currently</div>
+          <p class="role">Design engineer building in public at <span class="sub">@pranavibuilds</span></p>
+          <p class="role" style="font-size:16px;">Computer Science + Literary Arts <span class="sub">· Brown University</span></p>
+        </div>
+        <div>
+          <div class="col-label mono" style="font-family:var(--band-mono);">Previously</div>
+          <div class="prev-row"><span class="prev-idx mono" style="font-family:var(--band-mono);">A1</span><span class="prev-role">Design Partner <span class="co">· OpenAI</span></span></div>
+          <div class="prev-row"><span class="prev-idx mono" style="font-family:var(--band-mono);">A2</span><span class="prev-role">Product Design <span class="co">· HBO Max</span></span></div>
+        </div>
+      </div>
+      <div class="specimen">
+        <p class="big">Field notes from things I&rsquo;ve built.</p>
+        <div class="glyphs">Aa Bb Gg Rr Qq &nbsp; 0123456789 &nbsp; &amp; @ # → ⇄</div>
+        <div class="mono-line mono" style="font-family:var(--band-mono);">MIXR · IOS APP&nbsp;&nbsp;/&nbsp;&nbsp;HBO MAX · SURPRISE RAIL&nbsp;&nbsp;/&nbsp;&nbsp;500–800MS · spring(0.22, 0.61, 0.36, 1)</div>
+      </div>
+    </div>
+
+    <div class="spec mono">
+      <span class="sh">Spec G</span>
+      <dl>
+        <dt>Title</dt><dd class="face" style="font-family:var(--band-sans);">Geist</dd>
+        <dt>Mono</dt><dd class="face" style="font-family:var(--band-mono);">Geist Mono</dd>
+        <dt>Hero</dt><dd>700 · −0.02em</dd>
+        <dt>Body</dt><dd>450 · 1.4</dd>
+        <dt>Labels</dt><dd>mono · 0.14em</dd>
+      </dl>
+      <div class="rail-glyph" style="font-family:var(--band-sans);">Rag Quo 8&amp;</div>
+      <div class="rail-glyph mono" style="font-family:var(--band-mono);">Rag 0O1l→</div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // Live detection: report which requested faces the browser can actually resolve.
+  const faces = [
+    'Archivo', 'Roboto', 'Roboto Mono',
+    'Forma DJR Display', 'Forma DJR Mono',
+    'Berkeley Mono Trial',
+    'Instrument Sans', 'IBM Plex Mono',
+    'Geist', 'Geist Mono'
+  ];
+  const legend = document.getElementById('legend');
+  function check(name){
+    try { return document.fonts.check('16px "' + name + '"'); }
+    catch(e){ return false; }
+  }
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve())
+    .then(() => {
+      faces.forEach(name => {
+        const ok = check(name);
+        const chip = document.createElement('div');
+        chip.className = 'chip';
+        chip.innerHTML =
+          '<span class="dot ' + (ok ? 'ok' : 'bad') + '"></span>' +
+          '<span>' + name + '</span>' +
+          '<span class="status ' + (ok ? 'ok' : 'bad') + '">' + (ok ? 'resolved' : 'NOT FOUND') + '</span>';
+        legend.appendChild(chip);
+      });
+    });
+</script>
+</body>
+</html>
