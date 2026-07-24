@@ -16,9 +16,11 @@
 }
 
 /* --- Cutting mat --------------------------------------------------------- */
+/* Inset past the viewport on every side so the parallax translation in
+   Home.tsx has bleed to move into and never exposes a bare edge. */
 .wt-surface {
   position: fixed;
-  inset: 0;
+  inset: -80px;
   z-index: 0;
   pointer-events: none;
   background-image:
@@ -37,7 +39,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  opacity: 0.3;
+  opacity: 0.13;
   mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)' opacity='0.32'/%3E%3C/svg%3E");
 }
@@ -87,7 +89,8 @@
    Regular only, so weight 625 is approximated with a hairline text-stroke
    instead of browser-synthesised bold. */
 .wt-wordmark,
-.wt-nav-links a {
+.wt-nav-links a,
+.wt-nav-links button {
   font-family: var(--font-mono);
   font-weight: 400;
   font-size: 1.1rem;
@@ -96,8 +99,7 @@
   color: var(--mono-secondary);
   text-decoration: none;
   -webkit-text-stroke: 0.55px currentColor;
-  transition: color var(--dur-nav) var(--ease-settle),
-    opacity var(--dur-nav) var(--ease-settle);
+  transition: color var(--dur-nav) var(--ease-settle);
 }
 
 .wt-wordmark {
@@ -113,7 +115,8 @@
   padding: 0;
 }
 
-.wt-nav-links a {
+.wt-nav-links a,
+.wt-nav-links button {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -121,8 +124,19 @@
   padding-block: 4px;
 }
 
-.wt-nav-links a::after {
-  content: "";
+/* WORK is a <button> for routing reasons; strip the UA chrome so it is
+   indistinguishable from its sibling links. */
+.wt-nav-links button {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding-inline: 0;
+  cursor: pointer;
+}
+
+/* A real element, not ::after — JS cannot animate pseudo-elements, and these
+   rules are wiped in by Motion (see attachUnderlineWipe in interactions.ts). */
+.nav-rule {
   position: absolute;
   left: 0;
   right: 0;
@@ -131,21 +145,30 @@
   background: currentColor;
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform var(--dur-nav) var(--ease-settle);
 }
 
 .wt-wordmark:hover,
 .wt-nav-links a:hover,
-.wt-nav-links a:focus-visible {
-  opacity: 0.62;
+.wt-nav-links a:focus-visible,
+.wt-nav-links button:hover,
+.wt-nav-links button:focus-visible {
+  color: var(--mono-tertiary);
 }
 
-.wt-nav-links a:hover::after,
-.wt-nav-links a:focus-visible::after {
-  transform: scaleX(1);
+/* Sized to match the footer © optically, not nominally — they are different
+   systems (stroked SVG vs a fallback-font glyph, since Berkeley Mono Trial is
+   ASCII-only and has no ©).
+   The arrow's ink is 64% of its box: the path spans 2.5→7.5 of a 0–10 viewBox
+   (5 units) plus 1.4 units of stroke spread = 6.4/10. The © measures 8px of ink
+   at .foot-name's 15px. So box = 8 / 0.64 = 12.5px.
+   Recompute if .foot-name's font-size changes; do not nudge this by eye. */
+.ext-arrow {
+  position: static;
+  width: 12.5px;
+  height: 12.5px;
+  flex-shrink: 0;
 }
 
-.ext-arrow,
 .jr-arrow {
   position: static;
   width: 9px;
@@ -189,11 +212,13 @@
 }
 
 /* Pronunciation note — quiet until the title is hovered. */
+/* X-centring on the `translate` property, so Motion's `transform` (y + scale)
+   composes with it instead of overwriting it. Auto width rules out margins. */
 .hero-pron {
   position: absolute;
   left: 50%;
   top: -36px;
-  transform: translate(-50%, 4px);
+  translate: -50% 0;
   display: inline-flex;
   gap: 5px;
   padding: 8px 13px;
@@ -205,7 +230,6 @@
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 240ms var(--ease-settle), transform 240ms var(--ease-settle);
 }
 
 .hero-pron em {
@@ -224,10 +248,8 @@
   border-top: 7px solid var(--espresso);
 }
 
-.hero-title:hover .hero-pron {
-  opacity: 1;
-  transform: translate(-50%, 0);
-}
+/* No :hover rule — Motion springs this in from Home.tsx. A CSS rule here would
+   set the same properties and fight the inline styles Motion writes. */
 
 /* width:0;min-width:100% — fill the title-sized block without contributing
    to its intrinsic width. Desktop: contacts under copy, PREV beside both
@@ -293,23 +315,34 @@
 .line--label {
   letter-spacing: 0.18em;
   color: var(--mono-secondary);
-  margin-bottom: 4px;
 }
 
-/* Body is already the brass tone, so the handle is distinguished by the rule
-   under it and by darkening on hover, not by hue. */
+/* Handle uses the same tertiary hover as the nav (soft sepia).
+   Underline matches the type color at rest and on hover. */
 .line a {
+  position: relative;
   color: inherit;
   text-decoration: none;
-  border-bottom: 1px solid color-mix(in srgb, var(--mono-secondary) 55%, transparent);
-  transition: color var(--dur-nav) var(--ease-settle),
-    border-color var(--dur-nav) var(--ease-settle);
+  border-bottom: 1px solid currentColor;
+  transition: color var(--dur-nav) var(--ease-settle);
 }
 
 .line a:hover,
 .line a:focus-visible {
-  color: var(--espresso);
-  border-bottom-color: var(--espresso);
+  color: var(--mono-tertiary);
+}
+
+/* Wipes over the resting border, same gesture as .nav-rule. Real element, not
+   ::after, so Motion can drive it. */
+.line-rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
 }
 
 /* --- Contact tiles ------------------------------------------------------- */
@@ -345,8 +378,8 @@
 
 .tile:hover,
 .tile:focus-visible {
-  color: var(--espresso);
-  border-color: var(--mono-secondary);
+  color: var(--mono-tertiary);
+  border-color: var(--mono-tertiary);
   transform: translateY(-2px);
   outline: none;
 }
@@ -358,6 +391,13 @@
 
 .tiles--hero {
   margin-top: 14px;
+}
+
+@media (min-width: 1024px) {
+  /* Extra 2px under Brown before contacts in the two-column layout. */
+  .hero-intro > .tiles--hero {
+    margin-top: 16px;
+  }
 }
 
 /* --- Journal shelf ------------------------------------------------------- */
@@ -425,7 +465,7 @@
   width: 100%;
   height: auto;
   display: block;
-  transition: opacity var(--dur-leave) var(--ease-settle);
+  /* No opacity transition — Motion cross-fades these inline. */
 }
 
 .jr-img--open {
@@ -452,13 +492,23 @@
   display: block;
 }
 
+/* Centred with negative margins, not translate(-50%,-50%): Motion animates
+   x/y/rotate/scale by writing `transform`, which would overwrite any centering
+   baked in there and leave every artifact half its own size off. With margins
+   doing the centering, Motion's x/y are pure offsets from the journal's middle. */
 .jr-artifact {
   position: absolute;
   left: 50%;
   top: 42%;
   width: var(--aw);
   height: var(--ah);
-  transform: translate(-50%, -50%) scale(0.72);
+  /* Required, not cosmetic: the margins below centre by --aw/--ah, so the
+     padded treatments (note, polaroid) must not grow past those values or the
+     centring under-compensates by half the padding. */
+  box-sizing: border-box;
+  margin-left: calc(var(--aw) / -2);
+  margin-top: calc(var(--ah) / -2);
+  transform: scale(0.72);
   opacity: 0;
   background: #f1ead4;
   border: 1px solid rgb(120 100 70 / 0.35);
@@ -526,42 +576,24 @@
 
 /* --- Hover / focus: the journal opens ------------------------------------ */
 /* No lift and no straightening — the notebook stays exactly where it sits and
-   only its cover opens. */
+   only its cover opens.
 
-.jr-link:hover .jr-img--closed,
-.jr-link:focus-visible .jr-img--closed {
-  opacity: 0;
-  transition-duration: var(--dur-hover);
-}
-
-.jr-link:hover .jr-img--open,
-.jr-link:focus-visible .jr-img--open {
-  opacity: 1;
-  transition-duration: var(--dur-hover);
-}
-
-/* Offsets are measured from the journal's centre, so the -50% centering has to
-   survive into the splayed state. --splay shrinks the arrangement at narrower
-   viewports, where the gutter between journals is tighter. */
-.jr-link:hover .jr-artifact,
-.jr-link:focus-visible .jr-artifact {
-  transform: translate(
-      calc(-50% + var(--ax) * var(--splay)),
-      calc(-50% + var(--ay) * var(--splay))
-    )
-    rotate(var(--ar)) scale(1);
-  opacity: 1;
-  transition-duration: var(--dur-hover);
-  transition-delay: calc(var(--ai) * 70ms);
-}
+   The open/close choreography lives in Journal.tsx on Motion. There are
+   deliberately no :hover/:focus-visible rules for the covers, tooltip or
+   artifacts here: Motion writes inline transform/opacity, and any CSS rule
+   touching the same properties would fight it. */
 
 /* --- Tooltip ------------------------------------------------------------- */
+/* Centred with the `translate` property rather than inside `transform`.
+   Motion animates `y` by writing `transform`, which would clobber a
+   translate(-50%) baked into it — the individual `translate` property is
+   applied separately and composes instead. Auto width rules out margins. */
 .jr-tooltip {
   position: absolute;
   left: 50%;
   top: 6px;
   z-index: 6;
-  transform: translate(-50%, 6px);
+  translate: -50% 0;
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -572,14 +604,6 @@
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 220ms var(--ease-settle), transform 220ms var(--ease-settle);
-}
-
-.jr-link:hover .jr-tooltip,
-.jr-link:focus-visible .jr-tooltip {
-  opacity: 1;
-  transform: translate(-50%, 0);
-  transition-delay: 140ms;
 }
 
 .jr-tooltip-title {
@@ -668,56 +692,11 @@
     rotate(calc((var(--si) - 2) * 5deg)) scale(0.84);
 }
 
-/* Deliberately no visibility gate here. If measurement ever fails, --dx/--dy
-   fall back to 0 and the scraps simply rest in their row — visible in the
-   wrong place is a far better failure than invisible. The animation itself is
-   still gated on .is-measured so it never runs against unknown offsets. */
-
-/* Stop-motion: stepped easing makes the travel read frame-by-frame rather
-   than as a smooth glide, and the mid-flight swings give it the dance. */
-@keyframes scrapDance {
-  0% {
-    transform: translate(
-        calc(var(--dx) + (var(--si) - 2) * 17px),
-        var(--dy)
-      )
-      rotate(calc((var(--si) - 2) * 5deg)) scale(0.84);
-  }
-  /* Pops up out of the pocket mouth before travelling. */
-  22% {
-    transform: translate(calc(var(--dx) * 0.86), calc(var(--dy) - 46px))
-      rotate(-13deg) scale(0.96);
-  }
-  48% {
-    transform: translate(calc(var(--dx) * 0.5), calc(var(--dy) * 0.42 - 30px))
-      rotate(16deg) scale(1.07);
-  }
-  72% {
-    transform: translate(calc(var(--dx) * 0.22), calc(var(--dy) * 0.12 + 14px))
-      rotate(-11deg) scale(0.97);
-  }
-  88% {
-    transform: translate(calc(var(--dx) * 0.06), -9px) rotate(6deg) scale(1.02);
-  }
-  100% {
-    transform: translate(0, 0) rotate(var(--sr)) scale(1);
-  }
-}
-
-.archive.is-in .archive-stage.is-measured .scrap {
-  animation: scrapDance 1080ms steps(7, end) forwards;
-  animation-delay: calc(var(--si) * 130ms);
-}
-
-/* Scrolling back up runs the same choreography in reverse, so the fabric packs
-   itself into the pocket. `reverse` plays 100% -> 0% and `forwards` holds that
-   0% frame, which is exactly the tucked state. `has-played` keeps this from
-   firing on first paint, when the section is simply not on screen yet. */
-.archive.has-played:not(.is-in) .archive-stage.is-measured .scrap {
-  animation: scrapDance 860ms steps(7, end) reverse forwards;
-  /* Last one out is first one back in. */
-  animation-delay: calc((4 - var(--si)) * 105ms);
-}
+/* The transform above is only the pre-JS resting state. Once measured, Motion
+   (motion.dev) owns these transforms and writes them inline — see Home.tsx.
+   Deliberately no visibility gate: if measurement ever fails, --dx/--dy fall
+   back to 0 and the scraps simply rest in their row. Visible in the wrong
+   place is a far better failure than invisible. */
 
 /* --- Footer -------------------------------------------------------------- */
 .wt-foot {
@@ -730,7 +709,6 @@
   justify-content: space-between;
   gap: 24px;
   padding-top: 26px;
-  border-top: 1px solid rgb(48 34 25 / 0.2);
 }
 
 .foot-name {
@@ -742,6 +720,8 @@
   text-transform: uppercase;
 }
 
+/* © is outside Berkeley Mono Trial's ASCII range, so this glyph comes from
+   the fallback mono. Sized 1.5× the foot type for optical weight. */
 .foot-copy {
   font-size: 1.5em;
   line-height: 1;
@@ -845,9 +825,25 @@
     --nav-height: 62px;
   }
 
+  /* `button` must be listed alongside `a` — WORK is a button for routing
+     reasons, and omitting it here leaves it at desktop size while its
+     siblings shrink, overflowing the bar.
+     Sized so wordmark + three items + the flush padding fit inside 375px;
+     at 1rem the row overflows by 8px and RESUME is clipped. */
   .wt-wordmark,
-  .wt-nav-links a {
-    font-size: 1rem;
+  .wt-nav-links a,
+  .wt-nav-links button {
+    font-size: 13px;
+    letter-spacing: 0.07em;
+  }
+
+  .wt-nav-links {
+    gap: 16px;
+  }
+
+  .wt-nav-inner,
+  .wt-foot-inner {
+    padding-inline: 16px;
   }
 
   .line,
@@ -902,34 +898,18 @@
 /* ==========================================================================
    Reduced motion — arrive in place, opacity only.
    ========================================================================== */
+/* Motion now owns the notebook and fabric choreography, so reduced motion for
+   those is enforced in JS (each animate() call drops to duration 0) rather than
+   here — a CSS rule cannot cancel a JS-driven animation. What remains below is
+   only the pre-JS resting state and the transitions CSS still owns. */
 @media (prefers-reduced-motion: reduce) {
   .jr-stage,
   .jr-shadow {
     transition: none !important;
   }
 
-  .jr-link:hover .jr-stage,
-  .jr-link:focus-visible .jr-stage {
-    transform: rotate(var(--jrot));
-  }
-
-  .jr-artifact {
-    transform: translate(var(--ax), var(--ay)) rotate(var(--ar)) scale(1);
-    transition: opacity 160ms linear !important;
-  }
-
-  .jr-link:hover .jr-artifact,
-  .jr-link:focus-visible .jr-artifact {
-    transition-delay: 0ms !important;
-  }
-
-  /* No flight across the page: the scraps sit in the row from the start. */
+  /* Scraps sit in the row from the start; Home.tsx also skips the timeline. */
   .scrap {
     transform: rotate(var(--sr));
-  }
-
-  .archive.is-in .archive-stage.is-measured .scrap,
-  .archive.has-played:not(.is-in) .archive-stage.is-measured .scrap {
-    animation: none;
   }
 }

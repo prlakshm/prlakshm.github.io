@@ -1,3 +1,6 @@
+import { useEffect, useRef } from "react";
+import { attachTilePress } from "./interactions.js";
+
 /* Contact tiles — rounded outlined squares holding a monochrome glyph.
    Same set and links as the site's global Footer: email, GitHub, LinkedIn, X.
    Used twice (under the hero and in the footer), so the markup lives here. */
@@ -43,8 +46,19 @@ const links = [
 ];
 
 function ContactIcons({ className = "" }: { className?: string }) {
+  const rootRef = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const cleanups = Array.from(
+      root.querySelectorAll<HTMLElement>(".tile")
+    ).map(attachTilePress);
+    return () => cleanups.forEach((fn) => fn());
+  }, []);
+
   return (
-    <ul className={`tiles ${className}`.trim()}>
+    <ul className={`tiles ${className}`.trim()} ref={rootRef}>
       {links.map((l) => (
         <li key={l.href}>
           <a

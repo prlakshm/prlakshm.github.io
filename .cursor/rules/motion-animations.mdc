@@ -1,0 +1,10 @@
+---
+description: Prefer Motion (motion.dev) for UI animations
+alwaysApply: true
+---
+
+# Animations
+
+Use [Motion](https://motion.dev) (`motion` / `motion/react`) for UI animation work — entrances, exits, gestures, layout transitions, and scroll-linked motion.
+
+Prefer Motion over ad-hoc CSS keyframes, `requestAnimationFrame`, or other animation libraries unless the existing code already uses a different approach that should be preserved, or Motion cannot express the effect cleanly.
