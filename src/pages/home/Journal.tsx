@@ -87,16 +87,22 @@ function Journal({ journal, index }: Props) {
 
       const reduced = isReduced();
       const splay = splayFor(window.innerWidth);
-      // Heavier spring than the contact tiles — same character, a touch longer,
-      // because the notebooks are a weightier component (no stepped easing;
-      // a spring is still a plain start→end move).
-      const motion = reduced ? { duration: 0 } : SPRING_HEAVY;
 
-      if (openImg) animate(openImg, { opacity: open ? 1 : 0 }, motion);
+      // Cover: cross-fade plus a small peel — the open photo lifts and tilts as
+      // it appears, so the notebook reads as opening rather than dissolving.
+      // Trim is on the `translate` property, so this `transform` motion is free.
+      if (openImg) {
+        animate(
+          openImg,
+          { opacity: open ? 1 : 0, y: open ? -7 : 0, rotate: open ? -1.5 : 0 },
+          reduced ? { duration: 0 } : SPRING_HEAVY
+        );
+      }
       if (tooltip) {
+        // Opacity only — left/top track the cursor via pointermove.
         animate(
           tooltip,
-          { opacity: open ? 1 : 0, y: open ? 0 : 6 },
+          { opacity: open ? 1 : 0 },
           reduced
             ? { duration: 0 }
             : { ...SPRING_HEAVY, delay: open ? 0.06 : 0 }
@@ -106,24 +112,65 @@ function Journal({ journal, index }: Props) {
       cards.forEach((card, i) => {
         const a = artifacts[i];
         if (!a) return;
-        animate(
-          card,
-          {
-            opacity: open ? 1 : 0,
-            x: open ? a.x * splay : 0,
-            y: open ? a.y * splay : 0,
-            rotate: open ? a.rotate : 0,
-            scale: open ? 1 : 0.72,
-          },
-          reduced
-            ? { duration: 0 }
-            : {
-                ...SPRING_HEAVY,
-                // A light stagger so they don't all snap at once.
-                delay: open ? i * 0.04 : 0,
-              }
-        );
+        const fx = a.x * splay;
+        const fy = a.y * splay;
+        const fr = a.rotate;
+
+        if (reduced) {
+          animate(
+            card,
+            {
+              opacity: open ? 1 : 0,
+              x: open ? fx : 0,
+              y: open ? fy : 0,
+              rotate: open ? fr : 0,
+              scale: open ? 1 : 0.72,
+            },
+            { duration: 0 }
+          );
+          return;
+        }
+
+        if (open) {
+          // Spill out, like the fabric leaving the pocket: pop up-and-out, then
+          // overshoot both the rotation and the scale before settling. The -22
+          // in the mid y-frame is the upward hop that makes it an arc, not a
+          // straight slide. Pronounced per-card delay deals them out one by one.
+          animate(
+            card,
+            {
+              opacity: [0, 1, 1, 1],
+              x: [0, fx * 0.55, fx * 1.07, fx],
+              y: [0, fy * 0.45 - 22, fy * 1.06, fy],
+              rotate: [0, fr * 1.85, fr * 0.92, fr],
+              scale: [0.72, 1.0, 1.07, 1],
+            },
+            {
+              duration: 0.52,
+              ease: [0.33, 0.9, 0.4, 1],
+              delay: i * 0.11,
+            }
+          );
+        } else {
+          // Gather back into the notebook quickly on close.
+          animate(
+            card,
+            { opacity: 0, x: 0, y: 0, rotate: 0, scale: 0.72 },
+            SPRING_HEAVY
+          );
+        }
       });
+    };
+
+    const target = root.querySelector<HTMLElement>(".jr-link");
+    if (!target) return;
+
+    const placeTooltip = (clientX: number, clientY: number) => {
+      if (!tooltip) return;
+      const rect = target.getBoundingClientRect();
+      // Nudge past the cursor so the chip doesn't sit under the pointer.
+      tooltip.style.left = `${clientX - rect.left + 14}px`;
+      tooltip.style.top = `${clientY - rect.top + 18}px`;
     };
 
     // Establish the closed state before first paint so nothing flashes open.
@@ -131,31 +178,39 @@ function Journal({ journal, index }: Props) {
     if (openImg) openImg.style.opacity = "0";
     if (tooltip) {
       tooltip.style.opacity = "0";
-      // X-centring lives on the `translate` property, so `transform` is free
-      // to carry only the y offset Motion animates.
-      tooltip.style.transform = "translateY(6px)";
     }
     cards.forEach((card) => {
       card.style.opacity = "0";
       card.style.transform = "scale(0.72)";
     });
 
-    const enter = () => setOpen(true);
+    const enter = (e: PointerEvent) => {
+      placeTooltip(e.clientX, e.clientY);
+      setOpen(true);
+    };
+    const move = (e: PointerEvent) => {
+      if (!isOpenRef.current) return;
+      placeTooltip(e.clientX, e.clientY);
+    };
     const leave = () => setOpen(false);
-    const target = root.querySelector<HTMLElement>(".jr-link");
-    if (!target) return;
+    const onFocus = () => {
+      // No cursor on keyboard focus — anchor near the top centre of the link.
+      const rect = target.getBoundingClientRect();
+      placeTooltip(rect.left + rect.width * 0.5, rect.top + 24);
+      setOpen(true);
+    };
 
     target.addEventListener("pointerenter", enter);
+    target.addEventListener("pointermove", move);
     target.addEventListener("pointerleave", leave);
-    // focusin/out rather than focus/blur: these bubble, and the link is the
-    // element that actually receives focus.
-    target.addEventListener("focusin", enter);
+    target.addEventListener("focusin", onFocus);
     target.addEventListener("focusout", leave);
 
     return () => {
       target.removeEventListener("pointerenter", enter);
+      target.removeEventListener("pointermove", move);
       target.removeEventListener("pointerleave", leave);
-      target.removeEventListener("focusin", enter);
+      target.removeEventListener("focusin", onFocus);
       target.removeEventListener("focusout", leave);
     };
   }, [artifacts]);
@@ -192,15 +247,16 @@ function Journal({ journal, index }: Props) {
 
         <span className="jr-shadow" aria-hidden="true" />
 
-        {/* translateY of a % resolves against the image's own height, so this
-            cancels each PNG's transparent footer exactly, at any width. */}
+        {/* PNG-footer trim lives on the `translate` property (a % of the image's
+            own height), NOT `transform` — that leaves `transform` free for Motion
+            to lift/tilt the open cover on top without clobbering the trim. */}
         <img
           className="jr-img jr-img--closed"
           src={closed}
           alt={alt}
           width={width}
           decoding="async"
-          style={{ transform: `translateY(${trimClosed})` }}
+          style={{ translate: `0 ${trimClosed}` }}
         />
         <img
           className="jr-img jr-img--open"
@@ -208,7 +264,7 @@ function Journal({ journal, index }: Props) {
           alt=""
           aria-hidden="true"
           decoding="async"
-          style={{ transform: `translateY(${trimOpen})` }}
+          style={{ translate: `0 ${trimOpen}` }}
         />
       </span>
 

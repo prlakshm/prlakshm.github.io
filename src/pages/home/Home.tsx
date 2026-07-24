@@ -125,24 +125,36 @@ function Home() {
       });
     }
 
-    // Pronunciation note: springs in with a slight overshoot.
+    // Pronunciation note: follows the cursor, opacity only (no y/scale — those
+    // would fight left/top placement).
     const title = heroRef.current?.querySelector<HTMLElement>(".hero-title");
     const pron = title?.querySelector<HTMLElement>(".hero-pron");
     if (title && pron) {
       const reduced = prefersReducedMotion();
+      const place = (clientX: number, clientY: number) => {
+        const rect = title.getBoundingClientRect();
+        pron.style.left = `${clientX - rect.left + 14}px`;
+        pron.style.top = `${clientY - rect.top + 18}px`;
+      };
       const show = (on: boolean) =>
         animate(
           pron,
-          { opacity: on ? 1 : 0, y: on ? 0 : 4, scale: on ? 1 : 0.96 },
+          { opacity: on ? 1 : 0 },
           reduced ? { duration: 0 } : { type: "spring", stiffness: 460, damping: 24 }
         );
-      const on = () => show(true);
-      const off = () => show(false);
-      title.addEventListener("pointerenter", on);
-      title.addEventListener("pointerleave", off);
+      const enter = (e: PointerEvent) => {
+        place(e.clientX, e.clientY);
+        show(true);
+      };
+      const move = (e: PointerEvent) => place(e.clientX, e.clientY);
+      const leave = () => show(false);
+      title.addEventListener("pointerenter", enter);
+      title.addEventListener("pointermove", move);
+      title.addEventListener("pointerleave", leave);
       cleanups.push(() => {
-        title.removeEventListener("pointerenter", on);
-        title.removeEventListener("pointerleave", off);
+        title.removeEventListener("pointerenter", enter);
+        title.removeEventListener("pointermove", move);
+        title.removeEventListener("pointerleave", leave);
       });
     }
 

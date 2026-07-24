@@ -211,41 +211,34 @@
   color: var(--espresso);
 }
 
-/* Pronunciation note — quiet until the title is hovered. */
-/* X-centring on the `translate` property, so Motion's `transform` (y + scale)
-   composes with it instead of overwriting it. Auto width rules out margins. */
+/* Pronunciation note — follows the cursor (left/top from Home.tsx).
+   Same --paper chip as journal tooltips / notecards. */
 .hero-pron {
   position: absolute;
-  left: 50%;
-  top: -36px;
-  translate: -50% 0;
+  left: 0;
+  top: 0;
+  z-index: 5;
   display: inline-flex;
   gap: 5px;
-  padding: 8px 13px;
-  background: var(--espresso);
-  color: var(--on-panel);
+  padding: 9px 13px;
+  background: var(--paper);
+  border: 1px solid color-mix(in srgb, var(--espresso) 18%, transparent);
+  color: var(--mono-secondary);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-weight: 400;
+  font-size: 13px;
   letter-spacing: 0.03em;
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
+  box-shadow: 0 4px 14px rgb(61 42 31 / 0.12);
+  /* Berkeley Mono Trial is Regular-only — stroke stands in for weight. */
+  -webkit-text-stroke: 0.4px currentColor;
 }
 
 .hero-pron em {
   font-style: normal;
-  color: var(--on-panel-accent);
-}
-
-.hero-pron::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: -7px;
-  margin-left: -6px;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 7px solid var(--espresso);
+  color: var(--mono-secondary);
 }
 
 /* No :hover rule — Motion springs this in from Home.tsx. A CSS rule here would
@@ -435,6 +428,7 @@
 }
 
 .jr-link {
+  position: relative;
   display: block;
   text-decoration: none;
   color: inherit;
@@ -562,7 +556,7 @@
   display: flex;
   align-items: center;
   padding: 12px 14px;
-  background: #f6f0dd;
+  background: var(--paper);
   border-color: rgb(120 100 70 / 0.3);
   box-shadow: 0 8px 20px rgb(58 40 22 / 0.22);
 }
@@ -584,39 +578,42 @@
    touching the same properties would fight it. */
 
 /* --- Tooltip ------------------------------------------------------------- */
-/* Centred with the `translate` property rather than inside `transform`.
-   Motion animates `y` by writing `transform`, which would clobber a
-   translate(-50%) baked into it — the individual `translate` property is
-   applied separately and composes instead. Auto width rules out margins. */
+/* Follows the cursor (left/top written from Journal.tsx on pointermove).
+   Same --paper as .jr-artifact--note so chips match the notecards. */
 .jr-tooltip {
   position: absolute;
-  left: 50%;
-  top: 6px;
-  z-index: 6;
-  translate: -50% 0;
+  left: 0;
+  top: 0;
+  z-index: 20;
   display: flex;
   flex-direction: column;
   gap: 3px;
   padding: 9px 13px;
-  background: var(--espresso);
-  border: 1px solid var(--panel-border);
-  color: var(--on-panel);
+  background: var(--paper);
+  border: 1px solid color-mix(in srgb, var(--espresso) 18%, transparent);
+  color: var(--mono-secondary);
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
+  box-shadow: 0 4px 14px rgb(61 42 31 / 0.12);
 }
 
 .jr-tooltip-title {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-weight: 400;
+  font-size: 14px;
   letter-spacing: 0.1em;
+  color: var(--mono-secondary);
+  -webkit-text-stroke: 0.4px currentColor;
 }
 
 .jr-tooltip-meta {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-weight: 400;
+  font-size: 13px;
   letter-spacing: 0.04em;
-  color: var(--on-panel-muted);
+  color: var(--mono-secondary);
+  -webkit-text-stroke: 0.35px currentColor;
 }
 
 .jr-tooltip-cta {
@@ -625,11 +622,13 @@
   gap: 5px;
   margin-top: 5px;
   padding-top: 6px;
-  border-top: 1px solid rgb(243 239 228 / 0.22);
+  border-top: 1px solid color-mix(in srgb, var(--mono-secondary) 28%, transparent);
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-weight: 400;
+  font-size: 12px;
   letter-spacing: 0.12em;
-  color: var(--on-panel-accent);
+  color: var(--mono-secondary);
+  -webkit-text-stroke: 0.35px currentColor;
 }
 
 .jr-link:focus-visible {

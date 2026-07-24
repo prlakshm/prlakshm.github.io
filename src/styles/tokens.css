@@ -34,6 +34,8 @@
 
   /* --- Core ------------------------------------------------------------- */
   --parchment: #f5eee4;
+  /* Journal notecard / slip paper — tooltips share this so they match. */
+  --paper: #f6f0dd;
   /* Slightly lifted from near-black so the title reads brown, not ink. */
   --espresso: #3d2a1f;
 
