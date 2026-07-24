@@ -160,7 +160,7 @@
   align-items: center;
   text-align: center;
   padding-top: clamp(64px, 14vh, 148px);
-  padding-bottom: clamp(28px, 5vh, 64px);
+  padding-bottom: clamp(24px, 4.3vh, 55px);
 }
 
 /* Sized by the title alone. Intro is stretched to that width (see
@@ -362,7 +362,9 @@
 
 /* --- Journal shelf ------------------------------------------------------- */
 .shelf {
-  padding-block: clamp(8px, 1.5vh, 20px) clamp(72px, 12vh, 150px);
+  /* Pull up ~2 minor grid lines (32px step) toward the hero. */
+  margin-top: calc(-2 * var(--grid-minor-step));
+  padding-block: clamp(7px, 1.25vh, 17px) clamp(72px, 12vh, 150px);
 }
 
 .shelf-row {
