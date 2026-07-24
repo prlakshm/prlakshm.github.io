@@ -1,219 +1,318 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
+import "../../styles/tokens.css";
 import "./home.css";
-import ProjectCard from "../projects/ProjectCard.js";
-import projectData from "../projects/project-data.json";
-import "../projects/projects.css";
+import Journal from "./Journal.js";
+import ContactIcons from "./ContactIcons.js";
+import { journals } from "./journals.js";
+
+// Matches the link the global Header already uses. public/docs also holds
+// Resume_2026.pdf and "New Grad 2026 Resume.pdf" — switch here if this is stale.
+const RESUME_URL = "/docs/Pranavi_Lakshminarayanan_AI_Product_Resume.pdf";
+
+/* Fabric scraps. Colors stand in until the real textile photography exists —
+   add `src` here and the markup is unchanged. */
+const scraps = [
+  { id: "s1", label: "my grad dress", color: "#D8B98A", rotate: -7 },
+  { id: "s2", label: "curtains from my childhood bedroom", color: "#C9A24B", rotate: 4 },
+  { id: "s3", label: "my fav kurti from india", color: "#B3542E", rotate: -3 },
+  { id: "s4", label: "my sister's fav dress from high school", color: "#31556B", rotate: 6 },
+  { id: "s5", label: "purple top my mom stitched 4 me", color: "#6E4E8C", rotate: -5 },
+];
+
+function ExternalArrow() {
+  return (
+    <svg className="ext-arrow" viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+      <path
+        d="M2.5 7.5 L7.5 2.5 M3.6 2.5 H7.5 V6.4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="square"
+      />
+    </svg>
+  );
+}
 
 function Home() {
-  const homeRef = useRef<HTMLDivElement>(null);
-  const revealedProjectsRef = useRef(new Set<string>());
-  const [revealDelays, setRevealDelays] = useState<Record<string, number>>({});
+  const archiveRef = useRef<HTMLElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const pocketRef = useRef<HTMLDivElement>(null);
+  const shelfRef = useRef<HTMLUListElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
 
-  useEffect(() => {
-    const home = homeRef.current;
-    if (!home) return;
+  /* The intro block is sized to the rendered width of the title so the two
+     share a left edge. That width comes from font metrics, so it cannot be
+     expressed in CSS — measure it and publish it as a custom property. */
+  useLayoutEffect(() => {
+    const hero = heroRef.current;
+    const title = titleRef.current;
+    if (!hero || !title) return;
 
-    const cards = Array.from(
-      home.querySelectorAll<HTMLElement>(".project-cards[data-project-id]")
-    );
-    const revealAll = () => {
-      const next = Object.fromEntries(
-        cards.map((card) => [card.dataset.projectId as string, 0])
-      );
-      cards.forEach((card) => {
-        if (card.dataset.projectId) {
-          revealedProjectsRef.current.add(card.dataset.projectId);
-        }
-      });
-      setRevealDelays(next);
+    const sync = () => {
+      hero.style.setProperty("--title-w", `${Math.round(title.offsetWidth)}px`);
     };
 
-    if (
-      typeof IntersectionObserver === "undefined" ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      revealAll();
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entering = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => {
-            const topDifference = a.boundingClientRect.top - b.boundingClientRect.top;
-            return topDifference || a.boundingClientRect.left - b.boundingClientRect.left;
-          });
-        const newlyRevealed: Array<{ id: string; delay: number }> = [];
-
-        entering.forEach((entry, index) => {
-          const card = entry.target as HTMLElement;
-          const id = card.dataset.projectId;
-          if (!id || revealedProjectsRef.current.has(id)) return;
-
-          revealedProjectsRef.current.add(id);
-          newlyRevealed.push({ id, delay: index * 70 });
-          observer.unobserve(card);
-        });
-
-        if (newlyRevealed.length > 0) {
-          setRevealDelays((previous) => {
-            const next = { ...previous };
-            newlyRevealed.forEach(({ id, delay }) => {
-              next[id] = delay;
-            });
-            return next;
-          });
-        }
-      },
-      { rootMargin: "10000px 0px -12% 0px", threshold: 0.01 }
-    );
-
-    cards.forEach((card) => observer.observe(card));
+    sync();
+    const observer = new ResizeObserver(sync);
+    observer.observe(title);
+    // Re-sync once webfonts land, since metrics shift when Forma swaps in.
+    if (document.fonts?.ready) document.fonts.ready.then(sync).catch(() => {});
     return () => observer.disconnect();
   }, []);
 
-  const renderProject = (
-    project: (typeof projectData)[number],
-    index: number
-  ) => (
-    <div
-      className={`project-cards ${project.link in revealDelays ? "is-revealed" : "is-reveal-pending"}`}
-      key={project.link}
-      data-project-id={project.link}
-      style={{
-        "--card-index": index,
-        "--reveal-delay": `${revealDelays[project.link] ?? 0}ms`,
-      } as React.CSSProperties}
-    >
-      <a
-        href={project.link}
-        onClick={(event) => {
-          if (project.locked) {
-            event.preventDefault();
-            const password = prompt("Enter password to view this case study:");
-            if (password === "warbros21") {
-              window.location.href = project.link;
-            } else if (password !== null) {
-              alert("Incorrect password.");
-            }
+  /* Each scrap lives in its final position in the row, then is pushed back into
+     the pocket with a per-element transform. Measuring gives us that offset.
+     offsetLeft/offsetTop are layout positions, so they are unaffected by the
+     transforms already sitting on these elements — no need to reset anything. */
+  useLayoutEffect(() => {
+    const stage = stageRef.current;
+    const pocket = pocketRef.current;
+    if (!stage || !pocket) return;
+
+    const measure = () => {
+      // Sit them high in the pocket so their tops clear the denim lip and the
+      // fabric is visibly stuffed in there before the scroll pulls it out.
+      const px = pocket.offsetLeft + pocket.offsetWidth * 0.5;
+      const py = pocket.offsetTop + pocket.offsetHeight * 0.16;
+      stage.querySelectorAll<HTMLElement>(".scrap").forEach((el) => {
+        const cx = el.offsetLeft + el.offsetWidth * 0.5;
+        const cy = el.offsetTop + el.offsetHeight * 0.5;
+        el.style.setProperty("--dx", `${Math.round(px - cx)}px`);
+        el.style.setProperty("--dy", `${Math.round(py - cy)}px`);
+      });
+      stage.classList.add("is-measured");
+    };
+
+    // Measure synchronously: useLayoutEffect runs before paint, so this is both
+    // flash-free and reliable. Deferring the first measure to rAF would break in
+    // a background tab, where rAF is throttled indefinitely and the scraps would
+    // never receive their offsets.
+    measure();
+
+    // Re-measure on resize, via rAF to coalesce bursts. A ResizeObserver on the
+    // stage alone can miss viewport changes that reflow the row without
+    // changing the stage's own box.
+    let frame = 0;
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(measure);
+    };
+
+    const observer = new ResizeObserver(schedule);
+    observer.observe(stage);
+    const row = stage.querySelector(".scrap-row");
+    if (row) observer.observe(row);
+    window.addEventListener("resize", schedule);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("resize", schedule);
+    };
+  }, []);
+
+  /* Reveal on scroll. The observer only toggles a class; all motion lives in
+     CSS so prefers-reduced-motion is handled in one place. */
+  useEffect(() => {
+    const shelf = shelfRef.current;
+    const archive = archiveRef.current;
+
+    if (typeof IntersectionObserver === "undefined") {
+      shelf?.classList.add("is-in");
+      archive?.classList.add("is-in");
+      return;
+    }
+
+    // The shelf reveals once and stays.
+    const shelfObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-in");
+          shelfObserver.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.2, rootMargin: "0px 0px -8% 0px" }
+    );
+    if (shelf) shelfObserver.observe(shelf);
+
+    // The fabric toggles, so scrolling back up dances it into the pocket again.
+    // `has-played` gates the return animation so it cannot fire on first paint,
+    // when the section is legitimately out of view and still tucked.
+    const archiveObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const el = entry.target;
+          if (entry.isIntersecting) {
+            el.classList.add("has-played", "is-in");
+          } else {
+            el.classList.remove("is-in");
           }
-        }}
-      >
-        <ProjectCard
-          name={project.name}
-          color={project.color}
-          skills={project.skills}
-          logline={project.logline}
-          image={project.image}
-          alphaColor={0.9}
-        />
-      </a>
-    </div>
-  );
+        });
+      },
+      { threshold: 0.25 }
+    );
+    if (archive) archiveObserver.observe(archive);
+
+    return () => {
+      shelfObserver.disconnect();
+      archiveObserver.disconnect();
+    };
+  }, []);
 
   return (
-    <div className="app">
-      <div className="home" ref={homeRef}>
-        <div className="home-column home-column-left">
-          <div className="landing-page">
-            <div className="title">
-            <h1 className="cutout-text">
-              <span className="word">
-                <span>H</span><span>I</span><span>,</span>
-              </span>
-              <span className="word">
-                {" "}
-                <span>I</span><span>'</span><span>M</span>
-              </span>
-              <span className="word">
-                {" "}
-                <span>P</span><span>R</span><span>A</span><span>N</span><span>A</span><span>V</span><span>I</span>
-              </span>
-            </h1>
-            {/* <div className="name-image">
-          <img
-                className="profile"
-                src="/home/linkedin_profile.jpg"
-                alt="Profile Picture of Pranavi"
-            />
-            <img
-                src="/home/flowers-dense.png"
-                alt="Hi, I'm Pranavi in vine font"
-            /></div> */}
-            <h2>
-              A design engineer with so many ideas that I coded them myself. Previously prototyping AI experiences @ HBO Max. You might know me from {" "}
-              <a href="https://www.brown.edu" target="_blank" rel="noreferrer">
-                <span style={{ whiteSpace: "nowrap" }}>Brown University</span>
-              </a>{" "}
-              or{" "}
-              <a href="https://www.wbd.com/" target="_blank" rel="noreferrer">
-                <span style={{ whiteSpace: "nowrap" }}>Warner Bros. Discovery</span>
-              </a>.
-            </h2>
-            <div className="contact">
-              <a href="mailto:pranavi_lakshminarayanan@brown.edu" target="_blank">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 197 157.79"
-                  className="icon"
-                  aria-label="Email Icon"
-                >
-                  <path fill="currentColor" d="M166.98,157.78c-47.82,0-95.15,0-142.48,0C8.18,157.78,0,149.58,0,133.19,0,98.03,0,62.86,0,27.7v-6.79c33.37,23.08,65.9,45.59,98.5,68.14,32.54-22.54,64.99-45.02,98.5-68.24,0,3.09,0,4.99,0,6.9,0,35,0,69.99,0,104.99,0,16.99-8.09,25.09-25.03,25.09-1.5,0-3,0-4.99,0Z" />
-                  <path fill="currentColor" d="M174.26,16.18c-25.39,17.64-50.5,35.06-75.77,52.59C68.25,47.8,37.98,26.82,7.39,5.61,11.52,1.55,16.29.06,21.48.05,72.78,0,124.08-.08,175.38.19c4.68.02,9.35,2.36,14.03,3.62,0,.61,0,1.22,0,1.82-4.95,3.44-9.9,6.89-15.14,10.55Z" />
-                </svg>
+    <div className="wt">
+      <div className="wt-surface" aria-hidden="true" />
 
-              </a>
-              <a href="https://github.com/prlakshm" target="_blank">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 511.9 500.52"
-                  className="icon"
-                  aria-label="Github Icon"
-                >
-                  <path fill="currentColor" d="M511.9,278.68c-.67,4.36-1.27,8.26-2.01,12.14-2.32,12.21-3.62,24.73-7.29,36.52-4.74,15.25-10.29,30.46-17.51,44.67-7.03,13.84-16.03,26.82-25.24,39.39-7.72,10.54-16.39,20.55-25.69,29.72-15.88,15.65-33.34,29.57-53.45,39.51-13.76,6.8-27.92,12.86-42.22,18.46-11.29,4.42-19.59-1.85-19.59-13.78,0-24.83.32-49.66-.12-74.49-.27-15.49-5.07-29.58-17.12-41.49,3.94-.79,7.35-1.76,10.82-2.12,18.48-1.93,35.86-7.17,52.29-15.97,16.79-8.99,30.49-21.07,39.04-38.18,7.01-14.03,11.69-28.91,13.06-44.65.8-9.15,2.14-18.35,1.87-27.49-.64-21.83-6.52-42.17-20.92-59.12-4.43-5.21-5.18-9.84-2.99-16.12,4.08-11.66,4.02-23.71,1.41-35.72-1.16-5.33-2.34-10.68-3.97-15.87-2.52-8.01-5.59-9.6-13.63-7.83-17.47,3.85-33.72,10.91-48.2,21.11-8.56,6.02-16.28,4.91-25.23,2.7-8.15-2.01-16.61-2.84-24.98-3.85-7.63-.92-15.31-1.76-22.99-1.94-7.07-.17-14.2.22-21.23,1-8.53.95-17,2.52-25.48,3.9-3.5.57-7.32.63-10.38,2.14-6.67,3.29-11.51.19-16.82-3.13-15.04-9.38-30.91-16.96-48.27-21.05-11.67-2.75-14.29-1.39-17.06,9.76-2.71,10.94-5.27,22.03-4,33.38.76,6.86,2.27,13.7,4.2,20.33.93,3.2.48,5.03-1.58,7.44-11.43,13.35-19.16,28.58-21.65,46.09-1.19,8.42-2.26,17.01-1.94,25.46,1.05,28.06,7.09,54.89,24.12,77.91,7.02,9.49,16.76,16.39,27.02,22.45,15.48,9.14,32.5,13.58,49.84,17.09,5.05,1.02,10.3,1.11,16.47,1.73-7.43,7.65-12.57,15.47-14.78,24.95-.51,2.18-1.87,4.39-1.66,6.46.46,4.49-2.75,5.25-5.56,5.86-7.39,1.61-14.91,2.65-22.33,4.15-12.15,2.46-22.41-1.74-32.21-8.4-8.83-6-12.85-15.69-19.12-23.65-9.24-11.74-20.8-20.09-36.15-21.48-3.55-.32-7.27,1.25-11.09,1.99,2.96,8.37,9.58,11.88,15.4,15.94,7.62,5.32,12.34,12.86,16.8,20.57,3.36,5.82,5.94,12.1,8.77,18.22,7,15.14,19.57,23.07,35.33,25.55,11.16,1.75,22.61,1.84,33.94,2.07,4.8.1,9.63-1.32,14.85-2.1.08,1.75.2,3.19.2,4.64.01,14-.11,28,.04,41.99.15,14.13-9.58,16.89-19.06,13.91-24.83-7.81-47.91-19.57-68.83-34.96-11.85-8.72-22.93-18.71-33.25-29.23-15.15-15.44-28.04-32.79-38.85-51.62-9.3-16.19-17.36-32.97-22.07-51.05-3.65-14.01-6.03-28.35-9.01-42.54-.26-1.25-.8-2.44-1.6-3.78-.38-19.82-.38-39.51,0-59.79,1.78-7.88,3.27-15.14,4.58-22.44,5.6-31.11,17.91-59.55,34.79-86.06,13.74-21.57,30.5-40.56,50-57.21,15.46-13.19,32.25-24.3,50.24-33.55,18.45-9.49,37.84-16.83,58.21-20.91,13.82-2.77,27.87-5.2,41.91-5.92,20.53-1.05,41.03-.04,61.48,3.55,23.64,4.15,46.07,11.49,67.56,21.88,20.45,9.89,39.37,22.34,56.24,37.48,15.68,14.07,29.91,29.57,41.79,47.21,11.83,17.55,22.02,35.9,29.3,55.73,6.62,18.02,11.69,36.49,13.55,55.72.39,4.08,1.29,8.12,1.96,12.18v44.53Z" />
-                </svg>
-              </a>
-              <a href="https://www.linkedin.com/in/prlakshm" target="_blank">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 240 240"
-                  className="icon"
-                  aria-label="LinkedIn Icon"
-                >
-                  <path fill="currentColor" d="M0,198c0-51.69,0-103.38.34-155.71C4.17,24.22,13.89,11.6,30.08,4.22c4.1-1.87,8.6-2.84,12.92-4.22,51.02,0,102.04,0,153.72.34,17.91,3.1,30.45,12.42,38.16,27.98,2.28,4.61,3.44,9.77,5.12,14.68,0,51.35,0,102.71-.34,154.71-4.37,20.06-15.65,33.2-34.36,39.86-2.71.97-5.53,1.63-8.31,2.43-51.35,0-102.71,0-154.71-.34-20.06-4.37-33.19-15.67-39.89-34.36C1.54,202.89.8,200.43,0,198M100,96.5v93.23h30c0-18.06-.23-35.86.14-53.65.11-5.18,1.07-10.72,3.2-15.39,3.45-7.54,10-11.39,18.58-10.81,8.28.56,13.53,5.38,16.03,12.89,1.34,4.02,1.88,8.46,1.95,12.72.23,14.49.09,28.98.09,43.47,0,3.6,0,7.21,0,10.75h29.88c0-24.23.77-48.22-.2-72.15-1.17-29.07-25.6-45.03-51.96-34.4-6.57,2.65-12.09,7.94-17.95,11.91v-14.81h-29.78v16.21M80,99.5v-19.21h-29.71v109.42h29.71v-90.21M50.01,40.7c-3.76,7.84-3.08,15.28,2.15,20.86,5.02,5.36,11.22,6.94,18.21,4.75,7.36-2.31,12.02-8.89,12.04-16.58.03-7.36-4.64-14.14-11.43-16.61-7.54-2.74-14.8-.31-20.97,7.58Z" />
-                </svg>
-              </a>
-              <a
-                href="https://x.com/pranavibuilds"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  className="icon"
-                  aria-label="Pranavi on X"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zM17.35 19.77h1.2L6.9 4.126H5.75z"
-                  />
-                </svg>
-              </a>
+      <header className="wt-nav">
+        <div className="wt-nav-inner">
+          <a className="wt-wordmark" href="#/">
+            PRANAVI RAM
+          </a>
+          <nav aria-label="Primary">
+            <ul className="wt-nav-links">
+              <li>
+                <a href="#work">WORK</a>
+              </li>
+              {/* Points at the existing /about route, since the homepage's own
+                  about section was removed in the simplification pass. */}
+              <li>
+                <a href="#/about">ABOUT</a>
+              </li>
+              <li>
+                <a href={RESUME_URL} target="_blank" rel="noreferrer">
+                  RESUME
+                  <ExternalArrow />
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </header>
+
+      <main>
+        <section className="hero">
+          <h1 className="hero-title">
+            hi, i&rsquo;m pranavi ram
+            <span className="hero-pron" aria-hidden="true">
+              pronounced <em>pren-uh-vi ram</em> (like palm)
+            </span>
+          </h1>
+
+          <div className="hero-intro">
+            <div className="hero-col">
+              <p className="line">
+                Design engineer building in public on X{" "}
+                <a href="https://x.com/pranavibuilds" target="_blank" rel="noreferrer">
+                  @pranavibuilds
+                </a>
+              </p>
+              <p className="line">CS + Literary Arts @ Brown University</p>
+              <ContactIcons className="tiles--hero" />
             </div>
+
+            <div className="hero-col">
+              <p className="line line--label">PREV</p>
+              <p className="line">Design Partner @ OpenAI</p>
+              <p className="line">Product Design @ HBO Max</p>
             </div>
           </div>
-          {projectData.map((project, index) =>
-            index % 2 === 0 ? renderProject(project, index) : null
-          )}
+        </section>
+
+        <section className="shelf" id="work" aria-label="Selected work">
+          <ul className="shelf-row" ref={shelfRef}>
+            {journals.map((journal, i) => (
+              <Journal key={journal.id} journal={journal} index={i} />
+            ))}
+          </ul>
+        </section>
+
+        <section
+          className="archive"
+          ref={archiveRef}
+          aria-label="Fabric scraps I keep"
+        >
+          <div className="archive-stage" ref={stageRef}>
+            <div className="pocket-wrap" ref={pocketRef}>
+              <svg
+                className="pocket"
+                viewBox="0 0 400 406"
+                role="img"
+                aria-label="A denim pocket holding folded fabric scraps."
+              >
+                <path
+                  d="M14 26 L390 26 L356 262 L202 398 L46 262 Z"
+                  transform="translate(4,8)"
+                  fill="rgb(58 40 22 / 20%)"
+                />
+                <path d="M10 18 L386 18 L352 254 L198 390 L42 254 Z" fill="#3C5A79" />
+                <path d="M10 18 L386 18 L380 62 L16 62 Z" fill="rgb(20 34 52 / 28%)" />
+                <path
+                  d="M22 32 L374 32 L342 246 L198 372 L54 246 Z"
+                  fill="none"
+                  stroke="#C9A25E"
+                  strokeWidth="2"
+                  strokeDasharray="7 5"
+                />
+                <path
+                  d="M30 42 L366 42 L335 240 L198 360 L61 240 Z"
+                  fill="none"
+                  stroke="#C9A25E"
+                  strokeWidth="1.5"
+                  strokeDasharray="6 5"
+                  opacity="0.75"
+                />
+                <path
+                  d="M60 120 Q198 190 336 120"
+                  fill="none"
+                  stroke="#C9A25E"
+                  strokeWidth="2"
+                  strokeDasharray="7 5"
+                  opacity="0.85"
+                />
+                <path
+                  d="M60 140 Q198 210 336 140"
+                  fill="none"
+                  stroke="#C9A25E"
+                  strokeWidth="1.5"
+                  strokeDasharray="6 5"
+                  opacity="0.6"
+                />
+                <circle cx="26" cy="30" r="6" fill="#A8794A" />
+                <circle cx="370" cy="30" r="6" fill="#A8794A" />
+              </svg>
+            </div>
+
+            <ul className="scrap-row">
+              {scraps.map((s, i) => (
+                <li
+                  key={s.id}
+                  className="scrap"
+                  aria-label={s.label}
+                  style={
+                    {
+                      background: s.color,
+                      "--sr": `${s.rotate}deg`,
+                      "--si": i,
+                    } as React.CSSProperties
+                  }
+                />
+              ))}
+            </ul>
+          </div>
+        </section>
+      </main>
+
+      <footer className="wt-foot">
+        <div className="wt-foot-inner">
+          {/* © is outside Berkeley Mono Trial's ASCII range, so this one glyph
+              comes from the fallback mono. It is a symbol, not a letterform,
+              so the seam is invisible at this size. */}
+          <p className="foot-name">&copy; 2026 coded by pranavi</p>
+          <ContactIcons className="tiles--foot" />
         </div>
-        <div className="home-column home-column-right">
-          {projectData.map((project, index) =>
-            index % 2 === 1 ? renderProject(project, index) : null
-          )}
-        </div>
-      </div>
+      </footer>
     </div>
   );
 }

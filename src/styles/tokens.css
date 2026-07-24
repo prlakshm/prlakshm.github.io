@@ -1,0 +1,81 @@
+/* ==========================================================================
+   Editorial worktable — design tokens
+   Archival paper, espresso leather, twine, aged brass.
+   The interface stays cream / espresso / muted brown; journals and project
+   imagery carry the saturated color.
+   ========================================================================== */
+
+@import url("https://use.typekit.net/ovs8xoo.css");
+
+/* Berkeley Mono Trial — ASCII only (95 glyphs), Regular only (no bold/italic).
+   It has no · — ’ ↗ ↓ ⇄, so those fall through to the next mono in the stack.
+   Keep a metrics-compatible mono next in line. Swap src for a licensed woff2
+   when the full family is bought — everything else here stays as-is. */
+@font-face {
+  font-family: "Berkeley Mono";
+  src: url("/fonts/berkeley/BerkeleyMonoTrial-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* --- Type ------------------------------------------------------------- */
+  --font-display: "forma-djr-display", "Forma DJR Display", system-ui, sans-serif;
+  --font-text: "forma-djr-text", "Forma DJR Text", system-ui, sans-serif;
+  --font-mono: "Berkeley Mono", "Berkeley Mono Trial", ui-monospace, "SF Mono",
+    Menlo, "Roboto Mono", monospace;
+
+  /* Forma DJR Display ships 400 and 700 only in kit ovs8xoo — no 650. */
+  --weight-display: 700;
+
+  --hero-size: clamp(52px, 8vw, 112px);
+  --section-size: clamp(34px, 4.6vw, 58px);
+
+  /* --- Core ------------------------------------------------------------- */
+  --parchment: #f3efe4;
+  --espresso: #302219;
+
+  /* --- Supporting browns ------------------------------------------------ */
+  /* Values used on the cream ground are AA-corrected (>= 4.5:1 vs parchment);
+     hue and saturation are unchanged from the source palette. */
+  --secondary: #786b5a; /* 4.51:1 — was #796C5B at 4.45 */
+  --muted: #746c61; /* 4.50:1 — was #A0988D at 2.48 */
+  --divider: #d1ccc1; /* decorative hairline, never text */
+  --panel-border: #51443a;
+
+  /* --- Dark panels (tooltips, spec panels) ------------------------------ */
+  /* On espresso the source values already clear AA, so they stand. */
+  --on-panel: #f3efe4; /* 13.36:1 */
+  --on-panel-muted: #a0988d; /* 5.39:1 */
+  --on-panel-accent: #9a7b45;
+
+  /* --- Antique brass accent --------------------------------------------- */
+  --accent: #9a7b45; /* 3.45:1 — rules, underlines, focus rings, large numerals */
+  --accent-text: #83693b; /* 4.51:1 — small labels and indices on cream */
+  --accent-soft: #b59a69; /* decorative only, never text on cream */
+
+  /* --- Cutting mat ------------------------------------------------------ */
+  --grid-minor: rgba(70, 58, 43, 0.07);
+  --grid-major: rgba(70, 58, 43, 0.12);
+  --grid-minor-step: 32px;
+  --grid-major-step: 128px;
+
+  /* --- Layout ----------------------------------------------------------- */
+  --page-max: 1248px;
+  --page-gutter: clamp(20px, 5vw, 96px);
+  --nav-height: 78px;
+
+  /* --- Motion ----------------------------------------------------------- */
+  --ease-settle: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur-hover: 620ms;
+  --dur-leave: 460ms;
+  --dur-nav: 180ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-hover: 160ms;
+    --dur-leave: 160ms;
+  }
+}

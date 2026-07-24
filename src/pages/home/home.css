@@ -1,272 +1,854 @@
-@import url('https://fonts.googleapis.com/css2?family=Krub:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
-@import url("https://use.typekit.net/ovs8xoo.css");
-@import url("https://use.typekit.net/ovs8xoo.css");
+/* ==========================================================================
+   Worktable homepage
+   A cutting-mat surface holding three notebooks and a pocket of fabric.
+   Everything except the hero title is brown Berkeley Mono.
+   ========================================================================== */
 
-
-.app {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.wt {
+  position: relative;
+  min-height: 100vh;
+  background: var(--parchment);
+  color: var(--espresso);
+  font-family: var(--font-text);
   overflow-x: clip;
-  animation: fadeIn 0.4s ease forwards;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.home {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 75px;
-  margin: 0rem 7.5rem 2.5rem 7.5rem;
-  margin-top: 4.8rem;
+/* --- Cutting mat --------------------------------------------------------- */
+.wt-surface {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--grid-major) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-major) 1px, transparent 1px),
+    linear-gradient(var(--grid-minor) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-minor) 1px, transparent 1px);
+  background-size:
+    var(--grid-major-step) var(--grid-major-step),
+    var(--grid-major-step) var(--grid-major-step),
+    var(--grid-minor-step) var(--grid-minor-step),
+    var(--grid-minor-step) var(--grid-minor-step);
 }
 
-.home-column {
+.wt-surface::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.3;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)' opacity='0.32'/%3E%3C/svg%3E");
+}
+
+.wt > *:not(.wt-surface) {
+  position: relative;
+  z-index: 1;
+}
+
+/* --- Shared shells ------------------------------------------------------- */
+.hero,
+.shelf,
+.archive {
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--page-gutter);
+}
+
+/* Nav and footer run wider than the content column so they sit flush to the
+   edges of the table, framing everything between them. */
+.wt-nav-inner,
+.wt-foot-inner {
+  max-width: none;
+  margin-inline: 0;
+  padding-inline: clamp(22px, 3.2vw, 60px);
+}
+
+/* --- Navigation ---------------------------------------------------------- */
+/* Fully transparent: any tint here paints over the cutting mat and clips the
+   grid lines behind the bar. The grid must run unbroken to the top edge. */
+.wt-nav {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: none;
+}
+
+.wt-nav-inner {
+  height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+/* Berkeley Mono Trial ships Regular only, so weight cannot carry emphasis
+   here. Size, tracking and the darkest brown do it instead, with a hairline
+   text-stroke for the extra density a bold would have given. */
+.wt-wordmark,
+.wt-nav-links a {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  letter-spacing: 0.15em;
+  color: var(--espresso);
+  text-decoration: none;
+  /* Berkeley Mono Trial ships Regular only, so a real bold is not available.
+     A hairline stroke thickens the letterforms without the smearing that
+     browser-synthesised bold produces at this size. */
+  -webkit-text-stroke: 0.5px currentColor;
+  transition: color var(--dur-nav) var(--ease-settle),
+    opacity var(--dur-nav) var(--ease-settle);
+}
+
+.wt-wordmark {
+  white-space: nowrap;
+}
+
+.wt-nav-links {
+  display: flex;
+  align-items: center;
+  gap: clamp(26px, 3vw, 40px);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.wt-nav-links a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-block: 4px;
+}
+
+.wt-nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-nav) var(--ease-settle);
+}
+
+.wt-wordmark:hover,
+.wt-nav-links a:hover,
+.wt-nav-links a:focus-visible {
+  opacity: 0.62;
+}
+
+.wt-nav-links a:hover::after,
+.wt-nav-links a:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.ext-arrow,
+.jr-arrow {
+  position: static;
+  width: 9px;
+  height: 9px;
+  flex-shrink: 0;
+}
+
+/* --- Hero ---------------------------------------------------------------- */
+.hero {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: clamp(48px, 11vh, 116px);
+  padding-bottom: clamp(56px, 10vh, 112px);
+}
+
+.hero-title {
+  position: relative;
+  margin: 0;
+  max-width: 1100px;
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+  font-size: var(--hero-size);
+  line-height: 0.97;
+  color: var(--espresso);
+}
+
+/* Pronunciation note — quiet until the title is hovered. */
+.hero-pron {
+  position: absolute;
+  left: 50%;
+  top: -36px;
+  transform: translate(-50%, 4px);
+  display: inline-flex;
+  gap: 5px;
+  padding: 8px 13px;
+  background: var(--espresso);
+  color: var(--on-panel);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 240ms var(--ease-settle), transform 240ms var(--ease-settle);
+}
+
+.hero-pron em {
+  font-style: normal;
+  color: var(--on-panel-accent);
+}
+
+.hero-pron::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  margin-left: -6px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 7px solid var(--espresso);
+}
+
+.hero-title:hover .hero-pron {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* Two columns centred as a block, both left-aligned. The first column is
+   sized to its own content rather than a half share, so the X handle cannot
+   be pushed onto a second line and PREV starts as far left as it can. */
+.hero-intro {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: clamp(30px, 3.4vw, 54px);
+  width: min(100%, 900px);
+  margin-top: clamp(34px, 5vh, 56px);
+  text-align: left;
+}
+
+/* Only where there is room for it — narrower viewports must still wrap. */
+@media (min-width: 1024px) {
+  .hero-col:first-child .line:first-child {
+    white-space: nowrap;
+  }
+}
+
+.hero-col {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
   min-width: 0;
 }
 
-.home .card {
-  width: 100%;
+/* Every line beneath the title: tan-brown, monospace, one weight.
+   --accent-text is the antique-brass tone corrected to clear AA on parchment
+   (4.51:1); the raw #9A7B45 only manages 3.45:1 and is not safe for body. */
+.line {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.65;
+  letter-spacing: 0.04em;
+  color: var(--accent-text);
 }
 
-
-.home .landing-page {
-  position: relative;
-
+.line--label {
+  letter-spacing: 0.18em;
+  color: var(--muted);
+  margin-bottom: 4px;
 }
 
+/* Body is already the brass tone, so the handle is distinguished by the rule
+   under it and by darkening on hover, not by hue. */
+.line a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid rgb(131 105 59 / 0.5);
+  transition: color var(--dur-nav) var(--ease-settle),
+    border-color var(--dur-nav) var(--ease-settle);
+}
 
-.title {
+.line a:hover,
+.line a:focus-visible {
+  color: var(--espresso);
+  border-bottom-color: var(--espresso);
+}
+
+/* --- Contact tiles ------------------------------------------------------- */
+/* Rounded outlined squares with a monochrome glyph, per the reference. */
+.tiles {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: left;
-  padding: 4.5rem 0.75rem 0.25rem 3rem;
-  padding-left: 3rem;
-  padding-top: 4.5rem;
-  padding-bottom: 0.25rem;
-}
-
-.name-image {
-  display: flex;
-  width: 100%;
-  justify-content: flex-start;
   align-items: center;
-}
-
-.name-image img {
-  height: 6.1rem;
-  margin: -0.5rem 0.25rem 0.5rem 0rem;
-}
-
-.name-image .profile {
-  height: 8.5rem;
-  width: auto;
-  border-radius: 50%;        /* makes it circular */
-}
-
-h1 {
-  font-family: "punch-holes";
-  font-weight: 400;
-  font-size: 3.5rem;
-  letter-spacing: 0.05cap;
-  line-height: 3.5rem;
-  margin-top: 0.9rem;
-  margin-bottom: 1.8rem;
-  padding: 0;
-  color: #18181b;
-  animation: pageEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
-}
-
-.cutout-text .word {
-  display: inline-block;  /* shrink-wrap the word */
-  white-space: nowrap;    /* prevent breaks inside the word */
-  margin-right: 0.25rem;  /* optional spacing between words */
-}
-
-.cutout-text span {
-  display: inline-block;
-  transform: rotate(calc(-3deg + 6deg * var(--r))) translateY(calc(-3px + 7px * var(--y)));
-}
-
-/* Create slight variations for each letter */
-.cutout-text span:nth-child(odd) { --r: -0.5; --y: 0.4; }
-.cutout-text span:nth-child(even) { --r: 0.5; --y: -0.2; }
-.cutout-text span:nth-child(3n) { --r: 0.8; --y: 0.3; }
-
-h2 {
-  font-family: "forma-djr-text", sans-serif;
-  font-weight: 425;
-  font-size: 1.05rem;
-  line-height: 1.8rem;
-  letter-spacing: 1.5px;
-  text-align: left;
-  color: #4e4e54;
+  gap: 10px;
+  list-style: none;
   margin: 0;
   padding: 0;
-  z-index: 2;
-  animation: pageEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
 }
 
-h3 {
-  color: #f43f5e;
+.tile {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--divider);
+  border-radius: 11px;
+  color: var(--secondary);
+  transition: color var(--dur-nav) var(--ease-settle),
+    border-color var(--dur-nav) var(--ease-settle),
+    transform var(--dur-nav) var(--ease-settle);
 }
 
-.home h2 a {
-  display: inline;
-  color: #f43f5e;
-  font-weight: 625;
-  text-decoration: underline;
-  text-decoration-color: #fda4af;
-  transition: all 0.2s;
+.tile svg {
+  position: static;
+  width: 16px;
+  height: 16px;
+  display: block;
 }
 
-.home h2 a:hover,
-.home h2 a:active {
-  color: #e11d48;
-  text-decoration-color: #f43f5e;
-  text-shadow: 0 2px 8px rgba(225, 29, 72, 0.125);
+.tile:hover,
+.tile:focus-visible {
+  color: var(--espresso);
+  border-color: var(--secondary);
+  transform: translateY(-2px);
+  outline: none;
 }
 
-.home h2 a img {
-  width: 0.9rem;
-  padding-left: 1.8px;
+.tile:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
-.contact {
+.tiles--hero {
+  margin-top: 14px;
+}
+
+/* --- Journal shelf ------------------------------------------------------- */
+.shelf {
+  padding-block: clamp(20px, 4vh, 48px) clamp(72px, 12vh, 150px);
+}
+
+.shelf-row {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  /* Notebooks share one baseline — see .jr-img, anchored to the stage floor. */
+  align-items: flex-end;
+  justify-content: center;
+  /* Wide lanes so splayed artifacts never collide between neighbours. */
+  gap: clamp(56px, 9vw, 150px);
+  min-height: 500px;
+}
+
+.jr {
+  position: relative;
+  width: var(--jw);
+  flex-shrink: 0;
+  --splay: 1;
+  transform: translateY(var(--joffset));
+  opacity: 0;
+  transition: opacity 620ms var(--ease-settle) calc(var(--ji) * 90ms);
+}
+
+.shelf-row.is-in .jr {
+  opacity: 1;
+}
+
+.jr-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  outline: none;
+  cursor: pointer;
+}
+
+.jr-link--inert {
+  cursor: default;
+}
+
+.jr-stage {
+  position: relative;
+  display: block;
+  height: 430px;
+  transform: rotate(var(--jrot));
+  transform-origin: 50% 90%;
+  transition: transform var(--dur-leave) var(--ease-settle);
+  will-change: transform;
+}
+
+/* Bottom-anchored, not top-anchored: the source photographs have different
+   aspect ratios, so this is what actually puts every notebook on one line. */
+.jr-img {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: opacity var(--dur-leave) var(--ease-settle);
+}
+
+.jr-img--open {
+  opacity: 0;
+}
+
+.jr-shadow {
+  position: absolute;
+  left: 16%;
+  bottom: 58px;
+  width: 68%;
+  height: 26px;
+  border-radius: 50%;
+  background: rgb(58 40 22 / 0.34);
+  filter: blur(15px);
+  transition: transform var(--dur-leave) var(--ease-settle),
+    opacity var(--dur-leave) var(--ease-settle);
+}
+
+/* --- Artifacts ----------------------------------------------------------- */
+.jr-artifacts {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.jr-artifact {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: var(--aw);
+  height: var(--ah);
+  transform: translate(-50%, -50%) scale(0.72);
+  opacity: 0;
+  background: #f1ead4;
+  border: 1px solid rgb(120 100 70 / 0.35);
+  box-shadow: 0 6px 14px rgb(58 40 22 / 0.18);
+  overflow: hidden;
+  transition: transform var(--dur-leave) var(--ease-settle),
+    opacity calc(var(--dur-leave) * 0.7) var(--ease-settle);
+  will-change: transform, opacity;
+}
+
+.jr-artifact img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.jr-artifact--photo {
+  background: #ece3ca;
+  border-radius: 1px;
+}
+
+.jr-artifact--polaroid {
+  background: #fbf7ea;
+  border-color: rgb(120 100 70 / 0.28);
+  padding: 7px 7px 26px;
+  box-shadow: 0 8px 18px rgb(58 40 22 / 0.2);
+}
+
+.jr-artifact--film {
+  background: rgb(228 235 232 / 0.55);
+  border-color: rgb(90 110 105 / 0.35);
+}
+
+/* A blank ruled slip, for journals whose case study is unwritten. */
+.jr-artifact--slip {
+  background-color: #f4eedb;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 17px,
+    rgb(120 100 70 / 0.16) 17px 18px
+  );
+  border-color: rgb(120 100 70 / 0.26);
+}
+
+/* Notes carry text, so they land on top of the covers rather than behind
+   them — the journal is wider than the gutter, and anything tucked behind it
+   would have its copy occluded. */
+.jr-artifact--note {
+  z-index: 5;
   display: flex;
   align-items: center;
-  gap: 1.8rem;
-  margin: 1.5rem 0 1.5rem 0;
-  animation: pageEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
+  padding: 12px 14px;
+  background: #f6f0dd;
+  border-color: rgb(120 100 70 / 0.3);
+  box-shadow: 0 8px 20px rgb(58 40 22 / 0.22);
 }
 
-.contact a {
-  width: 1.9rem;
+.jr-note {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.55;
+  color: var(--secondary);
 }
 
-.contact svg {
-  width: 1.9rem;
-  height: 1.9rem;
+/* --- Hover / focus: the journal opens ------------------------------------ */
+/* No lift and no straightening — the notebook stays exactly where it sits and
+   only its cover opens. */
+
+.jr-link:hover .jr-img--closed,
+.jr-link:focus-visible .jr-img--closed {
+  opacity: 0;
+  transition-duration: var(--dur-hover);
+}
+
+.jr-link:hover .jr-img--open,
+.jr-link:focus-visible .jr-img--open {
+  opacity: 1;
+  transition-duration: var(--dur-hover);
+}
+
+/* Offsets are measured from the journal's centre, so the -50% centering has to
+   survive into the splayed state. --splay shrinks the arrangement at narrower
+   viewports, where the gutter between journals is tighter. */
+.jr-link:hover .jr-artifact,
+.jr-link:focus-visible .jr-artifact {
+  transform: translate(
+      calc(-50% + var(--ax) * var(--splay)),
+      calc(-50% + var(--ay) * var(--splay))
+    )
+    rotate(var(--ar)) scale(1);
+  opacity: 1;
+  transition-duration: var(--dur-hover);
+  transition-delay: calc(var(--ai) * 70ms);
+}
+
+/* --- Tooltip ------------------------------------------------------------- */
+.jr-tooltip {
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  z-index: 6;
+  transform: translate(-50%, 6px);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 13px;
+  background: var(--espresso);
+  border: 1px solid var(--panel-border);
+  color: var(--on-panel);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms var(--ease-settle), transform 220ms var(--ease-settle);
+}
+
+.jr-link:hover .jr-tooltip,
+.jr-link:focus-visible .jr-tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  transition-delay: 140ms;
+}
+
+.jr-tooltip-title {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+}
+
+.jr-tooltip-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--on-panel-muted);
+}
+
+.jr-tooltip-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+  padding-top: 6px;
+  border-top: 1px solid rgb(243 239 228 / 0.22);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  color: var(--on-panel-accent);
+}
+
+.jr-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 10px;
+}
+
+/* --- Fabric archive ------------------------------------------------------ */
+.archive {
+  padding-block: clamp(40px, 8vh, 110px) clamp(56px, 10vh, 130px);
+}
+
+.archive-stage {
+  position: relative; /* offsetParent for the measured scrap offsets */
+  display: grid;
+  grid-template-columns: minmax(240px, 340px) 1fr;
+  gap: clamp(40px, 6vw, 96px);
+  align-items: center;
+}
+
+.pocket-wrap {
+  width: 100%;
+}
+
+.pocket {
+  position: relative;
+  z-index: 2; /* the denim hides the scraps tucked behind it */
   display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Deliberately NOT positioned. The scrap offsets are measured against
+   .archive-stage, and giving this row `position` would make it the scraps'
+   offsetParent instead — mixing two origins and short-changing every offset.
+   Stacking still works: .pocket is positioned with z-index 2, and positioned
+   descendants paint above non-positioned ones whatever the DOM order. */
+.scrap-row {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: clamp(12px, 1.6vw, 24px);
+}
+
+/* Resting place is the row; the measured --dx/--dy shove each scrap back into
+   the pocket until the section scrolls into view. The --si term fans them out
+   in the pocket mouth so five scraps read as a stuffed handful, not one. */
+.scrap {
+  width: clamp(52px, 6.4vw, 88px);
+  height: clamp(120px, 15vw, 190px);
   flex-shrink: 0;
-  color: #27272a;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.05));
-  transition: all 0.2s ease;
+  box-shadow: 0 3px 9px rgb(58 40 22 / 0.24);
+  transform: translate(
+      calc(var(--dx, 0px) + (var(--si) - 2) * 17px),
+      var(--dy, 0px)
+    )
+    rotate(calc((var(--si) - 2) * 5deg)) scale(0.84);
 }
 
-.contact a:hover svg {
-  color: #e11d48;
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.12));
-  transform: translateY(-2px);
-}
+/* Deliberately no visibility gate here. If measurement ever fails, --dx/--dy
+   fall back to 0 and the scraps simply rest in their row — visible in the
+   wrong place is a far better failure than invisible. The animation itself is
+   still gated on .is-measured so it never runs against unknown offsets. */
 
-
-
-/*------------------------ Media Queries --------------------------*/
-
-
-@media screen and (max-width: 1440px) {
-  h1 {
-    font-size: 3.25rem;
+/* Stop-motion: stepped easing makes the travel read frame-by-frame rather
+   than as a smooth glide, and the mid-flight swings give it the dance. */
+@keyframes scrapDance {
+  0% {
+    transform: translate(
+        calc(var(--dx) + (var(--si) - 2) * 17px),
+        var(--dy)
+      )
+      rotate(calc((var(--si) - 2) * 5deg)) scale(0.84);
   }
-
-}
-
-@media screen and (max-width: 768px) {
-
-    .home {
-      padding: 0rem 2.5rem 2rem 2.5rem;
-      margin-left: 0;
-      margin-right: 0;
-      margin-top: 5rem;
-      gap: 2rem;
-    }
-  
-    .cutout-text {
-      font-size: 2.4rem;
-    }
-  
-    .title {
-      padding: 2.5rem 0 0.5rem 2rem;
-    }
-  
-    h2 {
-      font-size: 0.9rem;
-      line-height: 1.5rem;
-    }
-  
-  .contact img {
-    width: 1.75rem;
-}
-}
-
-@media screen and (max-width: 600px) {
-  h1 {
-    font-size: 2.75rem;
+  /* Pops up out of the pocket mouth before travelling. */
+  22% {
+    transform: translate(calc(var(--dx) * 0.86), calc(var(--dy) - 46px))
+      rotate(-13deg) scale(0.96);
   }
-
-  .home {
-    display: flex; 
-    flex-direction: column; 
-    padding: 4rem 1.5rem; 
-    margin-top: 0rem; 
-    justify-content: center; 
-    align-items: center; 
+  48% {
+    transform: translate(calc(var(--dx) * 0.5), calc(var(--dy) * 0.42 - 30px))
+      rotate(16deg) scale(1.07);
   }
-
-  .home-column {
-    display: contents;
+  72% {
+    transform: translate(calc(var(--dx) * 0.22), calc(var(--dy) * 0.12 + 14px))
+      rotate(-11deg) scale(0.97);
   }
-
-  .home .landing-page {
-    order: -1;
+  88% {
+    transform: translate(calc(var(--dx) * 0.06), -9px) rotate(6deg) scale(1.02);
   }
-
-  .home .project-cards {
-    order: var(--card-index);
+  100% {
+    transform: translate(0, 0) rotate(var(--sr)) scale(1);
   }
 }
 
+.archive.is-in .archive-stage.is-measured .scrap {
+  animation: scrapDance 1080ms steps(7, end) forwards;
+  animation-delay: calc(var(--si) * 130ms);
+}
 
-  @media screen and (max-width: 426px) {
+/* Scrolling back up runs the same choreography in reverse, so the fabric packs
+   itself into the pocket. `reverse` plays 100% -> 0% and `forwards` holds that
+   0% frame, which is exactly the tucked state. `has-played` keeps this from
+   firing on first paint, when the section is simply not on screen yet. */
+.archive.has-played:not(.is-in) .archive-stage.is-measured .scrap {
+  animation: scrapDance 860ms steps(7, end) reverse forwards;
+  /* Last one out is first one back in. */
+  animation-delay: calc((4 - var(--si)) * 105ms);
+}
 
-    .home {
-      padding: 4rem 1.25rem;  
-    }
+/* --- Footer -------------------------------------------------------------- */
+.wt-foot {
+  padding-block: clamp(32px, 6vh, 72px) 44px;
+}
 
-    .title {
-      padding: 2rem 0 0.5rem 0; 
-      text-align: center;
-    }
+.wt-foot-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 26px;
+  border-top: 1px solid rgb(48 34 25 / 0.2);
+}
 
-    .title h2 {
-      text-align: center;
-    }
+.foot-name {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--accent-text);
+}
 
-  
-    h1 {
-      font-size: 2.5rem;
-    }
-  
-    h2 {
-      font-size: 0.9rem;
-      line-height: 1.45rem;
-    }
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
 
-    .contact {
-      justify-content: center;
-      margin-top: 1rem;
-      gap: 1rem;
-    }
-  
-    .contact img {
-      width: 1.75rem;
-    }
-  
-    .contact a {
-      padding: 0 0.5rem;
-    }
-  
+@media (max-width: 1439px) {
+  .jr {
+    width: min(var(--jw), 25vw);
+    --splay: 0.78;
   }
-  
+  .jr-stage {
+    height: 396px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .shelf-row {
+    flex-wrap: wrap;
+    gap: 56px clamp(40px, 7vw, 80px);
+    min-height: 0;
+  }
+  .jr {
+    width: min(var(--jw), 38vw);
+    transform: translateY(calc(var(--joffset) * 0.5));
+    --splay: 0.6;
+  }
+  .archive-stage {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    justify-items: center;
+  }
+  .pocket-wrap {
+    max-width: 320px;
+  }
+  .scrap-row {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 767px) {
+  .wt {
+    --nav-height: 62px;
+  }
+
+  .wt-wordmark,
+  .wt-nav-links a {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+  }
+
+  .hero-intro {
+    grid-template-columns: 1fr;
+    gap: 26px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .hero-col {
+    align-items: center;
+  }
+
+  .hero-col--right {
+    align-items: center;
+    text-align: center;
+  }
+
+  .shelf-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .jr {
+    width: min(76vw, 300px);
+    transform: none;
+  }
+
+  .jr-stage {
+    height: auto;
+    aspect-ratio: 300 / 400;
+    transform: rotate(var(--jrot));
+  }
+
+  /* Touch has no hover: the notebook stays closed and nothing splays. */
+  .jr-artifacts,
+  .jr-tooltip,
+  .jr-img--open {
+    display: none;
+  }
+
+  /* The open image is display:none here, so the cross-fade must not run —
+     otherwise tapping a journal fades the cover to nothing with no
+     replacement behind it. */
+  .jr-link:hover .jr-img--closed,
+  .jr-link:focus-visible .jr-img--closed {
+    opacity: 1;
+  }
+
+  .jr-link:active .jr-stage {
+    transform: rotate(calc(var(--jrot) + 1deg)) scale(0.985);
+    transition-duration: 140ms;
+  }
+
+  .scrap-row {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .wt-foot-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+}
+
+/* ==========================================================================
+   Reduced motion — arrive in place, opacity only.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .jr-stage,
+  .jr-shadow {
+    transition: none !important;
+  }
+
+  .jr-link:hover .jr-stage,
+  .jr-link:focus-visible .jr-stage {
+    transform: rotate(var(--jrot));
+  }
+
+  .jr-artifact {
+    transform: translate(var(--ax), var(--ay)) rotate(var(--ar)) scale(1);
+    transition: opacity 160ms linear !important;
+  }
+
+  .jr-link:hover .jr-artifact,
+  .jr-link:focus-visible .jr-artifact {
+    transition-delay: 0ms !important;
+  }
+
+  /* No flight across the page: the scraps sit in the row from the start. */
+  .scrap {
+    transform: rotate(var(--sr));
+  }
+
+  .archive.is-in .archive-stage.is-measured .scrap,
+  .archive.has-played:not(.is-in) .archive-stage.is-measured .scrap {
+    animation: none;
+  }
+}
