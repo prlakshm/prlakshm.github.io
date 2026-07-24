@@ -33,8 +33,13 @@
   --section-size: clamp(34px, 4.6vw, 58px);
 
   /* --- Core ------------------------------------------------------------- */
-  --parchment: #f3efe4;
-  --espresso: #302219;
+  --parchment: #faf3e3;
+  /* Slightly lifted from near-black so the title reads brown, not ink. */
+  --espresso: #3d2a1f;
+
+  /* Secondary monospace (nav, hero body, PREV, footer). Title uses --espresso
+     as primary. Sepia #704214. */
+  --mono-secondary: #704214;
 
   /* --- Supporting browns ------------------------------------------------ */
   /* Values used on the cream ground are AA-corrected (>= 4.5:1 vs parchment);

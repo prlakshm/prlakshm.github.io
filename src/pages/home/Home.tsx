@@ -38,28 +38,6 @@ function Home() {
   const stageRef = useRef<HTMLDivElement>(null);
   const pocketRef = useRef<HTMLDivElement>(null);
   const shelfRef = useRef<HTMLUListElement>(null);
-  const heroRef = useRef<HTMLElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
-
-  /* The intro block is sized to the rendered width of the title so the two
-     share a left edge. That width comes from font metrics, so it cannot be
-     expressed in CSS — measure it and publish it as a custom property. */
-  useLayoutEffect(() => {
-    const hero = heroRef.current;
-    const title = titleRef.current;
-    if (!hero || !title) return;
-
-    const sync = () => {
-      hero.style.setProperty("--title-w", `${Math.round(title.offsetWidth)}px`);
-    };
-
-    sync();
-    const observer = new ResizeObserver(sync);
-    observer.observe(title);
-    // Re-sync once webfonts land, since metrics shift when Forma swaps in.
-    if (document.fonts?.ready) document.fonts.ready.then(sync).catch(() => {});
-    return () => observer.disconnect();
-  }, []);
 
   /* Each scrap lives in its final position in the row, then is pushed back into
      the pocket with a per-element transform. Measuring gives us that offset.
@@ -193,29 +171,36 @@ function Home() {
 
       <main>
         <section className="hero">
-          <h1 className="hero-title">
-            hi, i&rsquo;m pranavi ram
-            <span className="hero-pron" aria-hidden="true">
-              pronounced <em>pren-uh-vi ram</em> (like palm)
-            </span>
-          </h1>
+          {/* hero-block width is driven only by the title; intro uses
+              width:0;min-width:100% so it shares those left/right edges
+              without expanding the block past the title. */}
+          <div className="hero-block">
+            <h1 className="hero-title">
+              hi, i&rsquo;m pranavi ram
+              <span className="hero-pron" aria-hidden="true">
+                pronounced <em>pren-uh-vi ram</em> (like palm)
+              </span>
+            </h1>
 
-          <div className="hero-intro">
-            <div className="hero-col">
-              <p className="line">
-                Design engineer building in public on X{" "}
-                <a href="https://x.com/pranavibuilds" target="_blank" rel="noreferrer">
-                  @pranavibuilds
-                </a>
-              </p>
-              <p className="line">CS + Literary Arts @ Brown University</p>
+            <div className="hero-intro">
+              <div className="hero-col hero-col--copy">
+                <p className="line">
+                  Design engineer building in public on X{" "}
+                  <a href="https://x.com/pranavibuilds" target="_blank" rel="noreferrer">
+                    @pranavibuilds
+                  </a>
+                </p>
+                <p className="line">CS + Literary Arts @ Brown University</p>
+              </div>
+
+              <div className="hero-col hero-col--prev">
+                <p className="line line--label">PREV:</p>
+                <p className="line">Design Partner @ OpenAI</p>
+                <p className="line">Product Design @ HBO Max</p>
+              </div>
+
+              {/* Desktop: under copy. Stacked: below all text (copy → PREV → tiles). */}
               <ContactIcons className="tiles--hero" />
-            </div>
-
-            <div className="hero-col">
-              <p className="line line--label">PREV</p>
-              <p className="line">Design Partner @ OpenAI</p>
-              <p className="line">Product Design @ HBO Max</p>
             </div>
           </div>
         </section>
@@ -309,7 +294,12 @@ function Home() {
           {/* © is outside Berkeley Mono Trial's ASCII range, so this one glyph
               comes from the fallback mono. It is a symbol, not a letterform,
               so the seam is invisible at this size. */}
-          <p className="foot-name">&copy; 2026 coded by pranavi</p>
+          <p className="foot-name">
+            <span className="foot-copy" aria-hidden="true">
+              &copy;
+            </span>{" "}
+            2026 Coded by Pranavi
+          </p>
           <ContactIcons className="tiles--foot" />
         </div>
       </footer>

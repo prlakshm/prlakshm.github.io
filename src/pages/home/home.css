@@ -83,20 +83,19 @@
   gap: 24px;
 }
 
-/* Berkeley Mono Trial ships Regular only, so weight cannot carry emphasis
-   here. Size, tracking and the darkest brown do it instead, with a hairline
-   text-stroke for the extra density a bold would have given. */
+/* Nav size matches the deployed Header (1.1rem). Berkeley Mono Trial ships
+   Regular only, so weight 625 is approximated with a hairline text-stroke
+   instead of browser-synthesised bold. */
 .wt-wordmark,
 .wt-nav-links a {
   font-family: var(--font-mono);
-  font-size: 15px;
-  letter-spacing: 0.15em;
-  color: var(--espresso);
+  font-weight: 400;
+  font-size: 1.1rem;
+  letter-spacing: 0.12em;
+  line-height: 1.6rem;
+  color: var(--mono-secondary);
   text-decoration: none;
-  /* Berkeley Mono Trial ships Regular only, so a real bold is not available.
-     A hairline stroke thickens the letterforms without the smearing that
-     browser-synthesised bold produces at this size. */
-  -webkit-text-stroke: 0.5px currentColor;
+  -webkit-text-stroke: 0.55px currentColor;
   transition: color var(--dur-nav) var(--ease-settle),
     opacity var(--dur-nav) var(--ease-settle);
 }
@@ -160,14 +159,28 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding-top: clamp(48px, 11vh, 116px);
-  padding-bottom: clamp(56px, 10vh, 112px);
+  padding-top: clamp(64px, 14vh, 148px);
+  padding-bottom: clamp(28px, 5vh, 64px);
+}
+
+/* Sized by the title alone. Intro is stretched to that width (see
+   .hero-intro) so body copy shares the title's left and right edges.
+   text-align:left beats .hero's center so title + body share one left edge. */
+.hero-block {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: max-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  text-align: left;
 }
 
 .hero-title {
   position: relative;
   margin: 0;
-  max-width: 1100px;
+  width: max-content;
+  max-width: 100%;
   font-family: var(--font-display);
   font-weight: var(--weight-display);
   font-size: var(--hero-size);
@@ -216,23 +229,24 @@
   transform: translate(-50%, 0);
 }
 
-/* Two columns centred as a block, both left-aligned. The first column is
-   sized to its own content rather than a half share, so the X handle cannot
-   be pushed onto a second line and PREV starts as far left as it can. */
+/* width:0;min-width:100% — fill the title-sized block without contributing
+   to its intrinsic width. Desktop: contacts under copy, PREV beside both
+   (same visual as when contacts lived inside the first column). */
 .hero-intro {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: clamp(30px, 3.4vw, 54px);
-  width: min(100%, 900px);
+  grid-template-columns: max-content max-content;
+  grid-template-areas:
+    "copy prev"
+    "tiles prev";
+  justify-content: start;
+  align-items: start;
+  column-gap: clamp(37px, 4.63vw, 74px);
+  row-gap: 0;
+  box-sizing: border-box;
+  width: 0;
+  min-width: 100%;
   margin-top: clamp(34px, 5vh, 56px);
   text-align: left;
-}
-
-/* Only where there is room for it — narrower viewports must still wrap. */
-@media (min-width: 1024px) {
-  .hero-col:first-child .line:first-child {
-    white-space: nowrap;
-  }
 }
 
 .hero-col {
@@ -240,23 +254,45 @@
   flex-direction: column;
   gap: 7px;
   min-width: 0;
+  width: max-content;
 }
 
-/* Every line beneath the title: tan-brown, monospace, one weight.
-   --accent-text is the antique-brass tone corrected to clear AA on parchment
-   (4.51:1); the raw #9A7B45 only manages 3.45:1 and is not safe for body. */
+.hero-col--copy {
+  grid-area: copy;
+}
+
+.hero-col--prev {
+  grid-area: prev;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.hero-intro > .tiles--hero {
+  grid-area: tiles;
+}
+
+/* Side-by-side + nowrap only when both columns fit. Tablet stacks. */
+@media (min-width: 1024px) {
+  .hero-col--copy .line {
+    white-space: nowrap;
+  }
+}
+
+/* Every line beneath the title: secondary mono, one weight.
+   Swap --mono-secondary in tokens.css when the tan is locked. */
 .line {
   margin: 0;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.65;
   letter-spacing: 0.04em;
-  color: var(--accent-text);
+  color: var(--mono-secondary);
+  text-transform: uppercase;
 }
 
 .line--label {
   letter-spacing: 0.18em;
-  color: var(--muted);
+  color: var(--mono-secondary);
   margin-bottom: 4px;
 }
 
@@ -265,7 +301,7 @@
 .line a {
   color: inherit;
   text-decoration: none;
-  border-bottom: 1px solid rgb(131 105 59 / 0.5);
+  border-bottom: 1px solid color-mix(in srgb, var(--mono-secondary) 55%, transparent);
   transition: color var(--dur-nav) var(--ease-settle),
     border-color var(--dur-nav) var(--ease-settle);
 }
@@ -290,11 +326,11 @@
 .tile {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
-  border: 1px solid var(--divider);
-  border-radius: 11px;
-  color: var(--secondary);
+  width: 44px;
+  height: 44px;
+  border: 1px solid color-mix(in srgb, var(--mono-secondary) 35%, transparent);
+  border-radius: 12px;
+  color: var(--mono-secondary);
   transition: color var(--dur-nav) var(--ease-settle),
     border-color var(--dur-nav) var(--ease-settle),
     transform var(--dur-nav) var(--ease-settle);
@@ -302,15 +338,15 @@
 
 .tile svg {
   position: static;
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
   display: block;
 }
 
 .tile:hover,
 .tile:focus-visible {
   color: var(--espresso);
-  border-color: var(--secondary);
+  border-color: var(--mono-secondary);
   transform: translateY(-2px);
   outline: none;
 }
@@ -326,7 +362,7 @@
 
 /* --- Journal shelf ------------------------------------------------------- */
 .shelf {
-  padding-block: clamp(20px, 4vh, 48px) clamp(72px, 12vh, 150px);
+  padding-block: clamp(8px, 1.5vh, 20px) clamp(72px, 12vh, 150px);
 }
 
 .shelf-row {
@@ -338,8 +374,8 @@
   align-items: flex-end;
   justify-content: center;
   /* Wide lanes so splayed artifacts never collide between neighbours. */
-  gap: clamp(56px, 9vw, 150px);
-  min-height: 500px;
+  gap: clamp(18px, 2.8vw, 48px);
+  min-height: 672px;
 }
 
 .jr {
@@ -371,7 +407,7 @@
 .jr-stage {
   position: relative;
   display: block;
-  height: 430px;
+  height: 594px;
   transform: rotate(var(--jrot));
   transform-origin: 50% 90%;
   transition: transform var(--dur-leave) var(--ease-settle);
@@ -698,9 +734,16 @@
 .foot-name {
   margin: 0;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 15px;
   letter-spacing: 0.06em;
-  color: var(--accent-text);
+  color: var(--mono-secondary);
+  text-transform: uppercase;
+}
+
+.foot-copy {
+  font-size: 1.5em;
+  line-height: 1;
+  vertical-align: -0.05em;
 }
 
 /* ==========================================================================
@@ -713,14 +756,65 @@
     --splay: 0.78;
   }
   .jr-stage {
-    height: 396px;
+    height: 546px;
   }
 }
 
 @media (max-width: 1023px) {
+  /* Keep the title's centered max-content start. Body stacks inside that
+     same block (shifts right vs full-bleed), so edges still match. */
+  .hero-block {
+    width: max-content;
+    max-width: 100%;
+    align-self: center;
+  }
+
+  .hero-title {
+    width: max-content;
+    max-width: 100%;
+    text-align: left;
+  }
+
+  /* Stack: copy → PREV → contacts. Tighter under Brown; roomier under HBO Max. */
+  .hero-intro {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "copy"
+      "prev"
+      "tiles";
+    justify-content: start;
+    justify-items: start;
+    row-gap: 0;
+    width: 0;
+    min-width: 100%;
+    text-align: left;
+  }
+
+  .hero-col,
+  .hero-col--copy,
+  .hero-col--prev {
+    width: auto;
+    max-width: 100%;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .hero-col--copy .line {
+    white-space: normal;
+  }
+
+  .hero-col--prev {
+    margin-top: 14px;
+  }
+
+  .hero-intro > .tiles--hero {
+    justify-self: start;
+    margin-top: 20px;
+  }
+
   .shelf-row {
     flex-wrap: wrap;
-    gap: 56px clamp(40px, 7vw, 80px);
+    gap: 28px clamp(16px, 3vw, 36px);
     min-height: 0;
   }
   .jr {
@@ -737,7 +831,10 @@
     max-width: 320px;
   }
   .scrap-row {
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
+    gap: 20px;
   }
 }
 
@@ -748,24 +845,12 @@
 
   .wt-wordmark,
   .wt-nav-links a {
+    font-size: 1rem;
+  }
+
+  .line,
+  .foot-name {
     font-size: 12px;
-    letter-spacing: 0.1em;
-  }
-
-  .hero-intro {
-    grid-template-columns: 1fr;
-    gap: 26px;
-    width: 100%;
-    text-align: center;
-  }
-
-  .hero-col {
-    align-items: center;
-  }
-
-  .hero-col--right {
-    align-items: center;
-    text-align: center;
   }
 
   .shelf-row {
@@ -775,7 +860,7 @@
   }
 
   .jr {
-    width: min(76vw, 300px);
+    width: min(76vw, 414px);
     transform: none;
   }
 
@@ -806,15 +891,9 @@
   }
 
   .scrap-row {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px;
-  }
-
-  .wt-foot-inner {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 20px;
+    align-items: center;
+    gap: 16px;
   }
 }
 

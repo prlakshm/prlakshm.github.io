@@ -61,7 +61,7 @@ export const journals: Journal[] = [
     trimOpen: "15.43%",
     alt:
       "A red leather journal stuffed with loose papers, resting on a drafting table.",
-    width: 300,
+    width: 414,
     offsetY: 0,
     rotate: -1.5,
     // Case study not yet written; artifacts stay deliberately incomplete
@@ -93,7 +93,7 @@ export const journals: Journal[] = [
     trimOpen: "5.71%",
     alt:
       "A dark brown leather journal with Mixr, headphone and waveform stickers, closed with a brass snap.",
-    width: 348, // flagship — reads ~10% larger than the others
+    width: 480, // flagship — reads ~10% larger than the others
     offsetY: 0,
     rotate: 1.2,
     artifacts: [
@@ -134,7 +134,7 @@ export const journals: Journal[] = [
     alt:
       "A sandy tan leather journal with HBO Max, eyes and Surprise stickers, tied with twine.",
     href: "/hbo-max-surprise",
-    width: 306,
+    width: 422,
     offsetY: 0,
     rotate: 1.8,
     artifacts: [
