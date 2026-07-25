@@ -860,33 +860,47 @@
     margin-top: 20px;
   }
 
+  /* Two notebooks on the first row, the third centered on the second. */
   .shelf-row {
     flex-wrap: wrap;
-    gap: 28px clamp(16px, 3vw, 36px);
+    justify-content: center;
+    align-items: flex-end;
+    gap: 28px 24px;
     min-height: 0;
   }
   .jr {
-    width: min(var(--jw), 38vw);
+    /* Half-row width so exactly two fit; the third wraps and centers. */
+    width: min(var(--jw), calc((100% - 24px) / 2));
+    max-width: 340px;
     transform: translateY(calc(var(--joffset) * 0.5));
-    --splay: 0.6;
+    --splay: 0.55;
   }
+  .jr-stage {
+    height: auto;
+    aspect-ratio: 300 / 400;
+  }
+
+  /* Fabric: pocket above, scraps stacked in a column below. */
   .archive-stage {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 36px;
     justify-items: center;
+    padding-block: clamp(32px, 5vh, 64px);
   }
   .pocket-wrap {
-    max-width: 324px;
+    max-width: min(324px, 72vw);
   }
   .scrap-row {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    width: auto;
+    margin-bottom: 0;
     gap: 0;
   }
   .scrap:not(:first-child) {
     margin-left: 0;
-    margin-top: calc(var(--pocket-h, 280px) * -0.5);
+    margin-top: calc(var(--pocket-h, 280px) * -0.45);
   }
 }
 
@@ -923,12 +937,14 @@
 
   .shelf-row {
     flex-direction: column;
+    flex-wrap: nowrap;
     align-items: center;
     gap: 40px;
   }
 
   .jr {
     width: min(76vw, 414px);
+    max-width: none;
     transform: none;
   }
 
