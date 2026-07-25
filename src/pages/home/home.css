@@ -1005,6 +1005,43 @@
   }
 }
 
+/* --- Fabric wraps to two rows -------------------------------------------- */
+/* 1249, not 1023: the single row only holds while it has room. Measured at
+   1280 the tallest strip is 1.02x the denim's height, at 1180 it is 0.90x and
+   by 1024 it has collapsed to 0.71x — weedy beside the pocket. So the archive
+   breaks to 3 + 2 as soon as one row stops earning its width.
+
+   The second row is not positioned by hand. Every strip is sized from the same
+   --wf3 basis, so the two remaining textiles come out to ~64% of the row and
+   centring them lands each within ~10px of the midpoint between two strips
+   above — they nest without a grid. One basis also means one height scale, so
+   all five stay in the reference photograph's proportions. */
+@media (max-width: 1249px) {
+  .scrap-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    /* Capped, and that cap is load-bearing. Three strips sharing the full
+       column are far wider each than five sharing it, so an uncapped row made
+       the textiles GROW on wrapping — 1.48x the denim at 1180px against 1.17x
+       on desktop. 530px puts the tallest strip at ~1.16x, matching desktop. */
+    width: min(100%, 530px);
+    margin-inline: auto;
+    --scrap-gap: 18px;
+    gap: 22px var(--scrap-gap);
+  }
+
+  .scrap {
+    /* Was an EQUAL third-of-a-row slot for all five. With aspects from 0.308
+       to 0.555 that forced wildly unequal heights — the broken part. */
+    flex: 0 0 calc((100% - 2 * var(--scrap-gap, 18px)) * var(--wf3, 0.33));
+    width: auto;
+    height: auto;
+    aspect-ratio: var(--ar, 0.5);
+  }
+}
+
 @media (max-width: 1023px) {
   /* Keep the title's centered max-content start. Body stacks inside that
      same block (shifts right vs full-bleed), so edges still match. */
@@ -1087,32 +1124,16 @@
   .pocket-wrap {
     max-width: min(330px, 72vw); /* +2%, gap unchanged */
   }
-  /* Tablet: two fabric rows — 3 on top, 2 centered below (same idea as the
-     notebook shelf's 2+1). Each scrap takes a third of the row so wrap is
-     forced; justify-content centers the shorter second row. */
+  /* Stacked: the row now spans the page rather than a grid column. Same 530px
+     cap as the wrap tier so the strips do not change size at this boundary. */
   .scrap-row {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: center;
-    width: min(92vw, 560px);
+    width: min(92vw, 530px);
     margin-left: 0;
     margin-bottom: 0;
-    --scrap-gap: 18px;
-    gap: 20px var(--scrap-gap);
   }
   .scrap:not(:first-child) {
     margin-left: 0;
     margin-top: 0;
-  }
-
-  .scrap {
-    /* Three equal slots per row; aspect-ratio sets height from that width.
-       Items 4–5 wrap and sit centered in the same slot size. */
-    flex: 0 0 calc((100% - 2 * var(--scrap-gap, 18px)) / 3);
-    width: calc((100% - 2 * var(--scrap-gap, 18px)) / 3);
-    height: auto;
-    aspect-ratio: var(--ar, 0.5);
   }
 }
 

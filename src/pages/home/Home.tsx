@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
-import { animate, scroll, stagger, steps } from "motion";
+import { animate, inView, scroll, stagger, steps } from "motion";
 import "../../styles/tokens.css";
 import "./home.css";
 import "../about/about.css";
@@ -82,6 +82,13 @@ const scraps = [
    proportions into a share of the row, so the whole set scales to fit without
    overlapping while holding the reference's relative sizing. */
 const SHARE_TOTAL = scraps.reduce((sum, s) => sum + s.ar * s.h, 0);
+
+/* Same sum across only the first three textiles — the top row of the 3 + 2
+   layout. Deriving both rows from this single basis is what keeps every strip
+   on one height scale when the archive wraps. */
+const TOP_ROW_TOTAL = scraps
+  .slice(0, 3)
+  .reduce((sum, s) => sum + s.ar * s.h, 0);
 
 /* Patch-pocket sew-on, in the PNG's 716×690 space:
    1. outer running stitch (hand-wobbled) ending on the top-edge corners,
@@ -187,10 +194,12 @@ function Home() {
     if (pathname === "/projects") scrollToSection("work");
   }, [pathname]);
 
-  /* Hero entrance. The title, each line and the contact tiles rise and fade on
-     a tight stagger. Runs in useLayoutEffect so the hidden starting state is
-     committed before first paint — a plain useEffect runs after paint and the
-     hero would flash in fully formed before dropping to opacity 0. */
+  /* Hero entrance. Hidden before paint (useLayoutEffect), then revealed once
+     when the hero is in view. A mount-only animate() was easy to interrupt
+     (Strict Mode stop(), route remount while scrolled down) and never retried,
+     so scrolling back up could find the hero stuck at opacity 0. inView fires
+     once; after that we keep the resting styles and never re-hide. */
+  const heroEnteredRef = useRef(false);
   useLayoutEffect(() => {
     const hero = heroRef.current;
     if (!hero) return;
@@ -203,22 +212,58 @@ function Home() {
     );
     if (targets.length === 0) return;
 
+    const applyVisible = () => {
+      targets.forEach((el) => {
+        el.style.opacity = "1";
+        el.style.transform = "none";
+      });
+    };
+
+    if (heroEnteredRef.current) {
+      applyVisible();
+      return;
+    }
+
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      heroEnteredRef.current = true;
+      applyVisible();
+      return;
+    }
 
     targets.forEach((el) => {
       el.style.opacity = "0";
-      if (!reduced) el.style.transform = "translateY(9px)";
+      el.style.transform = "translateY(9px)";
     });
 
-    const controls = animate(
-      targets,
-      { opacity: 1, y: 0 },
-      reduced
-        ? { duration: 0 }
-        : { duration: 0.7, delay: stagger(0.06), ease: [0.22, 0.61, 0.36, 1] }
+    let controls: ReturnType<typeof animate> | undefined;
+    const stopInView = inView(
+      hero,
+      () => {
+        controls = animate(
+          targets,
+          { opacity: 1, y: 0 },
+          { duration: 0.7, delay: stagger(0.06), ease: [0.22, 0.61, 0.36, 1] }
+        );
+        const commit = () => {
+          heroEnteredRef.current = true;
+          applyVisible();
+        };
+        controls.finished.then(commit).catch(commit);
+      },
+      { margin: "0px 0px -8% 0px" }
     );
 
-    return () => controls.stop();
+    return () => {
+      stopInView();
+      // complete() jumps to the end instead of stop()'s mid-hide freeze, so a
+      // Strict Mode remount never inherits a half-hidden hero.
+      if (controls) {
+        controls.complete();
+        heroEnteredRef.current = true;
+        applyVisible();
+      }
+    };
   }, []);
 
   /* Underline wipes (nav links + the @handle) and the pronunciation tooltip.
@@ -710,6 +755,12 @@ function Home() {
                          the heights stay in the reference's proportions at any
                          container width. The five shares sum to 1. */
                       "--wf": (s.ar * s.h) / SHARE_TOTAL,
+                      /* Same idea for the two-row (3 + 2) layout, but measured
+                         against the TOP row's total. Both rows use this one
+                         basis, so all five keep a single height scale — the
+                         second row simply comes out narrower and centres,
+                         nesting between the three above it. */
+                      "--wf3": (s.ar * s.h) / TOP_ROW_TOTAL,
                     } as React.CSSProperties
                   }
                 >

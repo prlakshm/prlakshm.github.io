@@ -31,7 +31,10 @@ function SurpriseRail() {
   }, []);
 
   /* Entrances. Text lifts ~20px, media settles from 0.97 — small enough to read
-     as the page composing itself rather than as an effect. inView fires once. */
+     as the page composing itself rather than as an effect. inView fires once;
+     after a successful reveal we keep resting styles and never re-hide (a
+     remount that reset opacity to 0 after unobserve left sections stuck
+     invisible when scrolling back up). */
   useLayoutEffect(() => {
     const root = rootRef.current;
     if (!root) return;
@@ -43,54 +46,82 @@ function SurpriseRail() {
       [...rise, ...settle].forEach((el) => {
         el.style.opacity = "1";
         el.style.transform = "none";
+        el.dataset.entered = "1";
       });
       return;
     }
 
-    rise.forEach((el) => {
-      el.style.opacity = "0";
-      el.style.transform = "translateY(20px)";
-    });
-    settle.forEach((el) => {
-      el.style.opacity = "0";
-      el.style.transform = "scale(0.97)";
-    });
-
     const stops: Array<() => void> = [];
+    const pending: Array<ReturnType<typeof animate>> = [];
 
-    rise.forEach((el) => {
+    const arm = (
+      el: HTMLElement,
+      hidden: () => void,
+      play: () => ReturnType<typeof animate>,
+      margin: `${number}px ${number}px ${number}% ${number}px`
+    ) => {
+      if (el.dataset.entered === "1") {
+        el.style.opacity = "1";
+        el.style.transform = "none";
+        return;
+      }
+      hidden();
       stops.push(
         inView(
           el,
           () => {
-            animate(
-              el,
-              { opacity: 1, y: 0 },
-              { duration: 0.7, ease: [0.22, 0.61, 0.36, 1] }
-            );
+            const controls = play();
+            pending.push(controls);
+            const commit = () => {
+              el.dataset.entered = "1";
+              el.style.opacity = "1";
+              el.style.transform = "none";
+            };
+            controls.finished.then(commit).catch(commit);
           },
-          { margin: "0px 0px -12% 0px" }
+          { margin }
         )
+      );
+    };
+
+    rise.forEach((el) => {
+      arm(
+        el,
+        () => {
+          el.style.opacity = "0";
+          el.style.transform = "translateY(20px)";
+        },
+        () =>
+          animate(
+            el,
+            { opacity: 1, y: 0 },
+            { duration: 0.7, ease: [0.22, 0.61, 0.36, 1] }
+          ),
+        "0px 0px -12% 0px"
       );
     });
 
     settle.forEach((el) => {
-      stops.push(
-        inView(
-          el,
-          () => {
-            animate(
-              el,
-              { opacity: 1, scale: 1 },
-              { duration: 0.9, ease: [0.22, 0.61, 0.36, 1] }
-            );
-          },
-          { margin: "0px 0px -8% 0px" }
-        )
+      arm(
+        el,
+        () => {
+          el.style.opacity = "0";
+          el.style.transform = "scale(0.97)";
+        },
+        () =>
+          animate(
+            el,
+            { opacity: 1, scale: 1 },
+            { duration: 0.9, ease: [0.22, 0.61, 0.36, 1] }
+          ),
+        "0px 0px -8% 0px"
       );
     });
 
-    return () => stops.forEach((stop) => stop());
+    return () => {
+      stops.forEach((stop) => stop());
+      pending.forEach((controls) => controls.complete());
+    };
   }, []);
 
   /* Chapter progress: the rail marks which chapter is in view. Cheap, and it
