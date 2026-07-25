@@ -13,13 +13,12 @@ import CaseStudyHBOMax1 from './pages/case-study-hbo-max1/CaseStudyHBOMax1.js';
 import CaseStudyHBOMax2 from './pages/case-study-hbo-max2/CaseStudyHBOMax2.js';
 import CaseStudyBinary from './pages/case-study-binary/CaseStudyBinary.js';
 import CaseStudyDreamer from './pages/case-study-dreamer/CaseStudyDreamer.js';
-import About from './pages/about/About.js';
 import './app.css';
 import Fun from './pages/fun/Fun.js';
 
 /* The worktable homepage ships its own nav and footer as part of the surface,
-   so the global chrome is suppressed there and kept everywhere else. */
-const OWN_CHROME = ['/', '/projects'];
+   so the global chrome is suppressed there and kept elsewhere. */
+const OWN_CHROME = ['/', '/projects', '/about'];
 
 function Shell() {
   const { pathname } = useLocation();
@@ -61,7 +60,8 @@ function Shell() {
         <Route path="/hbo-max-rtw" element={<CaseStudyHBOMax2 />} />
         <Route path="/binary-escape" element={<CaseStudyBinary />} />
         <Route path="/richdreamer" element={<CaseStudyDreamer />} />
-        <Route path="/about" element={<About />} />
+        {/* /about deep-links to the manifesto section on the homepage. */}
+        <Route path="/about" element={<Home />} />
       </Routes>
       </div>
       {!ownsChrome && <Footer />}

@@ -1,7 +1,9 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { animate, scroll, stagger, steps } from "motion";
 import "../../styles/tokens.css";
 import "./home.css";
+import "../about/about.css";
 import Journal from "./Journal.js";
 import ContactIcons from "./ContactIcons.js";
 import { attachUnderlineWipe, prefersReducedMotion } from "./interactions.js";
@@ -11,10 +13,19 @@ import { journals } from "./journals.js";
 // Resume_2026.pdf and "New Grad 2026 Resume.pdf" — switch here if this is stale.
 const RESUME_URL = "/docs/Pranavi_Lakshminarayanan_AI_Product_Resume.pdf";
 
-/* Fabric scraps. Colors stand in until the real textile photography exists —
-   add `src` here and the markup is unchanged. */
+// public/about/"Profile picture.png" — space encoded for the URL.
+const PORTRAIT = "/about/Profile%20picture.png";
+
+/* Fabric scraps. Prefer a photo `src` when the textile exists; `color` is the
+   placeholder fill until then. */
 const scraps = [
-  { id: "s1", label: "my grad dress", color: "#D8B98A", rotate: -7 },
+  {
+    id: "s1",
+    label: "my grad dress",
+    src: "/home/scraps/pink%20floral%20fabric/grad-dress.png?v=1",
+    color: "#D8B98A",
+    rotate: -7,
+  },
   { id: "s2", label: "curtains from my childhood bedroom", color: "#C9A24B", rotate: 4 },
   { id: "s3", label: "my fav kurti from india", color: "#B3542E", rotate: -3 },
   { id: "s4", label: "my sister's fav dress from high school", color: "#31556B", rotate: 6 },
@@ -36,6 +47,7 @@ function ExternalArrow() {
 }
 
 function Home() {
+  const { pathname } = useLocation();
   const archiveRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const pocketRef = useRef<HTMLDivElement>(null);
@@ -43,12 +55,19 @@ function Home() {
   const heroRef = useRef<HTMLElement>(null);
   const surfaceRef = useRef<HTMLDivElement>(null);
 
-  const scrollToWork = () => {
-    document.getElementById("work")?.scrollIntoView({
+  const scrollToSection = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({
       behavior: prefersReducedMotion() ? "auto" : "smooth",
       block: "start",
     });
   };
+
+  /* Deep links (#/about, #/projects) land on this page and scroll to the
+     matching section once it is in the tree. */
+  useEffect(() => {
+    if (pathname === "/about") scrollToSection("about");
+    if (pathname === "/projects") scrollToSection("work");
+  }, [pathname]);
 
   /* Hero entrance. The title, each line and the contact tiles rise and fade on
      a tight stagger. Runs in useLayoutEffect so the hidden starting state is
@@ -161,6 +180,54 @@ function Home() {
     return () => cleanups.forEach((fn) => fn());
   }, []);
 
+  /* Fabric scrap tooltips — follow the cursor, same chip as journal tips. */
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const cleanups: Array<() => void> = [];
+    const reduced = prefersReducedMotion();
+
+    stage.querySelectorAll<HTMLElement>(".scrap").forEach((scrap) => {
+      const tip = scrap.querySelector<HTMLElement>(".scrap-tooltip");
+      if (!tip) return;
+
+      /* Motion (and the cutting-mat parallax) put `transform` on ancestors,
+         which makes `position: fixed` resolve to that box — not the viewport.
+         Park the tip on `document.body` while visible so +14 / +18 matches
+         the hero-title chip distance. */
+      const place = (clientX: number, clientY: number) => {
+        tip.style.left = `${clientX + 14}px`;
+        tip.style.top = `${clientY + 18}px`;
+      };
+      const show = (on: boolean) =>
+        animate(
+          tip,
+          { opacity: on ? 1 : 0 },
+          reduced ? { duration: 0 } : { type: "spring", stiffness: 460, damping: 24 }
+        );
+
+      const enter = (e: PointerEvent) => {
+        if (tip.parentElement !== document.body) document.body.appendChild(tip);
+        place(e.clientX, e.clientY);
+        show(true);
+      };
+      const move = (e: PointerEvent) => place(e.clientX, e.clientY);
+      const leave = () => show(false);
+
+      scrap.addEventListener("pointerenter", enter);
+      scrap.addEventListener("pointermove", move);
+      scrap.addEventListener("pointerleave", leave);
+      cleanups.push(() => {
+        scrap.removeEventListener("pointerenter", enter);
+        scrap.removeEventListener("pointermove", move);
+        scrap.removeEventListener("pointerleave", leave);
+        if (tip.parentElement !== scrap) scrap.appendChild(tip);
+      });
+    });
+
+    return () => cleanups.forEach((fn) => fn());
+  }, []);
+
   /* Cutting-mat parallax. The fixed grid drifts slightly slower than the page,
      so the mat reads as a surface the content sits on rather than wallpaper
      locked to the viewport. .wt-surface is inset past the viewport edges in CSS
@@ -185,6 +252,13 @@ function Home() {
     if (!stage || !pocket) return;
 
     const measure = () => {
+      // Scrap height is 130% of the denim — publish it before reading offsets
+      // so layout (and thus dx/dy) sees the settled sizes.
+      stage.style.setProperty(
+        "--pocket-h",
+        `${Math.round(pocket.offsetHeight)}px`
+      );
+
       // Sit them high in the pocket so their tops clear the denim lip and the
       // fabric is visibly stuffed in there before the scroll pulls it out.
       const px = pocket.offsetLeft + pocket.offsetWidth * 0.5;
@@ -219,6 +293,7 @@ function Home() {
 
     const observer = new ResizeObserver(schedule);
     observer.observe(stage);
+    observer.observe(pocket);
     const row = stage.querySelector(".scrap-row");
     if (row) observer.observe(row);
     window.addEventListener("resize", schedule);
@@ -339,22 +414,19 @@ function Home() {
           </a>
           <nav aria-label="Primary">
             <ul className="wt-nav-links">
-              {/* A button, not <a href="#work">. This is a HashRouter, so the
-                  hash is the route: an in-page anchor would navigate to a
-                  non-existent "/work" route and blank the page. */}
+              {/* Buttons, not <a href="#…">. This is a HashRouter, so the hash
+                  is the route: an in-page anchor would navigate away. */}
               <li>
-                <button type="button" onClick={scrollToWork}>
+                <button type="button" onClick={() => scrollToSection("work")}>
                   WORK
                   <span className="nav-rule" aria-hidden="true" />
                 </button>
               </li>
-              {/* Points at the existing /about route, since the homepage's own
-                  about section was removed in the simplification pass. */}
               <li>
-                <a href="#/about">
+                <button type="button" onClick={() => scrollToSection("about")}>
                   ABOUT
                   <span className="nav-rule" aria-hidden="true" />
-                </a>
+                </button>
               </li>
               <li>
                 <a href={RESUME_URL} target="_blank" rel="noreferrer">
@@ -419,71 +491,90 @@ function Home() {
         >
           <div className="archive-stage" ref={stageRef}>
             <div className="pocket-wrap" ref={pocketRef}>
-              <svg
+              <img
                 className="pocket"
-                viewBox="0 0 400 406"
-                role="img"
-                aria-label="A denim pocket holding folded fabric scraps."
-              >
-                <path
-                  d="M14 26 L390 26 L356 262 L202 398 L46 262 Z"
-                  transform="translate(4,8)"
-                  fill="rgb(58 40 22 / 20%)"
-                />
-                <path d="M10 18 L386 18 L352 254 L198 390 L42 254 Z" fill="#3C5A79" />
-                <path d="M10 18 L386 18 L380 62 L16 62 Z" fill="rgb(20 34 52 / 28%)" />
-                <path
-                  d="M22 32 L374 32 L342 246 L198 372 L54 246 Z"
-                  fill="none"
-                  stroke="#C9A25E"
-                  strokeWidth="2"
-                  strokeDasharray="7 5"
-                />
-                <path
-                  d="M30 42 L366 42 L335 240 L198 360 L61 240 Z"
-                  fill="none"
-                  stroke="#C9A25E"
-                  strokeWidth="1.5"
-                  strokeDasharray="6 5"
-                  opacity="0.75"
-                />
-                <path
-                  d="M60 120 Q198 190 336 120"
-                  fill="none"
-                  stroke="#C9A25E"
-                  strokeWidth="2"
-                  strokeDasharray="7 5"
-                  opacity="0.85"
-                />
-                <path
-                  d="M60 140 Q198 210 336 140"
-                  fill="none"
-                  stroke="#C9A25E"
-                  strokeWidth="1.5"
-                  strokeDasharray="6 5"
-                  opacity="0.6"
-                />
-                <circle cx="26" cy="30" r="6" fill="#A8794A" />
-                <circle cx="370" cy="30" r="6" fill="#A8794A" />
-              </svg>
+                src="/home/denim-pocket.png"
+                alt="A denim pocket holding folded fabric scraps."
+                width={716}
+                height={690}
+                decoding="async"
+              />
             </div>
 
             <ul className="scrap-row">
               {scraps.map((s, i) => (
                 <li
                   key={s.id}
-                  className="scrap"
+                  className={`scrap${s.src ? " scrap--photo" : ""}`}
                   aria-label={s.label}
                   style={
                     {
-                      background: s.color,
+                      background: s.src ? undefined : s.color,
                       "--sr": `${s.rotate}deg`,
                       "--si": i,
                     } as React.CSSProperties
                   }
-                />
+                >
+                  {s.src && (
+                    <img
+                      className="scrap-img"
+                      src={s.src}
+                      alt=""
+                      draggable={false}
+                      decoding="async"
+                    />
+                  )}
+                  <span className="scrap-tooltip" aria-hidden="true">
+                    {s.label}
+                  </span>
+                </li>
               ))}
             </ul>
+          </div>
+        </section>
+
+        <section className="ab" id="about" aria-labelledby="ab-title">
+          <div className="ab-grid">
+            <div className="ab-text">
+              <h2 className="ab-title" id="ab-title">
+                Design Manifesto
+              </h2>
+              <div className="ab-body">
+                <p>
+                  I studied Computer Science and Literary Arts at Brown &mdash; which
+                  sounds like two degrees and is really one habit: take a thing
+                  apart, learn how it holds together, and put it back with the
+                  seams showing.
+                </p>
+                <p>
+                  Every project starts as a sentence before it starts as a screen.
+                  If I can&rsquo;t say what a thing is for in one line, the
+                  interface is usually covering for a decision I haven&rsquo;t made
+                  yet.
+                </p>
+                <p>
+                  I build in public because finishing in private taught me nothing.
+                  I&rsquo;d rather show the drafts, the dead ends, the version that
+                  argued back.
+                </p>
+                <p>
+                  And I keep a drawer of fabric &mdash; my mother&rsquo;s, my
+                  sister&rsquo;s, my own &mdash; because material memory is the only
+                  design education I never had to pay for. I want software to carry
+                  that much texture: things you can feel the weight of before you
+                  know what they do.
+                </p>
+              </div>
+              <p className="ab-sign">&mdash; Pranavi</p>
+            </div>
+
+            <figure className="ab-portrait">
+              <img
+                src={PORTRAIT}
+                alt="Pranavi Ram, smiling, on the Brown University campus green."
+                decoding="async"
+              />
+            </figure>
           </div>
         </section>
       </main>

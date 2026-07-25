@@ -36,6 +36,8 @@
   --parchment: #f5eee4;
   /* Journal notecard / slip paper — tooltips share this so they match. */
   --paper: #f6f0dd;
+  /* Tooltip fill: same as the page, ~2% warmer — separation is shadow + hairline. */
+  --tooltip-fill: color-mix(in srgb, var(--parchment) 98%, #e0b87a 2%);
   /* Slightly lifted from near-black so the title reads brown, not ink. */
   --espresso: #3d2a1f;
 

@@ -1,168 +1,121 @@
-.about {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    margin-top: 6.5rem;
-    overflow: clip;
-    animation: fadeIn 0.4s ease forwards;
+/* ==========================================================================
+   About — Design Manifesto
+   Section lives on the homepage below the fabric archive; chrome comes from
+   home.css. This file only lays out the manifesto + portrait.
+   ========================================================================== */
+
+.ab {
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--page-gutter);
+  padding-block: clamp(48px, 9vh, 120px) clamp(56px, 10vh, 130px);
+  /* Clear the sticky worktable nav when scrolled into via the ABOUT link. */
+  scroll-margin-top: calc(var(--nav-height) + 12px);
 }
 
-.about .main {
-  display: flex;
-  flex-direction: column;
-  padding-top: 0;
-  align-items: center;
+/* Full page-column width (same as hero / shelf / archive). Pair is centered
+   with a moderate gap so copy and portrait aren’t pinned to opposite edges. */
+.ab-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 38rem) auto;
   justify-content: center;
-  padding: 2.5rem auto 1.5rem auto;
+  column-gap: clamp(67px, 7.39vw, 118px);
+  align-items: stretch;
+  width: 100%;
 }
 
-
-.about .main h1 {
-    font-family: "punch-holes";
-    font-weight: 400;
-    font-size: 3.75rem;
-    letter-spacing: 0.05cap;
-    margin-top: 0.9rem;
-    margin-bottom: 1.4rem;
-    padding: 0;
-    color: #18181b;
+.ab-text {
+  min-width: 0;
+  max-width: 38rem;
 }
 
-.about .main p {
-  font-family: "forma-djr-text", sans-serif;
-  width: 55vw;
-  font-size: 1.1rem;
-  font-weight: 425;
-  text-align: left;
-  margin-top: 1rem;
-  letter-spacing: 1px;
-  line-height: 1.8rem;
-  color: #4e4e54;
-  animation: pageEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+.ab-title {
+  margin: 0 0 28px;
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+  font-size: var(--section-size);
+  line-height: 0.98;
+  letter-spacing: -0.015em;
+  color: var(--espresso);
+  white-space: nowrap;
 }
 
-.about .main p:nth-child(1) { animation-delay: 0.15s; }
-.about .main p:nth-child(2) { animation-delay: 0.22s; }
-.about .main p:nth-child(3) { animation-delay: 0.29s; }
-.about .main p:nth-child(4) { animation-delay: 0.36s; }
-
-.about .main a {
-  text-decoration: none;
-}
-
-.about .main a:hover, .about .main a:active {
-  text-decoration: underline;
-}
-
-
-.image-row {
-  display: flex;
-  width: 100vw;
-  margin-top: 3.25rem;
-  margin-bottom: 1rem;
-  overflow: hidden;
-  align-items: center;
-  justify-content: space-evenly;
-}
-
-.image-row img {
-  width: 12vw;
-  height: auto;
-  object-fit: cover;
-  animation: pageEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), filter 0.35s ease;
-}
-
-.image-row img:hover {
-  transform: scale(1.06) translateY(-4px);
-  filter: brightness(1.05);
-  z-index: 1;
-  position: relative;
-}
-
-.image-row img:nth-child(1) { animation-delay: 0.4s; }
-.image-row img:nth-child(2) { animation-delay: 0.46s; }
-.image-row img:nth-child(3) { animation-delay: 0.52s; }
-.image-row img:nth-child(4) { animation-delay: 0.58s; }
-.image-row img:nth-child(5) { animation-delay: 0.64s; }
-.image-row img:nth-child(6) { animation-delay: 0.70s; }
-.image-row img:nth-child(7) { animation-delay: 0.76s; }
-.image-row img:nth-child(8) { animation-delay: 0.82s; }
-
-  /*------------------------ Media Queries --------------------------*/
-
-
-@media screen and (max-width: 768px) {
-
-  .about .main h1 {
-    font-size: 3.25rem;
-  }
-
-  .about .main p {
-    font-size: 1rem; 
-    width: 70vw;
-  }
-
-  .image-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0;
-  }
-
-  .image-row img {
-    width: 24.25vw;
-  }
-}
-
-/* Media Query for screens 600px or smaller */
-@media screen and (max-width: 672px) {
-  .about {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.about .main {
-  width: 95vw;
-}
-
-.about .text {
+.ab-body {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 18px;
 }
 
-.about .main h1 {
-  font-size: 2.75rem;
-}
-.about .main p {
-  font-size: 0.8rem;
-  text-align: center; 
-}
-
-
+.ab-body p {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.75;
+  letter-spacing: 0.01em;
+  color: var(--mono-secondary);
 }
 
-@media screen and (max-width: 426px) {
+.ab-sign {
+  margin: 26px 0 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: var(--accent-text);
+}
 
-  .about .main {
-    margin-top: 0rem;;
-    padding-top: 0.25rem;
+/* ~97% of the manifesto column height, vertically centered. Image is out of
+   flow so aspect-ratio can derive width from that height. */
+.ab-portrait {
+  position: relative;
+  margin: 0;
+  align-self: center;
+  height: 97%;
+  aspect-ratio: 3 / 4;
+}
+
+.ab-portrait img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Landscape source; face sits centre-x, so this keeps her framed. */
+  object-position: 50% 42%;
+}
+
+/* --- Responsive ---------------------------------------------------------- */
+@media (max-width: 900px) {
+  .ab-grid {
+    grid-template-columns: 1fr;
+    row-gap: 28px;
+    justify-items: start;
+    width: 100%;
+    max-width: 100%;
   }
 
-  .about .main p {
- width: 75vw;
+  .ab-text {
+    max-width: none;
   }
 
-  .image-row {
-    margin-top: 2.5rem;
-    grid-template-columns: repeat(2, 1fr);
+  .ab-title {
+    white-space: normal;
   }
 
-  .image-row img {
-    width: 49.5vw;
+  .ab-portrait {
+    justify-self: center;
+    align-self: auto;
+    width: min(233px, 54vw);
+    height: auto;
   }
-  
 
+  .ab-portrait img {
+    position: static;
+  }
 }
 
+@media (max-width: 767px) {
+  .ab {
+    padding-block: clamp(32px, 7vh, 64px) clamp(40px, 8vh, 80px);
+  }
+}

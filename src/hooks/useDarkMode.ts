@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router-dom';
 
-const darkModeRoutes = ['/about']; // Add other routes as needed
+const darkModeRoutes: string[] = []; // Add routes as needed
 
 
 function useDarkMode() {
