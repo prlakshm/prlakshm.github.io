@@ -58,6 +58,14 @@
   padding-inline: var(--page-gutter);
 }
 
+/* The archive runs one minor grid column (32px) wider than its siblings — 16px
+   proud on each side. That whole 32px is handed to the gap between the denim
+   and the textiles (see .archive-stage), so the fabrics keep their size and
+   only the breathing room changes. */
+.archive {
+  max-width: calc(var(--page-max) + var(--grid-minor-step));
+}
+
 /* Nav and footer run wider than the content column so they sit flush to the
    edges of the table, framing everything between them. */
 .wt-nav-inner,
@@ -647,20 +655,74 @@
 .archive-stage {
   position: relative; /* offsetParent for the measured scrap offsets */
   display: grid;
-  /* Pocket ~70% of flagship notebook width (480 × 0.7). */
-  grid-template-columns: minmax(240px, 371px) 1fr;
-  /* Keep scraps tight to the denim — they start immediately beside it. */
-  gap: clamp(20px, 2.4vw, 40px);
+  /* Pocket column ~2% over the prior 352px max; gap unchanged so the fabric
+     row keeps its measure and only the denim grows. */
+  grid-template-columns: minmax(228px, 359px) 1fr;
+  gap: clamp(24px, 3.3vw, 56px);
   /* Bottoms share an edge; the scrap row then lifts via margin-bottom so
      lined-up fabric sits 10% of pocket height above the denim hem. */
   align-items: end;
   /* Room for scraps taller than the denim (130%) and the deal-out arc. */
   padding-block: clamp(48px, 7vh, 96px);
+  /* Scrap layout keys off this width so split-screen / mid widths wrap to
+     3+2 instead of crushing five textiles into one shrinking row. */
+  container-type: inline-size;
+  container-name: archive;
 }
 
 .pocket-wrap {
+  position: relative; /* containing block for the stitch overlay */
   width: 100%;
-  max-width: 371px;
+  max-width: 359px; /* +2% over 352; spacing/gap unchanged */
+}
+
+/* --- Sewn on, not pasted on ---------------------------------------------- */
+/* Three devices, in order of how much they do:
+   1. thread that crosses onto the paper (the stitch overlay below),
+   2. needle holes shadowed under that thread,
+   3. a tight contact shadow — small offset, small blur. A large soft shadow
+      would read as floating above the page, which is the opposite of sewn. */
+.pocket {
+  filter: drop-shadow(0 1.5px 1.5px rgb(61 42 31 / 0.3))
+    drop-shadow(0 5px 9px rgb(61 42 31 / 0.14));
+}
+
+/* `position` and the explicit size are load-bearing: the unscoped
+   `svg { position: absolute; width: 0; height: 0 }` in the case-study
+   stylesheets is bundled globally and would otherwise collapse this. */
+.pocket-stitch {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  pointer-events: none;
+  overflow: visible; /* the seam sits outside the denim silhouette */
+}
+
+.pocket-stitch-thread,
+.pocket-stitch-holes {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* Uneven dash so it reads as hand-run stitching, not a dotted border.
+     dashoffset nudges a stitch onto each top corner so the seam looks tied off. */
+  stroke-dasharray: 11 8 7 9;
+  stroke-dashoffset: 2;
+}
+
+/* Offset dark copy = the puncture under each stitch. This is what makes the
+   thread look pressed into the paper instead of drawn on top of it. */
+.pocket-stitch-holes {
+  stroke: rgb(61 42 31 / 0.32);
+  stroke-width: 4.8;
+  transform: translate(0.6px, 1.8px);
+}
+
+.pocket-stitch-thread {
+  /* The pocket's own topstitch gold, a shade deeper so it holds on parchment. */
+  stroke: #c08c2c;
+  stroke-width: 3.4;
 }
 
 .pocket {
@@ -679,14 +741,18 @@
 .scrap-row {
   list-style: none;
   /* Lined-up view: sit 10% of pocket height above the denim’s bottom line.
-     In-pocket start is unchanged — still measured to the pocket mouth in JS. */
-  margin: 0 0 calc(var(--pocket-h, 280px) * 0.1);
+     In-pocket start is unchanged — still measured to the pocket mouth in JS.
+     2px left margin scoots the whole row right on the desktop one-row view. */
+  margin: 0 0 calc(var(--pocket-h, 280px) * 0.1) 2px;
   padding: 0;
   display: flex;
-  align-items: center;
-  /* Span the full column: first scrap sits beside the pocket, last keeps
-     the current right edge, with even space between. Overlap comes from
-     negative margins on .scrap — not from transforms (Motion owns those). */
+  flex-wrap: wrap;
+  align-items: flex-end;
+  /* Span the full column: first scrap sits beside the pocket, last keeps the
+     right edge. The scraps reserve 4 x --scrap-gap of width between them (see
+     .scrap flex-basis), and space-between then distributes exactly that as
+     four even gaps — so they never overlap at any width. */
+  --scrap-gap: clamp(6px, 0.8vw, 12px);
   justify-content: space-between;
   width: 100%;
   gap: 0;
@@ -697,10 +763,15 @@
    in the pocket mouth so five scraps read as a stuffed handful, not one. */
 .scrap {
   position: relative;
-  /* ~130% of denim height; width follows the tall strip aspect. */
-  height: calc(var(--pocket-h, 280px) * 1.3);
-  width: calc(var(--pocket-h, 280px) * 1.3 * 0.5);
-  flex-shrink: 0;
+  /* Each textile takes a fixed share (--wf) of the row after gaps, and its
+     height falls out of its own aspect (--ar). Because the shares are derived
+     from aspect x reference-height, the rendered heights hold the reference
+     photograph's proportions at any container width, and the set always fits
+     without overlapping. Nothing is stretched: --ar is the textile's true
+     measured aspect. */
+  flex: 0 0 calc((100% - 4 * var(--scrap-gap, 16px)) * var(--wf, 0.2));
+  height: auto;
+  aspect-ratio: var(--ar, 0.5);
   box-shadow: 0 3px 9px rgb(58 40 22 / 0.24);
   transform: translate(
       calc(var(--dx, 0px) + (var(--si) - 2) * 17px),
@@ -709,9 +780,35 @@
     rotate(calc((var(--si) - 2) * 5deg)) scale(0.84);
 }
 
-/* Pull neighbors together so textiles can layer while ends stay pinned. */
-.scrap:not(:first-child) {
-  margin-left: calc(var(--pocket-h, 280px) * -0.34);
+/* No negative margin any more: the textiles are sized as shares of the row,
+   so they fit side by side with a real gap instead of overlapping. */
+
+/* Desktop single-row only: green plaid sits a hair right so its tilt doesn't
+   kiss the neighbour. Cleared under the container 3+2 and phone stack. */
+.scrap--plaid {
+  margin-left: 8px;
+}
+
+/* Narrow archive (split-screen, mid desktop, tablet): keep scrap scale, wrap
+   to two rows — 3 on top, 2 centered underneath — instead of shrinking.
+   Lives after base .scrap / .scrap--plaid so these flex and margin overrides win. */
+@container archive (max-width: 1200px) {
+  .scrap-row {
+    justify-content: center;
+    width: min(100%, 560px);
+    margin-inline: auto;
+    --scrap-gap: 16px;
+    gap: 22px var(--scrap-gap);
+  }
+
+  .scrap,
+  .scrap--plaid {
+    margin-left: 0;
+  }
+
+  .scrap {
+    flex: 0 0 calc((100% - 2 * var(--scrap-gap)) / 3);
+  }
 }
 
 .scrap--photo {
@@ -720,24 +817,14 @@
   overflow: visible;
 }
 
-/* Per-textile optical scales (Motion owns .scrap transform — scale the img). */
-.scrap--curtains .scrap-img {
-  width: 90%;
-  height: 90%;
-  inset: auto;
-  left: 50%;
-  top: 50%;
-  translate: -50% -50%;
-}
+/* No per-textile optical scales any more. The old --curtains 90% and --mesh
+   179% rules existed to undo transparent padding baked into the assets; the
+   assets are now trimmed to their alpha bounds, so every scrap fills its own
+   box exactly and the sizes come purely from --sh and --ar.
 
-/* Sheer mesh — multiply for see-through; +40% on the prior 128% optical scale. */
+   The mesh rule survives for material only: the kurti is sheer, so it
+   multiplies against the parchment instead of sitting on it. */
 .scrap--mesh .scrap-img {
-  width: 179%;
-  height: 179%;
-  inset: auto;
-  left: 50%;
-  top: 50%;
-  translate: -50% -50%;
   mix-blend-mode: multiply;
   filter: drop-shadow(0 2px 6px rgb(58 40 22 / 0.18));
 }
@@ -902,7 +989,7 @@
     aspect-ratio: 300 / 400;
   }
 
-  /* Fabric: pocket above, scraps stacked in a column below. */
+  /* Fabric: pocket above scraps. 3+2 wrap comes from @container archive. */
   .archive-stage {
     grid-template-columns: 1fr;
     gap: 36px;
@@ -910,20 +997,10 @@
     padding-block: clamp(32px, 5vh, 64px);
   }
   .pocket-wrap {
-    max-width: min(324px, 72vw);
+    max-width: min(330px, 72vw); /* +2%, gap unchanged */
   }
   .scrap-row {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: auto;
     margin-bottom: 0;
-    /* Phone / tablet column: stack with space — no fabric overlap. */
-    gap: 20px;
-  }
-  .scrap:not(:first-child) {
-    margin-left: 0;
-    margin-top: 0;
   }
 }
 
@@ -998,10 +1075,27 @@
     transition-duration: 140ms;
   }
 
+  /* Phone: one scrap per line — overrides container 3+2. */
   .scrap-row {
     flex-direction: column;
+    flex-wrap: nowrap;
     align-items: center;
+    justify-content: center;
+    width: auto;
+    margin-inline: 0;
     gap: 16px;
+  }
+
+  .scrap,
+  .scrap--plaid {
+    margin-left: 0;
+  }
+
+  .scrap {
+    flex: 0 0 auto;
+    height: calc(var(--pocket-h, 280px) * 1.265 * var(--sh, 1));
+    width: auto;
+    max-height: none;
   }
 }
 

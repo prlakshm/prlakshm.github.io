@@ -16,41 +16,84 @@ const RESUME_URL = "/docs/Pranavi_Lakshminarayanan_AI_Product_Resume.pdf";
 // public/about/"Profile picture.png" — space encoded for the URL.
 const PORTRAIT = "/about/Profile%20picture.png";
 
-/* Fabric scraps. Prefer a photo `src` when the textile exists; `color` is the
-   placeholder fill until then. */
+/* Fabric scraps, in the order and relative proportions of the reference
+   photograph of the real textiles laid out side by side.
+
+   `h`  — height relative to the tallest piece (the curtains), read off that
+          photograph. Height is what carries the relationship between the
+          pieces, so it drives the sizing.
+   `ar` — the textile's own width/height, measured from the alpha bounds of the
+          trimmed asset. Width is derived from it so no photograph is stretched.
+
+   The assets were trimmed to their alpha bounds first: the kurti carried 51%
+   transparent side padding, which is why it used to need a 179% "optical
+   scale" hack to look right. With the padding gone the numbers below are the
+   real thing and no per-textile fudge factors are needed. */
 const scraps = [
   {
     id: "s1",
     label: "my grad dress",
-    src: "/home/scraps/pink%20floral%20fabric/grad-dress.png?v=1",
+    src: "/home/scraps/pink%20floral%20fabric/grad-dress.png?v=2",
     color: "#D8B98A",
     rotate: -7,
-  },
-  {
-    id: "s2",
-    label: "curtains from my childhood bedroom",
-    src: "/home/scraps/golden%20fabrix/curtains.png?v=1",
-    curtains: true,
-    color: "#C9A24B",
-    rotate: 4,
+    h: 0.83,
+    ar: 0.555,
   },
   {
     id: "s3",
     label: "my fav kurti from india",
-    src: "/home/scraps/red%20kurta/kurti.png?v=2",
+    src: "/home/scraps/red%20kurta/kurti.png?v=3",
     mesh: true,
     color: "#B3542E",
     rotate: -3,
+    h: 0.945,
+    ar: 0.385,
+  },
+  {
+    id: "s5",
+    label: "purple top my mom stitched 4 me",
+    src: "/home/scraps/purple%20top/purple-top.png?v=2",
+    color: "#6E4E8C",
+    rotate: -5,
+    h: 0.911,
+    ar: 0.441,
   },
   {
     id: "s4",
     label: "my sister's fav dress from high school",
-    src: "/home/scraps/green%20plaid%20fabric/sister-dress.png?v=1",
+    src: "/home/scraps/green%20plaid%20fabric/sister-dress.png?v=2",
     color: "#31556B",
-    rotate: 6,
+    rotate: 5,
+    plaid: true,
+    h: 0.909,
+    ar: 0.531,
   },
-  { id: "s5", label: "purple top my mom stitched 4 me", color: "#6E4E8C", rotate: -5 },
+  {
+    id: "s2",
+    label: "curtains from my childhood bedroom",
+    src: "/home/scraps/golden%20fabric/curtains.png?v=2",
+    color: "#C9A24B",
+    rotate: 4,
+    h: 1,
+    ar: 0.308,
+  },
 ];
+
+/* Sum of (aspect x height) across the archive. Used to turn each textile's
+   proportions into a share of the row, so the whole set scales to fit without
+   overlapping while holding the reference's relative sizing. */
+const SHARE_TOTAL = scraps.reduce((sum, s) => sum + s.ar * s.h, 0);
+
+/* The seam the denim is sewn along, in the pocket PNG's own 716x690 space.
+   Runs outside the silhouette and terminates on the top-edge corners (where
+   the bar tacks sit) — open at the mouth, like a real patch pocket. */
+const POCKET_SEAM =
+  "M 8,8 L -10,22 L 0.1,79.2 L 9.1,140.1 L 18.1,200.8 L 26.1,261.9 " +
+  "L 32.1,323.9 L 38.1,386.2 L 45.1,448.0 L 52.2,510.8 L 93.2,563.9 " +
+  "L 150.7,594.2 L 208.2,623.4 L 266.2,651.9 L 322.6,681.1 L 358,698 " +
+  "L 396.0,682.8 L 452.4,652.1 L 508.5,622.0 L 564.3,591.2 L 620.9,560.3 " +
+  "L 665.4,510.0 L 673.9,447.2 L 681.9,386.2 L 688.9,325.0 L 695.0,262.8 " +
+  "L 699.9,201.2 L 705.9,139.6 L 712.9,78.9 L 726,22 L 708,8";
 
 function ExternalArrow() {
   return (
@@ -330,6 +373,8 @@ function Home() {
   useEffect(() => {
     const shelf = shelfRef.current;
     const archive = archiveRef.current;
+    // The fabric timeline below is anchored to the pocket, not the section.
+    const pocket = pocketRef.current;
 
     if (typeof IntersectionObserver === "undefined") {
       shelf?.classList.add("is-in");
@@ -401,7 +446,7 @@ function Home() {
       timelines.forEach((t) => {
         t.time = DURATION;
       });
-    } else if (archive && timelines.length > 0) {
+    } else if (pocket && timelines.length > 0) {
       // One scroll subscription driving all five timelines, not five listeners.
       stopScroll = scroll(
         (progress: number) => {
@@ -410,9 +455,16 @@ function Home() {
             t.time = Math.min(DURATION, Math.max(0, local));
           });
         },
-        // Runs as the section rises through the lower half of the viewport,
-        // which is a comfortable distance for the whole dance.
-        { target: archive, offset: ["start 0.95", "start 0.45"] }
+        /* Anchored to the POCKET, not the section. The section's top sits well
+           above the pocket, so the old range ran the whole dance before the
+           pocket had entered the viewport — you arrived to fabric already laid
+           out. Tracking the pocket instead means the deal-out plays while the
+           thing it comes out of is on screen.
+
+           The timeline is scrubbed, so this one range governs both directions:
+           scrolling back up re-tucks over exactly the same travel. The 0.5
+           spread between the two stops is kept from the previous setup. */
+        { target: pocket, offset: ["start 0.9", "start 0.4"] }
       );
     }
 
@@ -519,6 +571,19 @@ function Home() {
                 height={690}
                 decoding="async"
               />
+              {/* Running stitch attaching the denim to the page. Path hugs the
+                  outside of the silhouette and lands on the top-edge corners
+                  (bar-tack points). Open across the mouth — sewing that shut
+                  would close the pocket. viewBox matches the image. */}
+              <svg
+                className="pocket-stitch"
+                viewBox="0 0 716 690"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path className="pocket-stitch-holes" d={POCKET_SEAM} />
+                <path className="pocket-stitch-thread" d={POCKET_SEAM} />
+              </svg>
             </div>
 
             <ul className="scrap-row">
@@ -527,13 +592,23 @@ function Home() {
                   key={s.id}
                   className={`scrap${s.src ? " scrap--photo" : ""}${
                     s.mesh ? " scrap--mesh" : ""
-                  }${s.curtains ? " scrap--curtains" : ""}`}
+                  }${s.plaid ? " scrap--plaid" : ""}`}
                   aria-label={s.label}
                   style={
                     {
                       background: s.src ? undefined : s.color,
                       "--sr": `${s.rotate}deg`,
                       "--si": i,
+                      "--ar": s.ar,
+                      /* Height relative to the tallest textile, from the
+                         reference photo. Drives the stacked layout. */
+                      "--sh": s.h,
+                      /* Share of the row this textile occupies. Derived so it
+                         cannot drift from h/ar: width = share x available, and
+                         height = width / ar = available x h / SHARE_TOTAL, so
+                         the heights stay in the reference's proportions at any
+                         container width. The five shares sum to 1. */
+                      "--wf": (s.ar * s.h) / SHARE_TOTAL,
                     } as React.CSSProperties
                   }
                 >

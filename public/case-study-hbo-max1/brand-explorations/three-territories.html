@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Surprise Rail — three identity territories (SPECULATIVE, not approved)</title>
+<style>
+@font-face{font-family:"BerkMono";src:url("/fonts/berkeley/BerkeleyMonoTrial-Regular.otf") format("opentype");font-display:swap}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#121114;color:#EFEAF0;font:400 15px/1.5 "Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.mono{font-family:"BerkMono",ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.13em;text-transform:uppercase}
+.board{width:1560px;padding:56px 56px 72px}
+.banner{border:1px solid #C9274B;color:#F2A0AE;padding:9px 14px;margin-bottom:34px}
+.boardhead{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid #2B282F;padding-bottom:14px;margin-bottom:34px}
+.boardhead h1{font-size:26px;font-weight:600;letter-spacing:-.02em}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;align-items:start}
+.col{overflow:hidden}
+.colhead{padding:22px 24px 20px}
+.colhead .idx{opacity:.55;margin-bottom:14px}
+.colhead h2{font-size:29px;font-weight:600;letter-spacing:-.03em;line-height:1}
+.colhead .thesis{margin-top:11px;font-size:15px;line-height:1.4;max-width:34ch}
+.stage{height:250px;position:relative;overflow:hidden}
+.notes{padding:20px 24px 24px}
+.notes h3{font-size:11px;letter-spacing:.13em;text-transform:uppercase;opacity:.5;margin:16px 0 7px;font-weight:400;font-family:"BerkMono",monospace}
+.notes h3:first-child{margin-top:0}
+.notes p{font-size:13.5px;line-height:1.5}
+.chips{display:flex;gap:5px;margin-top:4px}
+.chip{flex:1;height:38px;position:relative}
+.chip b{position:absolute;left:4px;bottom:3px;font:400 8px/1 "BerkMono",monospace;letter-spacing:.06em}
+
+/* ---------- T1 LATENT IMAGE ---------- */
+.t1{background:#0B0A0C;border:1px solid #26222B}
+.t1 .thesis{color:#B4AAB8}
+.t1 .stage{background:#0B0A0C}
+.t1 .frame{position:absolute;inset:32px 28px;overflow:hidden;background:#08070B}
+.t1 .art{position:absolute;inset:0;background:url("/case-study-hbo-max1/generated-v5/suburban-key-art.png") center/cover}
+.t1 .veil{position:absolute;inset:0;-webkit-mask-image:linear-gradient(100deg,#000 0 42%,transparent 66%);mask-image:linear-gradient(100deg,#000 0 42%,transparent 66%)}
+.t1 .veil .blurart{position:absolute;inset:-30px;background:url("/case-study-hbo-max1/generated-v5/suburban-key-art.png") center/cover;filter:blur(15px)}
+.t1 .veil .black{position:absolute;inset:0;background:rgba(0,0,0,.75)}
+.t1 .veil .soft{position:absolute;inset:0;background:#fff;mix-blend-mode:soft-light}
+.t1 .clue{position:absolute;left:0;top:50%;transform:translateY(-50%);width:52%;text-align:center;font-size:23px;font-weight:700;letter-spacing:-.01em;color:#fff;text-shadow:0 1px 12px rgba(0,0,0,.5)}
+.t1 .edgelabel{position:absolute;right:30px;bottom:12px;color:#7C7482}
+.t1 .notes p{color:#B4AAB8}
+
+/* ---------- T2 CLUE INDEX ---------- */
+.t2{background:#F2EFE9;color:#16151A;border:1px solid #DAD5CB}
+.t2 .thesis{color:#5A5650}
+.t2 .stage{background:#F2EFE9;padding:22px 24px}
+.t2 .row{display:grid;grid-template-columns:22px 1fr 96px;gap:12px;align-items:baseline;padding:9px 0;border-top:1px solid #D9D4C9}
+.t2 .row:first-child{border-top:0}
+.t2 .n{font:400 10px/1 "BerkMono",monospace;color:#9A948A}
+.t2 .clue{font-size:22px;font-weight:600;letter-spacing:-.025em;line-height:1}
+.t2 .tag{font:400 9px/1 "BerkMono",monospace;letter-spacing:.1em;text-transform:uppercase;color:#1F2ADB;text-align:right}
+.t2 .redact{display:inline-block;height:12px;background:#16151A;vertical-align:baseline;margin-left:9px}
+.t2 .notes h3{opacity:.55}
+.t2 .notes p{color:#3C3A38}
+
+/* ---------- T3 WRAPPED ---------- */
+.t3{background:#C4A47C;color:#2A2622;border:1px solid #A78A63}
+.t3 .thesis{color:#4A4239}
+.t3 .stage{background:#B99B74;display:flex;align-items:center;gap:16px;padding:20px 24px}
+.t3 .bookwrap{width:132px;flex:0 0 auto}
+.t3 .bookwrap img{width:100%;display:block;filter:drop-shadow(0 8px 18px rgba(0,0,0,.3))}
+.t3 .card{flex:1;background:#E4D8C2;padding:16px 18px;position:relative;box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.t3 .card ul{list-style:none;font:italic 400 17px/1.55 Georgia,serif}
+.t3 .card ul li:before{content:"- ";color:#8A7B62}
+.t3 .seal{position:absolute;right:-16px;top:50%;transform:translateY(-50%);width:52px;height:52px;border-radius:50%;background:radial-gradient(circle at 34% 30%,#C8324A,#A8172B 62%,#7C0F1F);box-shadow:0 3px 8px rgba(0,0,0,.35)}
+.t3 .seal span{position:absolute;inset:0;display:grid;place-items:center;font:700 15px/1 Georgia,serif;color:#E8C9CF}
+.t3 .notes h3{opacity:.6}
+.t3 .notes p{color:#3A342C}
+.caveat{margin-top:30px;padding-top:14px;border-top:1px solid #2B282F;color:#7C7482;max-width:120ch;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="board">
+
+  <div class="banner mono">Speculative exploration only &middot; not an approved direction &middot; Phase 2 strategy support &middot; no repo files modified</div>
+
+  <div class="boardhead">
+    <h1>Surprise Rail &mdash; three identity territories</h1>
+    <div class="mono" style="opacity:.5">Conceal &rarr; clue &rarr; reveal &middot; HBO Max internship concept &middot; not shipped</div>
+  </div>
+
+  <div class="cols">
+
+    <!-- T1 -->
+    <section class="col t1">
+      <div class="colhead">
+        <div class="mono idx">Territory 01</div>
+        <h2>Latent Image</h2>
+        <p class="thesis">The poster was always on the tile. The identity is the act of it resolving.</p>
+      </div>
+      <div class="stage">
+        <div class="frame">
+          <div class="art"></div>
+          <div class="veil"><div class="blurart"></div><div class="black"></div><div class="soft"></div></div>
+          <div class="clue">Suburban<br>Secrets</div>
+        </div>
+        <div class="mono edgelabel">The clearing edge</div>
+      </div>
+      <div class="notes">
+        <h3>Signature device</h3>
+        <p>One soft-to-sharp boundary at a fixed 100&deg; angle runs through every asset. Left of it, the documented tile stack. Right of it, resolved image. Type crosses it and half-clears.</p>
+        <h3>Palette</h3>
+        <div class="chips">
+          <div class="chip" style="background:#0B0A0C"><b style="color:#8A8290">0B0A0C</b></div>
+          <div class="chip" style="background:#17141A"><b style="color:#8A8290">17141A</b></div>
+          <div class="chip" style="background:#EFEAF0"><b style="color:#0B0A0C">EFEAF0</b></div>
+          <div class="chip" style="background:#C9274B"><b style="color:#FFE9EE">C9274B</b></div>
+          <div class="chip" style="background:#FFF7ED"><b style="color:#242126">FFF7ED</b></div>
+        </div>
+        <h3>Risk</h3>
+        <p>Nearest neighbour to generic streaming glass. Only survives if the blur is always the real 15px foreground blur and 75% black, never decorative haze.</p>
+      </div>
+    </section>
+
+    <!-- T2 -->
+    <section class="col t2">
+      <div class="colhead">
+        <div class="mono idx" style="color:#9A948A">Territory 02</div>
+        <h2>The Clue Index</h2>
+        <p class="thesis">Nine phrases carry the whole product. Set them as a catalogue and withhold the titles.</p>
+      </div>
+      <div class="stage">
+        <div class="row"><span class="n">01</span><span class="clue">Suburban Secrets<span class="redact" style="width:74px"></span></span><span class="tag">Art-House</span></div>
+        <div class="row"><span class="n">02</span><span class="clue">Fame Gets Feral<span class="redact" style="width:52px"></span></span><span class="tag">Comedy</span></div>
+        <div class="row"><span class="n">03</span><span class="clue">Outsiders With Mics<span class="redact" style="width:52px"></span></span><span class="tag">LGBTQ+</span></div>
+        <div class="row"><span class="n">04</span><span class="clue">Bloodline Betrayal<span class="redact" style="width:118px"></span></span><span class="tag">Drama</span></div>
+        <div class="row"><span class="n">05</span><span class="clue">Dance Floor Disaster<span class="redact" style="width:66px"></span></span><span class="tag">Global Indie</span></div>
+        <div class="row"><span class="n">06</span><span class="clue">NYC Punk Dream<span class="redact" style="width:88px"></span></span><span class="tag">Art-House</span></div>
+      </div>
+      <div class="notes">
+        <h3>Signature device</h3>
+        <p>The withheld title as a measured black bar, its width set by the real title length. Same title, different collection, different clue &mdash; the mechanism is legible without a single screenshot.</p>
+        <h3>Palette</h3>
+        <div class="chips">
+          <div class="chip" style="background:#F2EFE9;border:1px solid #DAD5CB"><b style="color:#16151A">F2EFE9</b></div>
+          <div class="chip" style="background:#16151A"><b style="color:#F2EFE9">16151A</b></div>
+          <div class="chip" style="background:#1F2ADB"><b style="color:#DDE0FF">1F2ADB</b></div>
+          <div class="chip" style="background:#C9274B"><b style="color:#FFE9EE">C9274B</b></div>
+          <div class="chip" style="background:#9A948A"><b style="color:#16151A">9A948A</b></div>
+        </div>
+        <h3>Risk</h3>
+        <p>Reads as a literary zine, not an entertainment product. Redaction bars carry a political charge that has nothing to do with the idea. Shows writing and systems thinking, hides visual craft.</p>
+      </div>
+    </section>
+
+    <!-- T3 -->
+    <section class="col t3">
+      <div class="colhead">
+        <div class="mono idx" style="color:#6B5F4C">Territory 03</div>
+        <h2>Wrapped</h2>
+        <p class="thesis">The bookshop ritual, kept literal: paper, twine, a hand-written list, a seal that has to be broken.</p>
+      </div>
+      <div class="stage">
+        <div class="bookwrap"><img src="/case-study-hbo-max1/blind-date-book.png" alt="Kraft-wrapped blind date book"></div>
+        <div class="card">
+          <ul><li>Mystery</li><li>Suspense</li><li>Suburban Secrets</li></ul>
+          <div class="seal"><span>SR</span></div>
+        </div>
+      </div>
+      <div class="notes">
+        <h3>Signature device</h3>
+        <p>The seal. One circular mark that is simultaneously the wax seal, the focus ring on the tile and the reveal gesture. Flatbed-scanned paper collides with cold CTV black.</p>
+        <h3>Palette</h3>
+        <div class="chips">
+          <div class="chip" style="background:#C4A47C"><b style="color:#2A2622">C4A47C</b></div>
+          <div class="chip" style="background:#E4D8C2"><b style="color:#2A2622">E4D8C2</b></div>
+          <div class="chip" style="background:#A8172B"><b style="color:#F0CBD1">A8172B</b></div>
+          <div class="chip" style="background:#2A2622"><b style="color:#E4D8C2">2A2622</b></div>
+          <div class="chip" style="background:#08070B"><b style="color:#E4D8C2">08070B</b></div>
+        </div>
+        <h3>Risk</h3>
+        <p>Craft-fair warmth. Could read as a book club or a stationery brand and make the case study look like it is about books rather than a television interface.</p>
+      </div>
+    </section>
+  </div>
+
+  <p class="caveat mono">Handwriting in Territory 03 is stand-in Georgia italic &mdash; real handwriting would need to be sourced or scanned. Territory 01's tile is rebuilt live in CSS from the decoded Figma layer spec (15px blur, 75% black, white soft-light) over the real key art; it is an approximation of the Figma render, not a pixel-exact copy. No product screenshot has been redrawn.</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,613 @@
+/* ==========================================================================
+   Surprise Rail — case study environment
+
+   The exhibition room, not the archive. Deliberately none of the worktable:
+   no parchment, no cutting-mat grid, no journal props. The project's own
+   world takes the surface — cinematic black, pearl, frosted light.
+
+   Connective tissue back to the portfolio, and only this:
+     - Berkeley Mono for every piece of metadata
+     - the same display face for headline type
+     - the same 0.22/0.61/0.36/1 easing
+     - one warm brass accent, used sparingly
+     - project number + year, chapter labels
+   ========================================================================== */
+
+.sr {
+  --ink: #08080a;
+  --ink-2: #0d0d10;
+  --pearl: #f2f0ec;
+  --smoke: #8c8c95;
+  --graphite: #5a5a63;
+  --hair: rgb(242 240 236 / 0.12);
+  /* The one warm note carried from the homepage. Used twice on the page. */
+  --brass: #9a7b45;
+
+  --shell: min(1240px, 100% - clamp(32px, 8vw, 160px));
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  position: relative;
+  min-height: 100vh;
+  background: var(--ink);
+  color: var(--pearl);
+  font-family: var(--font-text);
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Persistent corner chrome -------------------------------------------- */
+.sr-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(18px, 2.2vw, 30px) clamp(20px, 4vw, 52px);
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  mix-blend-mode: difference;
+}
+
+.sr-back {
+  pointer-events: auto;
+  color: var(--pearl);
+  text-decoration: none;
+  opacity: 0.75;
+  transition: opacity 200ms var(--ease);
+}
+
+.sr-back:hover,
+.sr-back:focus-visible {
+  opacity: 1;
+}
+
+.sr-top-id {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  color: var(--pearl);
+  opacity: 0.75;
+}
+
+.sr-top-sep {
+  width: 26px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.5;
+}
+
+/* --- Chapter progress rail ------------------------------------------------ */
+/* A thin marker, not a nav. It answers "where am I" so the page needs no
+   other chrome. Hidden below desktop, where it would crowd the media. */
+.sr-rail {
+  position: fixed;
+  left: clamp(20px, 4vw, 52px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 35;
+  pointer-events: none;
+}
+
+.sr-rail ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sr-rail-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--graphite);
+  transition: color 320ms var(--ease);
+}
+
+.sr-rail-num::after {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 1px;
+  margin-left: 10px;
+  vertical-align: middle;
+  background: currentColor;
+  transition: width 320ms var(--ease);
+}
+
+.sr-rail-label {
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 320ms var(--ease), transform 320ms var(--ease);
+}
+
+.sr-rail-mark.is-current {
+  color: var(--pearl);
+}
+
+.sr-rail-mark.is-current .sr-rail-num::after {
+  width: 26px;
+}
+
+.sr-rail-mark.is-current .sr-rail-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@media (max-width: 1279px) {
+  .sr-rail {
+    display: none;
+  }
+}
+
+/* --- Hero ----------------------------------------------------------------- */
+/* Year, title, one description, three disciplines. Everything a reviewer needs
+   before they start scrolling — and nothing else. */
+.sr-hero {
+  width: var(--shell);
+  margin-inline: auto;
+  padding-block: clamp(120px, 24vh, 260px) clamp(56px, 9vh, 120px);
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: clamp(32px, 6vw, 96px);
+  align-items: end;
+}
+
+.sr-year {
+  margin: 0 0 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: var(--smoke);
+}
+
+.sr-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+  font-size: clamp(48px, 8.4vw, 132px);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  color: var(--pearl);
+}
+
+.sr-hero-side {
+  padding-bottom: 8px;
+}
+
+.sr-lede {
+  margin: 0 0 26px;
+  max-width: 42ch;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--pearl);
+}
+
+.sr-disciplines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--smoke);
+}
+
+/* --- Media plates --------------------------------------------------------- */
+/* Large by default. The work is the page; captions stay out of the way. */
+.sr-plate {
+  margin: 0 auto;
+  padding-block: clamp(28px, 5vh, 64px);
+}
+
+.sr-plate--full {
+  width: min(1600px, 100% - clamp(24px, 4vw, 64px));
+}
+
+.sr-plate--wide {
+  width: var(--shell);
+}
+
+.sr-plate img,
+.sr-plate video {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 2px;
+  /* Media is the only light source on the page; a hairline keeps dark art
+     from bleeding into the ground. */
+  box-shadow: 0 0 0 1px var(--hair);
+}
+
+/* The redrawn diagram is inline SVG, not a photograph — it needs no hairline
+   frame and should sit directly on the ground.
+
+   `position: static` is load-bearing, not tidiness: case-study-binary.css and
+   case-study-dreamer.css each declare an unscoped
+   `svg { position: absolute; width: 0; height: 0 }` to hide sprite defs, and
+   Vite bundles every stylesheet globally. Without this the diagram stays
+   absolutely positioned, so `width: 100%` resolves against `.sr` rather than
+   its figure and the SVG overflows by ~600px. */
+.sr-diagram svg {
+  position: static;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.sr-plate figcaption,
+.sr-seq-alt,
+.sr-frame figcaption {
+  margin: 16px 0 0;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.65;
+  letter-spacing: 0.03em;
+  color: var(--smoke);
+  max-width: 52ch;
+}
+
+/* --- Chapters -------------------------------------------------------------- */
+.sr-chapter {
+  width: var(--shell);
+  margin-inline: auto;
+  padding-block: clamp(72px, 14vh, 180px) clamp(24px, 4vh, 56px);
+}
+
+.sr-chapter--last {
+  padding-bottom: clamp(96px, 18vh, 220px);
+}
+
+.sr-head {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(24px, 5vw, 88px);
+  align-items: start;
+}
+
+.sr-head-id {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 26px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.sr-head-label {
+  color: var(--smoke);
+}
+
+/* The thesis, not a process label. Big enough to be the only thing you read. */
+.sr-thesis {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+  font-size: clamp(28px, 3.9vw, 60px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--pearl);
+  text-wrap: balance;
+}
+
+.sr-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 8px;
+}
+
+.sr-body p {
+  margin: 0;
+  max-width: 46ch;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--smoke);
+}
+
+/* --- Pull quote ------------------------------------------------------------ */
+.sr-pull {
+  width: var(--shell);
+  margin: clamp(48px, 9vh, 120px) auto clamp(16px, 3vh, 40px);
+  border-top: 1px solid var(--hair);
+  padding-top: clamp(28px, 5vh, 56px);
+}
+
+.sr-pull p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+  font-size: clamp(32px, 6vw, 92px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--pearl);
+}
+
+/* --- Sticky sequence ------------------------------------------------------- */
+/* One of only two on the page. The thesis holds on the left while iterations
+   cross-fade on the right; both release when the sequence ends. Driven by
+   Motion's scroll() in the component, so it scrubs in both directions. */
+.sr-seq {
+  position: relative;
+  height: 300vh;
+  background: var(--ink-2);
+  margin-block: clamp(40px, 8vh, 100px);
+}
+
+.sr-seq-inner {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: var(--shell);
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: clamp(28px, 5vw, 80px);
+  align-items: center;
+}
+
+.sr-seq-kicker {
+  margin: 0 0 14px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.sr-seq-note {
+  margin: 0;
+  max-width: 34ch;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--smoke);
+}
+
+.sr-seq-stage {
+  position: relative;
+  aspect-ratio: 16 / 10;
+}
+
+.sr-seq-frame {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  display: grid;
+  place-items: center;
+}
+
+.sr-seq-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 2px;
+}
+
+.sr-seq-alt {
+  width: var(--shell);
+  margin-inline: auto;
+}
+
+/* Below desktop the sticky sequence becomes a plain stack — a 300vh scroll
+   trap on a phone is hostile, and the content reads fine as a list. */
+@media (max-width: 1023px) {
+  .sr-seq {
+    height: auto;
+    margin-block: clamp(32px, 6vh, 64px);
+    padding-block: clamp(40px, 8vh, 80px);
+  }
+
+  .sr-seq-inner {
+    position: static;
+    height: auto;
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .sr-seq-stage {
+    aspect-ratio: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .sr-seq-frame {
+    position: static;
+    opacity: 1 !important;
+  }
+}
+
+/* --- Storyboard ------------------------------------------------------------ */
+.sr-storyboard {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(10px, 1.4vw, 20px);
+  margin-top: clamp(40px, 7vh, 88px);
+}
+
+.sr-frame {
+  margin: 0;
+}
+
+.sr-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px var(--hair);
+}
+
+.sr-frame figcaption {
+  margin-top: 10px;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 767px) {
+  .sr-storyboard {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* --- Contribution ---------------------------------------------------------- */
+.sr-contrib {
+  width: var(--shell);
+  margin-inline: auto;
+  padding-block: clamp(80px, 15vh, 190px);
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: clamp(28px, 5vw, 88px);
+  align-items: start;
+}
+
+.sr-h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+  font-size: clamp(26px, 3.2vw, 46px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+.sr-contrib-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sr-contrib-list li {
+  padding: 15px 0;
+  border-top: 1px solid var(--hair);
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--pearl);
+}
+
+.sr-contrib-list li:last-child {
+  border-bottom: 1px solid var(--hair);
+}
+
+/* Honest placeholder — the campaign identity is still in strategy. */
+.sr-pending {
+  margin: clamp(28px, 5vh, 56px) 0 0;
+  padding: 14px 16px;
+  border: 1px dashed var(--hair);
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+
+/* --- Footer ---------------------------------------------------------------- */
+.sr-foot {
+  width: var(--shell);
+  margin-inline: auto;
+  padding-block: clamp(32px, 6vh, 64px) clamp(40px, 7vh, 80px);
+  border-top: 1px solid var(--hair);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  color: var(--graphite);
+}
+
+.sr-foot p {
+  margin: 0;
+}
+
+.sr-foot-back {
+  color: var(--smoke);
+  text-decoration: none;
+  transition: color 200ms var(--ease);
+}
+
+.sr-foot-back:hover,
+.sr-foot-back:focus-visible {
+  color: var(--pearl);
+}
+
+/* --- Responsive ------------------------------------------------------------ */
+@media (max-width: 899px) {
+  .sr-hero {
+    grid-template-columns: 1fr;
+    gap: 36px;
+    align-items: start;
+    padding-block: clamp(96px, 18vh, 160px) clamp(40px, 7vh, 72px);
+  }
+
+  .sr-head,
+  .sr-contrib {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .sr-contrib {
+    padding-block: clamp(56px, 10vh, 100px);
+  }
+}
+
+/* --- Reduced motion --------------------------------------------------------- */
+/* Entrances are neutralised in JS (elements are set visible and never
+   animated). This releases the sticky sequence so nothing is scroll-locked. */
+@media (prefers-reduced-motion: reduce) {
+  .sr-seq {
+    height: auto;
+    padding-block: clamp(40px, 8vh, 80px);
+  }
+
+  .sr-seq-inner {
+    position: static;
+    height: auto;
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .sr-seq-stage {
+    aspect-ratio: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .sr-seq-frame {
+    position: static;
+    opacity: 1 !important;
+  }
+
+  .sr-rail-mark,
+  .sr-rail-label,
+  .sr-back {
+    transition: none;
+  }
+}
