@@ -26,9 +26,29 @@ const scraps = [
     color: "#D8B98A",
     rotate: -7,
   },
-  { id: "s2", label: "curtains from my childhood bedroom", color: "#C9A24B", rotate: 4 },
-  { id: "s3", label: "my fav kurti from india", color: "#B3542E", rotate: -3 },
-  { id: "s4", label: "my sister's fav dress from high school", color: "#31556B", rotate: 6 },
+  {
+    id: "s2",
+    label: "curtains from my childhood bedroom",
+    src: "/home/scraps/golden%20fabrix/curtains.png?v=1",
+    curtains: true,
+    color: "#C9A24B",
+    rotate: 4,
+  },
+  {
+    id: "s3",
+    label: "my fav kurti from india",
+    src: "/home/scraps/red%20kurta/kurti.png?v=2",
+    mesh: true,
+    color: "#B3542E",
+    rotate: -3,
+  },
+  {
+    id: "s4",
+    label: "my sister's fav dress from high school",
+    src: "/home/scraps/green%20plaid%20fabric/sister-dress.png?v=1",
+    color: "#31556B",
+    rotate: 6,
+  },
   { id: "s5", label: "purple top my mom stitched 4 me", color: "#6E4E8C", rotate: -5 },
 ];
 
@@ -505,7 +525,9 @@ function Home() {
               {scraps.map((s, i) => (
                 <li
                   key={s.id}
-                  className={`scrap${s.src ? " scrap--photo" : ""}`}
+                  className={`scrap${s.src ? " scrap--photo" : ""}${
+                    s.mesh ? " scrap--mesh" : ""
+                  }${s.curtains ? " scrap--curtains" : ""}`}
                   aria-label={s.label}
                   style={
                     {

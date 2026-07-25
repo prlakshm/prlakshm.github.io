@@ -129,6 +129,10 @@
     justify-content: start;
   }
 
+  .ab-text {
+    text-align: center;
+  }
+
   .ab-title {
     margin-bottom: 20px;
   }

@@ -720,6 +720,28 @@
   overflow: visible;
 }
 
+/* Per-textile optical scales (Motion owns .scrap transform — scale the img). */
+.scrap--curtains .scrap-img {
+  width: 90%;
+  height: 90%;
+  inset: auto;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+}
+
+/* Sheer mesh — multiply for see-through; +40% on the prior 128% optical scale. */
+.scrap--mesh .scrap-img {
+  width: 179%;
+  height: 179%;
+  inset: auto;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  mix-blend-mode: multiply;
+  filter: drop-shadow(0 2px 6px rgb(58 40 22 / 0.18));
+}
+
 .scrap-img {
   display: block;
   position: absolute;
@@ -896,11 +918,12 @@
     justify-content: center;
     width: auto;
     margin-bottom: 0;
-    gap: 0;
+    /* Phone / tablet column: stack with space — no fabric overlap. */
+    gap: 20px;
   }
   .scrap:not(:first-child) {
     margin-left: 0;
-    margin-top: calc(var(--pocket-h, 280px) * -0.45);
+    margin-top: 0;
   }
 }
 
@@ -978,7 +1001,7 @@
   .scrap-row {
     flex-direction: column;
     align-items: center;
-    gap: 0;
+    gap: 16px;
   }
 }
 
