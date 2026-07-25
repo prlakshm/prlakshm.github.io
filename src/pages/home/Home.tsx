@@ -63,8 +63,7 @@ const scraps = [
     label: "my sister's fav dress from high school",
     src: "/home/scraps/green%20plaid%20fabric/sister-dress.png?v=2",
     color: "#31556B",
-    rotate: 5,
-    plaid: true,
+    rotate: 6,
     h: 0.909,
     ar: 0.531,
   },
@@ -84,16 +83,72 @@ const scraps = [
    overlapping while holding the reference's relative sizing. */
 const SHARE_TOTAL = scraps.reduce((sum, s) => sum + s.ar * s.h, 0);
 
-/* The seam the denim is sewn along, in the pocket PNG's own 716x690 space.
-   Runs outside the silhouette and terminates on the top-edge corners (where
-   the bar tacks sit) — open at the mouth, like a real patch pocket. */
+/* Patch-pocket sew-on, in the PNG's 716×690 space:
+   1. outer running stitch (hand-wobbled) ending on the top-edge corners,
+   2. inner double-needle line ~3.5px toward the denim,
+   3. bar-tack clusters at the mouth corners. */
 const POCKET_SEAM =
-  "M 8,8 L -10,22 L 0.1,79.2 L 9.1,140.1 L 18.1,200.8 L 26.1,261.9 " +
-  "L 32.1,323.9 L 38.1,386.2 L 45.1,448.0 L 52.2,510.8 L 93.2,563.9 " +
-  "L 150.7,594.2 L 208.2,623.4 L 266.2,651.9 L 322.6,681.1 L 358,698 " +
-  "L 396.0,682.8 L 452.4,652.1 L 508.5,622.0 L 564.3,591.2 L 620.9,560.3 " +
-  "L 665.4,510.0 L 673.9,447.2 L 681.9,386.2 L 688.9,325.0 L 695.0,262.8 " +
-  "L 699.9,201.2 L 705.9,139.6 L 712.9,78.9 L 726,22 L 708,8";
+  "M 8.0,8.0 L -1.1,14.9 L -10.3,21.9 L -7.7,37.7 L -5.4,53.4 L -2.1,68.9 L 0.4,8" +
+  "4.3 L 2.0,99.7 L 4.3,114.9 L 6.8,130.1 L 9.4,145.2 L 12.6,160.3 L 15.5,175.3 L" +
+  " 15.3,190.9 L 19.0,205.9 L 19.5,221.3 L 23.3,236.4 L 24.1,251.8 L 25.6,267.2 L" +
+  " 28.5,282.5 L 29.9,298.0 L 30.4,313.6 L 33.7,329.0 L 33.5,344.7 L 35.5,360.3 L" +
+  " 38.5,375.7 L 37.5,391.5 L 41.0,406.7 L 42.3,422.2 L 44.4,437.6 L 45.4,453.3 L" +
+  " 48.2,468.9 L 50.1,484.5 L 51.8,500.2 L 56.1,514.3 L 65.6,526.6 L 75.4,538.6 L" +
+  " 83.7,551.7 L 93.2,563.9 L 107.5,571.7 L 122.0,579.0 L 137.1,585.2 L 150.3,595" +
+  ".0 L 165.5,600.6 L 179.0,609.7 L 193.8,616.1 L 207.9,624.1 L 222.4,631.1 L 237" +
+  ".9,636.3 L 251.4,645.3 L 266.3,651.7 L 280.3,659.1 L 294.2,667.0 L 308.6,673.7" +
+  " L 322.2,681.8 L 332.3,686.8 L 343.0,690.4 L 352.9,695.7 L 367.8,694.9 L 381.6" +
+  ",688.1 L 396.6,684.0 L 409.6,674.3 L 424.0,667.1 L 437.6,658.6 L 452.4,652.1 L" +
+  " 466.1,643.9 L 480.1,636.3 L 495.0,630.5 L 509.0,622.9 L 522.0,613.5 L 536.7,6" +
+  "07.2 L 550.1,598.5 L 564.2,591.1 L 578.7,583.9 L 592.4,575.3 L 607.1,568.8 L 6" +
+  "20.7,560.0 L 631.0,548.5 L 642.1,537.7 L 651.0,524.8 L 662.4,514.2 L 667.6,499" +
+  ".6 L 669.5,483.9 L 671.6,468.2 L 672.6,452.3 L 674.8,437.0 L 678.6,422.0 L 678" +
+  ".3,406.4 L 680.8,391.2 L 683.2,376.0 L 684.6,360.7 L 686.5,345.4 L 689.4,330.2" +
+  " L 688.6,314.5 L 692.4,299.2 L 693.2,283.6 L 693.5,267.9 L 696.9,252.6 L 697.6" +
+  ",237.2 L 697.1,221.6 L 699.5,206.3 L 700.2,190.9 L 703.1,175.6 L 704.7,160.2 L" +
+  " 705.0,144.7 L 708.3,129.6 L 708.4,114.3 L 710.9,99.2 L 713.1,84.0 L 714.4,68." +
+  "3 L 718.5,53.0 L 722.1,37.4 L 726.3,21.9 L 717.0,15.0 L 708.0,8.0";
+
+const POCKET_SEAM_INNER =
+  "M 8.5,11.2 L 1.0,17.7 L -7.0,22.8 L -4.2,37.1 L -2.0,52.7 L 1.4,68.2 L 3.9,83." +
+  "9 L 5.5,99.2 L 7.7,114.3 L 10.2,129.5 L 12.8,144.6 L 16.0,159.6 L 19.0,175.0 L" +
+  " 18.8,190.5 L 22.5,205.4 L 23.0,220.8 L 26.8,235.9 L 27.6,251.5 L 29.1,266.7 L" +
+  " 32.0,282.0 L 33.3,297.8 L 33.9,313.2 L 37.2,328.6 L 37.0,344.5 L 38.9,359.7 L" +
+  " 42.0,375.5 L 41.0,391.2 L 44.5,406.2 L 45.8,421.9 L 47.9,437.3 L 48.9,452.9 L" +
+  " 51.6,468.3 L 53.5,484.1 L 55.2,499.6 L 59.2,512.7 L 68.3,524.4 L 78.2,536.5 L" +
+  " 86.5,549.7 L 95.4,561.2 L 109.1,568.6 L 123.4,575.8 L 138.8,582.2 L 152.0,591" +
+  ".9 L 167.1,597.5 L 180.7,606.6 L 195.4,612.9 L 209.5,621.0 L 223.7,627.8 L 239" +
+  ".4,633.1 L 253.1,642.2 L 267.8,648.5 L 282.0,656.1 L 295.8,663.9 L 310.2,670.6" +
+  " L 323.9,678.8 L 333.6,683.5 L 344.4,687.2 L 353.5,692.3 L 366.9,691.5 L 380.4" +
+  ",684.8 L 395.0,680.9 L 407.8,671.3 L 422.3,664.1 L 436.0,655.5 L 450.8,649.0 L" +
+  " 464.3,640.9 L 478.6,633.1 L 493.5,627.4 L 507.1,620.0 L 520.3,610.5 L 535.1,6" +
+  "04.1 L 548.4,595.5 L 562.6,588.0 L 577.0,580.9 L 590.7,572.2 L 605.5,565.7 L 6" +
+  "18.4,557.3 L 628.4,546.1 L 639.5,535.4 L 648.3,522.5 L 659.5,512.3 L 664.2,498" +
+  ".8 L 666.0,483.5 L 668.2,467.9 L 669.1,452.0 L 671.3,436.3 L 675.1,421.6 L 674" +
+  ".9,406.2 L 677.4,390.7 L 679.7,375.6 L 681.1,360.3 L 683.0,344.8 L 685.9,330.0" +
+  " L 685.1,314.2 L 689.0,298.7 L 689.7,283.4 L 690.0,267.5 L 693.5,252.2 L 694.1" +
+  ",237.2 L 693.6,221.4 L 696.0,206.0 L 696.7,190.5 L 699.6,175.1 L 701.2,160.0 L" +
+  " 701.5,144.3 L 704.8,129.2 L 704.9,114.0 L 707.5,98.6 L 709.6,83.7 L 710.9,67." +
+  "7 L 715.2,52.1 L 718.7,36.6 L 722.8,22.7 L 714.9,17.8 L 707.5,11.2";
+
+const POCKET_BARTACK =
+  "M -6.7,5.6 L 6.0,-0.4 M -5.9,4.6 L 8.7,0.6 M -3.5,3.8 L 9.8,1.4 M -1.9,3.8 L 1" +
+  "1.7,1.4 M 0.5,5.5 L 12.8,-0.3 M 1.3,5.5 L 15.5,-0.3 M 3.2,5.8 L 17.1,-0.6 M 72" +
+  "3.2,4.2 L 709.5,1.1 M 721.6,5.5 L 707.6,-0.3 M 718.9,5.8 L 706.8,-0.5 M 717.2," +
+  "5.8 L 705.0,-0.6 M 716.0,4.1 L 702.7,1.1 M 714.9,4.7 L 700.3,0.5 M 713.3,4.4 L" +
+  " 698.4,0.8";
+
+/* Faint radial creases in the parchment just outside the sew line. */
+const POCKET_PUCKER =
+  "M -2.1,84.6 Q -11.0,84.2 -20.9,87.5 M 13.0,175.5 Q 7.7,174.8 -0.4,175.6 M 26.0" +
+  ",282.8 Q 18.9,284.9 7.1,283.8 M 36.0,375.9 Q 31.0,377.2 22.6,377.6 M 45.7,469." +
+  "3 Q 39.0,469.4 31.6,470.6 M 91.6,565.8 Q 87.6,568.6 81.8,573.8 M 177.8,611.9 Q" +
+  " 174.4,619.3 167.9,629.2 M 265.2,654.0 Q 264.2,658.7 258.3,664.7 M 352.5,698.2" +
+  " Q 349.8,704.5 350.7,719.4 M 438.8,660.8 Q 441.8,665.9 446.0,671.4 M 523.2,615" +
+  ".7 Q 526.2,621.9 531.6,634.4 M 622.3,561.9 Q 624.4,566.8 631.6,572.3 M 672.0,4" +
+  "84.2 Q 675.8,485.0 684.3,486.7 M 683.3,391.6 Q 686.5,393.2 697.7,392.9 M 695.7" +
+  ",283.7 Q 701.9,284.3 714.4,285.4 M 702.7,191.2 Q 709.0,192.4 720.3,192.8 M 713" +
+  ".4,99.6 Q 717.4,98.9 727.5,101.0";
 
 function ExternalArrow() {
   return (
@@ -563,6 +618,20 @@ function Home() {
         >
           <div className="archive-stage" ref={stageRef}>
             <div className="pocket-wrap" ref={pocketRef}>
+              {/* Paper compressed under the sew + grid killed locally so the
+                  denim sits in the mat instead of floating over it. */}
+              <div className="pocket-mat" aria-hidden="true" />
+
+              {/* Pucker / gather creases in the parchment outside the seam. */}
+              <svg
+                className="pocket-pucker"
+                viewBox="0 0 716 690"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d={POCKET_PUCKER} />
+              </svg>
+
               <img
                 className="pocket"
                 src="/home/denim-pocket.png"
@@ -571,18 +640,50 @@ function Home() {
                 height={690}
                 decoding="async"
               />
-              {/* Running stitch attaching the denim to the page. Path hugs the
-                  outside of the silhouette and lands on the top-edge corners
-                  (bar-tack points). Open across the mouth — sewing that shut
-                  would close the pocket. viewBox matches the image. */}
+
+              {/* Shared paper grain over the denim (masked to its alpha). */}
+              <div className="pocket-grain" aria-hidden="true" />
+
+              {/* Sew-on stitching + edge shade + thread highlight.
+                  Open across the top — sewing that shut would close the pocket. */}
               <svg
                 className="pocket-stitch"
                 viewBox="0 0 716 690"
                 aria-hidden="true"
                 focusable="false"
               >
+                <defs>
+                  <mask
+                    id="pocket-denim-mask"
+                    maskUnits="userSpaceOnUse"
+                    x="0"
+                    y="0"
+                    width="716"
+                    height="690"
+                  >
+                    <image
+                      href="/home/denim-pocket.png"
+                      width="716"
+                      height="690"
+                      preserveAspectRatio="xMidYMid meet"
+                    />
+                  </mask>
+                </defs>
+
+                {/* Inner shade along sewn sides only (masked to denim). */}
+                <g mask="url(#pocket-denim-mask)">
+                  <path className="pocket-edge-shade" d={POCKET_SEAM_INNER} />
+                </g>
+
                 <path className="pocket-stitch-holes" d={POCKET_SEAM} />
                 <path className="pocket-stitch-thread" d={POCKET_SEAM} />
+                <path className="pocket-stitch-highlight" d={POCKET_SEAM} />
+                <path className="pocket-stitch-holes pocket-stitch-holes--inner" d={POCKET_SEAM_INNER} />
+                <path className="pocket-stitch-thread pocket-stitch-thread--inner" d={POCKET_SEAM_INNER} />
+                <path className="pocket-stitch-highlight pocket-stitch-highlight--inner" d={POCKET_SEAM_INNER} />
+                <path className="pocket-stitch-holes pocket-stitch-holes--tack" d={POCKET_BARTACK} />
+                <path className="pocket-stitch-thread pocket-stitch-thread--tack" d={POCKET_BARTACK} />
+                <path className="pocket-stitch-highlight pocket-stitch-highlight--tack" d={POCKET_BARTACK} />
               </svg>
             </div>
 
@@ -592,7 +693,7 @@ function Home() {
                   key={s.id}
                   className={`scrap${s.src ? " scrap--photo" : ""}${
                     s.mesh ? " scrap--mesh" : ""
-                  }${s.plaid ? " scrap--plaid" : ""}`}
+                  }`}
                   aria-label={s.label}
                   style={
                     {
