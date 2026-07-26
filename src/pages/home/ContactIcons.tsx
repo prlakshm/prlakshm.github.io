@@ -1,13 +1,13 @@
 import { useEffect, useRef } from "react";
 import { attachTilePress } from "./interactions.js";
 
-/* Contact tiles — soft 8-tooth outlined gears holding a monochrome glyph
-   (OPTION 4). Hover: lift + rotate right (attachTilePress).
+/* Contact tiles — soft 8-tooth outlined gears (option 2).
+   Hover: lift + rotate right (attachTilePress).
    Same set and links as the site's global Footer: email, GitHub, LinkedIn, X.
    Used twice (under the hero and in the footer), so the markup lives here. */
 
-/* 8-tooth gear (OPTION 4 ref) — short wide teeth, parallel flanks, soft
-   filleted tips/valleys. Hub ring omitted for glyphs. viewBox 0 0 100 100. */
+/* 8-tooth — short wide teeth, parallel flanks, soft tip/valley fillets.
+   Hub ring omitted for glyphs. viewBox 0 0 100 100. */
 const GEAR_PATH =
   "M 40.80,5.28 Q 40.80,1.20 45.60,1.20 L 54.40,1.20 Q 59.20,1.20 59.20,5.28 L 59.20,5.78 Q 59.20,9.53 63.08,11.14 L 68.23,13.27 Q 72.11,14.88 74.76,12.23 L 75.11,11.87 Q 78.00,8.99 81.40,12.38 L 87.62,18.60 Q 91.01,22.00 88.13,24.89 L 87.77,25.24 Q 85.12,27.89 86.73,31.77 L 88.86,36.92 Q 90.47,40.80 94.22,40.80 L 94.72,40.80 Q 98.80,40.80 98.80,45.60 L 98.80,54.40 Q 98.80,59.20 94.72,59.20 L 94.22,59.20 Q 90.47,59.20 88.86,63.08 L 86.73,68.23 Q 85.12,72.11 87.77,74.76 L 88.13,75.11 Q 91.01,78.00 87.62,81.40 L 81.40,87.62 Q 78.00,91.01 75.11,88.13 L 74.76,87.77 Q 72.11,85.12 68.23,86.73 L 63.08,88.86 Q 59.20,90.47 59.20,94.22 L 59.20,94.72 Q 59.20,98.80 54.40,98.80 L 45.60,98.80 Q 40.80,98.80 40.80,94.72 L 40.80,94.22 Q 40.80,90.47 36.92,88.86 L 31.77,86.73 Q 27.89,85.12 25.24,87.77 L 24.89,88.13 Q 22.00,91.01 18.60,87.62 L 12.38,81.40 Q 8.99,78.00 11.87,75.11 L 12.23,74.76 Q 14.88,72.11 13.27,68.23 L 11.14,63.08 Q 9.53,59.20 5.78,59.20 L 5.28,59.20 Q 1.20,59.20 1.20,54.40 L 1.20,45.60 Q 1.20,40.80 5.28,40.80 L 5.78,40.80 Q 9.53,40.80 11.14,36.92 L 13.27,31.77 Q 14.88,27.89 12.23,25.24 L 11.87,24.89 Q 8.99,22.00 12.38,18.60 L 18.60,12.38 Q 22.00,8.99 24.89,11.87 L 25.24,12.23 Q 27.89,14.88 31.77,13.27 L 36.92,11.14 Q 40.80,9.53 40.80,5.78 Z";
 

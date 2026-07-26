@@ -414,9 +414,8 @@
 
 .tile--gear .tile-gear-body {
   fill: none;
-  /* ~1px at 56px display — same hairline as the old square border.
-     Softened to 55% so chrome stays light; round joins echo square tiles. */
-  stroke: color-mix(in srgb, currentColor 55%, transparent);
+  /* ~1px at 56px display — warm soft outline, round joins. */
+  stroke: color-mix(in srgb, currentColor 48%, transparent);
   stroke-width: 1.8;
   stroke-linejoin: round;
   stroke-linecap: round;
