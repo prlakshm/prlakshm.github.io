@@ -178,6 +178,7 @@ function Home() {
   const pocketRef = useRef<HTMLDivElement>(null);
   const shelfRef = useRef<HTMLUListElement>(null);
   const heroRef = useRef<HTMLElement>(null);
+  const aboutRef = useRef<HTMLElement>(null);
   const surfaceRef = useRef<HTMLDivElement>(null);
 
   const scrollToSection = (id: string) => {
@@ -482,7 +483,8 @@ function Home() {
       return;
     }
 
-    // The shelf reveals once and stays.
+    // The shelf reveals once and stays. Higher threshold so the fade finishes
+    // before the pocket enters its scrub window on tall viewports.
     const shelfObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -491,7 +493,7 @@ function Home() {
           shelfObserver.unobserve(entry.target);
         });
       },
-      { threshold: 0.2, rootMargin: "0px 0px -8% 0px" }
+      { threshold: 0.35, rootMargin: "0px 0px -8% 0px" }
     );
     if (shelf) shelfObserver.observe(shelf);
 
@@ -572,6 +574,63 @@ function Home() {
       shelfObserver.disconnect();
       stopScroll?.();
       timelines.forEach((t) => t.stop());
+    };
+  }, []);
+
+  /* Manifesto: one soft settle after the fabric act — no stagger, no scrub. */
+  const aboutEnteredRef = useRef(false);
+  useLayoutEffect(() => {
+    const about = aboutRef.current;
+    if (!about) return;
+
+    const grid = about.querySelector<HTMLElement>(".ab-grid");
+    if (!grid) return;
+
+    const applyVisible = () => {
+      grid.style.opacity = "1";
+      grid.style.transform = "none";
+    };
+
+    if (aboutEnteredRef.current) {
+      applyVisible();
+      return;
+    }
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      aboutEnteredRef.current = true;
+      applyVisible();
+      return;
+    }
+
+    grid.style.opacity = "0";
+    grid.style.transform = "translateY(8px)";
+
+    let controls: ReturnType<typeof animate> | undefined;
+    const stopInView = inView(
+      about,
+      () => {
+        controls = animate(
+          grid,
+          { opacity: 1, y: 0 },
+          { duration: 0.75, ease: [0.22, 0.61, 0.36, 1] }
+        );
+        const commit = () => {
+          aboutEnteredRef.current = true;
+          applyVisible();
+        };
+        controls.finished.then(commit).catch(commit);
+      },
+      { margin: "0px 0px -12% 0px", amount: 0.2 }
+    );
+
+    return () => {
+      stopInView();
+      if (controls) {
+        controls.complete();
+        aboutEnteredRef.current = true;
+        applyVisible();
+      }
     };
   }, []);
 
@@ -782,11 +841,18 @@ function Home() {
           </div>
         </section>
 
-        <section className="ab" id="about" aria-labelledby="ab-title">
+        <section
+          className="ab"
+          id="about"
+          ref={aboutRef}
+          aria-labelledby="ab-title"
+        >
           <div className="ab-grid">
             <div className="ab-text">
+              {/* Mono eyebrow only — Forma Display stays a hero climax.
+                  Handwriting will take the manifesto headline role next. */}
               <h2 className="ab-title" id="ab-title">
-                Design Manifesto
+                Manifesto
               </h2>
               <div className="ab-body">
                 <p>

@@ -220,7 +220,7 @@
 }
 
 /* Pronunciation note — follows the cursor (left/top from Home.tsx).
-   Near-parchment fill; reads as a chip via hairline + shadow only. */
+   Paper-slip language shared with journal / scrap tips. */
 .hero-pron {
   position: absolute;
   left: 0;
@@ -229,8 +229,9 @@
   display: inline-flex;
   gap: 5px;
   padding: 9px 13px;
-  background: var(--tooltip-fill);
-  border: 1px solid color-mix(in srgb, var(--espresso) 10%, transparent);
+  background: var(--paper);
+  border: 1px solid color-mix(in srgb, var(--espresso) 12%, transparent);
+  border-radius: 1px;
   color: var(--mono-secondary);
   font-family: var(--font-mono);
   font-weight: 400;
@@ -239,7 +240,7 @@
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  box-shadow: 0 2px 8px rgb(61 42 31 / 0.08), 0 8px 20px rgb(61 42 31 / 0.06);
+  box-shadow: 0 4px 12px var(--shadow-soft);
   /* Berkeley Mono Trial is Regular-only — stroke stands in for weight. */
   -webkit-text-stroke: 0.4px currentColor;
 }
@@ -349,12 +350,23 @@
 /* --- Contact tiles ------------------------------------------------------- */
 /* Rounded outlined squares with a monochrome glyph, per the reference. */
 .tiles {
+  /* Shared by hero + footer so contact rows always match. */
+  --tile-gap: 15px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--tile-gap);
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+.tiles > li {
+  margin: 0;
+  padding: 0;
+}
+
+.tiles--foot {
+  gap: var(--tile-gap);
 }
 
 .tile {
@@ -377,12 +389,58 @@
   display: block;
 }
 
+/* Gear mock — silhouette chrome instead of rounded square. Motion owns
+   transform (lift + clockwise rotate); no CSS :hover transform here. */
+.tile--gear {
+  position: relative;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  /* Optical match to old 44px squares; body sits inside the tooth tips. */
+  width: 56px;
+  height: 56px;
+  overflow: visible;
+  /* Motion owns transform — don’t CSS-transition it or the spring fights. */
+  transition: color var(--dur-nav) var(--ease-settle);
+}
+
+.tile--gear .tile-gear {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.tile--gear .tile-gear-body {
+  fill: none;
+  /* ~1px at 56px display — same hairline as the old square border.
+     Softened to 55% so chrome stays light; round joins echo square tiles. */
+  stroke: color-mix(in srgb, currentColor 55%, transparent);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.tile--gear .tile-glyph {
+  position: relative;
+  z-index: 1;
+  /* Large glyphs in the open hub (OPTION 4). */
+  width: 26px;
+  height: 26px;
+}
+
 .tile:hover,
 .tile:focus-visible {
   color: var(--mono-tertiary);
   border-color: var(--mono-tertiary);
-  transform: translateY(-2px);
   outline: none;
+}
+
+/* Square tiles still get a CSS lift fallback; gears use Motion only. */
+.tile:not(.tile--gear):hover,
+.tile:not(.tile--gear):focus-visible {
+  transform: translateY(-2px);
 }
 
 .tile:focus-visible {
@@ -390,22 +448,29 @@
   outline-offset: 3px;
 }
 
+.tile--gear:focus-visible {
+  outline-offset: 5px;
+}
+
 .tiles--hero {
   margin-top: 14px;
 }
 
 @media (min-width: 1024px) {
-  /* Extra 2px under Brown before contacts in the two-column layout. */
+  /* Air under the meta lines before the gear row (+2px). */
   .hero-intro > .tiles--hero {
-    margin-top: 16px;
+    margin-top: 18px;
+    padding-top: 2px;
   }
 }
 
 /* --- Journal shelf ------------------------------------------------------- */
 .shelf {
-  /* Pull up ~2 minor grid lines (32px step) toward the hero. */
-  margin-top: calc(-2 * var(--grid-minor-step));
-  padding-block: clamp(7px, 1.25vh, 17px) clamp(72px, 12vh, 150px);
+  /* One minor grid pull — two steps overlapped the hero contact tiles.
+     The margin change alone clears ~28px; keep top pad modest. */
+  margin-top: calc(-1 * var(--grid-minor-step));
+  /* Bottom pad owns notebooks → fabric breath (doubled). */
+  padding-block: clamp(12px, 2vh, 24px) clamp(80px, 14vh, 176px);
 }
 
 .shelf-row {
@@ -481,7 +546,7 @@
   width: 68%;
   height: 26px;
   border-radius: 50%;
-  background: rgb(58 40 22 / 0.34);
+  background: var(--shadow-contact);
   filter: blur(15px);
   transition: transform var(--dur-leave) var(--ease-settle),
     opacity var(--dur-leave) var(--ease-settle);
@@ -512,9 +577,10 @@
   margin-top: calc(var(--ah) / -2);
   transform: scale(0.72);
   opacity: 0;
-  background: #f1ead4;
-  border: 1px solid rgb(120 100 70 / 0.35);
-  box-shadow: 0 6px 14px rgb(58 40 22 / 0.18);
+  background: var(--paper);
+  border: 1px solid color-mix(in srgb, var(--espresso) 18%, transparent);
+  border-radius: 1px;
+  box-shadow: 0 6px 14px var(--shadow-soft);
   overflow: hidden;
   transition: transform var(--dur-leave) var(--ease-settle),
     opacity calc(var(--dur-leave) * 0.7) var(--ease-settle);
@@ -529,31 +595,30 @@
 }
 
 .jr-artifact--photo {
-  background: #ece3ca;
-  border-radius: 1px;
+  background: var(--paper-photo);
 }
 
 .jr-artifact--polaroid {
-  background: #fbf7ea;
-  border-color: rgb(120 100 70 / 0.28);
+  background: var(--paper-polaroid);
+  border-color: color-mix(in srgb, var(--espresso) 14%, transparent);
   padding: 7px 7px 26px;
-  box-shadow: 0 8px 18px rgb(58 40 22 / 0.2);
+  box-shadow: 0 8px 18px var(--shadow-object);
 }
 
 .jr-artifact--film {
-  background: rgb(228 235 232 / 0.55);
-  border-color: rgb(90 110 105 / 0.35);
+  background: color-mix(in srgb, var(--paper) 70%, #d8e2de 30%);
+  border-color: color-mix(in srgb, #5a6e69 35%, transparent);
 }
 
 /* A blank ruled slip, for journals whose case study is unwritten. */
 .jr-artifact--slip {
-  background-color: #f4eedb;
+  background-color: var(--paper);
   background-image: repeating-linear-gradient(
     to bottom,
     transparent 0 17px,
-    rgb(120 100 70 / 0.16) 17px 18px
+    color-mix(in srgb, var(--espresso) 14%, transparent) 17px 18px
   );
-  border-color: rgb(120 100 70 / 0.26);
+  border-color: color-mix(in srgb, var(--espresso) 14%, transparent);
 }
 
 /* Notes carry text, so they land on top of the covers rather than behind
@@ -565,8 +630,8 @@
   align-items: center;
   padding: 12px 14px;
   background: var(--paper);
-  border-color: rgb(120 100 70 / 0.3);
-  box-shadow: 0 8px 20px rgb(58 40 22 / 0.22);
+  border-color: color-mix(in srgb, var(--espresso) 16%, transparent);
+  box-shadow: 0 8px 20px var(--shadow-object);
 }
 
 .jr-note {
@@ -587,7 +652,7 @@
 
 /* --- Tooltip ------------------------------------------------------------- */
 /* Follows the cursor (left/top written from Journal.tsx on pointermove).
-   Near-parchment fill; reads as a chip via hairline + shadow only. */
+   Paper-slip — sharper corner, single shadow, same stock as journal notes. */
 .jr-tooltip {
   position: absolute;
   left: 0;
@@ -597,13 +662,14 @@
   flex-direction: column;
   gap: 3px;
   padding: 9px 13px;
-  background: var(--tooltip-fill);
-  border: 1px solid color-mix(in srgb, var(--espresso) 10%, transparent);
+  background: var(--paper);
+  border: 1px solid color-mix(in srgb, var(--espresso) 12%, transparent);
+  border-radius: 1px;
   color: var(--mono-secondary);
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  box-shadow: 0 2px 8px rgb(61 42 31 / 0.08), 0 8px 20px rgb(61 42 31 / 0.06);
+  box-shadow: 0 4px 12px var(--shadow-soft);
 }
 
 .jr-tooltip-title {
@@ -649,7 +715,8 @@
   /* Extra top room so fabric can stick up out of the pocket mouth.
      Slight negative margin pulls the whole archive up toward the shelf. */
   margin-top: calc(-1 * var(--grid-minor-step));
-  padding-block: clamp(56px, 9vh, 128px) clamp(56px, 10vh, 130px);
+  /* Top (after notebooks) doubled; bottom before manifesto nudged up a little. */
+  padding-block: clamp(64px, 10vh, 144px) clamp(56px, 10vh, 128px);
 }
 
 .archive-stage {
@@ -662,7 +729,7 @@
   /* Bottoms share an edge; the scrap row then lifts via margin-bottom so
      lined-up fabric sits 10% of pocket height above the denim hem. */
   align-items: end;
-  /* Room for scraps taller than the denim (130%) and the deal-out arc. */
+  /* Scrap-arc room; doubled with the notebooks → fabric breath. */
   padding-block: clamp(48px, 7vh, 96px);
 }
 
@@ -735,7 +802,7 @@
   width: 100%;
   height: auto;
   /* 1px contact only — a larger soft shadow reads as floating/pasted. */
-  filter: drop-shadow(0 1px 0 rgb(61 42 31 / 0.34));
+  filter: drop-shadow(0 1px 0 var(--shadow-contact));
 }
 
 /* Paper grain multiplied onto the denim so it shares the mat's surface. */
@@ -888,7 +955,7 @@
   flex: 0 0 calc((100% - 4 * var(--scrap-gap, 16px)) * var(--wf, 0.2));
   height: auto;
   aspect-ratio: var(--ar, 0.5);
-  box-shadow: 0 3px 9px rgb(58 40 22 / 0.24);
+  box-shadow: 0 3px 9px var(--shadow-object);
   transform: translate(
       calc(var(--dx, 0px) + (var(--si) - 2) * 17px),
       var(--dy, 0px)
@@ -914,7 +981,7 @@
    multiplies against the parchment instead of sitting on it. */
 .scrap--mesh .scrap-img {
   mix-blend-mode: multiply;
-  filter: drop-shadow(0 2px 6px rgb(58 40 22 / 0.18));
+  filter: drop-shadow(0 2px 6px var(--shadow-soft));
 }
 
 .scrap-img {
@@ -928,30 +995,31 @@
   pointer-events: none;
   background: transparent;
   /* Soft lift without a rectangular plate behind the textile. */
-  filter: drop-shadow(0 3px 8px rgb(58 40 22 / 0.28));
+  filter: drop-shadow(0 3px 8px var(--shadow-object));
 }
 
-/* Same chip language as the hero pronunciation tip — follows the cursor from
-   Home.tsx. Parked on document.body while open (see Home.tsx) so ancestor
-   transforms don't steal `position: fixed` from the viewport. */
+/* Quieter paper slip than journal CTAs — follows the cursor from Home.tsx.
+   Parked on document.body while open so ancestor transforms don't steal
+   `position: fixed` from the viewport. */
 .scrap-tooltip {
   position: fixed;
   left: 0;
   top: 0;
   z-index: 40;
-  padding: 9px 13px;
-  background: var(--tooltip-fill);
-  border: 1px solid color-mix(in srgb, var(--espresso) 10%, transparent);
+  padding: 7px 11px;
+  background: var(--paper);
+  border: 1px solid color-mix(in srgb, var(--espresso) 12%, transparent);
+  border-radius: 1px;
   color: var(--mono-secondary);
   font-family: var(--font-mono);
   font-weight: 400;
-  font-size: 13px;
-  letter-spacing: 0.04em;
+  font-size: 12px;
+  letter-spacing: 0.03em;
   text-transform: lowercase;
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  box-shadow: 0 2px 8px rgb(61 42 31 / 0.08), 0 8px 20px rgb(61 42 31 / 0.06);
+  box-shadow: 0 2px 8px var(--shadow-soft);
   -webkit-text-stroke: 0.35px currentColor;
 }
 
@@ -1119,7 +1187,7 @@
     grid-template-columns: 1fr;
     gap: 36px;
     justify-items: center;
-    padding-block: clamp(32px, 5vh, 64px);
+    padding-block: clamp(64px, 10vh, 128px);
   }
   .pocket-wrap {
     max-width: min(330px, 72vw); /* +2%, gap unchanged */

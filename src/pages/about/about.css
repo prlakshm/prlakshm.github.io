@@ -2,23 +2,29 @@
    About — Design Manifesto
    Section lives on the homepage below the fabric archive; chrome comes from
    home.css. This file only lays out the manifesto + portrait.
+
+   Cinematic role: quiet close-up after the fabric spectacle. Hero keeps the
+   Forma display climax; this section uses a mono eyebrow so handwriting (soon)
+   can be the headline.
    ========================================================================== */
 
 .ab {
   max-width: var(--page-max);
   margin-inline: auto;
+  /* Soft pull into the archive afterglow — intimate beat, not a new chapter. */
+  margin-top: calc(-1 * var(--grid-minor-step));
   padding-inline: var(--page-gutter);
-  padding-block: clamp(48px, 9vh, 120px) clamp(56px, 10vh, 130px);
+  /* Top pad owns fabric → manifesto breath (nudged up a little). */
+  padding-block: clamp(56px, 8vh, 112px) clamp(48px, 8vh, 100px);
   /* Clear the sticky worktable nav when scrolled into via the ABOUT link. */
   scroll-margin-top: calc(var(--nav-height) + 12px);
 }
 
-/* Full page-column width (same as hero / shelf / archive). Pair is centered
-   with a moderate gap so copy and portrait aren’t pinned to opposite edges. */
+/* Same table edge as shelf / archive — not a centered CMS island. */
 .ab-grid {
   display: grid;
-  grid-template-columns: minmax(0, 38rem) auto;
-  justify-content: center;
+  grid-template-columns: minmax(0, 1fr) auto;
+  justify-content: space-between;
   column-gap: clamp(67px, 7.39vw, 118px);
   align-items: stretch;
   width: 100%;
@@ -29,15 +35,18 @@
   max-width: 38rem;
 }
 
+/* Mono eyebrow — hero owns Forma Display; hand will own the manifesto voice. */
 .ab-title {
-  margin: 0 0 28px;
-  font-family: var(--font-display);
-  font-weight: var(--weight-display);
-  font-size: var(--section-size);
-  line-height: 0.98;
-  letter-spacing: -0.015em;
-  color: var(--espresso);
+  margin: 0 0 22px;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.4;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mono-secondary);
   white-space: nowrap;
+  -webkit-text-stroke: 0.35px currentColor;
 }
 
 .ab-body {
@@ -55,12 +64,16 @@
   color: var(--mono-secondary);
 }
 
+/* Brass punctuation on the close — one mark, then stop decorating. */
 .ab-sign {
   margin: 26px 0 0;
+  padding-bottom: 7px;
+  width: fit-content;
   font-family: var(--font-mono);
   font-size: 13px;
   letter-spacing: 0.1em;
   color: var(--accent-text);
+  border-bottom: 1px solid var(--accent);
 }
 
 /* ~97% of the manifesto column height, vertically centered. Image is out of
@@ -82,13 +95,15 @@
   object-fit: cover;
   /* Landscape source; face sits centre-x, so this keeps her framed. */
   object-position: 50% 42%;
+  /* Pocket-style contact so the photo sits on the mat. */
+  filter: drop-shadow(0 1px 0 var(--shadow-contact));
 }
 
 /* --- Responsive ---------------------------------------------------------- */
 /* Tablet: keep the two-column read, but let copy flex and tighten the gap. */
 @media (max-width: 1023px) {
   .ab {
-    padding-block: clamp(40px, 7vh, 80px) clamp(48px, 8vh, 96px);
+    padding-block: clamp(48px, 8vh, 100px) clamp(40px, 7vh, 88px);
   }
 
   .ab-grid {
@@ -103,7 +118,6 @@
 
   .ab-title {
     white-space: normal;
-    font-size: clamp(30px, 4.2vw, 48px);
   }
 
   .ab-body p {
@@ -119,7 +133,7 @@
 /* Phone: stack — title + copy, then portrait. */
 @media (max-width: 767px) {
   .ab {
-    padding-block: clamp(32px, 7vh, 64px) clamp(40px, 8vh, 80px);
+    padding-block: clamp(44px, 8vh, 80px) clamp(36px, 7vh, 72px);
   }
 
   .ab-grid {
@@ -130,11 +144,15 @@
   }
 
   .ab-text {
-    text-align: center;
+    text-align: left;
   }
 
   .ab-title {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
+  }
+
+  .ab-sign {
+    margin-inline: 0;
   }
 
   .ab-body {
@@ -147,7 +165,7 @@
   }
 
   .ab-portrait {
-    justify-self: center;
+    justify-self: start;
     align-self: auto;
     width: min(220px, 58vw);
     height: auto;

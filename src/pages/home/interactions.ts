@@ -52,17 +52,21 @@ export function attachUnderlineWipe(trigger: HTMLElement, rule: HTMLElement) {
 /**
  * Lifts a tile on hover/focus and presses it down on pointerdown, so it reads
  * as a physical button rather than a rectangle that changes colour.
+ * Gear tiles also rotate clockwise on lift (see .tile--gear).
  */
 export function attachTilePress(tile: HTMLElement) {
   const reduced = prefersReducedMotion();
   const opts = reduced ? { duration: 0 } : SPRING;
+  const isGear = tile.classList.contains("tile--gear");
+  const hoverRotate = isGear ? 18 : 0;
 
-  const lift = () => animate(tile, { y: -3, scale: 1.05 }, opts);
-  const rest = () => animate(tile, { y: 0, scale: 1 }, opts);
+  const lift = () =>
+    animate(tile, { y: -3, scale: 1.05, rotate: hoverRotate }, opts);
+  const rest = () => animate(tile, { y: 0, scale: 1, rotate: 0 }, opts);
   const press = () =>
     animate(
       tile,
-      { scale: 0.93 },
+      { scale: 0.93, rotate: isGear ? 10 : 0 },
       reduced ? { duration: 0 } : { type: "spring", stiffness: 700, damping: 28 }
     );
 
