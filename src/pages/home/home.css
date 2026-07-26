@@ -149,8 +149,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: 1.5px;
-  background: currentColor;
+  height: var(--underline-thickness);
+  background: var(--underline-stroke);
   transform: scaleX(0);
   transform-origin: left;
 }
@@ -320,12 +320,12 @@
 }
 
 /* Handle uses the same tertiary hover as the nav (soft sepia).
-   Underline matches the type color at rest and on hover. */
+   Underline matches gear chrome (see --underline-* in tokens). */
 .line a {
   position: relative;
   color: inherit;
   text-decoration: none;
-  border-bottom: 1px solid currentColor;
+  border-bottom: var(--underline-thickness) solid var(--underline-stroke);
   transition: color var(--dur-nav) var(--ease-settle);
 }
 
@@ -340,9 +340,9 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -1px;
-  height: 1px;
-  background: currentColor;
+  bottom: calc(-1 * var(--underline-thickness));
+  height: var(--underline-thickness);
+  background: var(--underline-stroke);
   transform: scaleX(0);
   transform-origin: left;
 }
@@ -414,9 +414,9 @@
 
 .tile--gear .tile-gear-body {
   fill: none;
-  /* ~1px at 56px display — warm soft outline, round joins. */
-  stroke: color-mix(in srgb, currentColor 48%, transparent);
-  stroke-width: 1.8;
+  /* Visual weight matches --underline-thickness (2.7 in 100vb @ 56px ≈ 1.5px). */
+  stroke: var(--underline-stroke);
+  stroke-width: 2.7;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
@@ -424,7 +424,7 @@
 .tile--gear .tile-glyph {
   position: relative;
   z-index: 1;
-  /* Large glyphs in the open hub (OPTION 4). */
+  /* Large glyphs in the open hub. */
   width: 26px;
   height: 26px;
 }
@@ -1084,11 +1084,24 @@
    above — they nest without a grid. One basis also means one height scale, so
    all five stay in the reference photograph's proportions. */
 @media (max-width: 1249px) {
+  /* The base stage bottom-aligns its two columns, which is right when the
+     fabric is a single row of roughly the denim's height. Once it wraps to
+     two rows the block is far taller, so bottom-aligning shoved the whole
+     grid up above the pocket. Centre the two columns against each other so
+     the denim sits level with the middle of the fabric block. */
+  .archive-stage {
+    align-items: center;
+  }
+
   .scrap-row {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
+    /* The base rule lifts the row by 10% of the denim height so a single row
+       sits on the hem line. Centring a box with that margin still on it puts
+       the fabric half the margin too high — measured 17px — so it goes here. */
+    margin-bottom: 0;
     /* Capped, and that cap is load-bearing. Three strips sharing the full
        column are far wider each than five sharing it, so an uncapped row made
        the textiles GROW on wrapping — 1.48x the denim at 1180px against 1.17x
@@ -1195,8 +1208,12 @@
      cap as the wrap tier so the strips do not change size at this boundary. */
   .scrap-row {
     width: min(92vw, 530px);
-    margin-left: 0;
+    /* Centred on the page once the fabric sits below the denim. The base rule
+       carries a 2px left margin for the desktop one-row view, which offsets
+       the block here — so both margins are reset rather than just the left. */
+    margin-inline: auto;
     margin-bottom: 0;
+    justify-self: center;
   }
   .scrap:not(:first-child) {
     margin-left: 0;

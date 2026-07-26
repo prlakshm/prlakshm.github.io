@@ -6,6 +6,7 @@ import "./home.css";
 import "../about/about.css";
 import Journal from "./Journal.js";
 import ContactIcons from "./ContactIcons.js";
+import Manifesto from "../about/Manifesto.js";
 import { attachUnderlineWipe, prefersReducedMotion } from "./interactions.js";
 import { journals } from "./journals.js";
 
@@ -180,6 +181,10 @@ function Home() {
   const heroRef = useRef<HTMLElement>(null);
   const aboutRef = useRef<HTMLElement>(null);
   const surfaceRef = useRef<HTMLDivElement>(null);
+  /* Lets measure() rebuild the fabric timelines with fresh offsets, and lets a
+     rebuild re-seat itself at the current scroll position without jumping. */
+  const rebuildRef = useRef<(() => void) | null>(null);
+  const progressRef = useRef(0);
 
   const scrollToSection = (id: string) => {
     document.getElementById(id)?.scrollIntoView({
@@ -415,13 +420,21 @@ function Home() {
     const pocket = pocketRef.current;
     if (!stage || !pocket) return;
 
+    /* Guards the one layout-affecting write below so it cannot feed back into
+       the ResizeObserver that triggered it. --pocket-h drives the row's
+       margin-bottom, so rewriting it unconditionally inside an RO callback
+       could re-fire the observer forever; skipping the no-op write makes the
+       loop converge on the first pass. */
+    let lastPocketH = -1;
+
     const measure = () => {
-      // Scrap height is 130% of the denim — publish it before reading offsets
-      // so layout (and thus dx/dy) sees the settled sizes.
-      stage.style.setProperty(
-        "--pocket-h",
-        `${Math.round(pocket.offsetHeight)}px`
-      );
+      // Scrap height is a multiple of the denim's — publish it before reading
+      // offsets so layout (and thus dx/dy) sees the settled sizes.
+      const h = Math.round(pocket.offsetHeight);
+      if (h !== lastPocketH) {
+        lastPocketH = h;
+        stage.style.setProperty("--pocket-h", `${h}px`);
+      }
 
       // Sit them high in the pocket so their tops clear the denim lip and the
       // fabric is visibly stuffed in there before the scroll pulls it out.
@@ -438,6 +451,11 @@ function Home() {
         el.dataset.dy = String(dy);
       });
       stage.classList.add("is-measured");
+
+      /* Hand the fresh offsets to the scroll timelines. Without this the
+         animation keeps the dx/dy it was built with and aims at the pocket's
+         old position after any resize or layout-tier change. */
+      rebuildRef.current?.();
     };
 
     // Measure synchronously: useLayoutEffect runs before paint, so this is both
@@ -446,26 +464,42 @@ function Home() {
     // never receive their offsets.
     measure();
 
-    // Re-measure on resize, via rAF to coalesce bursts. A ResizeObserver on the
-    // stage alone can miss viewport changes that reflow the row without
-    // changing the stage's own box.
+    /* Re-measure SYNCHRONOUSLY, not on a rAF.
+
+       This used to defer to requestAnimationFrame to coalesce bursts, which
+       meant any environment that throttles rAF — a background tab, a heavily
+       loaded frame — skipped the re-measure entirely and left the fabric
+       aiming at the pocket's previous position. Layout is already up to date
+       inside a ResizeObserver callback, and the write above is guarded, so
+       measuring here is both safe and reliable.
+
+       A rAF pass still follows the window resize event, because some browsers
+       fire `resize` before the new layout has settled. */
     let frame = 0;
-    const schedule = () => {
+    const measureNow = () => measure();
+    const measureSoon = () => {
+      measure();
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(measure);
     };
 
-    const observer = new ResizeObserver(schedule);
+    const observer = new ResizeObserver(measureNow);
     observer.observe(stage);
     observer.observe(pocket);
     const row = stage.querySelector(".scrap-row");
     if (row) observer.observe(row);
-    window.addEventListener("resize", schedule);
+    window.addEventListener("resize", measureSoon);
+
+    /* The denim is an <img>: until it decodes, its box comes from the width and
+       height attributes. Re-measure on load so the target is the real pocket. */
+    const img = pocket.querySelector("img");
+    if (img && !img.complete) img.addEventListener("load", measureNow);
 
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
-      window.removeEventListener("resize", schedule);
+      window.removeEventListener("resize", measureSoon);
+      img?.removeEventListener("load", measureNow);
     };
   }, []);
 
@@ -512,50 +546,81 @@ function Home() {
     const STAGGER = 0.12; // offset between neighbours
     const span = DURATION + STAGGER * Math.max(0, els.length - 1);
 
-    const timelines = els.map((el, i) => {
-      const dx = Number(el.dataset.dx ?? 0);
-      const dy = Number(el.dataset.dy ?? 0);
-      const settled = Number(
-        getComputedStyle(el).getPropertyValue("--sr").replace("deg", "")
-      );
-      // Fanned inside the pocket mouth, so five scraps read as a handful.
-      const fanX = dx + (i - 2) * 17;
-      const fanR = (i - 2) * 5;
+    let timelines: Array<ReturnType<typeof animate>> = [];
 
-      const controls = animate(
-        el,
-        {
-          x: [fanX, dx * 0.86, dx * 0.5, dx * 0.22, dx * 0.06, 0],
-          y: [dy, dy - 46, dy * 0.42 - 30, dy * 0.12 + 14, -9, 0],
-          rotate: [fanR, -13, 16, -11, 6, settled],
-          scale: [0.84, 0.96, 1.07, 0.97, 1.02, 1],
-        },
-        // "start", not the default "end": with "end" the easing holds the
-        // previous step and never lands the final frame, which on a *scrubbed*
-        // timeline becomes the permanent resting state — the scraps settle
-        // several px and a couple of degrees off. Invisible on a timed
-        // animation, obvious here.
-        { duration: DURATION, ease: steps(7, "start") }
-      );
-      controls.pause();
-      return controls;
-    });
+    /* Built from whatever dx/dy the last measure() wrote, and REBUILT whenever
+       a new measurement lands.
+
+       This is the fix for scraps flying to empty space: the keyframes below
+       bake dx/dy in as numbers, and this effect only runs once. So a resize or
+       a switch between the one-row and 3+2 layouts moved the pocket while the
+       animation kept aiming at the pocket's original spot. Rebuilding on every
+       re-measure keeps the target rooted to where the denim actually is. */
+    const build = () => {
+      timelines.forEach((t) => t.stop());
+      timelines = els.map((el, i) => {
+        const dx = Number(el.dataset.dx ?? 0);
+        const dy = Number(el.dataset.dy ?? 0);
+        const settled = Number(
+          getComputedStyle(el).getPropertyValue("--sr").replace("deg", "")
+        );
+        // Fanned inside the pocket mouth, so five scraps read as a handful.
+        const fanX = dx + (i - 2) * 17;
+        const fanR = (i - 2) * 5;
+
+        /* Travel is expressed as fractions of dx/dy, so the arc always resolves
+           onto the pocket no matter how far away it currently is — the path
+           scales to the real distance instead of a remembered one. */
+        const controls = animate(
+          el,
+          {
+            x: [fanX, dx * 0.86, dx * 0.5, dx * 0.22, dx * 0.06, 0],
+            y: [dy, dy - 46, dy * 0.42 - 30, dy * 0.12 + 14, -9, 0],
+            rotate: [fanR, -13, 16, -11, 6, settled],
+            scale: [0.84, 0.96, 1.07, 0.97, 1.02, 1],
+          },
+          // "start", not the default "end": with "end" the easing holds the
+          // previous step and never lands the final frame, which on a *scrubbed*
+          // timeline becomes the permanent resting state — the scraps settle
+          // several px and a couple of degrees off. Invisible on a timed
+          // animation, obvious here.
+          { duration: DURATION, ease: steps(7, "start") }
+        );
+        controls.pause();
+        return controls;
+      });
+      // Re-seat at the current scroll position so a rebuild never visibly jumps.
+      apply(progressRef.current);
+    };
+
+    const apply = (progress: number) => {
+      if (reduced) {
+        timelines.forEach((t) => {
+          t.time = DURATION;
+        });
+        return;
+      }
+      timelines.forEach((t, i) => {
+        const local = progress * span - i * STAGGER;
+        t.time = Math.min(DURATION, Math.max(0, local));
+      });
+    };
+
+    build();
+    // measure() calls this after each re-measure (see the layout effect above).
+    rebuildRef.current = build;
 
     let stopScroll: (() => void) | undefined;
 
     if (reduced) {
       // Arrive laid out, with no travel.
-      timelines.forEach((t) => {
-        t.time = DURATION;
-      });
+      apply(1);
     } else if (pocket && timelines.length > 0) {
       // One scroll subscription driving all five timelines, not five listeners.
       stopScroll = scroll(
         (progress: number) => {
-          timelines.forEach((t, i) => {
-            const local = progress * span - i * STAGGER;
-            t.time = Math.min(DURATION, Math.max(0, local));
-          });
+          progressRef.current = progress;
+          apply(progress);
         },
         /* Anchored to the POCKET, not the section. The section's top sits well
            above the pocket, so the old range ran the whole dance before the
@@ -573,6 +638,7 @@ function Home() {
     return () => {
       shelfObserver.disconnect();
       stopScroll?.();
+      rebuildRef.current = null;
       timelines.forEach((t) => t.stop());
     };
   }, []);
@@ -849,38 +915,7 @@ function Home() {
         >
           <div className="ab-grid">
             <div className="ab-text">
-              {/* Mono eyebrow only — Forma Display stays a hero climax.
-                  Handwriting will take the manifesto headline role next. */}
-              <h2 className="ab-title" id="ab-title">
-                Manifesto
-              </h2>
-              <div className="ab-body">
-                <p>
-                  I studied Computer Science and Literary Arts at Brown &mdash; which
-                  sounds like two degrees and is really one habit: take a thing
-                  apart, learn how it holds together, and put it back with the
-                  seams showing.
-                </p>
-                <p>
-                  Every project starts as a sentence before it starts as a screen.
-                  If I can&rsquo;t say what a thing is for in one line, the
-                  interface is usually covering for a decision I haven&rsquo;t made
-                  yet.
-                </p>
-                <p>
-                  I build in public because finishing in private taught me nothing.
-                  I&rsquo;d rather show the drafts, the dead ends, the version that
-                  argued back.
-                </p>
-                <p>
-                  And I keep a drawer of fabric &mdash; my mother&rsquo;s, my
-                  sister&rsquo;s, my own &mdash; because material memory is the only
-                  design education I never had to pay for. I want software to carry
-                  that much texture: things you can feel the weight of before you
-                  know what they do.
-                </p>
-              </div>
-              <p className="ab-sign">&mdash; Pranavi</p>
+              <Manifesto />
             </div>
 
             <figure className="ab-portrait">

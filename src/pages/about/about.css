@@ -25,65 +25,87 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   justify-content: space-between;
-  column-gap: clamp(67px, 7.39vw, 118px);
+  column-gap: clamp(28px, 3.2vw, 48px);
   align-items: stretch;
   width: 100%;
 }
 
 .ab-text {
+  position: relative;
   min-width: 0;
-  max-width: 38rem;
+  max-width: none;
 }
 
-/* Mono eyebrow — hero owns Forma Display; hand will own the manifesto voice. */
-.ab-title {
-  margin: 0 0 22px;
-  font-family: var(--font-mono);
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 1.4;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--mono-secondary);
+/* Accessible name for the section; the traced hand is the visible manifesto. */
+.ab-title,
+.mf-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
   white-space: nowrap;
-  -webkit-text-stroke: 0.35px currentColor;
+  border: 0;
 }
 
-.ab-body {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.ab-body p {
-  margin: 0;
-  font-family: var(--font-mono);
-  font-size: 14px;
-  line-height: 1.75;
-  letter-spacing: 0.01em;
+/* --- Traced handwriting --------------------------------------------------
+   Everything is expressed in the unit space of manifesto-words.ts, where the
+   body x-height is 10 units. --mf-u is the px size of one unit, so the whole
+   block scales from a single value and stroke weight scales with it. */
+.mf {
+  --mf-u: clamp(1.02px, 0.108vw + 0.62px, 1.5px);
+  --mf-stroke: 1.25;
   color: var(--mono-secondary);
 }
 
-/* Brass punctuation on the close — one mark, then stop decorating. */
-.ab-sign {
-  margin: 26px 0 0;
-  padding-bottom: 7px;
-  width: fit-content;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  letter-spacing: 0.1em;
-  color: var(--accent-text);
-  border-bottom: 1px solid var(--accent);
+.mf-line {
+  display: flex;
+  flex-wrap: wrap;
+  /* flex-start, so every row reserves the same space above the baseline and
+     the per-word --dy lands each word on one straight line. */
+  align-items: flex-start;
+  column-gap: calc(var(--mf-u) * var(--mf-space));
+  row-gap: calc(var(--mf-u) * 15);
 }
 
-/* ~97% of the manifesto column height, vertically centered. Image is out of
-   flow so aspect-ratio can derive width from that height. */
+.mf-word {
+  /* case-study-binary.css and case-study-dreamer.css both ship a bare
+     `svg { position: absolute; width: 0; height: 0 }` for their sprite sheets,
+     and Vite bundles every stylesheet globally, so it lands on these words too.
+     Absolute words leave the flow and the flex lines collapse to zero height. */
+  position: static;
+  display: block;
+  width: calc(var(--mf-u) * var(--w));
+  height: calc(var(--mf-u) * var(--h));
+  margin-top: calc(var(--mf-u) * var(--dy));
+  /* Centrelines: the stroke straddles the path, so half of it sits outside a
+     tight viewBox. Visible rather than clipped -- see the note in the TSX. */
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--mf-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The title is written larger on the page, so it only needs its own weight —
+   the size difference is already in the traced coordinates. */
+.mf-line--title {
+  --mf-stroke: 1.9;
+  margin-bottom: calc(var(--mf-u) * 26);
+}
+
+/* Width-led sizing (not % of column height). Height-% + aspect-ratio blew up
+   once the manifesto became a tall hand SVG and the grid stretched with it. */
 .ab-portrait {
   position: relative;
   margin: 0;
   align-self: center;
-  height: 97%;
+  width: clamp(200px, 21vw, 300px);
   aspect-ratio: 3 / 4;
+  height: auto;
 }
 
 .ab-portrait img {
@@ -108,7 +130,7 @@
 
   .ab-grid {
     grid-template-columns: minmax(0, 1fr) auto;
-    column-gap: clamp(28px, 4vw, 52px);
+    column-gap: clamp(20px, 2.8vw, 36px);
     justify-content: space-between;
   }
 
@@ -116,17 +138,8 @@
     max-width: none;
   }
 
-  .ab-title {
-    white-space: normal;
-  }
-
-  .ab-body p {
-    font-size: 13px;
-  }
-
   .ab-portrait {
-    height: 88%;
-    max-height: 420px;
+    width: clamp(180px, 22vw, 260px);
   }
 }
 
@@ -145,23 +158,6 @@
 
   .ab-text {
     text-align: left;
-  }
-
-  .ab-title {
-    margin-bottom: 18px;
-  }
-
-  .ab-sign {
-    margin-inline: 0;
-  }
-
-  .ab-body {
-    gap: 14px;
-  }
-
-  .ab-body p {
-    font-size: 13px;
-    line-height: 1.7;
   }
 
   .ab-portrait {
