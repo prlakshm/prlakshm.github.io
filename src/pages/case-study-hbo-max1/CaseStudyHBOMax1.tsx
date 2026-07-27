@@ -35,8 +35,9 @@ function ChapterHeading({
 
 /**
  * A single portrait Surprise tile, rebuilt in the browser from the real Figma
- * layer spec (key art → black 75% → frost + descriptor) so every state uses the
- * exact same crop and sits directly on the page background.
+ * layer spec: white plate (4px blur) → key art (7.5px blur) → conic + flat black
+ * scrim → white soft-light → descriptor. Every state uses the exact same crop and
+ * sits directly on the page background.
  */
 function Tile({
   variant,
@@ -65,6 +66,7 @@ function Tile({
         {(variant === "black" || variant === "frost") && (
           <span className="sr4-tile-black" aria-hidden="true" />
         )}
+        {variant === "frost" && <span className="sr4-tile-soft" aria-hidden="true" />}
         {variant === "frost" && clue && <span className="sr4-tile-clue">{clue}</span>}
         {variant === "reveal" && <span className="sr4-tile-grad" aria-hidden="true" />}
       </div>

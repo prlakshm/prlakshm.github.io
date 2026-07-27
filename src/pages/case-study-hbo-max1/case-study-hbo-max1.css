@@ -5,6 +5,18 @@
   --muted: #675f65;
   --rose: #c9274b;
   --line: rgba(36, 33, 38, .16);
+
+  /* Real material, read out of the Surprise Tiles Figma file.
+     The tile layers are expressed as ratios of the 235px CTV design width, so
+     they hold at every size the tile is rendered at on this page. */
+  --irid: linear-gradient(89.974deg,
+    #bea6bf 0%, #edefe5 19.073%, #e6d5e8 39.484%, #979ab1 60.035%, #edefe5 89.238%);
+  --irid-wash: linear-gradient(90deg, rgba(255, 255, 255, .2), rgba(255, 255, 255, .2));
+  --tile-plate: rgba(255, 255, 255, .75); /* backing plate under the art, blurred 4px */
+  --tile-plate-blur: 1.702cqw;            /* 4px / 235px   */
+  --tile-art-blur: 3.191cqw;              /* 7.5px / 235px */
+  --tile-scrim: .66;                      /* flat black; .54–.75, tuned per artwork */
+
   --display: clamp(3.25rem, 6vw, 4.625rem);
   --heading: clamp(2.25rem, 4vw, 2.75rem);
   --subhead: clamp(1.45rem, 2.4vw, 1.7rem);
@@ -154,6 +166,7 @@
   text-transform: uppercase;
 }
 .sr4-tile {
+  container-type: inline-size;
   position: relative;
   width: 100%;
   aspect-ratio: 2 / 3;
@@ -163,27 +176,70 @@
   box-shadow: 0 12px 30px rgba(36, 33, 38, .16);
 }
 .sr4-tile-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.sr4-tile--frost .sr4-tile-art { filter: blur(9px); transform: scale(1.14); }
-.sr4-tile-black { position: absolute; inset: 0; background: rgba(6, 5, 9, .74); }
+
+/* Frost is a four-layer stack in Figma, not a single blur:
+   white plate (blurred 4px) → art (blurred 7.5px) → scrim → white soft-light. */
+.sr4-tile--frost::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--tile-plate);
+  filter: blur(var(--tile-plate-blur));
+}
+.sr4-tile--frost .sr4-tile-art { filter: blur(var(--tile-art-blur)); transform: scale(1.06); }
+.sr4-tile-black {
+  position: absolute;
+  inset: 0;
+  /* The conic layer sits at 60% in Figma; that opacity is baked into the stops
+     here so it can share one background shorthand with the flat scrim. */
+  background:
+    conic-gradient(from 90deg at 49% 50%,
+      rgba(0, 0, 0, .6) 0%,
+      rgba(1, 1, 1, .588) 2.567%,
+      rgba(14, 6, 6, .48) 26.12%,
+      rgba(6, 4, 10, .42) 47.745%,
+      rgba(11, 15, 7, .24) 76.726%,
+      rgba(0, 0, 0, .6) 100%),
+    rgba(0, 0, 0, var(--tile-scrim));
+}
+.sr4-tile-soft {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: #fff;
+  mix-blend-mode: soft-light;
+}
 .sr4-tile-clue {
   position: absolute;
   inset: 0;
   z-index: 2;
   display: grid;
   place-items: center;
-  padding: 10%;
+  /* Figma: Roboto Bold 32px on a 235px tile, 210px text box, line-height 1.5,
+     no letter-spacing and no text shadow — the scrim does that work. */
+  padding: 0 5.319%;
   color: #fff;
   font-weight: 700;
-  font-size: clamp(1.05rem, 1.1rem + .9vw, 1.5rem);
-  line-height: 1.15;
-  letter-spacing: -.01em;
+  font-size: 13.617cqw;
+  line-height: 1.5;
+  letter-spacing: 0;
   text-align: center;
-  text-shadow: 0 1px 14px rgba(0, 0, 0, .35);
 }
 .sr4-tile--reveal .sr4-tile-grad {
   position: absolute; inset: 0;
   background: linear-gradient(to top, rgba(0, 0, 0, .45), transparent 55%);
 }
+
+/* Iridescent: the real ramp off the "Surprise" wordmark — a flat 20% white wash
+   over a five-stop, near-horizontal (89.974deg) gradient. */
+.sr4-irid {
+  background-image: var(--irid-wash), var(--irid);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.sr4-irid-swatch { background-image: var(--irid-wash), var(--irid); }
 
 .sr4-tile-figure { margin-top: 32px; }
 .sr4-tile-row { display: grid; gap: clamp(1rem, 2.5vw, 1.75rem); }
