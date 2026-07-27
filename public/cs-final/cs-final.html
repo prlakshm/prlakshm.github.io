@@ -40,9 +40,9 @@
   --tile-plate:rgba(255,255,255,.75); --tile-plate-blur:1.702cqw; --tile-art-blur:3.191cqw; --tile-scrim:.5;
   --fd:"GS",system-ui,sans-serif; --fm:ui-monospace,"SF Mono",Menlo,monospace;
   --page-max:1248px; --gutter:clamp(20px,5vw,96px); --measure:66ch; --side:196px;
-  /* Five sizes, nothing else. --fs-micro is the floor (12px) for tracked
+  /* Five sizes, nothing else. --fs-micro is the floor (13px) for tracked
      uppercase labels; --fs-body is 14px. */
-  --fs-micro:12px; --fs-body:14px; --fs-lede:17px;
+  --fs-micro:13px; --fs-body:14px; --fs-lede:17px;
   --fs-h2:clamp(24px,3.2vw,34px); --fs-h1:clamp(32px,5.6vw,60px);
 }
 @media (prefers-color-scheme:dark){:root{
@@ -118,8 +118,7 @@ section{margin-top:clamp(16px,calc(9vw - 48px),84px);scroll-margin-top:28px}
 .rv.d1{transition-delay:.09s} .rv.d2{transition-delay:.18s} .rv.d3{transition-delay:.27s}
 
 /* meta strip */
-.meta{display:flex;flex-wrap:wrap;gap:0;border-top:1px solid var(--rule);
-  border-bottom:1px solid var(--rule);margin-top:30px}
+.meta{display:flex;flex-wrap:wrap;gap:0;margin-top:30px}
 .meta div{flex:1 1 150px;padding:14px 18px 14px 0;display:flex;flex-direction:column;gap:4px}
 .meta span:first-child{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.15em;
   text-transform:uppercase;color:var(--soft)}
@@ -127,6 +126,8 @@ section{margin-top:clamp(16px,calc(9vw - 48px),84px);scroll-margin-top:28px}
 
 /* figures + placeholders */
 figure{margin:26px 0 0}
+/* First figure in a stack already sits under .sechead's margin — don't double it */
+.stack > figure:first-child{margin-top:0}
 .ph{background:color-mix(in srgb,var(--ink) 7%,transparent);
   border:1px dashed color-mix(in srgb,var(--ink) 24%,transparent);
   display:flex;align-items:center;justify-content:center;text-align:center;padding:14px;
@@ -137,6 +138,10 @@ figcaption{font-family:var(--fm);font-size:var(--fs-micro);line-height:1.7;color
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:26px}
 .two .ph{min-height:170px}
 figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(--rule)}
+.book-ref{position:relative;isolation:isolate}
+.book-ref::after{content:"";position:absolute;z-index:0;left:16%;bottom:8%;width:68%;height:6%;
+  border-radius:50%;background:rgba(61,42,31,.34);filter:blur(12px)}
+.book-ref img{position:relative;z-index:1;border:0}
 /* The figures stretch to equal height in the grid, so a taller caption would
    otherwise steal height from its panel. Pin the panel and let the slack fall
    below the caption instead, so the two panels stay the same size. */
@@ -206,18 +211,14 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   background:var(--max-ink);border:1px solid var(--rule);padding:clamp(16px,2.6vw,28px)}
 .namecard .alt{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.13em;color:#7a7a88}
 
-/* pull quote */
 /* observed-session stats: big figure, label to its right, two across */
-.stats{display:flex;flex-wrap:wrap;gap:clamp(22px,5vw,64px);margin:18px 0 0;padding:0;list-style:none}
-.stats li{display:flex;align-items:baseline;gap:12px;min-width:0}
+.findings{padding-block:0 calc(clamp(19.2px,2.4vw,25.6px) - 16px)}
+.stats{display:flex;flex-wrap:wrap;gap:clamp(22px,5vw,64px);margin:clamp(19.2px,2.4vw,25.6px) 0 0;padding:0;list-style:none}
+.stats li{display:flex;align-items:center;gap:12px;min-width:0}
 .stats b{font-family:var(--fd);font-size:var(--fs-h2);font-variation-settings:"wght" 640;
   line-height:1;letter-spacing:-.02em;color:var(--ink);white-space:nowrap}
 .stats span{font-family:var(--fm);font-size:var(--fs-body);line-height:1.5;color:var(--body);
   max-width:20ch}
-
-.pull{border-left:2px solid var(--brass);padding-left:18px;margin-top:26px}
-.pull p{font-family:var(--fd);font-size:var(--fs-h2);line-height:1.32;color:var(--ink);
-  font-variation-settings:"wght" 560;max-width:26ch}
 
 /* decision block */
 .dec{border-top:1px solid var(--rule);padding-top:20px;margin-top:30px}
@@ -291,6 +292,9 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
    revealed title sits bottom-left, however many lines it runs to. */
 .back .m{display:block;position:relative;z-index:2;color:#f2f0ec;text-align:left}
 .back .name{display:block;font-size:var(--fs-body);font-variation-settings:"wght" 640;line-height:1.15}
+/* tracking kept light: .13em is an uppercase convention and reads loose on title case */
+.demo .foot{margin-top:16px;font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.04em;
+  color:#787884;line-height:1.75;max-width:62ch}
 
 /* flag box */
 .flag{border:1px solid var(--brass);background:color-mix(in srgb,var(--brass) 7%,var(--ground));
@@ -338,12 +342,12 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 <header class="rv">
   <p class="lab">Case study</p>
   <h1>Designing Surprise Rail for HBO Max</h1>
-  <p class="lede" style="margin-top:20px">Curiosity didn't kill the cat. It got us more clicks. <br/>
+  <p class="lede" style="margin-top:20px">Curiosity didn't kill the cat. It got more clicks. <br/>
     Surprise Rail is a new themed rail for HBO Max, built on tiles that hide the key art and sell the title in three words. A viewer with nothing in mind now has something to be curious about.</p>
   <div class="meta">
-    <div><span>Role</span><span>Product designer &middot; concept, research, prototype</span></div>
-    <div><span>Team</span><span>2 UX researchers, 1 visual designer, 1 manager</span></div>
-    <div><span>When</span><span>Jun &ndash; Jul 2025</span></div>
+    <div><span>Role</span><span>Product designer</span></div>
+    <div><span>Scope</span><span>Concept, research, prototype</span></div>
+    <div><span>Team</span><span>2 UX researchers, 1 product manager</span></div>
     <div><span>Status</span><span>Tested, not shipped</span></div>
   </div>
 </header>
@@ -371,6 +375,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
         <span class="face front"><span class="glass"></span><span class="art" style="background-image:url(art/climax.jpg)"></span><span class="scrim"></span><span class="soft"></span><span class="clue">Dance Floor Disaster</span></span>
         <span class="face back"><span class="art" style="background-image:url(art/climax.jpg)"></span><span class="m"><span class="name">Climax</span></span></span></span></button>
     </div>
+    <p class="foot">Working prototype.</p>
   </div>
 </div>
 
@@ -379,11 +384,11 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   <div class="sechead rv"><p class="lab">01 &mdash; The tension</p>
     <h2>Viewers want out of indecision.</h2></div>
   <div class="stack rv d1">
-    <figure class="rv d2">
-      <p class="lab">Summer 2025 Analytics</p>
+    <figure class="findings rv d2">
+      <p class="lab">Summer 2025 Findings</p>
       <ul class="stats">
         <li><b>2 min</b><span>users spent looking for a title</span></li>
-        <li><b>5/7</b><span>left without choosing</span></li>
+        <li><b>5 of 7</b><span>leave without playback</span></li>
       </ul>
     </figure>
     <p>HBO Max had plenty to watch, but viewers still struggled to choose. Key art or a synopsis alone wasn't enough.  There needed to be a better reason to get users to stop scrolling.</p>
@@ -394,37 +399,28 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 <!-- 02 -->
 <section id="insight">
   <div class="sechead rv"><p class="lab">02 &mdash; The insight</p>
-    <h2>Surprise works only when you can see why, and back out free</h2></div>
+    <h2>Surprise works because there is the potential for something great.</h2></div>
   <div class="stack rv d1">
-    <p>Blind Date with a Book works because the wrapping still tells you something. You don't get the cover, but you get three words that let you say yes or no on your own terms. The mystery is bounded.</p>
+    <p>I was walking through the Strand bookstore and saw a new display table: Blind Date with a Book. You don't get the cover, but you get clues that let you say yes or no. I thought, &ldquo;What if I could apply this idea to a rail?&rdquo;</p>
   </div>
-  <div class="pull rv d2"><p>Mystery is not the absence of information. It's the order you reveal it in.</p></div>
-  <figure class="rv d2" style="max-width:420px">
-    <img src="art/blind-date-book.jpg" alt="A hardback wrapped in kraft paper, tied with twine and a red wax seal, hand-lettered Blind Date with a Book with the clues mystery, thriller, suspense and crime" loading="lazy">
-    <figcaption>The Strand, summer 2025. Four handwritten words and a wax seal &mdash; enough to
-      choose by, nothing that gives the book away.</figcaption>
+  <figure class="book-ref rv d2" style="max-width:320px">
+    <img src="art/blind-date-book-transparent.png" alt="A hardback wrapped in kraft paper, tied with twine and a red wax seal, hand-lettered Blind Date with a Book with the clues mystery, thriller, suspense and crime" loading="lazy">
   </figure>
 </section>
 
 <!-- 03 -->
 <section id="decisions">
   <div class="sechead rv"><p class="lab">03 &mdash; Decisions</p>
-    <h2>Three choices that shaped it</h2></div>
+    <h2>What would this look like?</h2></div>
 
   <div class="dec rv d1">
-    <h3>Scattered tiles read as bugs. One rail reads as a rule.</h3>
-    <p style="margin-top:10px">The first version was a film-reel tile dropped randomly through the page. Cubby testing showed it broke people's mental model &mdash; they couldn't tell why <em>those</em> titles were hidden. A skip-level review also flagged the film-reel motif as overdone in entertainment.</p>
-    <div class="form">
-      <div><b>Constraint</b><span>Must not disturb the existing vertical browse</span></div>
-      <div><b>Considered</b><span>Scattered tiles &middot; modal &middot; film-reel row</span></div>
-      <div class="pick"><b>Chose</b><span>One dedicated rail, high on Home</span></div>
-      <div><b>Because</b><span>Content can be mysterious. Navigation cannot.</span></div>
-    </div>
+    <h3>Hidden tiles with clues on them.</h3>
+    <p style="margin-top:10px">The first version was a film-reel tile dropped randomly through the page.</p>
     <div class="two">
       <figure class="shot">
         <img src="art/film-reel.jpg" alt="Home page with film-strip tiles scattered one per row across Recent Releases, Art-House Gems and Global Indie" loading="lazy">
-        <figcaption>Rejected. The film-strip frame reads as a broken thumbnail, and one hidden
-          tile per row means the rule is never visible in one place.</figcaption>
+        <figcaption>Rejected. Testing showed it broke people's mental model. They couldn't tell why the titles were hidden. <br/>
+        A skip-level review flagged the film-reel motif as overdone and not feeling premium. </figcaption>
       </figure>
       <figure class="shot">
         <img src="art/one-rail.jpg" alt="The final Surprise Indie rail, six frosted tiles together in one dedicated row" loading="lazy">
