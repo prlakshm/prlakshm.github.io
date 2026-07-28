@@ -92,6 +92,14 @@ body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--fd);li
 .prog .track i{position:absolute;inset:0 100% 0 0;background:var(--brass)}
 /* tabular figures + a fixed width so the bar doesn't shift as the number changes */
 .prog .pct{font-variant-numeric:tabular-nums;color:var(--brass);min-width:4ch;text-align:right}
+.prog .next{display:inline-flex;align-items:center;gap:4px;color:var(--soft);text-decoration:none;
+  opacity:0;visibility:hidden;transform:translateX(-4px);pointer-events:none;
+  transition:color .2s ease,opacity .28s ease,transform .28s ease,visibility 0s linear .28s}
+.prog.done .next{opacity:1;visibility:visible;transform:none;pointer-events:auto;
+  transition-delay:0s}
+.prog .next:hover{color:var(--ink)}
+.prog .next:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+.prog .next-arrow{width:10px;height:10px;flex:none}
 
 /* ---------------- main column ---------------- */
 main{padding-block:clamp(28px,5vw,64px) 120px;min-width:0}
@@ -125,7 +133,7 @@ section{margin-top:clamp(16px,calc(9vw - 48px),84px);scroll-margin-top:28px}
 .meta span:last-child{font-family:var(--fm);font-size:var(--fs-body);color:var(--body);line-height:1.6}
 
 /* figures + placeholders */
-figure{margin:26px 0 0}
+figure{margin:26px 0}
 /* First figure in a stack already sits under .sechead's margin — don't double it */
 .stack > figure:first-child{margin-top:0}
 .ph{background:color-mix(in srgb,var(--ink) 7%,transparent);
@@ -135,9 +143,13 @@ figure{margin:26px 0 0}
 figcaption{font-family:var(--fm);font-size:var(--fs-micro);line-height:1.7;color:var(--soft);margin-top:9px;
   max-width:56ch}
 .wide{margin-inline:calc(-1*clamp(0px,3vw,60px))}
+/* Same rhythm as other figures; half the hero prototype width */
+figure.proto-match{margin:26px 0;width:75%;max-width:75%}
+figure.proto-match img{width:100%;height:auto;display:block;border:1px solid var(--rule)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:26px}
 .two .ph{min-height:170px}
 figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(--rule)}
+.tile-options img{border:0}
 .book-ref{position:relative;isolation:isolate}
 .book-ref::after{content:"";position:absolute;z-index:0;left:16%;bottom:8%;width:68%;height:6%;
   border-radius:50%;background:rgba(61,42,31,.34);filter:blur(12px)}
@@ -212,7 +224,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 .namecard .alt{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.13em;color:#7a7a88}
 
 /* observed-session stats: big figure, label to its right, two across */
-.findings{padding-block:0 calc(clamp(19.2px,2.4vw,25.6px) - 16px)}
+.findings{margin-bottom:0;padding-block:0 calc(clamp(19.2px,2.4vw,25.6px) - 16px)}
 .stats{display:flex;flex-wrap:wrap;gap:clamp(22px,5vw,64px);margin:clamp(19.2px,2.4vw,25.6px) 0 0;padding:0;list-style:none}
 .stats li{display:flex;align-items:center;gap:12px;min-width:0}
 .stats b{font-family:var(--fd);font-size:var(--fs-h2);font-variation-settings:"wght" 640;
@@ -222,6 +234,8 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 
 /* decision block */
 .dec{border-top:1px solid var(--rule);padding-top:20px;margin-top:30px}
+/* The opening comparison follows the same heading-to-body rhythm as every section. */
+#decisions .sechead + .dec{border-top:0;margin-top:0;padding-top:0}
 .dec .form{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:1px;
   background:var(--rule);border:1px solid var(--rule);margin-top:18px}
 .dec .form div{background:var(--ground);padding:13px 14px;display:flex;flex-direction:column;gap:5px}
@@ -317,6 +331,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   .rail{scroll-behavior:auto}
   .rv{opacity:1;transform:none;transition:none}
   .tile .inner{transition:none}
+  .prog .next{transition:none}
 }
 </style>
 
@@ -326,14 +341,25 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 <aside class="side">
   <div class="who">Surprise&nbsp;Rail<br><span style="color:var(--soft)">HBO Max &middot; 2025</span></div>
   <nav class="jump" id="jump" aria-label="Sections">
-    <a href="#tension"><span class="n">01</span>The tension</a>
-    <a href="#insight"><span class="n">02</span>The insight</a>
+    <a href="#tension"><span class="n">01</span>Problem</a>
+    <a href="#insight"><span class="n">02</span>Insights</a>
     <a href="#decisions"><span class="n">03</span>Decisions</a>
-    <a href="#built"><span class="n">04</span>Built behaviour</a>
+    <a href="#built"><span class="n">04</span>Behavior</a>
     <a href="#changed"><span class="n">05</span>What changed</a>
-    <a href="#limits"><span class="n">06</span>Result &amp; limits</a>
+    <a href="#limits"><span class="n">06</span>Results</a>
   </nav>
-  <div class="prog"><span>READ</span><span class="track"><i id="bar"></i></span><span class="pct" id="pct">0%</span></div>
+  <div class="prog" id="prog">
+    <span>READ</span>
+    <span class="track"><i id="bar"></i></span>
+    <span class="pct" id="pct">0%</span>
+    <a class="next" href="/" aria-label="Next: return to the portfolio">
+      NEXT
+      <svg class="next-arrow" viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+        <path d="M2 5 H8 M5.5 2.5 L8 5 L5.5 7.5" fill="none" stroke="currentColor"
+              stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"/>
+      </svg>
+    </a>
+  </div>
 </aside>
 
 <!-- ================= MAIN ================= -->
@@ -381,7 +407,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 
 <!-- 01 -->
 <section id="tension">
-  <div class="sechead rv"><p class="lab">01 &mdash; The tension</p>
+  <div class="sechead rv"><p class="lab">01 &mdash; Problem</p>
     <h2>Viewers want out of indecision.</h2></div>
   <div class="stack rv d1">
     <figure class="findings rv d2">
@@ -398,7 +424,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 
 <!-- 02 -->
 <section id="insight">
-  <div class="sechead rv"><p class="lab">02 &mdash; The insight</p>
+  <div class="sechead rv"><p class="lab">02 &mdash; Insights</p>
     <h2>Surprise works because there is the potential for something great.</h2></div>
   <div class="stack rv d1">
     <p>I was walking through the Strand bookstore and saw a new display table: Blind Date with a Book. You don't get the cover, but you get clues that let you say yes or no. I thought, &ldquo;What if I could apply this idea to a rail?&rdquo;</p>
@@ -411,87 +437,28 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 <!-- 03 -->
 <section id="decisions">
   <div class="sechead rv"><p class="lab">03 &mdash; Decisions</p>
-    <h2>What would this look like?</h2></div>
+    <h2>Hidden tiles with clues on them. But what would they look like?</h2></div>
 
   <div class="dec rv d1">
-    <h3>Hidden tiles with clues on them.</h3>
-    <p style="margin-top:10px">The first version was a film-reel tile dropped randomly through the page.</p>
-    <div class="two">
-      <figure class="shot">
-        <img src="art/film-reel.jpg" alt="Home page with film-strip tiles scattered one per row across Recent Releases, Art-House Gems and Global Indie" loading="lazy">
-        <figcaption>Rejected. Testing showed it broke people's mental model. They couldn't tell why the titles were hidden. <br/>
-        A skip-level review flagged the film-reel motif as overdone and not feeling premium. </figcaption>
-      </figure>
-      <figure class="shot">
-        <img src="art/one-rail.jpg" alt="The final Surprise Indie rail, six frosted tiles together in one dedicated row" loading="lazy">
-        <figcaption>Chosen. One dedicated rail. Six tiles side by side state the rule in a single
-          glance, and the rest of browse is left alone.</figcaption>
-      </figure>
+    <p>The first version was a film-reel tile dropped randomly through the page.</p>
+    <figure class="proto-match">
+      <img src="art/film-reel.jpg" alt="Home page with film-strip tiles scattered one per row across Recent Releases, Art-House Gems and Global Indie" loading="lazy">
+    </figure>
+    <p>Rejected: Testing showed it broke people's mental model. They couldn't tell why the titles were hidden. A skip-level review flagged the film-reel motif as overdone and not premium enough for HBO Max.</p>
+    <div class="flag rv d2">
+      <p>Chosen: One dedicated rail. One pattern to learn. Rest of browse stays familiar.</p>
     </div>
   </div>
 
   <div class="dec rv d1">
-    <h3>Two or three words. Thematic or tactical, never atmospheric.</h3>
-    <p style="margin-top:10px">Research compared four descriptor types. Thematic and tactical moved decisions most, and told you more about the title. Longer copy tested worse &mdash; it lost the pace of the interaction and stopped surviving a scan across a room.</p>
-    <div class="form">
-      <div><b>Constraint</b><span>Legible in a fast TV scan, at distance</span></div>
-      <div><b>Considered</b><span>Atmospheric &middot; behavioural &middot; thematic &middot; tactical</span></div>
-      <div class="pick"><b>Chose</b><span>Thematic + tactical, 2&ndash;3 words</span></div>
-      <div><b>Because</b><span>Skimmable, and it invites rather than describes</span></div>
-    </div>
-    <figure>
-      <svg class="dg" viewBox="0 0 760 400" role="img"
-           aria-label="Four descriptor types plotted by whether they tell you about the title or about yourself, against how much they moved a decision. Thematic and tactical sit highest on impact and are marked chosen.">
-        <text class="mi" x="22" y="26">DESCRIPTOR TYPES &#183; HOW PARTICIPANTS SPOKE</text>
-        <path class="ax" d="M100 52V330M100 330H730"/>
-        <text class="mi" transform="translate(26,120) rotate(-90)" text-anchor="middle">ABOUT THE TITLE</text>
-        <text class="mi" transform="translate(26,268) rotate(-90)" text-anchor="middle">ABOUT MYSELF</text>
-        <text class="mi" x="100" y="352">LOW IMPACT</text>
-        <text class="mi" x="730" y="352" text-anchor="end">HIGH IMPACT ON THE DECISION</text>
-
-        <rect class="bx" x="120" y="70" width="210" height="92"/>
-        <text class="hd" x="134" y="96">Atmospheric</text>
-        <text class="lb" x="134" y="118">Set in Big Sky Country</text>
-        <text class="lb" x="134" y="136">Poignant, reflective score</text>
-
-        <rect class="bx pick" x="440" y="62" width="210" height="92"/>
-        <text class="hd" x="454" y="88">Thematic</text>
-        <text class="mi ac" x="636" y="88" text-anchor="end">CHOSEN</text>
-        <text class="lb" x="454" y="110">Award-winning performance</text>
-        <text class="lb" x="454" y="128">Female director</text>
-
-        <rect class="bx pick" x="440" y="178" width="210" height="92"/>
-        <text class="hd" x="454" y="204">Tactical</text>
-        <text class="mi ac" x="636" y="204" text-anchor="end">CHOSEN</text>
-        <text class="lb" x="454" y="226">Run time &#183; rating &#183; series</text>
-        <text class="lb" x="454" y="244">Finish in one sitting</text>
-
-        <rect class="bx" x="120" y="218" width="210" height="92"/>
-        <text class="hd" x="134" y="244">Behavioural</text>
-        <text class="lb" x="134" y="266">Because you watched</text>
-        <text class="lb" x="134" y="284">Been on your My List</text>
-      </svg>
-      <figcaption>The four categories participants actually spoke in, plotted by impact on the
-        decision. Thematic and tactical sit high and to the right, which is why the tile ships
-        with those two. Redrawn from the research deck.</figcaption>
+    <p style="margin-top:10px">Next, I decided between a solid black tile and frosted glass.</p>
+    <figure class="tile-options">
+      <img src="art/tile-options-transparent.png" alt="Tile treatment test: solid black tiles on the left against frosted blurred key art on the right, each shown at two levels of darkness" loading="lazy">
     </figure>
-  </div>
-
-  <div class="dec rv d1">
-    <h3>Frosted, not black &mdash; hidden had to look deliberate</h3>
-    <p style="margin-top:10px">A solid black tile reads as a loading failure. Frosted glass reads as something placed in front of the art on purpose, and it borrows the language of the visual rebrand already in flight.</p>
-    <div class="form">
-      <div><b>Constraint</b><span>Must read as concealed, not broken</span></div>
-      <div><b>Considered</b><span>Solid black &middot; frosted glass</span></div>
-      <div class="pick"><b>Chose</b><span>Frosted glass</span></div>
-      <div><b>Because</b><span>Testers said it showed something was behind it</span></div>
+    <p>Rejected: Solid black. It was boring and gave no clue that anything was hidden.</p>
+    <div class="flag rv d2">
+      <p>Chosen: Frosted glass. Testers could tell the artwork was concealed and expected a title on the other side. It was visually intriguing and borrowed the design language of the glass rebrand in flight. </p>
     </div>
-    <figure>
-      <img src="art/tile-options.jpg" alt="Tile treatment test: solid black tiles on the left against frosted blurred key art on the right, each shown at two levels of darkness" loading="lazy">
-      <figcaption>Solid black on the left, frosted art on the right, each at two densities. The
-        black tile gives the eye nothing to resolve; the frosted one keeps enough shape behind the
-        words to read as covered on purpose.</figcaption>
-    </figure>
     <p class="small" style="margin-top:34px">The tile is small enough to specify completely, so I
       did &mdash; three layers and four colour styles, which is the whole component. Everything
       below is rendered live from those values, not pasted in as a picture of them.</p>
@@ -571,11 +538,57 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 
 <!-- 04 -->
 <section id="built">
-  <div class="sechead rv"><p class="lab">04 &mdash; Built behaviour</p>
+  <div class="sechead rv"><p class="lab">04 &mdash; Behavior</p>
     <h2>Where you are decides what you're told</h2></div>
   <div class="stack rv d1">
     <p>The descriptor isn't generated from the title alone. It takes three inputs &mdash; the title, where the viewer is in their journey, and a copy guide holding the descriptor rules and title metadata.</p>
     <p>The page you're on is the signal. <em>Hacks</em> earns a different descriptor on the Comedy genre page than on the LGBTQ+ collection, because the reason you'd want it is different.</p>
+  </div>
+  <div class="dec rv d1">
+    <h3>Two or three words. Thematic or tactical, never atmospheric.</h3>
+    <p style="margin-top:10px">Research compared four descriptor types. Thematic and tactical moved decisions most, and told you more about the title. Longer copy tested worse &mdash; it lost the pace of the interaction and stopped surviving a scan across a room.</p>
+    <div class="form">
+      <div><b>Constraint</b><span>Legible in a fast TV scan, at distance</span></div>
+      <div><b>Considered</b><span>Atmospheric &middot; behavioural &middot; thematic &middot; tactical</span></div>
+      <div class="pick"><b>Chose</b><span>Thematic + tactical, 2&ndash;3 words</span></div>
+      <div><b>Because</b><span>Skimmable, and it invites rather than describes</span></div>
+    </div>
+    <figure>
+      <svg class="dg" viewBox="0 0 760 400" role="img"
+           aria-label="Four descriptor types plotted by whether they tell you about the title or about yourself, against how much they moved a decision. Thematic and tactical sit highest on impact and are marked chosen.">
+        <text class="mi" x="22" y="26">DESCRIPTOR TYPES &#183; HOW PARTICIPANTS SPOKE</text>
+        <path class="ax" d="M100 52V330M100 330H730"/>
+        <text class="mi" transform="translate(26,120) rotate(-90)" text-anchor="middle">ABOUT THE TITLE</text>
+        <text class="mi" transform="translate(26,268) rotate(-90)" text-anchor="middle">ABOUT MYSELF</text>
+        <text class="mi" x="100" y="352">LOW IMPACT</text>
+        <text class="mi" x="730" y="352" text-anchor="end">HIGH IMPACT ON THE DECISION</text>
+
+        <rect class="bx" x="120" y="70" width="210" height="92"/>
+        <text class="hd" x="134" y="96">Atmospheric</text>
+        <text class="lb" x="134" y="118">Set in Big Sky Country</text>
+        <text class="lb" x="134" y="136">Poignant, reflective score</text>
+
+        <rect class="bx pick" x="440" y="62" width="210" height="92"/>
+        <text class="hd" x="454" y="88">Thematic</text>
+        <text class="mi ac" x="636" y="88" text-anchor="end">CHOSEN</text>
+        <text class="lb" x="454" y="110">Award-winning performance</text>
+        <text class="lb" x="454" y="128">Female director</text>
+
+        <rect class="bx pick" x="440" y="178" width="210" height="92"/>
+        <text class="hd" x="454" y="204">Tactical</text>
+        <text class="mi ac" x="636" y="204" text-anchor="end">CHOSEN</text>
+        <text class="lb" x="454" y="226">Run time &#183; rating &#183; series</text>
+        <text class="lb" x="454" y="244">Finish in one sitting</text>
+
+        <rect class="bx" x="120" y="218" width="210" height="92"/>
+        <text class="hd" x="134" y="244">Behavioural</text>
+        <text class="lb" x="134" y="266">Because you watched</text>
+        <text class="lb" x="134" y="284">Been on your My List</text>
+      </svg>
+      <figcaption>The four categories participants actually spoke in, plotted by impact on the
+        decision. Thematic and tactical sit high and to the right, which is why the tile ships
+        with those two. Redrawn from the research deck.</figcaption>
+    </figure>
   </div>
   <div class="two rv d2">
     <figure class="shot">
@@ -661,7 +674,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 
 <!-- 06 -->
 <section id="limits">
-  <div class="sechead rv"><p class="lab">06 &mdash; Result &amp; limits</p>
+  <div class="sechead rv"><p class="lab">06 &mdash; Results</p>
     <h2>Not shipped. Here's what a real test would measure.</h2></div>
   <div class="stack rv d1">
     <p>The concept preserves surprise while giving viewers enough to take the risk. It was tested with users and presented to product, and it wasn't picked up &mdash; so there is no engagement number to report and I'm not going to invent one.</p>
@@ -719,6 +732,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   var secs  = links.map(function(a){ return document.querySelector(a.getAttribute("href")); });
   var bar = document.getElementById("bar");
   var pct = document.getElementById("pct");
+  var prog = document.getElementById("prog");
   function onScroll(){
     var y = window.scrollY + window.innerHeight*0.28, cur = -1;
     secs.forEach(function(s,i){ if(s && s.offsetTop <= y) cur = i; });
@@ -728,6 +742,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
     var p = h > 0 ? Math.min(100, Math.max(0, window.scrollY / h * 100)) : 0;
     if(bar) bar.style.inset = "0 " + (100 - p) + "% 0 0";
     if(pct) pct.textContent = Math.round(p) + "%";
+    if(prog) prog.classList.toggle("done", p >= 99.5);
   }
   addEventListener("scroll", onScroll, {passive:true});
   addEventListener("resize", onScroll);
