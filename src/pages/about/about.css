@@ -185,7 +185,7 @@
   --mf-deskew: -2deg;
   color: var(--mono-secondary);
   margin-left: calc(-1 * var(--mf-u));
-  margin-bottom: calc(var(--mf-u) * 10);
+  margin-bottom: calc(var(--mf-u) * 10 - 4px);
 }
 
 .mf-line--title .mf-word {
@@ -200,7 +200,7 @@
   align-self: start;
   /* Title height (48.8u) plus its body gap (10u) places the portrait at the
      visual start of the first body line rather than the title's top edge. */
-  margin-top: calc(var(--mf-title-u) * 58.8 + 3px);
+  margin-top: calc(var(--mf-title-u) * 58.8 - 1px);
   width: clamp(250px, 26.25vw, 375px);
   aspect-ratio: 3 / 4;
   height: auto;

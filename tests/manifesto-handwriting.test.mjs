@@ -123,7 +123,7 @@ test("body and title preserve their authored stroke treatment at the compact sca
   );
   const titleGap = Number(
     titleLineRule?.match(
-      /margin-bottom:\s*calc\(var\(--mf-u\) \* ([0-9.]+)\)/,
+      /margin-bottom:\s*calc\(var\(--mf-u\) \* ([0-9.]+)(?: - 4px)?\)/,
     )?.[1],
   );
 
@@ -146,7 +146,10 @@ test("body and title preserve their authored stroke treatment at the compact sca
     "body text must grow five percent from its compact 90 percent scale",
   );
   assert.ok(titleMaxUnit > bodyMaxUnit, "title must render visibly larger than the body");
-  assert.ok(titleGap <= 10, "title-to-body gap should be visibly tighter");
+  assert.match(
+    titleLineRule ?? "",
+    /margin-bottom:\s*calc\(var\(--mf-u\) \* 10 - 4px\)/,
+  );
   assert.doesNotMatch(
     bodyWeightRule ?? "",
     /drop-shadow/,
@@ -245,7 +248,7 @@ test("the portrait aligns with the top of the manifesto body", () => {
   assert.doesNotMatch(manifestoRule ?? "", /display:\s*contents;/);
   assert.match(aboutRule ?? "", /--mf-title-u:\s*clamp\(1\.206px,\s*0\.1305vw \+ 0\.72px,\s*1\.8px\);/);
   assert.match(portraitRule ?? "", /align-self:\s*start;/);
-  assert.match(portraitRule ?? "", /margin-top:\s*calc\(var\(--mf-title-u\) \* 58\.8 \+ 3px\);/);
+  assert.match(portraitRule ?? "", /margin-top:\s*calc\(var\(--mf-title-u\) \* 58\.8 - 1px\);/);
   assert.doesNotMatch(portraitRule ?? "", /transform:/);
   assert.doesNotMatch(portraitRule ?? "", /grid-row:/);
   assert.doesNotMatch(portraitRule ?? "", /margin-left:/);

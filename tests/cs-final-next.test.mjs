@@ -17,7 +17,7 @@ test("keeps Home and Next past the content edge without shrinking reading progre
   assert.match(html, /<a class="case-next" href="\/"[^>]*>\s*NEXT/);
   assert.match(html, /main\{position:relative;/);
   assert.match(html, /\.case-actions\{position:absolute;right:calc\(-1 \* var\(--gutter\)\);/);
-  assert.match(html, /\.case-actions\{[^}]*flex-direction:column;[^}]*gap:2px/);
+  assert.match(html, /\.case-actions\{[^}]*flex-direction:column;[^}]*gap:calc\(var\(--grid-minor\) - var\(--case-link-h\)\)/);
 });
 
 test("reuses the landing-page navigation above the case-study shell", async () => {
@@ -43,22 +43,18 @@ test("aligns the sidebar and case-study labels to one shared grid offset", async
   assert.match(html, /main\{[^}]*padding-block:var\(--intro-grid-offset\)/);
 });
 
-test("fades the case-study grid beneath the main column and sidebar", async () => {
+test("uses a full-column wash on main and localizes sidebar and nav washes", async () => {
   const html = await readFile(pagePath, "utf8");
 
-  for (const selector of ["main", ".side"]) {
-    const rule = html.match(new RegExp(`${selector.replace(".", "\\.")}\\{([^}]*)\\}`))?.[1];
-    const wash = html.match(
-      new RegExp(`${selector.replace(".", "\\.")}::before\\{([^}]*)\\}`),
-    )?.[1];
-
-    assert.match(rule ?? "", /isolation:isolate/);
-    assert.match(wash ?? "", /content:""/);
-    assert.match(wash ?? "", /background:color-mix\(in srgb,var\(--ground\) 50%,transparent\)/);
-    assert.match(wash ?? "", /mask-image:.*10%/);
-    assert.match(wash ?? "", /-webkit-mask-image:.*10%/);
-    assert.doesNotMatch(wash ?? "", /border|box-shadow|border-radius/);
-  }
+  assert.doesNotMatch(html, /\.side::before/);
+  assert.match(html, /main::before\{content:"";position:absolute;z-index:-1;/);
+  assert.match(html, /main::before\{[^}]*background:color-mix\(in srgb,var\(--ground\) 50%,transparent\)/);
+  assert.match(html, /:is\(\.jump,\.prog,\.wt-nav-inner\),main\{position:relative;isolation:isolate\}/);
+  assert.doesNotMatch(html, /--parchment:/);
+  assert.match(html, /body::before\{[^}]*z-index:0/);
+  assert.match(html, /body>\.wt-nav,body>\.shell\{position:relative;z-index:1\}/);
+  assert.doesNotMatch(html, /header\.rv,\.sechead,\.stack>p/);
+  assert.match(html, /\.wt-nav-inner\{position:relative;isolation:isolate;/);
 });
 
 test("turns the frosted-glass anatomy into one focused black prototype panel", async () => {
@@ -79,7 +75,7 @@ test("turns the frosted-glass anatomy into one focused black prototype panel", a
   assert.doesNotMatch(decisions, /badge-iridescent|Contextual Info|tokbar--glare/);
   assert.match(html, /\.tile-breakdown\{[^}]*background:var\(--max-ink\)/);
   assert.match(html, /\.tile-breakdown\{[^}]*--breakdown-gap:19\.2px/);
-  assert.match(html, /\.tile-breakdown\{[^}]*--specimen-gap:4\.8px/);
+  assert.match(html, /\.tile-breakdown\{[^}]*--specimen-gap:11\.52px/);
   assert.match(html, /\.tile-breakdown\{[^}]*--title-font-gap:16\.848px/);
   assert.match(html, /\.tile-breakdown-title\{[^}]*color:#fff/);
   assert.match(html, /\.tile-breakdown-title\{[^}]*font-size:clamp\(37\.5px,5vw,55px\)/);
