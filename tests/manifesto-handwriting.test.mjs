@@ -206,7 +206,7 @@ test("the cleaner title source is used without per-letter warping", () => {
   assert.match(css, /\.mf-line--body\s*\{[^}]*--mf-deskew:\s*-[0-9.]+deg/s);
 });
 
-test("title and body share the 9:27 left edge", () => {
+test("title aligns to the pocket while body begins under the D foot", () => {
   const css = read("src/pages/about/about.css");
   const titleRule = css.match(
     /\.mf-line--title\s*\{([\s\S]*?)\n\}/,
@@ -215,8 +215,18 @@ test("title and body share the 9:27 left edge", () => {
     /\.mf-line--body\s*\{([\s\S]*?)\n\}/,
   )?.[1];
 
-  assert.doesNotMatch(titleRule ?? "", /margin-left:/);
-  assert.doesNotMatch(bodyRule ?? "", /margin-left:/);
+  assert.match(
+    titleRule ?? "",
+    /margin-left:\s*calc\(-1 \* var\(--mf-u\)\)/,
+  );
+  assert.match(
+    bodyRule ?? "",
+    /margin-left:\s*calc\(var\(--grid-minor-step\)\s*-\s*2px\);/,
+  );
+  assert.match(
+    bodyRule ?? "",
+    /width:\s*calc\(100% - \(var\(--grid-minor-step\) \* 2\)\)/,
+  );
 });
 
 test("the portrait centers against title plus body at the 9:27 state", () => {
@@ -230,6 +240,7 @@ test("the portrait centers against title plus body at the 9:27 state", () => {
   assert.doesNotMatch(manifestoRule ?? "", /display:\s*contents;/);
   assert.match(portraitRule ?? "", /align-self:\s*center;/);
   assert.doesNotMatch(portraitRule ?? "", /grid-row:/);
+  assert.doesNotMatch(portraitRule ?? "", /transform:|margin-left:/);
 });
 
 test("the rendered copy omits only the authored word that", () => {
@@ -263,7 +274,7 @@ test("the added where reuses the later authored where crop", () => {
   assert.deepEqual(insertedWhere.slice(1), sourceWhere.slice(1));
 });
 
-test("the body loses two grid lines of width and the portrait grows by 125 percent", () => {
+test("the body grows roughly five percent while retaining its left inset and the portrait grows by 125 percent", () => {
   const css = read("src/pages/about/about.css");
   const bodyRule = css.match(/\.mf-line--body\s*\{([\s\S]*?)\n\}/)?.[1];
   const portraitRule = css.match(/\.ab-portrait\s*\{([\s\S]*?)\n\}/)?.[1];
@@ -271,6 +282,10 @@ test("the body loses two grid lines of width and the portrait grows by 125 perce
   assert.match(
     bodyRule ?? "",
     /width:\s*calc\(100%\s*-\s*\(var\(--grid-minor-step\)\s*\*\s*2\)\)/,
+  );
+  assert.match(
+    bodyRule ?? "",
+    /margin-left:\s*calc\(var\(--grid-minor-step\)\s*-\s*2px\);/,
   );
   assert.doesNotMatch(
     css,

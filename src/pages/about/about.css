@@ -129,6 +129,7 @@
      its previous height at both desktop and mobile widths. */
   --mf-body-row-step: clamp(29.1px, calc(1.733vw + 22.37px), 44.55px);
   width: calc(100% - (var(--grid-minor-step) * 2));
+  margin-left: calc(var(--grid-minor-step) - 2px);
   row-gap: 0;
 }
 
@@ -156,6 +157,7 @@
   --mf-u: clamp(1.34px, 0.145vw + 0.8px, 2px);
   --mf-deskew: -2deg;
   color: var(--mono-secondary);
+  margin-left: calc(-1 * var(--mf-u));
   margin-bottom: calc(var(--mf-u) * 10);
 }
 
