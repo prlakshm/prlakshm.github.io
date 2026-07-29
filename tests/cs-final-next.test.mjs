@@ -60,3 +60,28 @@ test("fades the case-study grid beneath the main column and sidebar", async () =
     assert.doesNotMatch(wash ?? "", /border|box-shadow|border-radius/);
   }
 });
+
+test("turns the frosted-glass anatomy into one focused black prototype panel", async () => {
+  const html = await readFile(pagePath, "utf8");
+  const start = html.indexOf('<section id="decisions">');
+  const end = html.indexOf("<!-- 04 -->", start);
+  const decisions = html.slice(start, end);
+
+  assert.match(decisions, /<section class="tile-breakdown"/);
+  assert.match(decisions, /<h3 class="tile-breakdown-title"[^>]*>Design Breakdown<\/h3>/);
+  assert.match(decisions, /class="lyr"/);
+  assert.match(decisions, /class="irid-palette"/);
+  assert.match(decisions, />Iridescent Gradient<\/p>/);
+  assert.match(decisions, /class="gradient-bar"/);
+  assert.match(decisions, /left:0%[\s\S]*left:17%[\s\S]*left:30%[\s\S]*left:56%[\s\S]*left:91%/);
+  assert.match(decisions, /#BEA6BF[\s\S]*#EDEFE5[\s\S]*#E6D5E8[\s\S]*#979AB1[\s\S]*#EDEFE5/);
+  assert.match(decisions, /class="title-font-spec"[^>]*>Title Font</);
+  assert.doesNotMatch(decisions, /badge-iridescent|Contextual Info|tokbar--glare/);
+  assert.match(html, /\.tile-breakdown\{[^}]*background:var\(--max-ink\)/);
+  assert.match(html, /\.tile-breakdown-title\{[^}]*color:#fff/);
+  assert.match(html, /\.tile-breakdown \.lyr b,\.tile-breakdown \.lyr i\{color:#a6a6b0/);
+  assert.match(html, /\.gradient-bar\{[^}]*background-image:var\(--irid-banner\)/);
+  const paletteRule = html.match(/\.irid-palette\{([^}]*)\}/)?.[1] ?? "";
+  assert.doesNotMatch(paletteRule, /border-top/);
+  assert.match(html, /\.title-font-spec\{[^}]*background-image:var\(--irid-banner\)/);
+});

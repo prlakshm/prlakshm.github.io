@@ -1,4 +1,5 @@
 import BODY_INK_MASK from "./masks/manifesto-body-ink.png";
+import BODY_LATE_INK_MASK from "./masks/manifesto-body-late-ink.png";
 import BODY_MARK_MASK from "./masks/manifesto-body-marks.png";
 import TITLE_INK_MASK from "./masks/manifesto-title-ink.png";
 import TITLE_MARK_MASK from "./masks/manifesto-title-marks.png";
@@ -39,6 +40,7 @@ const MARK_MASKS = {
 /* The authored body ink peaks around 63% opacity. Four identical alpha passes
    make it read like solid marker ink without inventing or smoothing an edge. */
 const MASK_PASSES = 4;
+const LATE_BODY_START_LINE = 13;
 const maskStack = (source: string) =>
   Array.from({ length: MASK_PASSES }, () => `url("${source}")`).join(", ");
 
@@ -50,52 +52,56 @@ const scale = (ws: ManifestoWord[]) => {
 function Line({ words, className }: { words: ManifestoWord[]; className: string }) {
   return (
     <div className={className} style={{ "--mf-space": WORD_SPACE } as React.CSSProperties}>
-      {scale(words).map((w, i) => (
-        <span
-          key={`${w.t}-${i}`}
-          className="mf-word-wrap"
-          style={
-            {
-              "--w": w.w,
-              "--h": w.h,
-              "--dy": w.dy,
-              "--sw": MANIFESTO_SOURCES[w.s].w,
-              "--sh": MANIFESTO_SOURCES[w.s].h,
-            } as React.CSSProperties
-          }
-          aria-hidden="true"
-        >
+      {scale(words).map((w, i) => {
+        const isLateBody = w.s === "body" && w.l >= LATE_BODY_START_LINE;
+        const inkMask = isLateBody ? BODY_LATE_INK_MASK : MASKS[w.s];
+        return (
           <span
-            className="mf-word"
+            key={`${w.t}-${i}`}
+            className="mf-word-wrap"
             style={
               {
-                "--mx": -w.x,
-                "--my": -w.y,
-                maskImage: maskStack(MASKS[w.s]),
-                WebkitMaskImage: maskStack(MASKS[w.s]),
+                "--w": w.w,
+                "--h": w.h,
+                "--dy": w.dy,
+                "--sw": MANIFESTO_SOURCES[w.s].w,
+                "--sh": MANIFESTO_SOURCES[w.s].h,
               } as React.CSSProperties
             }
-          />
-          {w.m.map((mark, markIndex) => (
+            aria-hidden="true"
+          >
             <span
-              key={markIndex}
-              className="mf-mark"
+              className={isLateBody ? "mf-word mf-word--late" : "mf-word"}
               style={
                 {
-                  "--mark-x": mark.x,
-                  "--mark-y": mark.y,
-                  "--mark-w": mark.w,
-                  "--mark-h": mark.h,
-                  "--mx": mark.mx,
-                  "--my": mark.my,
-                  maskImage: maskStack(MARK_MASKS[w.s]),
-                  WebkitMaskImage: maskStack(MARK_MASKS[w.s]),
+                  "--mx": -w.x,
+                  "--my": -w.y,
+                  maskImage: maskStack(inkMask),
+                  WebkitMaskImage: maskStack(inkMask),
                 } as React.CSSProperties
               }
             />
-          ))}
-        </span>
-      ))}
+            {w.m.map((mark, markIndex) => (
+              <span
+                key={markIndex}
+                className="mf-mark"
+                style={
+                  {
+                    "--mark-x": mark.x,
+                    "--mark-y": mark.y,
+                    "--mark-w": mark.w,
+                    "--mark-h": mark.h,
+                    "--mx": mark.mx,
+                    "--my": mark.my,
+                    maskImage: maskStack(MARK_MASKS[w.s]),
+                    WebkitMaskImage: maskStack(MARK_MASKS[w.s]),
+                  } as React.CSSProperties
+                }
+              />
+            ))}
+          </span>
+        );
+      })}
     </div>
   );
 }

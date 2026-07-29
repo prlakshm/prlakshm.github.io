@@ -406,7 +406,7 @@ test("handwriting wraps as whole alpha-masked words", () => {
   const component = read("src/pages/about/Manifesto.tsx");
   const css = read("src/pages/about/about.css");
 
-  assert.match(component, /className="mf-word"/);
+  assert.match(component, /className=\{isLateBody \? "mf-word mf-word--late" : "mf-word"\}/);
   assert.match(component, /MANIFESTO_WORDS/);
   assert.match(component, /maskImage/);
   assert.match(component, /WebkitMaskImage/);
@@ -510,4 +510,16 @@ test("all i-dots and periods receive heavier source-mask overlays", () => {
   assert.match(component, /body-marks\.png/);
   assert.match(component, /title-marks\.png/);
   assert.match(component, /maskStack\(MARK_MASKS\[w\.s\]\)/);
+});
+
+test("words from Automate onward use a calibrated heavier authored mask", () => {
+  const build = read("scripts/manifesto/build.py");
+  const component = read("src/pages/about/Manifesto.tsx");
+
+  assert.match(build, /LATE_BODY_START_LINE\s*=\s*13/);
+  assert.match(build, /LATE_BODY_DILATION_RADIUS\s*=\s*0\.625/);
+  assert.match(build, /manifesto-body-late-ink\.png/);
+  assert.match(component, /manifesto-body-late-ink\.png/);
+  assert.match(component, /w\.l >= LATE_BODY_START_LINE/);
+  assert.match(component, /className=\{isLateBody \? "mf-word mf-word--late" : "mf-word"\}/);
 });

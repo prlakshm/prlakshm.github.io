@@ -222,6 +222,33 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   letter-spacing:normal;color:var(--ink);line-height:1.35;display:block;margin:14px 0 0;padding:0}
 @media (max-width:640px){.lyr{grid-template-columns:repeat(2,1fr)}}
 
+/* The component spec lives as one dark prototype, echoing the working rail above. */
+.tile-breakdown{margin-top:26px;background:var(--max-ink);border:1px solid var(--rule);
+  padding:clamp(18px,3vw,34px);overflow:hidden}
+.tile-breakdown-title{margin:0 0 19.2px;color:#fff;font-size:clamp(28px,3.8vw,44px);font-variation-settings:"wght" 640;
+  letter-spacing:-.025em;line-height:1}
+.tile-breakdown .lyr{margin-top:0}
+.tile-breakdown .lyr-tile{border-color:rgba(255,255,255,.16)}
+.tile-breakdown .lyr b,.tile-breakdown .lyr i{color:#a6a6b0}
+.layer-notes{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:22px 0 0;padding:18px 0 0;
+  list-style:none;border-top:1px solid rgba(255,255,255,.16)}
+.layer-notes li{font-family:var(--fm);font-size:var(--fs-micro);line-height:1.65;color:#a6a6b0}
+.layer-notes b{display:block;color:#d8d8de;font-weight:400;margin-bottom:3px}
+.irid-palette{margin-top:26px}
+.irid-palette-label{margin:0 0 12px;font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.12em;
+  text-transform:uppercase;color:#a6a6b0}
+.gradient-scale{position:relative;padding-bottom:30px}
+.gradient-bar{position:relative;height:44px;border:1px solid rgba(255,255,255,.18);background-image:var(--irid-banner)}
+.gradient-bar span{position:absolute;bottom:0;height:9px;width:1px;background:rgba(10,10,16,.55)}
+.gradient-labels{position:absolute;left:0;right:0;top:51px;height:18px}
+.gradient-labels code{position:absolute;transform:translateX(-50%);font-family:var(--fm);font-size:var(--fs-micro);
+  line-height:1;color:#a6a6b0;white-space:nowrap}
+.gradient-labels code:first-child{transform:none}
+.gradient-labels code:last-child{transform:translateX(-100%)}
+.title-font-spec{display:inline-block;margin:26px 0 0;font-size:clamp(30px,4vw,48px);font-variation-settings:"wght" 640;
+  letter-spacing:-.025em;line-height:1;background-image:var(--irid-banner);-webkit-background-clip:text;background-clip:text;color:transparent}
+@media (max-width:640px){.layer-notes{grid-template-columns:repeat(2,1fr)}}
+
 .tok{margin:20px 0 0;display:flex;flex-direction:column;gap:20px}
 .tokrow{display:flex;flex-direction:column;gap:8px}
 .tokrow .th{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
@@ -514,86 +541,30 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
       <p>Chosen: Frosted glass. Cause ya' gotta tease a little. <br/>
         Testers could tell there was a title underneath. It was visually intriguing and borrowed design language of the HBO Max glass. </p>
     </div>
-    <p class="small" style="margin-top:34px">The tile is small enough to specify completely, so I
-      did &mdash; three layers and four colour styles, which is the whole component. Everything
-      below is rendered live from values.</p>
-
-    <figure>
+    <section class="tile-breakdown" aria-labelledby="tile-breakdown-title">
+      <h3 class="tile-breakdown-title" id="tile-breakdown-title">Design Breakdown</h3>
       <ol class="lyr" style="--tile-scrim:.54">
-        <li>
-          <div class="lyr-tile"><span class="ar raw"></span></div>
-          <div class="lyr-cap"><b>Original Key Art</b></div>
-        </li>
-        <li>
-          <div class="lyr-tile"><span class="pl"></span><span class="ar"></span></div>
-          <div class="lyr-cap"><b>01 &middot; Layer Blur</b></div>
-        </li>
-        <li>
-          <div class="lyr-tile"><span class="pl"></span><span class="ar"></span><span class="bk"></span></div>
-          <div class="lyr-cap">
-            <b>02 &middot; Black Opacity</b>
-            <i>(54-75% depending on artwork)</i>
-          </div>
-        </li>
-        <li>
-          <div class="lyr-tile"><span class="pl"></span><span class="ar"></span><span class="bk"></span><span class="gl"></span><span class="sf"></span></div>
-          <div class="lyr-cap">
-            <b>03 &middot; Frosted Glass</b>
-            <i>(angular + soft white light)</i>
-          </div>
-        </li>
+        <li><div class="lyr-tile"><span class="ar raw"></span></div><div class="lyr-cap"><b>Original Key Art</b></div></li>
+        <li><div class="lyr-tile"><span class="pl"></span><span class="ar"></span></div><div class="lyr-cap"><b>01 &middot; Layer Blur</b></div></li>
+        <li><div class="lyr-tile"><span class="pl"></span><span class="ar"></span><span class="bk"></span></div><div class="lyr-cap"><b>02 &middot; Black Opacity</b><i>(54-75% depending on artwork)</i></div></li>
+        <li><div class="lyr-tile"><span class="pl"></span><span class="ar"></span><span class="bk"></span><span class="gl"></span><span class="sf"></span></div><div class="lyr-cap"><b>03 &middot; Frosted Glass</b><i>(angular + soft white light)</i></div></li>
       </ol>
-      <figcaption>The key art for <em>2073</em> as delivered, then the three layers that conceal
-        it, at the 54% black this particular artwork was tuned to. The blurs are held as ratios of
-        the 235px design width, so the tile survives being rendered this much smaller than it
-        ships. The descriptor sits above all three &mdash; the working rail at the top of this page
-        is the finished article.</figcaption>
-    </figure>
-
-    <figure>
-      <div class="tok">
-        <div class="tokrow">
-          <div class="th"><b>banner-iridescent</b><i>RAIL WORDMARK</i></div>
-          <div class="tokbar" style="background-image:var(--irid-banner)">
+      <div class="irid-palette">
+        <p class="irid-palette-label">Iridescent Gradient</p>
+        <div class="gradient-scale" aria-label="Iridescent banner gradient color stops">
+          <div class="gradient-bar">
             <span style="left:0%"></span><span style="left:17%"></span><span style="left:30%"></span>
             <span style="left:56%"></span><span style="left:91%"></span>
           </div>
-          <p class="tokstops"><em>0%</em> BEA6BF &nbsp; <em>17%</em> EDEFE5 &nbsp; <em>30%</em> E6D5E8
-            &nbsp; <em>56%</em> 979AB1 &nbsp; <em>91%</em> EDEFE5 &nbsp; <em>+ white 20%</em></p>
-          <p class="toknote">The ramp lands on "Surprise" only &mdash; "Indie" is plain white. The
-            theme word is the one that swaps, so a gradient there would resolve differently at every
-            width, and it's the contrast between treated and plain that marks which half is the
-            format and which is the subject.</p>
-        </div>
-        <div class="tokrow">
-          <div class="th"><b>badge-iridescent</b><i>TILE BADGE</i></div>
-          <div class="tokbar" style="background-image:var(--irid-badge)">
-            <span style="left:2%"></span><span style="left:31%"></span><span style="left:61%"></span>
+          <div class="gradient-labels">
+            <code style="left:0%">#BEA6BF</code><code style="left:17%">#EDEFE5</code>
+            <code style="left:30%">#E6D5E8</code><code style="left:56%">#979AB1</code>
+            <code style="left:91%">#EDEFE5</code>
           </div>
-          <p class="tokstops"><em>2%</em> EDEFE5 &nbsp; <em>31%</em> BEA6BF &nbsp; <em>61%</em> AFBECF
-            &nbsp; <em>100%</em> 8C95BE at 0% alpha<br>
-            over <em>4%</em> EDEFE5 &nbsp; <em>42%</em> AFBECF &nbsp; <em>100%</em> 8C95BE
-            &nbsp; <em>+ white 50%</em></p>
-        </div>
-        <div class="tokrow">
-          <div class="th"><b>Contextual Info &mdash; iridescent</b><i>SUPPORTING COPY</i></div>
-          <div class="tokbar" style="background-image:var(--irid-contextual)">
-            <span style="left:2%"></span><span style="left:20%"></span><span style="left:50%"></span>
-          </div>
-          <p class="tokstops"><em>2%</em> EDEFE5 &nbsp; <em>20%</em> BEA6BF &nbsp; <em>50%</em> AFBECF
-            &nbsp; <em>100%</em> 8C95BE &nbsp; <em>+ white 20%</em></p>
-        </div>
-        <div class="tokrow">
-          <div class="th"><b>Glare</b><i>TILE SCRIM</i></div>
-          <div class="tokbar tokbar--glare" style="background-image:var(--glare-sheen),linear-gradient(90deg,rgba(0,0,0,.5),rgba(0,0,0,.5))"></div>
-          <p class="tokstops"><em>white 5%</em> &nbsp; over <em>angular 60%</em> &nbsp; over
-            <em>black 50%</em> &nbsp; under <em>white soft-light</em></p>
         </div>
       </div>
-      <figcaption>The three iridescents are one family read at different speeds &mdash; the banner
-        travels furthest, the badge fades out so it can sit on artwork, the contextual ramp stays
-        shortest. Glare is the only one that conceals rather than decorates.</figcaption>
-    </figure>
+      <div class="title-font-spec" aria-label="Title Font">Title Font</div>
+    </section>
   </div>
 </section>
 

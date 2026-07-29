@@ -77,6 +77,8 @@ OMITTED_WORD = {"text": "that", "line": 4}
 # large runtime filter chains.
 RENDER_DILATION_RADII = {"body": 0.375, "title": 0.625}
 MARK_DILATION_RADII = {"body": 0.625, "title": 0.75}
+LATE_BODY_START_LINE = 13
+LATE_BODY_DILATION_RADIUS = 0.625
 FRACTIONAL_DILATION_SCALE = 2
 
 ALPHA_THRESHOLD = 4   # includes antialiasing while ignoring zero-alpha canvas
@@ -539,6 +541,11 @@ def main():
         source_paths["body"],
         MASKS / "manifesto-body-ink.png",
         RENDER_DILATION_RADII["body"],
+    )
+    write_dilated_mask(
+        source_paths["body"],
+        MASKS / "manifesto-body-late-ink.png",
+        LATE_BODY_DILATION_RADIUS,
     )
     for key, source_path in source_paths.items():
         write_dilated_mask(

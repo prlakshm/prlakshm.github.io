@@ -36,6 +36,7 @@ The generated runtime masks also use explicit names:
 - `manifesto-title-ink.png`
 - `manifesto-title-marks.png`
 - `manifesto-body-ink.png`
+- `manifesto-body-late-ink.png` (calibrated for the thinner second export)
 - `manifesto-body-marks.png`
 
 CSS supplies the secondary ink color and responsive size. Dots and periods use
