@@ -21,11 +21,15 @@ and baseline pitch of both:
 2. Body part 2 is uniformly scaled to part 1’s measured x-height.
 3. All 20 source lines are stacked on part 1’s measured line step.
 4. The normalized result is saved as `manifesto-body-normalized.png`.
+5. The two visibly crowded long words in the second export receive a small,
+   local horizontal resample and are saved in
+   `manifesto-body-letter-spaced.png`.
 
-This normalization changes only scale and line placement. Each handwritten
-line’s internal letterforms, joins, spacing, dots, and punctuation remain
-authored pixels. The browser then crops one mask per whole word so flexbox can
-wrap only between words.
+The broad normalization changes only scale and line placement. The two local
+spacing adjustments preserve their continuous authored alpha and do not trace
+or redraw any letter. Every other internal letterform, join, space, dot, and
+punctuation mark remains untouched. The browser then crops one mask per whole
+word so flexbox can wrap only between words.
 
 The copy edit “and **where** AI begins” reuses the later authored `where` from
 “learn where and when.” Its crop coordinates are duplicated in the generated

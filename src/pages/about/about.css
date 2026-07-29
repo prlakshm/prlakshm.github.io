@@ -157,6 +157,7 @@
   --mf-body-row-step: clamp(26.4995px, calc(1.637685vw + 20.13965px), 41.09975px);
   width: calc(100% - (var(--grid-minor-step) * 2));
   margin-left: calc(var(--grid-minor-step) - 4px);
+  transform: translateY(1px);
   row-gap: 0;
 }
 
@@ -199,7 +200,7 @@
   align-self: start;
   /* Title height (48.8u) plus its body gap (10u) places the portrait at the
      visual start of the first body line rather than the title's top edge. */
-  margin-top: calc(var(--mf-title-u) * 58.8);
+  margin-top: calc(var(--mf-title-u) * 58.8 + 3px);
   width: clamp(250px, 26.25vw, 375px);
   aspect-ratio: 3 / 4;
   height: auto;

@@ -81,6 +81,15 @@ LATE_BODY_START_LINE = 13
 LATE_BODY_DILATION_RADIUS = 0.625
 FRACTIONAL_DILATION_SCALE = 2
 
+# The second authored export is slightly tighter inside a couple of long
+# words. A restrained local width adjustment opens their internal rhythm while
+# leaving the rest of every line untouched. This resamples authored alpha only:
+# no tracing, smoothing, or redrawing.
+LATE_WORD_LETTER_SPACING = {
+    (13, "Automate"): {"scale": 1.07},
+    (20, "intentional"): {"scale": 1.055},
+}
+
 ALPHA_THRESHOLD = 4   # includes antialiasing while ignoring zero-alpha canvas
 MIN_SPECK = 5         # smallest confident tittle in the authored body export
 FAINT_SPECK_ALPHA = 64  # reject tiny export dust unless its alpha is confident
@@ -506,6 +515,91 @@ def segment_source(path, text, line_offset, key):
     )
 
 
+def write_letter_spaced_body_mask(source_path, source, output_path):
+    """Open selected authored words with a smooth, restrained local resample."""
+    image = Image.open(source_path).convert("RGBA")
+    pixels = np.asarray(image)
+    corrections = {}
+
+    for (line, text), adjustment in LATE_WORD_LETTER_SPACING.items():
+        word = next(
+            (
+                row for row in source["rows"]
+                if row["line"] == line and row["text"] == text
+            ),
+            None,
+        )
+        if word is None:
+            sys.exit(f"missing letter-spacing target: line {line} {text!r}")
+        corrections.setdefault(line, []).append(
+            (word, adjustment["scale"])
+        )
+
+    max_insert = max(
+        sum(
+            round((word["x1"] - word["x0"] + 1) * scale)
+            - (word["x1"] - word["x0"] + 1)
+            for word, scale in words
+        )
+        for words in corrections.values()
+    )
+    result = np.zeros(
+        (image.height, image.width + max_insert, 4),
+        dtype=pixels.dtype,
+    )
+
+    centers = [(start + stop) / 2 for start, stop in source["bands"]]
+    boundaries = [0]
+    boundaries.extend(
+        round((left + right) / 2)
+        for left, right in zip(centers, centers[1:])
+    )
+    boundaries.append(image.height)
+
+    for index, (top, bottom) in enumerate(
+        zip(boundaries, boundaries[1:])
+    ):
+        line = index + len(TITLE_TEXT)
+        words = sorted(
+            corrections.get(line, []),
+            key=lambda correction: correction[0]["x0"],
+        )
+        source_x = 0
+        destination_x = 0
+        for word, scale in words:
+            word_left = min(max(word["x0"], source_x), image.width)
+            word_right = min(max(word["x1"] + 1, word_left), image.width)
+            width = word_left - source_x
+            result[
+                top:bottom,
+                destination_x:destination_x + width,
+            ] = pixels[top:bottom, source_x:word_left]
+            destination_x += width
+
+            word_crop = Image.fromarray(
+                pixels[top:bottom, word_left:word_right]
+            )
+            target_width = round(word_crop.width * scale)
+            word_crop = word_crop.resize(
+                (target_width, word_crop.height),
+                Image.Resampling.LANCZOS,
+            )
+            result[
+                top:bottom,
+                destination_x:destination_x + target_width,
+            ] = np.asarray(word_crop)
+            destination_x += target_width
+            source_x = word_right
+
+        remaining = image.width - source_x
+        result[
+            top:bottom,
+            destination_x:destination_x + remaining,
+        ] = pixels[top:bottom, source_x:]
+
+    Image.fromarray(result).save(output_path)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--title-src",
@@ -528,9 +622,18 @@ def main():
         pathlib.Path(args.body_part_2_src),
         normalized_body,
     )
+    normalized_body_source = segment_source(
+        normalized_body, BODY_TEXT, len(TITLE_TEXT), "body",
+    )
+    letter_spaced_body = MASKS / "manifesto-body-letter-spaced.png"
+    write_letter_spaced_body_mask(
+        normalized_body,
+        normalized_body_source,
+        letter_spaced_body,
+    )
     source_paths = {
         "title": pathlib.Path(args.title_src),
-        "body": normalized_body,
+        "body": letter_spaced_body,
     }
     write_dilated_mask(
         source_paths["title"],

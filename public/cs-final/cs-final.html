@@ -223,9 +223,9 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 @media (max-width:640px){.lyr{grid-template-columns:repeat(2,1fr)}}
 
 /* The component spec lives as one dark prototype, echoing the working rail above. */
-.tile-breakdown{margin-top:26px;background:var(--max-ink);border:1px solid var(--rule);
+.tile-breakdown{--breakdown-gap:19.2px;--specimen-gap:4.8px;--title-font-gap:16.848px;margin-top:26px;background:var(--max-ink);border:1px solid var(--rule);
   padding:clamp(18px,3vw,34px);overflow:hidden}
-.tile-breakdown-title{margin:0 0 19.2px;color:#fff;font-size:clamp(28px,3.8vw,44px);font-variation-settings:"wght" 640;
+.tile-breakdown-title{margin:0 0 var(--breakdown-gap);color:#fff;font-size:clamp(37.5px,5vw,55px);font-variation-settings:"wght" 640;
   letter-spacing:-.025em;line-height:1}
 .tile-breakdown .lyr{margin-top:0}
 .tile-breakdown .lyr-tile{border-color:rgba(255,255,255,.16)}
@@ -234,18 +234,18 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   list-style:none;border-top:1px solid rgba(255,255,255,.16)}
 .layer-notes li{font-family:var(--fm);font-size:var(--fs-micro);line-height:1.65;color:#a6a6b0}
 .layer-notes b{display:block;color:#d8d8de;font-weight:400;margin-bottom:3px}
-.irid-palette{margin-top:26px}
+.irid-palette{margin-top:var(--specimen-gap)}
 .irid-palette-label{margin:0 0 12px;font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.12em;
   text-transform:uppercase;color:#a6a6b0}
 .gradient-scale{position:relative;padding-bottom:30px}
-.gradient-bar{position:relative;height:44px;border:1px solid rgba(255,255,255,.18);background-image:var(--irid-banner)}
+.gradient-bar{position:relative;height:44px;background-image:var(--irid-banner)}
 .gradient-bar span{position:absolute;bottom:0;height:9px;width:1px;background:rgba(10,10,16,.55)}
 .gradient-labels{position:absolute;left:0;right:0;top:51px;height:18px}
 .gradient-labels code{position:absolute;transform:translateX(-50%);font-family:var(--fm);font-size:var(--fs-micro);
   line-height:1;color:#a6a6b0;white-space:nowrap}
 .gradient-labels code:first-child{transform:none}
 .gradient-labels code:last-child{transform:translateX(-100%)}
-.title-font-spec{display:inline-block;margin:26px 0 0;font-size:clamp(30px,4vw,48px);font-variation-settings:"wght" 640;
+.title-font-spec{display:inline-block;margin:var(--title-font-gap) 0 0;font-size:clamp(30px,4vw,48px);font-variation-settings:"wght" 640;
   letter-spacing:-.025em;line-height:1;background-image:var(--irid-banner);-webkit-background-clip:text;background-clip:text;color:transparent}
 @media (max-width:640px){.layer-notes{grid-template-columns:repeat(2,1fr)}}
 

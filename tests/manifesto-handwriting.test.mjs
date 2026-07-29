@@ -230,6 +230,7 @@ test("title aligns to the pocket while body begins under the D foot", () => {
     bodyRule ?? "",
     /width:\s*calc\(100% - \(var\(--grid-minor-step\) \* 2\)\)/,
   );
+  assert.match(bodyRule ?? "", /transform:\s*translateY\(1px\);/);
 });
 
 test("the portrait aligns with the top of the manifesto body", () => {
@@ -244,7 +245,7 @@ test("the portrait aligns with the top of the manifesto body", () => {
   assert.doesNotMatch(manifestoRule ?? "", /display:\s*contents;/);
   assert.match(aboutRule ?? "", /--mf-title-u:\s*clamp\(1\.206px,\s*0\.1305vw \+ 0\.72px,\s*1\.8px\);/);
   assert.match(portraitRule ?? "", /align-self:\s*start;/);
-  assert.match(portraitRule ?? "", /margin-top:\s*calc\(var\(--mf-title-u\) \* 58\.8\);/);
+  assert.match(portraitRule ?? "", /margin-top:\s*calc\(var\(--mf-title-u\) \* 58\.8 \+ 3px\);/);
   assert.doesNotMatch(portraitRule ?? "", /transform:/);
   assert.doesNotMatch(portraitRule ?? "", /grid-row:/);
   assert.doesNotMatch(portraitRule ?? "", /margin-left:/);
@@ -522,4 +523,36 @@ test("words from Automate onward use a calibrated heavier authored mask", () => 
   assert.match(component, /manifesto-body-late-ink\.png/);
   assert.match(component, /w\.l >= LATE_BODY_START_LINE/);
   assert.match(component, /className=\{isLateBody \? "mf-word mf-word--late" : "mf-word"\}/);
+});
+
+test("crowded late-body words gain smooth local spacing without redrawing the handwriting", () => {
+  const build = read("scripts/manifesto/build.py");
+  const generated = read("src/pages/about/manifesto-words.ts");
+  const automate = generated.match(
+    /\{ t: "Automate", l: 13,[^}]*?w: ([0-9.]+)/,
+  );
+  const intentional = generated.match(
+    /\{ t: "intentional", l: 20,[^}]*?w: ([0-9.]+)/,
+  );
+
+  assert.match(build, /LATE_WORD_LETTER_SPACING\s*=/);
+  assert.match(build, /\(13,\s*"Automate"\)/);
+  assert.match(build, /\(20,\s*"intentional"\)/);
+  assert.match(build, /"scale":\s*1\.07/);
+  assert.match(build, /"scale":\s*1\.055/);
+  assert.match(build, /manifesto-body-letter-spaced\.png/);
+  assert.match(build, /write_letter_spaced_body_mask/);
+  assert.match(build, /word_crop\s*=\s*word_crop\.resize/);
+  assert.match(build, /Image\.Resampling\.LANCZOS/);
+  assert.ok(automate);
+  assert.ok(intentional);
+  assert.ok(
+    Number(automate[1]) >= 86,
+    "Automate should gain breathing room between its authored letter slices",
+  );
+  assert.ok(
+    Number(intentional[1]) >= 95,
+    "intentional should match the upper manifesto's internal rhythm",
+  );
+  assert.doesNotMatch(build, /potrace|svgwrite|map_coordinates/);
 });
