@@ -71,7 +71,7 @@ test("the visible masks and accessible copy use the rewritten manifesto", () => 
       "I decided to use this space to",
       "share my thoughts on AI. AI can",
       "write like us, talk like us, and imitate",
-      "everything that we do. At this point,",
+      "everything we do. At this point,",
       "I don't know where a person ends",
       "and where AI begins. But we are humans.",
       "We are made of flesh and blood. we",
@@ -154,7 +154,7 @@ test("body and title keep only 25 percent of their prior added stroke thickness"
   assert.match(glowRule ?? "", /rgba\(255,\s*255,\s*255/);
 });
 
-test("body row spacing is reduced by another quarter pixel", () => {
+test("body row spacing matches the 6:16 manifesto state", () => {
   const css = read("src/pages/about/about.css");
   const bodyLineRule = css.match(
     /\.mf-line--body\s*\{([\s\S]*?)\n\}/,
@@ -169,10 +169,10 @@ test("body row spacing is reduced by another quarter pixel", () => {
     /--mf-body-row-step:\s*clamp\(\s*([0-9.]+)px,\s*calc\(\s*([0-9.]+)vw\s*\+\s*([0-9.]+)px\s*\),\s*([0-9.]+)px\s*\)/,
   );
 
-  assert.equal(Number(rowStep?.[1]), 28.6);
+  assert.equal(Number(rowStep?.[1]), 29.1);
   assert.equal(Number(rowStep?.[2]), 1.733);
-  assert.equal(Number(rowStep?.[3]), 21.87);
-  assert.equal(Number(rowStep?.[4]), 44.05);
+  assert.equal(Number(rowStep?.[3]), 22.37);
+  assert.equal(Number(rowStep?.[4]), 44.55);
   assert.match(bodyLineRule ?? "", /row-gap:\s*0;/);
   assert.match(
     bodyWordRule ?? "",
@@ -206,7 +206,7 @@ test("the cleaner title source is used without per-letter warping", () => {
   assert.match(css, /\.mf-line--body\s*\{[^}]*--mf-deskew:\s*-[0-9.]+deg/s);
 });
 
-test("only the title compensates for its transparent crop edge", () => {
+test("title and body share the 9:27 left edge", () => {
   const css = read("src/pages/about/about.css");
   const titleRule = css.match(
     /\.mf-line--title\s*\{([\s\S]*?)\n\}/,
@@ -215,8 +215,33 @@ test("only the title compensates for its transparent crop edge", () => {
     /\.mf-line--body\s*\{([\s\S]*?)\n\}/,
   )?.[1];
 
-  assert.match(titleRule ?? "", /margin-left:\s*calc\(-1 \* var\(--mf-u\)\)/);
+  assert.doesNotMatch(titleRule ?? "", /margin-left:/);
   assert.doesNotMatch(bodyRule ?? "", /margin-left:/);
+});
+
+test("the portrait centers against title plus body at the 9:27 state", () => {
+  const css = read("src/pages/about/about.css");
+  const textRule = css.match(/\.ab-text\s*\{([\s\S]*?)\n\}/)?.[1];
+  const manifestoRule = css.match(/\.mf\s*\{([\s\S]*?)\n\}/)?.[1];
+  const portraitRule = css.match(/\.ab-portrait\s*\{([\s\S]*?)\n\}/)?.[1];
+
+  assert.match(textRule ?? "", /position:\s*relative;/);
+  assert.doesNotMatch(textRule ?? "", /display:\s*contents;/);
+  assert.doesNotMatch(manifestoRule ?? "", /display:\s*contents;/);
+  assert.match(portraitRule ?? "", /align-self:\s*center;/);
+  assert.doesNotMatch(portraitRule ?? "", /grid-row:/);
+});
+
+test("the rendered copy omits only the authored word that", () => {
+  const build = read("scripts/manifesto/build.py");
+  const generated = read("src/pages/about/manifesto-words.ts");
+
+  assert.match(build, /OMITTED_WORD\s*=\s*\{\s*"text":\s*"that",\s*"line":\s*4\s*\}/);
+  assert.doesNotMatch(generated, /\{ t: "that", l: 4,/);
+  assert.match(
+    generated,
+    /\{ t: "everything", l: 4,[\s\S]*?\{ t: "we", l: 4,/,
+  );
 });
 
 test("the added where reuses the later authored where crop", () => {

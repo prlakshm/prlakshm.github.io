@@ -70,6 +70,7 @@ INSERTED_WORD_REUSE = {
     "after_line": 6,
     "after_text": "and",
 }
+OMITTED_WORD = {"text": "that", "line": 4}
 
 # Rendering masks are derived only by expanding the original alpha. This keeps
 # every authored contour while producing the requested marker weights without
@@ -608,6 +609,14 @@ def main():
             # Each crop owns MASK_PAD transparent pixels on both sides.
             spaces.append((q["x0"] - p["x1"] - 2 * MASK_PAD) * scale)
     space = round(float(np.median(spaces)), 1)
+
+    out = [
+        record for record in out
+        if not (
+            record["l"] == OMITTED_WORD["line"]
+            and record["t"] == OMITTED_WORD["text"]
+        )
+    ]
 
     reused_source = next(
         record for record in out

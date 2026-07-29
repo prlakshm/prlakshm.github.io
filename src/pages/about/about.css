@@ -127,7 +127,7 @@
   /* The 10% smaller words reflow into fewer rows. This responsive row advance
      adds more air between those rows while holding the full body block near
      its previous height at both desktop and mobile widths. */
-  --mf-body-row-step: clamp(28.6px, calc(1.733vw + 21.87px), 44.05px);
+  --mf-body-row-step: clamp(29.1px, calc(1.733vw + 22.37px), 44.55px);
   width: calc(100% - (var(--grid-minor-step) * 2));
   row-gap: 0;
 }
@@ -156,7 +156,6 @@
   --mf-u: clamp(1.34px, 0.145vw + 0.8px, 2px);
   --mf-deskew: -2deg;
   color: var(--mono-secondary);
-  margin-left: calc(-1 * var(--mf-u));
   margin-bottom: calc(var(--mf-u) * 10);
 }
 
