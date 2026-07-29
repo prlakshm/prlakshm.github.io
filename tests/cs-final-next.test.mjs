@@ -4,7 +4,7 @@ import test from "node:test";
 
 const pagePath = new URL("../public/cs-final/cs-final.html", import.meta.url);
 
-test("keeps Next past the content edge without shrinking reading progress", async () => {
+test("keeps Home and Next past the content edge without shrinking reading progress", async () => {
   const html = await readFile(pagePath, "utf8");
   const progressStart = html.indexOf('<div class="prog" id="prog">');
   const progressEnd = html.indexOf("</div>", progressStart);
@@ -13,9 +13,11 @@ test("keeps Next past the content edge without shrinking reading progress", asyn
   assert.ok(progressStart >= 0, "reading progress should be present");
   assert.doesNotMatch(progressMarkup, /NEXT|class="next"/);
   assert.match(progressMarkup, /<span>READ<\/span>[\s\S]*class="track"[\s\S]*id="pct"/);
+  assert.match(html, /<a class="case-home" href="\/"[^>]*>\s*HOME[\s\S]*class="next-arrow"/);
   assert.match(html, /<a class="case-next" href="\/"[^>]*>\s*NEXT/);
   assert.match(html, /main\{position:relative;/);
-  assert.match(html, /\.case-next\{position:absolute;right:calc\(-1 \* var\(--gutter\)\);/);
+  assert.match(html, /\.case-actions\{position:absolute;right:calc\(-1 \* var\(--gutter\)\);/);
+  assert.match(html, /\.case-actions\{[^}]*flex-direction:column;[^}]*gap:2px/);
 });
 
 test("reuses the landing-page navigation above the case-study shell", async () => {
@@ -39,4 +41,22 @@ test("aligns the sidebar and case-study labels to one shared grid offset", async
   assert.match(html, /--intro-grid-offset:43px/);
   assert.match(html, /\.side\{[^}]*padding-block:var\(--intro-grid-offset\)/);
   assert.match(html, /main\{[^}]*padding-block:var\(--intro-grid-offset\)/);
+});
+
+test("fades the case-study grid beneath the main column and sidebar", async () => {
+  const html = await readFile(pagePath, "utf8");
+
+  for (const selector of ["main", ".side"]) {
+    const rule = html.match(new RegExp(`${selector.replace(".", "\\.")}\\{([^}]*)\\}`))?.[1];
+    const wash = html.match(
+      new RegExp(`${selector.replace(".", "\\.")}::before\\{([^}]*)\\}`),
+    )?.[1];
+
+    assert.match(rule ?? "", /isolation:isolate/);
+    assert.match(wash ?? "", /content:""/);
+    assert.match(wash ?? "", /background:color-mix\(in srgb,var\(--ground\) 50%,transparent\)/);
+    assert.match(wash ?? "", /mask-image:.*10%/);
+    assert.match(wash ?? "", /-webkit-mask-image:.*10%/);
+    assert.doesNotMatch(wash ?? "", /border|box-shadow|border-radius/);
+  }
 });

@@ -94,9 +94,11 @@ body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--fd);li
   display:grid;grid-template-columns:var(--side) minmax(0,1fr);gap:clamp(24px,4vw,64px)}
 
 /* ---------------- sidebar ---------------- */
-.side{position:sticky;top:var(--nav-height);align-self:start;height:calc(100vh - var(--nav-height));
+.side{position:sticky;top:var(--nav-height);isolation:isolate;align-self:start;height:calc(100vh - var(--nav-height));
   padding-block:var(--intro-grid-offset) clamp(28px,5vw,64px);
   display:flex;flex-direction:column;gap:22px}
+.side::before{content:"";position:absolute;z-index:0;inset:clamp(-89.6px,-9.8%,-44.8px) clamp(-67.2px,-8.4%,-33.6px);pointer-events:none;background:color-mix(in srgb,var(--ground) 50%,transparent);mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);mask-composite:intersect;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);-webkit-mask-composite:source-in}
+.side > *{position:relative;z-index:1}
 .side .who{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.16em;text-transform:uppercase;
   color:var(--brass)}
 .jump{display:flex;flex-direction:column;gap:1px;border-left:1px solid var(--rule)}
@@ -118,13 +120,17 @@ body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--fd);li
 .prog .pct{font-variant-numeric:tabular-nums;color:var(--brass);min-width:4ch;text-align:right}
 
 /* ---------------- main column ---------------- */
-main{position:relative;padding-block:var(--intro-grid-offset) 120px;min-width:0}
-.case-next{position:absolute;right:calc(-1 * var(--gutter));bottom:clamp(28px,5vw,64px);display:inline-flex;
-  align-items:center;gap:4px;font-family:var(--fm);font-size:var(--fs-micro);color:var(--soft);
-  text-decoration:none}
-.case-next:hover{color:var(--ink)}
-.case-next:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
-.case-next .next-arrow{width:10px;height:10px;flex:none}
+main{position:relative;isolation:isolate;padding-block:var(--intro-grid-offset) 120px;min-width:0}
+main::before{content:"";position:absolute;z-index:0;inset:clamp(-89.6px,-9.8%,-44.8px) clamp(-67.2px,-8.4%,-33.6px);pointer-events:none;background:color-mix(in srgb,var(--ground) 50%,transparent);mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);mask-composite:intersect;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);-webkit-mask-composite:source-in}
+main > *{position:relative;z-index:1}
+.case-actions{position:absolute;right:calc(-1 * var(--gutter));bottom:clamp(28px,5vw,64px);display:flex;
+  flex-direction:column;align-items:flex-end;gap:2px}
+.case-home,.case-next{display:inline-flex;align-items:center;gap:4px;font-family:var(--fm);font-size:var(--fs-micro);
+  color:var(--soft);text-decoration:none}
+.case-home{transform:translateY(0.25px)}
+.case-home:hover,.case-next:hover{color:var(--ink)}
+.case-home:focus-visible,.case-next:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+.case-home .next-arrow,.case-next .next-arrow{width:10px;height:10px;flex:none}
 .lab{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.17em;text-transform:uppercase;
   color:var(--brass);margin:0}
 h1{font-size:var(--fs-h1);line-height:1;letter-spacing:-.026em;
@@ -770,13 +776,22 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   </div>
 </section>
 
-<a class="case-next" href="/" aria-label="Next: return to the portfolio">
-  NEXT
-  <svg class="next-arrow" viewBox="0 0 10 10" aria-hidden="true" focusable="false">
-    <path d="M2 5 H8 M5.5 2.5 L8 5 L5.5 7.5" fill="none" stroke="currentColor"
-          stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"/>
-  </svg>
-</a>
+<div class="case-actions">
+  <a class="case-home" href="/" aria-label="Home: return to the portfolio">
+    HOME
+    <svg class="next-arrow" viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+      <path d="M2 5 H8 M5.5 2.5 L8 5 L5.5 7.5" fill="none" stroke="currentColor"
+            stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"/>
+    </svg>
+  </a>
+  <a class="case-next" href="/" aria-label="Next: return to the portfolio">
+    NEXT
+    <svg class="next-arrow" viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+      <path d="M2 5 H8 M5.5 2.5 L8 5 L5.5 7.5" fill="none" stroke="currentColor"
+            stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"/>
+    </svg>
+  </a>
+</div>
 
 </main>
 </div>

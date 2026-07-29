@@ -8,6 +8,7 @@
    ========================================================================== */
 
 .ab {
+  --mf-title-u: clamp(1.206px, 0.1305vw + 0.72px, 1.8px);
   max-width: var(--page-max);
   margin-inline: auto;
   /* Soft pull into the archive afterglow — intimate beat, not a new chapter. */
@@ -54,12 +55,36 @@
    body x-height is 10 units. --mf-u is the px size of one unit, so the whole
    block scales from a single value and stroke weight scales with it. */
 .mf {
-  --mf-u: clamp(1.06px, 0.112vw + 0.65px, 1.57px);
+  --mf-u: clamp(0.954px, 0.1008vw + 0.585px, 1.413px);
   --mf-deskew: 0deg;
+  position: relative;
+  isolation: isolate;
   color: var(--mono-secondary);
 }
 
+/* A quiet paper wash lets the hand read first. Its two intersected masks hold
+   the center at 50% paper while dissolving over the outer tenth on every edge,
+   so this still feels like part of the underlying grid rather than a card. */
+.mf::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: clamp(-80.64px, -8.82%, -40.32px) clamp(-60.48px, -7.56%, -30.24px);
+  pointer-events: none;
+  background: color-mix(in srgb, var(--parchment) 50%, transparent);
+  mask-image:
+    linear-gradient(to right, transparent 0%, #000 10%, #000 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%);
+  mask-composite: intersect;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, #000 10%, #000 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%);
+  -webkit-mask-composite: source-in;
+}
+
 .mf-line {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-wrap: wrap;
   /* flex-start, so every row reserves the same space above the baseline and
@@ -84,6 +109,7 @@
   position: absolute;
   display: block;
   pointer-events: none;
+  filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.72));
 }
 
 .mf-word {
@@ -124,12 +150,13 @@
    light even though every word remains independently responsive. */
 .mf-line--body {
   --mf-deskew: -3deg;
-  /* The 10% smaller words reflow into fewer rows. This responsive row advance
+  /* The compact body gets its own responsive row advance. This keeps its
      adds more air between those rows while holding the full body block near
      its previous height at both desktop and mobile widths. */
-  --mf-body-row-step: clamp(29.1px, calc(1.733vw + 22.37px), 44.55px);
+  --mf-u: clamp(1.0017px, 0.10584vw + 0.61425px, 1.48365px);
+  --mf-body-row-step: clamp(26.4995px, calc(1.637685vw + 20.13965px), 41.09975px);
   width: calc(100% - (var(--grid-minor-step) * 2));
-  margin-left: calc(var(--grid-minor-step) - 2px);
+  margin-left: calc(var(--grid-minor-step) - 4px);
   row-gap: 0;
 }
 
@@ -148,13 +175,12 @@
   left: 0;
   width: calc(var(--mf-u) * var(--w));
   height: calc(var(--mf-u) * var(--h));
-  filter: none;
 }
 
 /* The title uses the same secondary ink as the body. A larger marker radius
    makes it distinctly heavier, while the white halo keeps the glow-pen feel. */
 .mf-line--title {
-  --mf-u: clamp(1.34px, 0.145vw + 0.8px, 2px);
+  --mf-u: clamp(1.206px, 0.1305vw + 0.72px, 1.8px);
   --mf-deskew: -2deg;
   color: var(--mono-secondary);
   margin-left: calc(-1 * var(--mf-u));
@@ -162,15 +188,7 @@
 }
 
 .mf-line--title .mf-word {
-  filter:
-    drop-shadow(0 0 calc(var(--mf-u) * 0.75) rgba(255, 255, 255, 0.98))
-    drop-shadow(0 0 calc(var(--mf-u) * 2.25) rgba(255, 255, 255, 0.78))
-    drop-shadow(0 0 calc(var(--mf-u) * 5) rgba(255, 255, 255, 0.45));
-}
-
-/* Dots and periods use their separately expanded authored-alpha mask. */
-.mf-mark {
-  filter: none;
+  filter: drop-shadow(0 0 calc(var(--mf-u) * 1) rgba(255, 255, 255, 0.82));
 }
 
 /* Width-led sizing (not % of column height). Height-% + aspect-ratio blew up
@@ -178,7 +196,10 @@
 .ab-portrait {
   position: relative;
   margin: 0;
-  align-self: center;
+  align-self: start;
+  /* Title height (48.8u) plus its body gap (10u) places the portrait at the
+     visual start of the first body line rather than the title's top edge. */
+  margin-top: calc(var(--mf-title-u) * 58.8);
   width: clamp(250px, 26.25vw, 375px);
   aspect-ratio: 3 / 4;
   height: auto;
@@ -239,6 +260,7 @@
   .ab-portrait {
     justify-self: start;
     align-self: auto;
+    transform: none;
     width: min(275px, 72.5vw);
     height: auto;
     max-height: none;

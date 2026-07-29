@@ -86,11 +86,35 @@
 }
 
 .wt-nav-inner {
+  position: relative;
+  isolation: isolate;
   height: var(--nav-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
+}
+
+.wt-nav-inner::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: clamp(-76.8px, -8.4%, -38.4px) clamp(-57.6px, -7.2%, -28.8px);
+  pointer-events: none;
+  background: color-mix(in srgb, var(--parchment) 50%, transparent);
+  mask-image:
+    linear-gradient(to right, transparent 0%, #000 10%, #000 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%);
+  mask-composite: intersect;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, #000 10%, #000 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%);
+  -webkit-mask-composite: source-in;
+}
+
+.wt-nav-inner > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* Nav size matches the deployed Header (1.1rem). Berkeley Mono Trial ships
@@ -198,6 +222,8 @@
    .hero-intro) so body copy shares the title's left and right edges.
    text-align:left beats .hero's center so title + body share one left edge. */
 .hero-block {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -205,6 +231,30 @@
   max-width: 100%;
   box-sizing: border-box;
   text-align: left;
+}
+
+/* The hero gets the same unboxed paper wash as the manifesto: the center
+   quiets the grid for legibility, while the outer tenth feathers away. */
+.hero-block::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: clamp(-89.6px, -9.8%, -44.8px) clamp(-67.2px, -8.4%, -33.6px);
+  pointer-events: none;
+  background: color-mix(in srgb, var(--parchment) 50%, transparent);
+  mask-image:
+    linear-gradient(to right, transparent 0%, #000 10%, #000 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%);
+  mask-composite: intersect;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, #000 10%, #000 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%);
+  -webkit-mask-composite: source-in;
+}
+
+.hero-block > * {
+  position: relative;
+  z-index: 1;
 }
 
 .hero-title {

@@ -97,7 +97,7 @@ test("the visible masks and accessible copy use the rewritten manifesto", () => 
   assert.doesNotMatch(generated, /\bd:\s*"/);
 });
 
-test("body and title keep only 25 percent of their prior added stroke thickness", () => {
+test("body and title preserve their authored stroke treatment at the compact scale", () => {
   const css = read("src/pages/about/about.css");
   const build = read("scripts/manifesto/build.py");
   const component = read("src/pages/about/Manifesto.tsx");
@@ -105,6 +105,9 @@ test("body and title keep only 25 percent of their prior added stroke thickness"
   const manifestoRule = css.match(/\.mf\s*\{([\s\S]*?)\n\}/)?.[1];
   const titleLineRule = css.match(
     /\.mf-line--title\s*\{([\s\S]*?)\n\}/,
+  )?.[1];
+  const bodyLineRule = css.match(
+    /\.mf-line--body\s*\{([\s\S]*?)\n\}/,
   )?.[1];
   const bodyWeightRule = css.match(
     /\.mf-line--body \.mf-word\s*\{([\s\S]*?)\n\}/,
@@ -116,7 +119,7 @@ test("body and title keep only 25 percent of their prior added stroke thickness"
     titleLineRule?.match(/--mf-u:\s*clamp\([^;]*,\s*([0-9.]+)px\);/)?.[1],
   );
   const bodyMaxUnit = Number(
-    manifestoRule?.match(/--mf-u:\s*clamp\([^;]*,\s*([0-9.]+)px\);/)?.[1],
+    bodyLineRule?.match(/--mf-u:\s*clamp\([^;]*,\s*([0-9.]+)px\);/)?.[1],
   );
   const titleGap = Number(
     titleLineRule?.match(
@@ -139,10 +142,10 @@ test("body and title keep only 25 percent of their prior added stroke thickness"
   assert.match(component, /manifesto-body-ink\.png/);
   assert.match(component, /manifesto-title-ink\.png/);
   assert.ok(
-    bodyMaxUnit >= 1.56 && bodyMaxUnit <= 1.58,
-    "body text must be 90 percent of its previous 1.74px maximum unit",
+    bodyMaxUnit >= 1.48 && bodyMaxUnit <= 1.49,
+    "body text must grow five percent from its compact 90 percent scale",
   );
-  assert.ok(titleMaxUnit >= 2, "title must render visibly larger than the body");
+  assert.ok(titleMaxUnit > bodyMaxUnit, "title must render visibly larger than the body");
   assert.ok(titleGap <= 10, "title-to-body gap should be visibly tighter");
   assert.doesNotMatch(
     bodyWeightRule ?? "",
@@ -154,7 +157,7 @@ test("body and title keep only 25 percent of their prior added stroke thickness"
   assert.match(glowRule ?? "", /rgba\(255,\s*255,\s*255/);
 });
 
-test("body row spacing matches the 6:16 manifesto state", () => {
+test("body row spacing scales with the compact manifesto", () => {
   const css = read("src/pages/about/about.css");
   const bodyLineRule = css.match(
     /\.mf-line--body\s*\{([\s\S]*?)\n\}/,
@@ -169,10 +172,10 @@ test("body row spacing matches the 6:16 manifesto state", () => {
     /--mf-body-row-step:\s*clamp\(\s*([0-9.]+)px,\s*calc\(\s*([0-9.]+)vw\s*\+\s*([0-9.]+)px\s*\),\s*([0-9.]+)px\s*\)/,
   );
 
-  assert.equal(Number(rowStep?.[1]), 29.1);
-  assert.equal(Number(rowStep?.[2]), 1.733);
-  assert.equal(Number(rowStep?.[3]), 22.37);
-  assert.equal(Number(rowStep?.[4]), 44.55);
+  assert.equal(Number(rowStep?.[1]), 26.4995);
+  assert.equal(Number(rowStep?.[2]), 1.637685);
+  assert.equal(Number(rowStep?.[3]), 20.13965);
+  assert.equal(Number(rowStep?.[4]), 41.09975);
   assert.match(bodyLineRule ?? "", /row-gap:\s*0;/);
   assert.match(
     bodyWordRule ?? "",
@@ -221,7 +224,7 @@ test("title aligns to the pocket while body begins under the D foot", () => {
   );
   assert.match(
     bodyRule ?? "",
-    /margin-left:\s*calc\(var\(--grid-minor-step\)\s*-\s*2px\);/,
+    /margin-left:\s*calc\(var\(--grid-minor-step\)\s*-\s*4px\);/,
   );
   assert.match(
     bodyRule ?? "",
@@ -229,8 +232,9 @@ test("title aligns to the pocket while body begins under the D foot", () => {
   );
 });
 
-test("the portrait centers against title plus body at the 9:27 state", () => {
+test("the portrait aligns with the top of the manifesto body", () => {
   const css = read("src/pages/about/about.css");
+  const aboutRule = css.match(/\.ab\s*\{([\s\S]*?)\n\}/)?.[1];
   const textRule = css.match(/\.ab-text\s*\{([\s\S]*?)\n\}/)?.[1];
   const manifestoRule = css.match(/\.mf\s*\{([\s\S]*?)\n\}/)?.[1];
   const portraitRule = css.match(/\.ab-portrait\s*\{([\s\S]*?)\n\}/)?.[1];
@@ -238,9 +242,90 @@ test("the portrait centers against title plus body at the 9:27 state", () => {
   assert.match(textRule ?? "", /position:\s*relative;/);
   assert.doesNotMatch(textRule ?? "", /display:\s*contents;/);
   assert.doesNotMatch(manifestoRule ?? "", /display:\s*contents;/);
-  assert.match(portraitRule ?? "", /align-self:\s*center;/);
+  assert.match(aboutRule ?? "", /--mf-title-u:\s*clamp\(1\.206px,\s*0\.1305vw \+ 0\.72px,\s*1\.8px\);/);
+  assert.match(portraitRule ?? "", /align-self:\s*start;/);
+  assert.match(portraitRule ?? "", /margin-top:\s*calc\(var\(--mf-title-u\) \* 58\.8\);/);
+  assert.doesNotMatch(portraitRule ?? "", /transform:/);
   assert.doesNotMatch(portraitRule ?? "", /grid-row:/);
-  assert.doesNotMatch(portraitRule ?? "", /transform:|margin-left:/);
+  assert.doesNotMatch(portraitRule ?? "", /margin-left:/);
+});
+
+test("the manifesto has a grid-toned wash that fades at every edge", () => {
+  const css = read("src/pages/about/about.css");
+  const manifestoRule = css.match(/\.mf\s*\{([\s\S]*?)\n\}/)?.[1];
+  const washRule = css.match(/\.mf::before\s*\{([\s\S]*?)\n\}/)?.[1];
+
+  assert.match(manifestoRule ?? "", /position:\s*relative;/);
+  assert.match(washRule ?? "", /content:\s*["']{2};/);
+  assert.match(washRule ?? "", /position:\s*absolute;/);
+  assert.match(
+    washRule ?? "",
+    /inset:\s*clamp\(-80\.64px,\s*-8\.82%,\s*-40\.32px\)\s*clamp\(-60\.48px,\s*-7\.56%,\s*-30\.24px\);/,
+  );
+  assert.match(
+    washRule ?? "",
+    /background:\s*color-mix\(in srgb, var\(--parchment\) 50%, transparent\);/,
+  );
+  assert.match(washRule ?? "", /mask-image:[\s\S]*?10%/);
+  assert.match(washRule ?? "", /-webkit-mask-image:[\s\S]*?10%/);
+  assert.doesNotMatch(washRule ?? "", /border(?:-radius)?:|box-shadow:/);
+});
+
+test("the manifesto handwriting and its wash scale down to 90 percent without resizing the portrait", () => {
+  const css = read("src/pages/about/about.css");
+  const manifestoRule = css.match(/\.mf\s*\{([\s\S]*?)\n\}/)?.[1];
+  const bodyRule = css.match(/\.mf-line--body\s*\{([\s\S]*?)\n\}/)?.[1];
+  const titleRule = css.match(/\.mf-line--title\s*\{([\s\S]*?)\n\}/)?.[1];
+  const portraitRule = css.match(/\.ab-portrait\s*\{([\s\S]*?)\n\}/)?.[1];
+
+  assert.match(manifestoRule ?? "", /--mf-u:\s*clamp\(0\.954px,\s*0\.1008vw \+ 0\.585px,\s*1\.413px\);/);
+  assert.match(bodyRule ?? "", /--mf-u:\s*clamp\(1\.0017px,\s*0\.10584vw \+ 0\.61425px,\s*1\.48365px\);/);
+  assert.match(bodyRule ?? "", /--mf-body-row-step:\s*clamp\(26\.4995px,\s*calc\(1\.637685vw \+ 20\.13965px\),\s*41\.09975px\);/);
+  assert.match(titleRule ?? "", /--mf-u:\s*clamp\(1\.206px,\s*0\.1305vw \+ 0\.72px,\s*1\.8px\);/);
+  assert.match(portraitRule ?? "", /width:\s*clamp\(250px,\s*26\.25vw,\s*375px\);/);
+});
+
+test("the hero text receives the same feathered paper wash", () => {
+  const css = read("src/pages/home/home.css");
+  const blockRule = css.match(/\.hero-block\s*\{([\s\S]*?)\n\}/)?.[1];
+  const washRule = css.match(/\.hero-block::before\s*\{([\s\S]*?)\n\}/)?.[1];
+
+  assert.match(blockRule ?? "", /position:\s*relative;/);
+  assert.match(blockRule ?? "", /isolation:\s*isolate;/);
+  assert.match(washRule ?? "", /content:\s*["']{2};/);
+  assert.match(
+    washRule ?? "",
+    /inset:\s*clamp\(-89\.6px,\s*-9\.8%,\s*-44\.8px\)\s*clamp\(-67\.2px,\s*-8\.4%,\s*-33\.6px\);/,
+  );
+  assert.match(washRule ?? "", /background:\s*color-mix\(in srgb, var\(--parchment\) 50%, transparent\);/);
+  assert.match(washRule ?? "", /mask-image:[\s\S]*?10%/);
+  assert.match(washRule ?? "", /-webkit-mask-image:[\s\S]*?10%/);
+  assert.doesNotMatch(washRule ?? "", /border(?:-radius)?:|box-shadow:/);
+});
+
+test("the navigation text uses the same feathered paper wash", () => {
+  const css = read("src/pages/home/home.css");
+  const navRule = css.match(/\.wt-nav-inner\s*\{([\s\S]*?)\n\}/)?.[1];
+  const washRule = css.match(/\.wt-nav-inner::before\s*\{([\s\S]*?)\n\}/)?.[1];
+
+  assert.match(navRule ?? "", /position:\s*relative;/);
+  assert.match(navRule ?? "", /isolation:\s*isolate;/);
+  assert.match(washRule ?? "", /content:\s*["']{2};/);
+  assert.match(washRule ?? "", /background:\s*color-mix\(in srgb, var\(--parchment\) 50%, transparent\);/);
+  assert.match(washRule ?? "", /mask-image:[\s\S]*?10%/);
+  assert.match(washRule ?? "", /-webkit-mask-image:[\s\S]*?10%/);
+  assert.doesNotMatch(washRule ?? "", /border(?:-radius)?:|box-shadow:/);
+});
+
+test("each handwriting mask has a restrained light ink halo", () => {
+  const css = read("src/pages/about/about.css");
+  const inkRule = css.match(/\.mf-word,\s*\.mf-mark\s*\{([\s\S]*?)\n\}/)?.[1];
+  const titleRule = css.match(/\.mf-line--title \.mf-word\s*\{([\s\S]*?)\n\}/)?.[1];
+  const bodyRule = css.match(/\.mf-line--body \.mf-word\s*\{([\s\S]*?)\n\}/)?.[1];
+
+  assert.match(inkRule ?? "", /filter:\s*drop-shadow\(0 0 1\.5px rgba\(255, 255, 255, 0\.72\)\)/);
+  assert.match(titleRule ?? "", /drop-shadow\(0 0 calc\(var\(--mf-u\) \* 1\) rgba\(255, 255, 255, 0\.82\)\)/);
+  assert.doesNotMatch(bodyRule ?? "", /filter:\s*none;/);
 });
 
 test("the rendered copy omits only the authored word that", () => {
@@ -285,7 +370,7 @@ test("the body grows roughly five percent while retaining its left inset and the
   );
   assert.match(
     bodyRule ?? "",
-    /margin-left:\s*calc\(var\(--grid-minor-step\)\s*-\s*2px\);/,
+    /margin-left:\s*calc\(var\(--grid-minor-step\)\s*-\s*4px\);/,
   );
   assert.doesNotMatch(
     css,
