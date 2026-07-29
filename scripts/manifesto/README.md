@@ -1,60 +1,69 @@
-# Design Manifesto — handwriting vectorizer
+# Design Manifesto — authored alpha-mask layout
 
-Turns the photographed manifesto into `src/pages/about/manifesto-words.ts`:
-one SVG path per **word**, plus the baseline each word sits on.
+The active source files are named by role:
 
-Words are the atomic unit on purpose. `Manifesto.tsx` lays them out in a flex
-container, so the browser wraps between words exactly as it wraps text and a
-line break can never fall inside one. Letters stay together because a letter is
-never a box.
+- `manifesto-title-source.png`
+- `manifesto-body-part-1-source.png`
+- `manifesto-body-part-2-source.png`
 
-Paths are **centrelines**, not outlines. An outline trace would bake her pen's
-thickness into filled shapes; centrelines leave weight and colour to CSS
-(`--mf-stroke`, `currentColor`), which is why the hand can be made bolder or
-recoloured without retracing — and why every word ends up the same weight
-instead of inheriting her pressure variation.
+The earlier handwriting exports remain recoverable in `masks/archive/` under
+clear `manifesto-*-v1-*` names. They are not referenced by the site.
+
+## What the build does
+
+`build.py` preserves the authored PNG alpha. It does not trace, vectorize,
+redraw, or generate letters.
+
+The body was written across two exports. The build measures the median x-height
+and baseline pitch of both:
+
+1. Body part 1 is the visual reference.
+2. Body part 2 is uniformly scaled to part 1’s measured x-height.
+3. All 20 source lines are stacked on part 1’s measured line step.
+4. The normalized result is saved as `manifesto-body-normalized.png`.
+
+This normalization changes only scale and line placement. Each handwritten
+line’s internal letterforms, joins, spacing, dots, and punctuation remain
+authored pixels. The browser then crops one mask per whole word so flexbox can
+wrap only between words.
+
+The copy edit “and **where** AI begins” reuses the later authored `where` from
+“learn where and when.” Its crop coordinates are duplicated in the generated
+word data; no synthetic lettering is introduced.
+
+The generated runtime masks also use explicit names:
+
+- `manifesto-title-ink.png`
+- `manifesto-title-marks.png`
+- `manifesto-body-ink.png`
+- `manifesto-body-marks.png`
+
+CSS supplies the secondary ink color and responsive size. Dots and periods use
+the authored alpha with a slightly heavier derived mark mask.
 
 ## Run
 
 ```bash
-python3 -m venv .venv && .venv/bin/pip install numpy scipy scikit-image pillow
+python3 -m venv .venv
+.venv/bin/pip install numpy scipy scikit-image pillow
 .venv/bin/python scripts/manifesto/build.py
 ```
 
-Useful flags: `--src` (default `source/manifesto.jpg`), `--out`, `--eps`
-(simplification tolerance in source px, default 3.0), `--sigma` (polyline
-smoothing, default 3.2).
+Useful flags:
 
-## If the manifesto is rewritten
-
-1. Rephotograph it: flat, evenly lit, filling the frame. Roughly 4000px across.
-   Perspective skew is fine — baselines are re-fitted anyway.
-2. Replace `source/manifesto.jpg`.
-3. Update `TEXT` in `build.py` to the new wording.
-4. Re-run. Update the `mf-sr` fallback in `Manifesto.tsx` if the text changed.
-
-`TEXT` is not decoration: word segmentation is *validated* against it, and the
-script exits rather than emit a silently mis-split word.
+- `--title-src`
+- `--body-part-1-src`
+- `--body-part-2-src`
+- `--out`
 
 ## Guardrails
 
-The script fails loudly rather than degrade quietly:
+The generator exits instead of silently degrading when:
 
-- line count must match `TEXT`
-- each line must split into exactly its word count
-- every ink mark must survive tracing — this is what catches a dropped i-tittle
-  or period, which is otherwise invisible until someone reads the rendered page
+- a source does not contain alpha;
+- the measured line count differs from the corresponding source copy;
+- a line cannot be split into its exact authored word count;
+- an expected lowercase-i dot or sentence period is lost.
 
-It also warns (without failing) when a line's word gaps are barely wider than
-its letter gaps, which is where a mis-split would come from if one ever does.
-
-## Notes for whoever touches this next
-
-- `MIN_SPECK = 20` px is close to the bone: the faintest genuine i-tittle in the
-  photo measures 51 px, and the dot over the `i` in the title is fainter still
-  than the body text. Raising it will silently eat tittles.
-- A tittle skeletonizes into a tiny three-armed star whose arms all look like
-  spurs. `trace_word` handles marks below `dot_max` as a single round point
-  instead, which is both prettier and the reason they survive pruning.
-- `clean.py` documents one thing deliberately *not* done — see the note at the
-  top about the `o` in "know".
+The generated `MANIFESTO_BODY_NORMALIZATION` metrics document the measured
+x-heights, the part-2 scale factor, and the shared source-line step.

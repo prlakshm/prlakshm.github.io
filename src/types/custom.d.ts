@@ -3,3 +3,8 @@ declare module "@calcom/embed-react" {
     export default Cal;
     export const getCalApi: () => Promise<any>;
   }
+
+declare module "*.png" {
+  const src: string;
+  export default src;
+}
