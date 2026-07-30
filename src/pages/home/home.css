@@ -269,8 +269,16 @@
   color: var(--espresso);
 }
 
-/* Pronunciation note — follows the cursor (left/top from Home.tsx).
-   Paper-slip language shared with journal / scrap tips. */
+/* Shared tip plate — opaque parchment kills the cutting-mat grid underneath. */
+.hero-pron,
+.jr-tooltip,
+.scrap-tooltip {
+  background: var(--tooltip-fill);
+  border: 1px solid color-mix(in srgb, var(--espresso) 12%, transparent);
+  border-radius: 1px;
+}
+
+/* Pronunciation note — follows the cursor (left/top from Home.tsx). */
 .hero-pron {
   position: absolute;
   left: 0;
@@ -279,9 +287,6 @@
   display: inline-flex;
   gap: 5px;
   padding: 9px 13px;
-  background: var(--tooltip-fill);
-  border: 1px solid color-mix(in srgb, var(--espresso) 12%, transparent);
-  border-radius: 1px;
   color: var(--mono-secondary);
   font-family: var(--font-mono);
   font-weight: 400;
@@ -701,7 +706,7 @@
 
 /* --- Tooltip ------------------------------------------------------------- */
 /* Follows the cursor (left/top written from Journal.tsx on pointermove).
-   Paper-slip — sharper corner, single shadow, same stock as journal notes. */
+   Plate chrome shared with .hero-pron / .scrap-tooltip above. */
 .jr-tooltip {
   position: absolute;
   left: 0;
@@ -711,9 +716,6 @@
   flex-direction: column;
   gap: 3px;
   padding: 9px 13px;
-  background: var(--tooltip-fill);
-  border: 1px solid color-mix(in srgb, var(--espresso) 12%, transparent);
-  border-radius: 1px;
   color: var(--mono-secondary);
   white-space: nowrap;
   opacity: 0;
@@ -1049,16 +1051,13 @@
 
 /* Quieter paper slip than journal CTAs — follows the cursor from Home.tsx.
    Parked on document.body while open so ancestor transforms don't steal
-   `position: fixed` from the viewport. */
+   `position: fixed` from the viewport. Plate chrome shared above. */
 .scrap-tooltip {
   position: fixed;
   left: 0;
   top: 0;
   z-index: 40;
   padding: 7px 11px;
-  background: var(--tooltip-fill);
-  border: 1px solid color-mix(in srgb, var(--espresso) 12%, transparent);
-  border-radius: 1px;
   color: var(--mono-secondary);
   font-family: var(--font-mono);
   font-weight: 400;

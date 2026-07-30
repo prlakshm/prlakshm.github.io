@@ -42,7 +42,7 @@
   --paper-photo: color-mix(in srgb, var(--paper) 90%, var(--espresso) 10%);
   /* Polaroid border stock — paper lifted toward white. */
   --paper-polaroid: color-mix(in srgb, var(--paper) 82%, #ffffff 18%);
-  /* Tips match the cutting-mat ground (grid background). */
+  /* Tips: opaque cutting-mat parchment — kills grid lines under the chip. */
   --tooltip-fill: var(--parchment);
   /* Object shadows — one brown family (espresso), not a second raw RGB. */
   --shadow-soft: color-mix(in srgb, var(--espresso) 14%, transparent);
