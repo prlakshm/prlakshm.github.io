@@ -279,7 +279,7 @@
   display: inline-flex;
   gap: 5px;
   padding: 9px 13px;
-  background: var(--paper);
+  background: var(--tooltip-fill);
   border: 1px solid color-mix(in srgb, var(--espresso) 12%, transparent);
   border-radius: 1px;
   color: var(--mono-secondary);
@@ -711,7 +711,7 @@
   flex-direction: column;
   gap: 3px;
   padding: 9px 13px;
-  background: var(--paper);
+  background: var(--tooltip-fill);
   border: 1px solid color-mix(in srgb, var(--espresso) 12%, transparent);
   border-radius: 1px;
   color: var(--mono-secondary);
@@ -1056,7 +1056,7 @@
   top: 0;
   z-index: 40;
   padding: 7px 11px;
-  background: var(--paper);
+  background: var(--tooltip-fill);
   border: 1px solid color-mix(in srgb, var(--espresso) 12%, transparent);
   border-radius: 1px;
   color: var(--mono-secondary);
