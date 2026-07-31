@@ -28,8 +28,9 @@ export type Journal = {
   descriptor: string;
   /** Small body-type shelf note shown above the physical notebook. */
   annotation: string;
-  /** Alternates the thin pointer treatment across the shelf. */
-  arrow: "solid" | "dotted" | "dotted-reverse";
+  /** Leader line down to the cover: dotted, solid, or dashes that resolve into
+   *  a drawn arrowhead. One of each across the shelf. */
+  arrow: "solid" | "dotted" | "dotted-arrow";
   /** Second tooltip line, e.g. "IOS APP · SWIFTUI". */
   tooltipMeta: string;
   closed: string;
@@ -161,7 +162,7 @@ export const journals: Journal[] = [
     title: "REASONS TO WATCH",
     descriptor: "HBO MAX · AI AGENTS",
     annotation: "AI agents that explain why a title fits.",
-    arrow: "dotted-reverse",
+    arrow: "dotted-arrow",
     tooltipMeta: "AI AGENTS · PROTOTYPING",
     closed: "/home/journals/red-closed.png",
     open: "/home/journals/red-open.png",

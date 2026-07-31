@@ -349,19 +349,37 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 .demo .rail-title{font-size:clamp(37.5px,5vw,55px);line-height:1}
 /* The rail heading is a fixed box in the Figma file: 598px wide on a 90px cap,
    i.e. 6.644em. Holding that ratio is what makes the wrap real rather than styled
-   — "Blind Date with an Indie Film" genuinely does not fit inside it and
-   "Surprise Rail" genuinely does. The grid lines mark that box. */
-.namecard .gridbox{position:relative;font-size:clamp(30px,4vw,44px);width:6.644em;max-width:100%;
-  padding-block:.26em}
-.namecard .gridbox::before,.namecard .gridbox::after{content:"";position:absolute;left:0;right:0;
-  height:1px;background:rgba(255,255,255,.2)}
-.namecard .gridbox::before{top:0}
-.namecard .gridbox::after{bottom:0}
-.namecard .gridv{position:absolute;top:0;bottom:0;right:0;width:1px;background:rgba(255,255,255,.2)}
-/* Figma leadings: 90px type on 50px, and 38px type on 55px. The first is negative
+   — "Blind Date with an Indie Film" genuinely does not fit and "Surprise Indie"
+   genuinely does. The vertical rule marks that width.
+   Rules are drawn by JS from real font metrics (cap height and baseline measured
+   off the loaded face via canvas TextMetrics), not from guessed ratios. */
+.namecard{position:relative}
+.namecard .gridlines{position:absolute;inset:0;z-index:0;pointer-events:none}
+.namecard .gridlines i{position:absolute;display:block;background:#7a7a88}
+/* Hairlines. A 1px CSS rule is two device dots on a retina screen, which made
+   line 1's baseline and line 2's cap height — only 2px apart under Figma's
+   negative leading — read as one thick strike through the type. */
+.namecard .gridlines i.h{left:0;right:0;height:.5px}     /* full width of the card */
+.namecard .gridlines i.v{top:0;width:.5px}               /* card top -> heading box foot */
+.namecard .gridbox{position:relative;z-index:1;font-size:clamp(30px,4vw,44px);
+  width:6.644em;max-width:100%;padding-block:.26em}
+.namecard .alt{position:relative;z-index:1}
+/* Figma leadings: 90px type on 50px, 38px type on 55px. The first is negative
    leading — CSS will not land on it by accident. */
-.namecard .rail-title{display:block;font-size:1em;line-height:.556}
-.namecard .rail-title .lt{white-space:nowrap;line-height:1.447}
+.namecard .rail-title{display:block;font-size:1em;background-image:none}
+/* Each rendered line is its own block, so a rule can be placed per line.
+   .line-copy stays inline: its box is the text's inline box, which is what the
+   baseline maths reads. Figma leadings — 90px type on 50px (.556, negative
+   leading) and 38px type on 55px (1.447), tracking 8.74px = .23em. */
+.namecard .type-line{display:block}
+.namecard .line-copy{display:inline;background-image:var(--irid-banner);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.namecard .type-line--primary,
+.namecard .type-line--single{font-size:1em;line-height:.556}
+.namecard .type-line--secondary{font-size:.422em;line-height:1.447;letter-spacing:.23em;
+  font-variation-settings:"wght" 300;-webkit-text-fill-color:#fff;white-space:nowrap}
+.namecard .type-line--secondary .line-copy{-webkit-text-fill-color:#fff}
+.namecard .rail-title .lt{white-space:nowrap}
 .hint{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.13em;color:#7a7a88}
 /* overflow-x:auto forces overflow-y to auto, so the rail clips vertically too.
    Without room above, a focused tile's outline (2px + 3px offset) is cut off.
@@ -697,17 +715,22 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   </div>
   <div class="two rv d2">
     <figure class="shot">
-      <div class="namecard">
-        <div class="gridbox"><span class="gridv" aria-hidden="true"></span>
-          <span class="rail-title">Blind Date <span class="lt">with an Indie Film</span></span>
+      <div class="namecard namecard--blind">
+        <div class="gridlines" aria-hidden="true"></div>
+        <div class="gridbox">
+          <span class="rail-title">
+            <span class="type-line type-line--primary"><span class="line-copy">Blind Date</span></span>
+            <span class="type-line type-line--secondary"><span class="line-copy">with an Indie Film</span></span>
+          </span>
         </div>
         <span class="alt">&hellip;WITH A ROMANCE &middot; &hellip;WITH A MYSTERY</span>
       </div>
     </figure>
     <figure class="shot">
-      <div class="namecard">
-        <div class="gridbox"><span class="gridv" aria-hidden="true"></span>
-          <span class="rail-title">Surprise <span class="lt">Indie</span></span>
+      <div class="namecard namecard--surprise">
+        <div class="gridlines" aria-hidden="true"></div>
+        <div class="gridbox">
+          <span class="rail-title"><span class="type-line type-line--single"><span class="line-copy">Surprise <span class="lt">Indie</span></span></span></span>
         </div>
         <span class="alt">SURPRISE ROMANCE &middot; SURPRISE MYSTERY</span>
       </div>
@@ -862,6 +885,111 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
     }, {threshold:[0, .2, .35, .6, .8, .95, 1]});
     flows.forEach(function(sv){ flowIO.observe(sv); });
   }
+
+  /* Name-card grid rules.
+     Measured off the ACTUAL STRING, not a sample glyph. "H" would give cap
+     height, but the tallest letters in "Blind Date" are the ascenders on l/d/t,
+     which rise above cap height — a cap-height rule gets punched through by
+     them. Likewise the baseline is not the bottom: the p in "Surprise" descends
+     below it. So each rule is placed on the real ink extremes of the text on
+     that line, and offset by its own thickness so it brackets the letterforms
+     rather than crossing them. Rules sit behind the type, so touching reads as
+     flush. Runs are measured individually because a line can mix sizes. */
+  var RULE = 0.5;   // keep in step with .gridlines i height/width
+  var HANG = 12.45; // how far the vertical runs past the LOWEST BASELINE rule
+  function inkOf(el, text){
+    var cs = getComputedStyle(el);
+    var ctx = inkOf._c || (inkOf._c = document.createElement("canvas").getContext("2d"));
+    ctx.font = cs.fontStyle + " " + cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
+    var m = ctx.measureText(text);
+    return { up: m.actualBoundingBoxAscent, down: m.actualBoundingBoxDescent,
+             asc: m.fontBoundingBoxAscent };
+  }
+  function textRuns(root){
+    var out = [], w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), n;
+    while((n = w.nextNode())) if(n.nodeValue.trim()) out.push(n);
+    return out;
+  }
+  function drawNameGrid(){
+    [].slice.call(document.querySelectorAll(".namecard")).forEach(function(card){
+      var host = card.querySelector(".gridlines");
+      var box  = card.querySelector(".gridbox");
+      if(!host || !box) return;
+      host.textContent = "";
+      /* .gridlines is inset:0, so its children position from the card's PADDING
+         box, while getBoundingClientRect gives the BORDER box. The card has a
+         1px border, so measuring from the border box put every rule 1px low —
+         enough for the tops of the letters to poke through it. */
+      var cardR = card.getBoundingClientRect();
+      var ccs = getComputedStyle(card);
+      var originTop  = cardR.top  + (parseFloat(ccs.borderTopWidth)  || 0);
+      var originLeft = cardR.left + (parseFloat(ccs.borderLeftWidth) || 0);
+
+      var lowestBaseline = -Infinity;   // baseline of the last line in the card
+      [].slice.call(card.querySelectorAll(".line-copy")).forEach(function(copy){
+        var copyR = copy.getBoundingClientRect();
+        // every run on a line shares one baseline; take it from the line's own font
+        var baseline = copyR.top + inkOf(copy, "H").asc;
+        var top = Infinity;
+        textRuns(copy).forEach(function(node){
+          var m = inkOf(node.parentElement, node.nodeValue);
+          top = Math.min(top, baseline - m.up);     // true topmost ink (ascenders)
+        });
+        if(!isFinite(top)) return;
+        lowestBaseline = Math.max(lowestBaseline, baseline);
+        /* The lower rule is the true baseline, not the lowest ink: descenders
+           (the p in "Surprise") hang below it and should hang below the rule.
+           Neither Blind Date line has a descender, so it is unchanged there. */
+        var ys = [ top,            // touches the top of the tallest letter, extends down
+                   baseline - RULE ];   // bottom edge sits on the baseline, extends up
+        /* Third rule where a line carries a second, smaller face (the "Indie"
+           half): its cap height, so the two sizes can be read against each
+           other. Measured from a capital in that face — not from the word
+           itself, whose d ascender rises above cap height and is not what this
+           rule marks. */
+        var lt = copy.querySelector(".lt");
+        if(lt) ys.push(baseline - inkOf(lt, "H").up);
+        ys.forEach(function(y){
+          var i = document.createElement("i");
+          i.className = "h";
+          i.style.top = (y - originTop) + "px";
+          host.appendChild(i);
+        });
+      });
+
+      // one vertical rule at the heading's max width: card top down to the box foot
+      var boxR = box.getBoundingClientRect();
+      /* Ends a fixed distance below the lowest baseline rule, so both cards
+         terminate the same way regardless of line count or descenders.
+         Clamped to the padding box so it can never reach the card's bottom. */
+      var maxBottom = cardR.bottom - (parseFloat(ccs.borderBottomWidth) || 0);
+      var vBottom = Math.min((isFinite(lowestBaseline) ? lowestBaseline : boxR.bottom) + HANG, maxBottom);
+      var v = document.createElement("i");
+      v.className = "v";
+      v.style.left   = (boxR.right - originLeft) + "px";
+      v.style.height = (vBottom - originTop) + "px";
+      host.appendChild(v);
+    });
+  }
+  /* Line the small labels up across the cards. A relative offset is used on
+     purpose: it shifts only this text and leaves the flow — and therefore every
+     other line — exactly where it was. */
+  function alignCardLabels(){
+    var alts = [].slice.call(document.querySelectorAll(".namecard .alt"));
+    if(alts.length < 2) return;
+    alts.forEach(function(a){ a.style.top = "0px"; });
+    var lowest = -Infinity;
+    alts.forEach(function(a){ lowest = Math.max(lowest, a.getBoundingClientRect().top); });
+    alts.forEach(function(a){
+      a.style.top = (lowest - a.getBoundingClientRect().top).toFixed(2) + "px";
+    });
+  }
+  var drawNameGridOnly = drawNameGrid;
+  drawNameGrid = function(){ drawNameGridOnly(); alignCardLabels(); };
+
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(drawNameGrid);
+  else drawNameGrid();
+  addEventListener("resize", drawNameGrid);
 
   var tiles = [].slice.call(document.querySelectorAll(".tile"));
   var rail = document.getElementById("rail");

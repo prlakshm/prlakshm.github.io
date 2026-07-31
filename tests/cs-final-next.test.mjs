@@ -128,6 +128,37 @@ test("gives the paired naming prototypes the standard figure spacing", async () 
   assert.doesNotMatch(html, /\.two\{[^}]*margin-top:26px/);
 });
 
+test("uses type anatomy guides behind both naming lockups", async () => {
+  const html = await readFile(pagePath, "utf8");
+  const changedStart = html.indexOf('<section id="changed">');
+  const changedEnd = html.indexOf("<!-- 06 -->", changedStart);
+  const changed = html.slice(changedStart, changedEnd);
+
+  assert.match(changed, /namecard namecard--blind[\s\S]*type-line type-line--primary[\s\S]*type-line type-line--secondary/);
+  assert.match(changed, /namecard namecard--surprise[\s\S]*type-line type-line--single/);
+  assert.match(html, /\.namecard \.type-line::before,\.namecard \.type-line::after\{[^}]*background:#7a7a88/);
+  assert.match(html, /\.namecard \.type-line::before\{top:var\(--cap-line\)\}/);
+  assert.match(html, /\.namecard \.type-line::after\{top:var\(--baseline\)\}/);
+  assert.match(html, /\.namecard \.gridv\{[^}]*background:#7a7a88[^}]*bottom:auto/);
+  assert.match(html, /\.namecard--blind \.gridv\{[^}]*height:var\(--blind-guide-height\)/);
+  assert.match(html, /\.namecard--surprise \.gridv\{[^}]*height:var\(--surprise-guide-height\)/);
+  assert.doesNotMatch(html, /\.namecard \.gridbox::before,\.namecard \.gridbox::after/);
+});
+
+test("paints namecard gradients on the full glyph box despite negative leading", async () => {
+  const html = await readFile(pagePath, "utf8");
+
+  assert.match(
+    html,
+    /\.namecard \.line-copy\{[^}]*background-image:var\(--irid-banner\)[^}]*-webkit-background-clip:text[^}]*background-clip:text[^}]*color:transparent/,
+  );
+  assert.match(html, /\.namecard \.rail-title\{[^}]*background-image:none/);
+  assert.match(
+    html,
+    /\.namecard \.type-line--secondary \.line-copy\{[^}]*-webkit-text-fill-color:#fff/,
+  );
+});
+
 test("turns the frosted-glass anatomy into one focused black prototype panel", async () => {
   const html = await readFile(pagePath, "utf8");
   const start = html.indexOf('<section id="decisions">');

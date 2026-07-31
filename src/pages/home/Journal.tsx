@@ -1,6 +1,5 @@
 import { useLayoutEffect, useRef } from "react";
 import { animate } from "motion";
-import { CornerUpLeft, CornerUpRight } from "lucide-react";
 import { SPRING_HEAVY } from "./interactions.js";
 import type { Journal as JournalData } from "./journals.js";
 
@@ -41,31 +40,63 @@ function ExternalArrow() {
   );
 }
 
-function AnnotationArrow({ variant }: { variant: JournalData["arrow"] }) {
+/* The leader line that ties a note to the notebook underneath it. Drawn rather
+   than borrowed from an icon set: a right-angle UI glyph reads as chrome, and
+   these are meant to look ruled in by hand next to the shelf — bowed, uneven,
+   thin. Every one is read bottom-up, rising off the cover and curving into the
+   note, so the arrowheads sit at the TOP pointing up into the copy. Each is
+   authored at its rendered pixel size (viewBox === the CSS box) so no scaling
+   distorts the stroke or the head. */
+function AnnotationLeader({ variant }: { variant: JournalData["arrow"] }) {
   const common = {
+    className: `jr-leader jr-leader--${variant}`,
     "aria-hidden": true,
     focusable: false,
-    size: 48,
-    strokeWidth: 0.8,
-    absoluteStrokeWidth: true,
+    fill: "none",
+    stroke: "currentColor",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
   } as const;
 
-  if (variant === "dotted-reverse") {
+  if (variant === "solid") {
+    /* Centre notebook. The elbow from the reference: a run along the top of the
+       cover, a rounded right angle, then straight up into the note. Quadratic,
+       not an arc — the corner wants to look turned by hand, not compassed. */
     return (
-      <CornerUpRight
-        {...common}
-        className="jr-annotation-arrow jr-annotation-arrow--dotted jr-annotation-arrow--reverse"
-        strokeDasharray="0.7 3.4"
-      />
+      <svg {...common} viewBox="0 0 44 58" width="44" height="58">
+        <path d="M41.5 55.5H23Q12.5 55.5 12.5 43C12.6 33 12 18 12.2 5" strokeWidth="1.1" />
+        <path d="M7.4 12.8 12.2 4 17.2 11.6" strokeWidth="1.1" />
+      </svg>
     );
   }
 
+  if (variant === "dotted-arrow") {
+    /* Right notebook. Same elbow, but the dashes carry the run and the corner
+       and only the rise into the note is committed ink — the reference's
+       "dashes, then an arrow" in one continuous gesture. */
+    return (
+      <svg {...common} viewBox="0 0 52 98" width="52" height="98">
+        <path
+          d="M49.5 95.5H29Q16 95.5 16 82"
+          strokeWidth="1.1"
+          strokeDasharray="0.7 4.2"
+        />
+        <path d="M15.9 78C15.4 58 15.2 28 16 6.5" strokeWidth="1.1" />
+        <path d="M11.1 14.4 16 5.5 21 13.2" strokeWidth="1.1" />
+      </svg>
+    );
+  }
+
+  // Left notebook: the quietest of the three — a dotted rule, no head, just a
+  // bowed line the eye follows up to the note.
   return (
-    <CornerUpLeft
-      {...common}
-      className={`jr-annotation-arrow jr-annotation-arrow--${variant}`}
-      strokeDasharray={variant === "dotted" ? "0.7 3.4" : undefined}
-    />
+    <svg {...common} viewBox="0 0 24 54" width="24" height="54">
+      <path
+        d="M13.4 52.5C10.6 41 13.2 26 10.9 12 10.4 8.6 10.6 5 11 1.5"
+        strokeWidth="1.1"
+        strokeDasharray="0.7 4.2"
+      />
+    </svg>
   );
 }
 
@@ -266,7 +297,7 @@ function Journal({ journal, index }: Props) {
           {number} / {title}
         </span>
         <span className="jr-annotation-copy">{annotation}</span>
-        <AnnotationArrow variant={arrow} />
+        <AnnotationLeader variant={arrow} />
       </span>
 
       <span className="jr-stage">

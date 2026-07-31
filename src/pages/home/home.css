@@ -555,6 +555,10 @@
 
 .jr-link {
   position: relative;
+  /* Query container for the annotation below: every notebook is sized from its
+     own width, so 1cqw here is the one unit that tracks a cover across the
+     fluid tiers. Inline-size containment only — nothing here is clipped. */
+  container-type: inline-size;
   display: block;
   text-decoration: none;
   color: inherit;
@@ -566,12 +570,22 @@
   cursor: default;
 }
 
-/* Project notes live in the transparent headroom already baked into each
-   notebook stage and use the same quiet mono body system as the rest of the
-   page. Their arrows begin at the books and turn upward toward the copy. */
+/* Project notes sit clear of the notebooks, up in the row's own slack above
+   the stage, and a leader line covers the distance down to the cover. The gap
+   is the point: pinned to the top of the book the copy fought the cover art
+   and the pointer had nowhere to travel.
+
+   Anchored from the BOTTOM, not the top, and measured in cqw. The stage is a
+   fixed height per tier but each cover is sized from the journal's width, and
+   between 1024 and 1440 that width is fluid (25vw) — so any px offset from the
+   stage top only lines up at one viewport. --cover-lift is how far the visible
+   top of the cover sits above the stage floor as a multiple of the journal's
+   width: (naturalH / naturalW) x (1 − alphaHeadroom − trimClosed), taken from
+   the PNG itself. Add the leader and a ~24px breath and the note lands the
+   same distance above every cover at every size. */
 .jr-annotation {
   position: absolute;
-  top: 78px;
+  bottom: calc(100cqw * var(--cover-lift) + var(--lead-h) + 31px);
   left: 50%;
   z-index: 4;
   width: min(226px, 72%);
@@ -602,41 +616,60 @@
   -webkit-text-stroke: 0.35px currentColor;
 }
 
-.jr-annotation-arrow {
+/* Hangs off the bottom of the note and runs down toward the cover. The sizes
+   below must stay 1:1 with each leader's viewBox in Journal.tsx — they are not
+   free scaling, they are re-stating the intrinsic box, because the global
+   `svg { width: 0; height: 0 }` in home1.css would otherwise collapse it. Any
+   mismatch stretches the drawing and skews the arrowhead. */
+.jr-leader {
   position: absolute;
-  top: calc(100% + 8px);
-  right: 18px;
-  width: 48px;
-  height: 48px;
+  top: calc(100% + 7px);
   color: currentColor;
-  opacity: 0.72;
+  opacity: 0.56;
   overflow: visible;
 }
 
-.jr-annotation-arrow--dotted {
-  stroke-linecap: round;
+/* Each leader drops from the edge the note is set against. --lead-h comes from
+   the journal rules below and must equal the variant's viewBox height. */
+.jr-leader--dotted {
+  left: 6px;
+  width: 24px;
+  height: var(--lead-h);
 }
 
-.jr-annotation-arrow--solid {
-  top: calc(100% + 5px);
-  right: 34px;
-  transform: rotate(-5deg);
+/* The two arrows are wider than the dotted rule because they turn a corner
+   before they rise; the extra width is the horizontal run. */
+.jr-leader--solid {
+  left: 50%;
+  margin-left: -22px;
+  width: 44px;
+  height: var(--lead-h);
 }
 
-.jr-annotation-arrow--reverse {
-  right: auto;
-  left: 18px;
-  transform: rotate(4deg);
+.jr-leader--dotted-arrow {
+  right: 2px;
+  width: 52px;
+  height: var(--lead-h);
+}
+
+.jr[data-journal="surprise-rail"] .jr-annotation {
+  --cover-lift: 1.076;
+  --lead-h: 54px;
 }
 
 .jr[data-journal="mixr"] .jr-annotation {
-  top: 124px;
+  --cover-lift: 0.947;
+  --lead-h: 58px;
   align-items: center;
   text-align: center;
 }
 
+/* The longest leader on the shelf, and that is the photograph's doing: the red
+   notebook's PNG carries ~11% transparent headroom against ~4% for the other
+   two, so its cover starts lower and the arrow has further to travel. */
 .jr[data-journal="reasons-to-watch"] .jr-annotation {
-  top: 128px;
+  --cover-lift: 0.943;
+  --lead-h: 98px;
   align-items: flex-end;
   text-align: right;
 }
@@ -1314,6 +1347,13 @@
     transform: translateY(calc(var(--joffset) * 0.5));
     --splay: 0.55;
   }
+  /* The row drops its min-height here, so the slack the notes were hanging in
+     on desktop is gone — without this the first note climbs into the hero's
+     contact row. Each journal carries its own headroom instead. */
+  .jr-link {
+    padding-top: 80px;
+  }
+
   .jr-stage {
     height: auto;
     aspect-ratio: 300 / 400;
@@ -1390,15 +1430,11 @@
     transform: none;
   }
 
-  /* Keep the project note in its own headroom above each stacked notebook. */
+  /* Stacked, each notebook needs its own headroom: the note plus its leader,
+     since there is no row slack to borrow here. The annotation still measures
+     itself from the cover, so this only has to be tall enough not to clip. */
   .jr-link {
-    padding-top: 90px;
-  }
-
-  .jr .jr-annotation,
-  .jr[data-journal="mixr"] .jr-annotation,
-  .jr[data-journal="reasons-to-watch"] .jr-annotation {
-    top: 24px;
+    padding-top: 104px;
   }
 
   .jr-stage {
