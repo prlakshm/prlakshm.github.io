@@ -753,7 +753,7 @@ function Home() {
             <div className="hero-intro">
               <div className="hero-col hero-col--copy">
                 <p className="line">
-                Designer at intersection Film + Technology
+                Design Engineer inventing 0 → 1 experiences
                 </p>
                 <p className="line">
                   Building apps + sharing the process on X{" "}

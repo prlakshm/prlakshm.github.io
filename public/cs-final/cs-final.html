@@ -69,7 +69,12 @@
 /* browsers give <code> its own size; hold it on the scale */
 code{font-family:var(--fm);font-size:var(--fs-body)}
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--fd);line-height:1.62;position:relative}
+/* The decorative ::before below uses negative insets (down to -67.2px) so its
+   panel bleeds past its parent. On .wt-nav-inner that spills off the right of the
+   page and adds a horizontal scrollbar. clip, not hidden: hidden would make body a
+   scroll container and break the sticky sidebar. */
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--fd);line-height:1.62;position:relative;
+  overflow-x:clip}
 /* Grid sits on its own fixed layer so paper washes can stack above it and below text. */
 body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   background-image:linear-gradient(var(--grid-a) 1px,transparent 1px),
@@ -183,7 +188,7 @@ figcaption{font-family:var(--fm);font-size:var(--fs-micro);line-height:1.7;color
 /* Same rhythm as other figures; half the hero prototype width */
 figure.proto-match{margin:26px 0;width:75%;max-width:75%}
 figure.proto-match img{width:100%;height:auto;display:block;border:1px solid var(--rule)}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:26px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:26px 0}
 .two .ph{min-height:170px}
 figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(--rule)}
 .tile-options img{border:0}
@@ -286,14 +291,21 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 .dg .tick{fill:var(--brass)}
 .dg .fa{fill:var(--brass)}
 .dg .mt{font-size:16px;fill:var(--ink)}
-/* Flow diagram: the left block is present from the start; connectors draw left to
-   right and each block fades in behind them. --len is set from getTotalLength so
-   the dash matches each path exactly. */
-.dgflow .fx{opacity:0;transition:opacity .3s ease var(--d,0s)}
+/* Flow diagram. The whole sequence plays once it is in view; --d is the step's
+   place in that sequence in seconds, unitless so it can be scaled. --rate is the
+   playback multiplier JS sets from scroll velocity: 1.3 = the 6.5s baseline when
+   you are stopped, down to ~0.234 when you are breezing past. */
+.dgflow{--rate:1.3}
+.dgflow .fx{opacity:0;
+  transition:opacity calc(.35s * var(--rate)) ease calc(var(--d,0) * 1s * var(--rate))}
 .dgflow .fx-line{stroke-dasharray:var(--len,120);stroke-dashoffset:var(--len,120);
-  transition:stroke-dashoffset .35s ease var(--d,0s)}
+  transition:stroke-dashoffset calc(.45s * var(--rate)) ease calc(var(--d,0) * 1s * var(--rate))}
 .dgflow.go .fx{opacity:1}
 .dgflow.go .fx-line{stroke-dashoffset:0}
+/* Retracting: no stagger and a fixed quick rate — on the way out there is nothing
+   to read, and unwinding for seconds while you scroll away just feels stuck. */
+.dgflow.rev .fx{transition:opacity .25s ease 0s}
+.dgflow.rev .fx-line{transition:stroke-dashoffset .3s ease 0s}
 /* the naming pair: same wordmark treatment, only the words change */
 .namecard{display:flex;flex-direction:column;justify-content:center;gap:14px;min-height:176px;
   background:var(--max-ink);border:1px solid var(--rule);padding:clamp(16px,2.6vw,28px)}
@@ -335,7 +347,21 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 /* Namecard lockups keep the original size; the top demo is 25% larger.
    Namecard floor: 30px x .422 = 12.7px clears --fs-micro. */
 .demo .rail-title{font-size:clamp(37.5px,5vw,55px);line-height:1}
-.namecard .rail-title{font-size:clamp(30px,4vw,44px)}
+/* The rail heading is a fixed box in the Figma file: 598px wide on a 90px cap,
+   i.e. 6.644em. Holding that ratio is what makes the wrap real rather than styled
+   — "Blind Date with an Indie Film" genuinely does not fit inside it and
+   "Surprise Rail" genuinely does. The grid lines mark that box. */
+.namecard .gridbox{position:relative;font-size:clamp(30px,4vw,44px);width:6.644em;max-width:100%;
+  padding-block:.26em}
+.namecard .gridbox::before,.namecard .gridbox::after{content:"";position:absolute;left:0;right:0;
+  height:1px;background:rgba(255,255,255,.2)}
+.namecard .gridbox::before{top:0}
+.namecard .gridbox::after{bottom:0}
+.namecard .gridv{position:absolute;top:0;bottom:0;right:0;width:1px;background:rgba(255,255,255,.2)}
+/* Figma leadings: 90px type on 50px, and 38px type on 55px. The first is negative
+   leading — CSS will not land on it by accident. */
+.namecard .rail-title{display:block;font-size:1em;line-height:.556}
+.namecard .rail-title .lt{white-space:nowrap;line-height:1.447}
 .hint{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.13em;color:#7a7a88}
 /* overflow-x:auto forces overflow-y to auto, so the rail clips vertically too.
    Without room above, a focused tile's outline (2px + 3px offset) is cut off.
@@ -393,7 +419,10 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 .flag h3{color:var(--ink)}
 
 @media (max-width:900px){
-  .shell{grid-template-columns:1fr}
+  /* minmax(0,1fr), not 1fr: a bare 1fr is minmax(auto,1fr), so the track refuses
+     to shrink below its content's min-content width and any wide child pushes the
+     whole page sideways. The desktop rule already guards the main column this way. */
+  .shell{grid-template-columns:minmax(0,1fr)}
   .side{position:static;height:auto;flex-direction:row;align-items:center;gap:14px;
     padding-block:22px 0;overflow-x:auto}
   .jump{flex-direction:row;border-left:0;border-top:1px solid var(--rule)}
@@ -410,8 +439,8 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 }
 @media (max-width:620px){.two{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){
-  .dgflow .fx{opacity:1;transition:none}
-  .dgflow .fx-line{stroke-dashoffset:0;transition:none}
+  .dgflow .fx{opacity:1}
+  .dgflow .fx-line{stroke-dashoffset:0}
   html{scroll-behavior:auto}
   .rail{scroll-behavior:auto}
   .rv{opacity:1;transform:none;transition:none}
@@ -480,7 +509,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 <div class="rv d1">
   <div class="demo">
     <div class="rowlab">
-      <span class="rail-title">Surprise<span class="lt"> Rail</span></span>
+      <span class="rail-title">Surprise <span class="lt">Rail</span></span>
       <span class="hint">CLICK A TILE &middot; OR TAB AND PRESS ENTER</span>
     </div>
     <div class="rail" id="rail">
@@ -605,25 +634,25 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
       <text class="mi" x="24" y="26">TITLE &#8594; SUBPAGE &#8594; DESCRIPTOR</text>
 
       <rect class="bx" x="24" y="96" width="150" height="52"/>
-      <text class="hd" x="99" y="127" text-anchor="middle">Hacks</text>
-      <path class="ln fx-line" style="--d:0s" d="M174 122H212V82H250"/>
-      <path class="ln fx-line" style="--d:.85s" d="M174 122H212V162H250"/>
-      <g class="fx" style="--d:.25s">
+      <text class="lb" x="99" y="127" text-anchor="middle">Hacks</text>
+      <path class="ln fx-line" style="--d:0" d="M174 122H212V82H250"/>
+      <path class="ln fx-line" style="--d:1.25" d="M174 122H212V162H250"/>
+      <g class="fx" style="--d:.35">
         <rect class="bx" x="250" y="58" width="150" height="48"/>
         <text class="lb" x="325" y="87" text-anchor="middle">Comedy</text>
       </g>
-      <g class="fx" style="--d:1.1s">
+      <g class="fx" style="--d:1.6">
         <rect class="bx" x="250" y="138" width="150" height="48"/>
         <text class="lb" x="325" y="167" text-anchor="middle">LGBTQ+</text>
       </g>
-      <path class="ln fx-line" style="--d:.42s" d="M400 82H462"/>
-      <path class="ln fx-line" style="--d:1.27s" d="M400 162H462"/>
-      <g class="fx" style="--d:.65s">
+      <path class="ln fx-line" style="--d:.6" d="M400 82H462"/>
+      <path class="ln fx-line" style="--d:1.85" d="M400 162H462"/>
+      <g class="fx" style="--d:.9">
         <path class="tick" d="M470 82 462 78 462 86Z"/>
         <rect class="bx pick" x="470" y="58" width="266" height="48"/>
         <text class="lb ac" x="603" y="87" text-anchor="middle">Fame gets Feral</text>
       </g>
-      <g class="fx" style="--d:1.5s">
+      <g class="fx" style="--d:2.15">
         <path class="tick" d="M470 162 462 158 462 166Z"/>
         <rect class="bx pick" x="470" y="138" width="266" height="48"/>
         <text class="lb ac" x="603" y="167" text-anchor="middle">Outsiders with Mics</text>
@@ -632,25 +661,25 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
       <rect class="bx" x="24" y="286" width="150" height="52"/>
       <text class="lb" x="99" y="307" text-anchor="middle">Game of</text>
       <text class="lb" x="99" y="323" text-anchor="middle">Thrones</text>
-      <path class="ln fx-line" style="--d:1.7s" d="M174 312H212V272H250"/>
-      <path class="ln fx-line" style="--d:2.55s" d="M174 312H212V352H250"/>
-      <g class="fx" style="--d:1.95s">
+      <path class="ln fx-line" style="--d:2.5" d="M174 312H212V272H250"/>
+      <path class="ln fx-line" style="--d:3.75" d="M174 312H212V352H250"/>
+      <g class="fx" style="--d:2.85">
         <rect class="bx" x="250" y="248" width="150" height="48"/>
         <text class="lb" x="325" y="277" text-anchor="middle">Drama</text>
       </g>
-      <g class="fx" style="--d:2.8s">
+      <g class="fx" style="--d:4.1">
         <rect class="bx" x="250" y="328" width="150" height="48"/>
         <text class="lb" x="325" y="346" text-anchor="middle">Sci-fi &amp;</text>
         <text class="lb" x="325" y="362" text-anchor="middle">Fantasy</text>
       </g>
-      <path class="ln fx-line" style="--d:2.12s" d="M400 272H462"/>
-      <path class="ln fx-line" style="--d:2.97s" d="M400 352H462"/>
-      <g class="fx" style="--d:2.35s">
+      <path class="ln fx-line" style="--d:3.1" d="M400 272H462"/>
+      <path class="ln fx-line" style="--d:4.35" d="M400 352H462"/>
+      <g class="fx" style="--d:3.4">
         <path class="tick" d="M470 272 462 268 462 276Z"/>
         <rect class="bx pick" x="470" y="248" width="266" height="48"/>
         <text class="lb ac" x="603" y="277" text-anchor="middle">Bloodline Betrayal</text>
       </g>
-      <g class="fx" style="--d:3.2s">
+      <g class="fx" style="--d:4.65">
         <path class="tick" d="M470 352 462 348 462 356Z"/>
         <rect class="bx pick" x="470" y="328" width="266" height="48"/>
         <text class="lb ac" x="603" y="357" text-anchor="middle">Ancient Powers Rise</text>
@@ -664,30 +693,29 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   <div class="sechead rv"><p class="lab">05 &mdash; What changed</p>
     <h2>Testing killed the idea I liked.</h2></div>
   <div class="stack rv d1">
-    <p>The film-reel concept was mine and I was attached to it. Cubby testing and a skip-level review both said the same thing from different directions: it confused people, and it was a tired motif. Turning the tiles into their own rail cost me the idea but fixed the confusion.</p>
-    <p>Naming moved too. "Blind Date with a [theme]" landed with 18&ndash;25s and misfired with older viewers, who read it literally and expected romance. "Surprise [theme]" won for being plain.</p>
+    <p>"Blind Date" was a name I was attched to. It landed with 18&ndash;25s (people of my own taste), but was minunderstood by older viewers. They read it literally and expected a movie with a blind date invloved.</p>
   </div>
   <div class="two rv d2">
     <figure class="shot">
       <div class="namecard">
-        <span class="rail-title">Blind Date<span class="lt"> with an Indie Film</span></span>
+        <div class="gridbox"><span class="gridv" aria-hidden="true"></span>
+          <span class="rail-title">Blind Date <span class="lt">with an Indie Film</span></span>
+        </div>
         <span class="alt">&hellip;WITH A ROMANCE &middot; &hellip;WITH A MYSTERY</span>
       </div>
-      <figcaption>Before. Landed with 18&ndash;25s. Older viewers read it literally and expected
-        romance, so the name misdirected rather than merely missing.</figcaption>
     </figure>
     <figure class="shot">
       <div class="namecard">
-        <span class="rail-title">Surprise<span class="lt"> Indie</span></span>
+        <div class="gridbox"><span class="gridv" aria-hidden="true"></span>
+          <span class="rail-title">Surprise <span class="lt">Indie</span></span>
+        </div>
         <span class="alt">SURPRISE ROMANCE &middot; SURPRISE MYSTERY</span>
       </div>
-      <figcaption>After. Plain, and it survives every collection the rail lands in &mdash; the
-        theme swaps without the promise changing.</figcaption>
     </figure>
   </div>
+  <p>Rejected: "Blind Date with an Indie Film". It landed with 18&ndash;25s, but older viewers read it literally and expected romance. It also overruns the rail heading's fixed width, so it takes two lines everywhere it appears.</p>
   <div class="flag rv d2">
-    <h3>Check this one before we ship it</h3>
-    <p>Your brief suggested a stronger beat here &mdash; that hiding <em>everything</em> felt like surrendering control, so you exposed genre and runtime before the reveal. I can't find that in your deployed case study, so I've left it out rather than invent it. If it happened, it's the best "what changed" on the page and should replace what's above.</p>
+    <p>Chosen: "Surprise [theme]". Plain enough that nobody misreads it, and short enough to sit on one line inside the heading box &mdash; so the theme word swaps without the promise or the layout changing.</p>
   </div>
 </section>
 
@@ -782,23 +810,56 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   addEventListener("resize", onScroll);
   onScroll();
 
-  // flow diagrams: dash each connector to its own length, then run on first view
+  /* Flow diagram. The whole sequence plays through once triggered — it is an
+     argument you read in order, so it must not be scrubbed by the scroll wheel.
+     What the scroll DOES control is the tempo: velocity sampled at the moment it
+     fires sets --rate, so a reader who has stopped gets the full 6.5s and someone
+     breezing past gets a ~1.2s version rather than missing it entirely. */
+  var BASE_RATE = 1.3, FAST_RATE = 0.234, FAST_AT = 2000;   // px/s counts as breezing
+  var scrollVel = 0, lastY = window.scrollY, lastT = performance.now();
+  addEventListener("scroll", function(){
+    var now = performance.now(), y = window.scrollY, dt = now - lastT;
+    if(dt > 0){
+      var inst = Math.abs(y - lastY) / (dt / 1000);
+      scrollVel = scrollVel * 0.7 + inst * 0.3;          // smoothed, not spiky
+    }
+    lastY = y; lastT = now;
+  }, {passive:true});
+
   var flows = [].slice.call(document.querySelectorAll(".dgflow"));
   flows.forEach(function(sv){
     [].slice.call(sv.querySelectorAll(".fx-line")).forEach(function(path){
       path.style.setProperty("--len", path.getTotalLength());
     });
   });
+
   if(reduce){
     flows.forEach(function(sv){ sv.classList.add("go"); });
   } else {
+    /* Two thresholds, not one. Play only once it is (near enough) fully in view,
+       so you get to look at it before it starts rather than arriving to a diagram
+       already drawn. Do not retract until it is mostly gone — a single threshold
+       at "fully visible" re-triggers on every small scroll nudge while reading.
+       A diagram taller than the viewport can never reach 0.95, so cap it there. */
+    var PLAY = 0.95, DROP = 0.35;
     var flowIO = new IntersectionObserver(function(es){
       es.forEach(function(e){
-        if(!e.isIntersecting) return;
-        e.target.classList.add("go");
-        flowIO.unobserve(e.target);
+        var sv = e.target;
+        var vh = window.innerHeight || 1;
+        var enter = e.boundingClientRect.height > vh * 0.9 ? 0.6 : PLAY;
+        var playing = sv.classList.contains("go");
+        if(!playing && e.intersectionRatio >= enter){
+          var k = Math.min(1, scrollVel / FAST_AT);
+          var rate = BASE_RATE - k * (BASE_RATE - FAST_RATE);
+          sv.style.setProperty("--rate", rate.toFixed(3));
+          sv.classList.remove("rev");
+          sv.classList.add("go");
+        } else if(playing && e.intersectionRatio < DROP){
+          sv.classList.add("rev");
+          sv.classList.remove("go");
+        }
       });
-    }, {threshold:.3});
+    }, {threshold:[0, .2, .35, .6, .8, .95, 1]});
     flows.forEach(function(sv){ flowIO.observe(sv); });
   }
 

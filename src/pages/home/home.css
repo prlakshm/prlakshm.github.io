@@ -566,6 +566,81 @@
   cursor: default;
 }
 
+/* Project notes live in the transparent headroom already baked into each
+   notebook stage and use the same quiet mono body system as the rest of the
+   page. Their arrows begin at the books and turn upward toward the copy. */
+.jr-annotation {
+  position: absolute;
+  top: 78px;
+  left: 50%;
+  z-index: 4;
+  width: min(226px, 72%);
+  translate: -50% 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  color: var(--mono-secondary);
+  pointer-events: none;
+}
+
+.jr-annotation-kicker {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  color: var(--mono-secondary);
+  -webkit-text-stroke: 0.4px currentColor;
+}
+
+.jr-annotation-copy {
+  max-width: 18ch;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--mono-secondary);
+  -webkit-text-stroke: 0.35px currentColor;
+}
+
+.jr-annotation-arrow {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 18px;
+  width: 48px;
+  height: 48px;
+  color: currentColor;
+  opacity: 0.72;
+  overflow: visible;
+}
+
+.jr-annotation-arrow--dotted {
+  stroke-linecap: round;
+}
+
+.jr-annotation-arrow--solid {
+  top: calc(100% + 5px);
+  right: 34px;
+  transform: rotate(-5deg);
+}
+
+.jr-annotation-arrow--reverse {
+  right: auto;
+  left: 18px;
+  transform: rotate(4deg);
+}
+
+.jr[data-journal="mixr"] .jr-annotation {
+  top: 124px;
+  align-items: center;
+  text-align: center;
+}
+
+.jr[data-journal="reasons-to-watch"] .jr-annotation {
+  top: 128px;
+  align-items: flex-end;
+  text-align: right;
+}
+
 .jr-stage {
   position: relative;
   display: block;
@@ -585,7 +660,9 @@
   width: 100%;
   height: auto;
   display: block;
-  /* No opacity transition — Motion cross-fades these inline. */
+  /* No opacity transition here — Motion drives both covers inline (see
+     Journal.tsx). The closed one fades out fast on open and returns on a delay,
+     so the two are never both readable at once. */
 }
 
 .jr-img--open {
@@ -1313,6 +1390,17 @@
     transform: none;
   }
 
+  /* Keep the project note in its own headroom above each stacked notebook. */
+  .jr-link {
+    padding-top: 90px;
+  }
+
+  .jr .jr-annotation,
+  .jr[data-journal="mixr"] .jr-annotation,
+  .jr[data-journal="reasons-to-watch"] .jr-annotation {
+    top: 24px;
+  }
+
   .jr-stage {
     height: auto;
     aspect-ratio: 300 / 400;
@@ -1330,9 +1418,13 @@
   /* The open image is display:none here, so the cross-fade must not run —
      otherwise tapping a journal fades the cover to nothing with no
      replacement behind it. */
+  /* !important because Motion writes opacity inline on desktop: resizing down
+     mid-hover would otherwise leave a stale inline 0 here and strand the cover
+     invisible, which is the exact failure this rule exists to prevent. */
+  .jr-img--closed,
   .jr-link:hover .jr-img--closed,
   .jr-link:focus-visible .jr-img--closed {
-    opacity: 1;
+    opacity: 1 !important;
   }
 
   .jr-link:active .jr-stage {

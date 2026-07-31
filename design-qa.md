@@ -72,3 +72,49 @@ Visual source/normalization comparison:
 ## Final result
 
 passed
+
+---
+
+# Design QA — Notebook project annotations
+
+## Source truth
+
+- Arrow and label reference: `/var/folders/sl/q2rnvs0j6g1bb1pg7zjj5jyh0000gn/T/codex-clipboard-d5c82990-c118-4b4b-b389-7c76c2feb81c.png`
+- Reference pixels: 942 × 1672.
+- The reference is a style source rather than a same-page layout: the focused
+  comparison covers arrow scale, stroke weight, dash rhythm, label typography,
+  and arrow-to-notebook proximity.
+
+## Implementation evidence
+
+- Desktop screenshot: `/private/tmp/notebook-annotations-final.png`
+- Desktop viewport and screenshot: 1280 × 720 CSS/device pixels at 1× density.
+- Mobile screenshot: `/private/tmp/notebook-annotations-mobile.png`
+- Mobile viewport and screenshot: 375 × 812 CSS/device pixels at 1× density.
+- State: homepage notebook shelf revealed; covers closed; no hover tooltip.
+
+## Comparison and iterations
+
+- Compared the supplied reference and the desktop implementation together in
+  one visual inspection input.
+- First pass: 64px arrows floated above the notebook covers.
+- Second pass: 74px arrows connected, but read too large beside the books.
+- Final pass: 48px Lucide corner arrows with a 0.8px absolute stroke and a
+  tighter `0.7 3.4` dotted rhythm. Labels were moved closer to the covers so
+  the smaller arrows still originate visually at each notebook.
+- Mobile pass added dedicated label headroom so copy and arrows remain above,
+  rather than underneath, the stacked notebooks.
+
+## Findings
+
+- Thin solid arrow matches the reference's restrained stroke weight: passed.
+- Dotted arrows use smaller marks and a quieter rhythm: passed.
+- Arrowheads point from notebook toward label: passed.
+- Labels use the site's mono body font and secondary color: passed.
+- No desktop or 375px horizontal overflow: passed.
+- Notebook hover/open interaction and tooltip-only behavior remain intact:
+  passed.
+
+## Final result
+
+passed

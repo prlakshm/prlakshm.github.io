@@ -26,6 +26,10 @@ export type Journal = {
   number: string;
   title: string;
   descriptor: string;
+  /** Small body-type shelf note shown above the physical notebook. */
+  annotation: string;
+  /** Alternates the thin pointer treatment across the shelf. */
+  arrow: "solid" | "dotted" | "dotted-reverse";
   /** Second tooltip line, e.g. "IOS APP · SWIFTUI". */
   tooltipMeta: string;
   closed: string;
@@ -54,6 +58,8 @@ export const journals: Journal[] = [
     number: "01",
     title: "SURPRISE RAIL",
     descriptor: "HBO MAX · CTV",
+    annotation: "Turning indecision into curiosity.",
+    arrow: "dotted",
     tooltipMeta: "HBO MAX · CTV",
     closed: "/home/journals/hbomax-closed.png",
     open: "/home/journals/hbomax-open.png",
@@ -112,6 +118,8 @@ export const journals: Journal[] = [
     number: "02",
     title: "MIXR",
     descriptor: "NATIVE iOS DJ APP",
+    annotation: "Making remixing feel as easy as editing.",
+    arrow: "solid",
     tooltipMeta: "IOS APP · SWIFTUI",
     closed: "/home/journals/mixr-closed.png",
     open: "/home/journals/mixr-open.png",
@@ -152,6 +160,8 @@ export const journals: Journal[] = [
     number: "03",
     title: "REASONS TO WATCH",
     descriptor: "HBO MAX · AI AGENTS",
+    annotation: "AI agents that explain why a title fits.",
+    arrow: "dotted-reverse",
     tooltipMeta: "AI AGENTS · PROTOTYPING",
     closed: "/home/journals/red-closed.png",
     open: "/home/journals/red-open.png",

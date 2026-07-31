@@ -54,6 +54,17 @@ test("frames the behavior section as page-aware AI", async () => {
   assert.doesNotMatch(behavior, /Where you are decides what you're told/);
 });
 
+test("uses the same title color for Hacks and Game of Thrones", async () => {
+  const html = await readFile(pagePath, "utf8");
+  const start = html.indexOf('<section id="built">');
+  const end = html.indexOf("<!-- 05 -->", start);
+  const behavior = html.slice(start, end);
+
+  assert.match(behavior, /<text class="lb"[^>]*>Hacks<\/text>/);
+  assert.match(behavior, /<text class="lb"[^>]*>Game of<\/text>/);
+  assert.doesNotMatch(behavior, /<text class="hd"[^>]*>Hacks<\/text>/);
+});
+
 test("presents the descriptor research conclusion as a chosen decision", async () => {
   const html = await readFile(pagePath, "utf8");
   const start = html.indexOf('<section id="built">');
@@ -104,6 +115,17 @@ test("uses a full-column wash on main and localizes sidebar and nav washes", asy
   assert.match(html, /body>\.wt-nav,body>\.shell\{position:relative;z-index:1\}/);
   assert.doesNotMatch(html, /header\.rv,\.sechead,\.stack>p/);
   assert.match(html, /\.wt-nav-inner\{position:relative;isolation:isolate;/);
+});
+
+test("gives the paired naming prototypes the standard figure spacing", async () => {
+  const html = await readFile(pagePath, "utf8");
+  const changedStart = html.indexOf('<section id="changed">');
+  const changedEnd = html.indexOf("<!-- 06 -->", changedStart);
+  const changed = html.slice(changedStart, changedEnd);
+
+  assert.match(changed, /<div class="two rv d2">[\s\S]*Blind Date[\s\S]*Surprise/);
+  assert.match(html, /\.two\{[^}]*margin:26px 0/);
+  assert.doesNotMatch(html, /\.two\{[^}]*margin-top:26px/);
 });
 
 test("turns the frosted-glass anatomy into one focused black prototype panel", async () => {
