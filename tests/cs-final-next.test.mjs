@@ -43,6 +43,34 @@ test("aligns the sidebar and case-study labels to one shared grid offset", async
   assert.match(html, /main\{[^}]*padding-block:var\(--intro-grid-offset\)/);
 });
 
+test("frames the behavior section as an AI-agent design-engineering decision", async () => {
+  const html = await readFile(pagePath, "utf8");
+  const start = html.indexOf('<section id="built">');
+  const end = html.indexOf("<!-- 05 -->", start);
+  const behavior = html.slice(start, end);
+
+  assert.ok(start >= 0, "behavior section should be present");
+  assert.match(behavior, /<h2>Adding AI agents to make it better\.<\/h2>/);
+  assert.doesNotMatch(behavior, /Where you are decides what you're told/);
+});
+
+test("shows How I worked in its own full-width metadata structure", async () => {
+  const html = await readFile(pagePath, "utf8");
+  const headerStart = html.indexOf("<main>");
+  const headerEnd = html.indexOf("</header>", headerStart);
+  const header = html.slice(headerStart, headerEnd);
+
+  assert.match(
+    header,
+    /<div class="meta meta-how">\s*<div><span>How I worked<\/span><span>Invent an engaging feature &rarr; build a product yourself &rarr; design with emerging technology<\/span><\/div>\s*<\/div>/,
+  );
+  const primaryMetaEnd = header.indexOf("</div>", header.indexOf('<div class="meta">'));
+  const howIndex = header.indexOf('<div class="meta meta-how">');
+  assert.ok(howIndex > primaryMetaEnd, "How I worked should sit below the primary metadata");
+  assert.match(html, /\.meta-how\{[^}]*margin-top:0/);
+  assert.match(html, /\.meta-how div\{[^}]*flex-basis:100%/);
+});
+
 test("uses a full-column wash on main and localizes sidebar and nav washes", async () => {
   const html = await readFile(pagePath, "utf8");
 

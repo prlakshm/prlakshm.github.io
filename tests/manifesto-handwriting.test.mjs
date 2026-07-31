@@ -289,18 +289,16 @@ test("the manifesto handwriting and its wash scale down to 90 percent without re
   assert.match(portraitRule ?? "", /width:\s*clamp\(250px,\s*26\.25vw,\s*375px\);/);
 });
 
-test("the hero text receives the same feathered paper wash", () => {
+test("the hero wash hugs the title and copy instead of extending through the contact row", () => {
   const css = read("src/pages/home/home.css");
   const blockRule = css.match(/\.hero-block\s*\{([\s\S]*?)\n\}/)?.[1];
-  const washRule = css.match(/\.hero-block::before\s*\{([\s\S]*?)\n\}/)?.[1];
+  const washRule = css.match(/\.hero-title::before,\s*\.hero-col::before\s*\{([\s\S]*?)\n\}/)?.[1];
 
   assert.match(blockRule ?? "", /position:\s*relative;/);
   assert.match(blockRule ?? "", /isolation:\s*isolate;/);
+  assert.doesNotMatch(css, /\.hero-block::before\s*\{/);
   assert.match(washRule ?? "", /content:\s*["']{2};/);
-  assert.match(
-    washRule ?? "",
-    /inset:\s*clamp\(-89\.6px,\s*-9\.8%,\s*-44\.8px\)\s*clamp\(-67\.2px,\s*-8\.4%,\s*-33\.6px\);/,
-  );
+  assert.match(washRule ?? "", /inset:\s*-8px\s+-14px;/);
   assert.match(washRule ?? "", /background:\s*color-mix\(in srgb, var\(--parchment\) 50%, transparent\);/);
   assert.match(washRule ?? "", /mask-image:[\s\S]*?10%/);
   assert.match(washRule ?? "", /-webkit-mask-image:[\s\S]*?10%/);

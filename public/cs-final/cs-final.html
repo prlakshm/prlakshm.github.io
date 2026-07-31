@@ -163,6 +163,8 @@ section{margin-top:clamp(16px,calc(9vw - 48px),84px);
 /* meta strip */
 .meta{display:flex;flex-wrap:wrap;gap:0;margin-top:30px}
 .meta div{flex:1 1 150px;padding:14px 18px 14px 0;display:flex;flex-direction:column;gap:4px}
+.meta-how{margin-top:0}
+.meta-how div{flex-basis:100%;padding-right:0}
 .meta span:first-child{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.15em;
   text-transform:uppercase;color:var(--soft)}
 .meta span:last-child{font-family:var(--fm);font-size:var(--fs-body);color:var(--body);line-height:1.6}
@@ -577,62 +579,22 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 <!-- 04 -->
 <section id="built">
   <div class="sechead rv"><p class="lab">04 &mdash; Behavior</p>
-    <h2>Where you are decides what you're told</h2></div>
+    <h2>AI tailors clues to the page.</h2></div>
   <div class="stack rv d1">
-    <p>The descriptor isn't generated from the title alone. It takes three inputs &mdash; the title, where the viewer is in their journey, and a copy guide holding the descriptor rules and title metadata.</p>
-    <p>The page you're on is the signal. <em>Hacks</em> earns a different descriptor on the Comedy genre page than on the LGBTQ+ collection, because the reason you'd want it is different.</p>
+    <p>AI generates clues from three inputs: title metadata, the subpage it appears, and a copy guide with writing rules.</p>  
+    <p> AI makes the idea scalable. Instead of writing every variation by hand, the system generates context-specific clues across the catalog.</p>
+    <p> The secret sauce is that the subpage indicates what the user wants. If the user is on the Comedy page, they want comedic themes. We adapt clues to the user's intent at time of browsing.</p>  
+    
   </div>
   <div class="dec rv d1">
-    <h3>Two or three words. Thematic or tactical, never atmospheric.</h3>
-    <p style="margin-top:10px">Research compared four descriptor types. Thematic and tactical moved decisions most, and told you more about the title. Longer copy tested worse &mdash; it lost the pace of the interaction and stopped surviving a scan across a room.</p>
-    <div class="form">
-      <div><b>Constraint</b><span>Legible in a fast TV scan, at distance</span></div>
-      <div><b>Considered</b><span>Atmospheric &middot; behavioural &middot; thematic &middot; tactical</span></div>
-      <div class="pick"><b>Chose</b><span>Thematic + tactical, 2&ndash;3 words</span></div>
-      <div><b>Because</b><span>Skimmable, and it invites rather than describes</span></div>
-    </div>
-    <figure>
-      <svg class="dg" viewBox="0 0 760 400" role="img"
-           aria-label="Four descriptor types plotted by whether they tell you about the title or about yourself, against how much they moved a decision. Thematic and tactical sit highest on impact and are marked chosen.">
-        <text class="mi" x="22" y="26">DESCRIPTOR TYPES &#183; HOW PARTICIPANTS SPOKE</text>
-        <path class="ax" d="M100 52V330M100 330H730"/>
-        <text class="mi" transform="translate(26,120) rotate(-90)" text-anchor="middle">ABOUT THE TITLE</text>
-        <text class="mi" transform="translate(26,268) rotate(-90)" text-anchor="middle">ABOUT MYSELF</text>
-        <text class="mi" x="100" y="352">LOW IMPACT</text>
-        <text class="mi" x="730" y="352" text-anchor="end">HIGH IMPACT ON THE DECISION</text>
+    <h3>Working with UX research, we found 2-3 word descriptors were easiest to scan and had highest impact on decision-making.</h3>
 
-        <rect class="bx" x="120" y="70" width="210" height="92"/>
-        <text class="hd" x="134" y="96">Atmospheric</text>
-        <text class="lb" x="134" y="118">Set in Big Sky Country</text>
-        <text class="lb" x="134" y="136">Poignant, reflective score</text>
-
-        <rect class="bx pick" x="440" y="62" width="210" height="92"/>
-        <text class="hd" x="454" y="88">Thematic</text>
-        <text class="mi ac" x="636" y="88" text-anchor="end">CHOSEN</text>
-        <text class="lb" x="454" y="110">Award-winning performance</text>
-        <text class="lb" x="454" y="128">Female director</text>
-
-        <rect class="bx pick" x="440" y="178" width="210" height="92"/>
-        <text class="hd" x="454" y="204">Tactical</text>
-        <text class="mi ac" x="636" y="204" text-anchor="end">CHOSEN</text>
-        <text class="lb" x="454" y="226">Run time &#183; rating &#183; series</text>
-        <text class="lb" x="454" y="244">Finish in one sitting</text>
-
-        <rect class="bx" x="120" y="218" width="210" height="92"/>
-        <text class="hd" x="134" y="244">Behavioural</text>
-        <text class="lb" x="134" y="266">Because you watched</text>
-        <text class="lb" x="134" y="284">Been on your My List</text>
-      </svg>
-      <figcaption>The four categories participants actually spoke in, plotted by impact on the
-        decision. Thematic and tactical sit high and to the right, which is why the tile ships
-        with those two. Redrawn from the research deck.</figcaption>
-    </figure>
   </div>
   <div class="two rv d2">
     <figure class="shot">
       <svg class="dg" viewBox="0 0 470 220" role="img"
            aria-label="Hacks branches to Comedy, which yields the descriptor Fame gets Feral, and to LGBTQ plus, which yields Outsiders with Mics">
-        <text class="mi" x="16" y="20">TITLE &#8594; COLLECTION &#8594; DESCRIPTOR</text>
+        <text class="mi" x="16" y="20">TITLE &#8594; SUBPAGE &#8594; DESCRIPTOR</text>
         <path class="ln" d="M134 110H151V52H168M134 110H151V168H168M272 52H300M272 168H300"/>
         <path class="tick" d="M306 52 298 48 298 56Z"/><path class="tick" d="M306 168 298 164 298 172Z"/>
         <rect class="bx" x="16" y="86" width="118" height="48"/>
@@ -646,12 +608,11 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
         <rect class="bx pick" x="306" y="144" width="148" height="48"/>
         <text class="lb ac" x="380" y="172" text-anchor="middle">Outsiders with Mics</text>
       </svg>
-      <figcaption><em>Hacks</em> on the Comedy page against the same title on the LGBTQ+ collection.</figcaption>
     </figure>
     <figure class="shot">
       <svg class="dg" viewBox="0 0 470 220" role="img"
            aria-label="Game of Thrones branches to Drama, which yields Bloodline Betrayal, and to Sci-fi and Fantasy, which yields Ancient Powers Rise">
-        <text class="mi" x="16" y="20">THE SAME RULE, A SECOND TITLE</text>
+        <text class="mi" x="16" y="20">TITLE &#8594; SUBPAGE &#8594; DESCRIPTOR</text>
         <path class="ln" d="M134 110H151V52H168M134 110H151V168H168M272 52H300M272 168H300"/>
         <path class="tick" d="M306 52 298 48 298 56Z"/><path class="tick" d="M306 168 298 164 298 172Z"/>
         <rect class="bx" x="16" y="86" width="118" height="48"/>
@@ -667,14 +628,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
         <rect class="bx pick" x="306" y="144" width="148" height="48"/>
         <text class="lb ac" x="380" y="172" text-anchor="middle">Ancient Powers Rise</text>
       </svg>
-      <figcaption>The same rule on a second title, to show it generalises.</figcaption>
     </figure>
-  </div>
-  <p class="small rv d2" style="margin-top:9px">One title, two pages, two descriptors &mdash; the
-    collection is the third input, and it is what keeps the copy from being a synopsis.</p>
-  <div class="flag rv d2">
-    <h3>This section needs the most from you</h3>
-    <p>Right now it can only describe the model. To make it <em>built behaviour</em> it should show the real component &mdash; states, transitions, focus order, reduced-motion fallback &mdash; the way the rail above does. That's the day of work we talked about, and it's the part Cursor actually reads.</p>
   </div>
 </section>
 
@@ -713,7 +667,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 <!-- 06 -->
 <section id="limits">
   <div class="sechead rv"><p class="lab">06 &mdash; Results</p>
-    <h2>Not shipped. Here's what a real test would measure.</h2></div>
+    <h2>Not shipped. Here's how I would measure success.</h2></div>
   <div class="stack rv d1">
     <p>The concept preserves surprise while giving viewers enough to take the risk. It was tested with users and presented to product, and it wasn't picked up &mdash; so there is no engagement number to report and I'm not going to invent one.</p>
     <p>Two numbers would carry the experiment: how often a tile gets revealed at all, and how often a reveal turns into a play. Clicks alone would look like success even if every reveal disappointed &mdash; the second number is the one that separates a feature from a toy.</p>

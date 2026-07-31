@@ -233,32 +233,9 @@
   text-align: left;
 }
 
-/* The hero gets the same unboxed paper wash as the manifesto: the center
-   quiets the grid for legibility, while the outer tenth feathers away. */
-.hero-block::before {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  inset: clamp(-89.6px, -9.8%, -44.8px) clamp(-67.2px, -8.4%, -33.6px);
-  pointer-events: none;
-  background: color-mix(in srgb, var(--parchment) 50%, transparent);
-  mask-image:
-    linear-gradient(to right, transparent 0%, #000 10%, #000 90%, transparent 100%),
-    linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%);
-  mask-composite: intersect;
-  -webkit-mask-image:
-    linear-gradient(to right, transparent 0%, #000 10%, #000 90%, transparent 100%),
-    linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%);
-  -webkit-mask-composite: source-in;
-}
-
-.hero-block > * {
-  position: relative;
-  z-index: 1;
-}
-
 .hero-title {
   position: relative;
+  isolation: isolate;
   margin: 0;
   width: max-content;
   max-width: 100%;
@@ -329,11 +306,33 @@
 }
 
 .hero-col {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   gap: 7px;
   min-width: 0;
   width: max-content;
+}
+
+/* Keep the grid-softening wash close to the words themselves. Separate title
+   and column masks prevent the contact row from stretching it downward. */
+.hero-title::before,
+.hero-col::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -8px -14px;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--parchment) 50%, transparent);
+  mask-image:
+    linear-gradient(to right, transparent 0%, #000 10%, #000 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%);
+  mask-composite: intersect;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, #000 10%, #000 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%);
+  -webkit-mask-composite: source-in;
 }
 
 .hero-col--copy {
