@@ -43,15 +43,36 @@ test("aligns the sidebar and case-study labels to one shared grid offset", async
   assert.match(html, /main\{[^}]*padding-block:var\(--intro-grid-offset\)/);
 });
 
-test("frames the behavior section as an AI-agent design-engineering decision", async () => {
+test("frames the behavior section as page-aware AI", async () => {
   const html = await readFile(pagePath, "utf8");
   const start = html.indexOf('<section id="built">');
   const end = html.indexOf("<!-- 05 -->", start);
   const behavior = html.slice(start, end);
 
   assert.ok(start >= 0, "behavior section should be present");
-  assert.match(behavior, /<h2>Adding AI agents to make it better\.<\/h2>/);
+  assert.match(behavior, /<h2>AI tailors clues to the page\.<\/h2>/);
   assert.doesNotMatch(behavior, /Where you are decides what you're told/);
+});
+
+test("presents the descriptor research conclusion as a chosen decision", async () => {
+  const html = await readFile(pagePath, "utf8");
+  const start = html.indexOf('<section id="built">');
+  const end = html.indexOf("<!-- 05 -->", start);
+  const behavior = html.slice(start, end);
+
+  assert.match(
+    behavior,
+    /<div class="flag rv d2">\s*<p>Chosen: Two- or three-word thematic clues\. Working with UX research, we found they were easiest to scan and had the greatest impact on decisions\.<\/p>\s*<\/div>/,
+  );
+  assert.doesNotMatch(
+    behavior,
+    /<h3>Two or three words\. Thematic or tactical, never atmospheric\.<\/h3>/,
+  );
+  assert.doesNotMatch(behavior, /Research compared four descriptor types/);
+  assert.doesNotMatch(
+    behavior,
+    /<div class="dec rv d1">\s*<div class="flag rv d2">/,
+  );
 });
 
 test("shows How I worked in its own full-width metadata structure", async () => {

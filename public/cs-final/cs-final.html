@@ -286,6 +286,14 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 .dg .tick{fill:var(--brass)}
 .dg .fa{fill:var(--brass)}
 .dg .mt{font-size:16px;fill:var(--ink)}
+/* Flow diagram: the left block is present from the start; connectors draw left to
+   right and each block fades in behind them. --len is set from getTotalLength so
+   the dash matches each path exactly. */
+.dgflow .fx{opacity:0;transition:opacity .3s ease var(--d,0s)}
+.dgflow .fx-line{stroke-dasharray:var(--len,120);stroke-dashoffset:var(--len,120);
+  transition:stroke-dashoffset .35s ease var(--d,0s)}
+.dgflow.go .fx{opacity:1}
+.dgflow.go .fx-line{stroke-dashoffset:0}
 /* the naming pair: same wordmark treatment, only the words change */
 .namecard{display:flex;flex-direction:column;justify-content:center;gap:14px;min-height:176px;
   background:var(--max-ink);border:1px solid var(--rule);padding:clamp(16px,2.6vw,28px)}
@@ -402,6 +410,8 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 }
 @media (max-width:620px){.two{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){
+  .dgflow .fx{opacity:1;transition:none}
+  .dgflow .fx-line{stroke-dashoffset:0;transition:none}
   html{scroll-behavior:auto}
   .rail{scroll-behavior:auto}
   .rv{opacity:1;transform:none;transition:none}
@@ -581,55 +591,72 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   <div class="sechead rv"><p class="lab">04 &mdash; Behavior</p>
     <h2>AI tailors clues to the page.</h2></div>
   <div class="stack rv d1">
-    <p>AI generates clues from three inputs: title metadata, the subpage it appears, and a copy guide with writing rules.</p>  
-    <p> AI makes the idea scalable. Instead of writing every variation by hand, the system generates context-specific clues across the catalog.</p>
-    <p> The secret sauce is that the subpage indicates what the user wants. If the user is on the Comedy page, they want comedic themes. We adapt clues to the user's intent at time of browsing.</p>  
-    
-  </div>
-  <div class="dec rv d1">
-    <h3>Working with UX research, we found 2-3 word descriptors were easiest to scan and had highest impact on decision-making.</h3>
+    <p>AI generates clues from three inputs: title metadata, the subpage it appears, and a copy guide with writing rules.</p>
+    <p>AI makes the idea scalable. Instead of writing every variation by hand, the system generates context-specific clues across the catalog.</p>
+    <p>The secret sauce is that the subpage indicates what the user wants. If the user is on the Comedy page, they want comedic themes. We adapt clues based on the user's intent at time of browsing.</p>
 
   </div>
-  <div class="two rv d2">
-    <figure class="shot">
-      <svg class="dg" viewBox="0 0 470 220" role="img"
-           aria-label="Hacks branches to Comedy, which yields the descriptor Fame gets Feral, and to LGBTQ plus, which yields Outsiders with Mics">
-        <text class="mi" x="16" y="20">TITLE &#8594; SUBPAGE &#8594; DESCRIPTOR</text>
-        <path class="ln" d="M134 110H151V52H168M134 110H151V168H168M272 52H300M272 168H300"/>
-        <path class="tick" d="M306 52 298 48 298 56Z"/><path class="tick" d="M306 168 298 164 298 172Z"/>
-        <rect class="bx" x="16" y="86" width="118" height="48"/>
-        <text class="hd" x="75" y="114" text-anchor="middle">Hacks</text>
-        <rect class="bx" x="168" y="28" width="104" height="48"/>
-        <text class="lb" x="220" y="56" text-anchor="middle">Comedy</text>
-        <rect class="bx" x="168" y="144" width="104" height="48"/>
-        <text class="lb" x="220" y="172" text-anchor="middle">LGBTQ+</text>
-        <rect class="bx pick" x="306" y="28" width="148" height="48"/>
-        <text class="lb ac" x="380" y="56" text-anchor="middle">Fame gets Feral</text>
-        <rect class="bx pick" x="306" y="144" width="148" height="48"/>
-        <text class="lb ac" x="380" y="172" text-anchor="middle">Outsiders with Mics</text>
-      </svg>
-    </figure>
-    <figure class="shot">
-      <svg class="dg" viewBox="0 0 470 220" role="img"
-           aria-label="Game of Thrones branches to Drama, which yields Bloodline Betrayal, and to Sci-fi and Fantasy, which yields Ancient Powers Rise">
-        <text class="mi" x="16" y="20">TITLE &#8594; SUBPAGE &#8594; DESCRIPTOR</text>
-        <path class="ln" d="M134 110H151V52H168M134 110H151V168H168M272 52H300M272 168H300"/>
-        <path class="tick" d="M306 52 298 48 298 56Z"/><path class="tick" d="M306 168 298 164 298 172Z"/>
-        <rect class="bx" x="16" y="86" width="118" height="48"/>
-        <text class="lb" x="75" y="107" text-anchor="middle">Game of</text>
-        <text class="lb" x="75" y="123" text-anchor="middle">Thrones</text>
-        <rect class="bx" x="168" y="28" width="104" height="48"/>
-        <text class="lb" x="220" y="56" text-anchor="middle">Drama</text>
-        <rect class="bx" x="168" y="144" width="104" height="48"/>
-        <text class="lb" x="220" y="165" text-anchor="middle">Sci-fi &amp;</text>
-        <text class="lb" x="220" y="181" text-anchor="middle">Fantasy</text>
-        <rect class="bx pick" x="306" y="28" width="148" height="48"/>
-        <text class="lb ac" x="380" y="56" text-anchor="middle">Bloodline Betrayal</text>
-        <rect class="bx pick" x="306" y="144" width="148" height="48"/>
-        <text class="lb ac" x="380" y="172" text-anchor="middle">Ancient Powers Rise</text>
-      </svg>
-    </figure>
+  <div class="flag rv d2">
+    <p>Chosen: 2-3 word thematic descriptors. Working with UX research, we found they were easiest to scan and had the greatest impact on decision-making.</p>
   </div>
+  <figure class="rv d2">
+    <svg class="dg dgflow" viewBox="0 0 760 410" role="img"
+         aria-label="Hacks on the Comedy subpage yields the descriptor Fame gets Feral, and on the LGBTQ plus subpage yields Outsiders with Mics. Game of Thrones on Drama yields Bloodline Betrayal, and on Sci-fi and Fantasy yields Ancient Powers Rise.">
+      <text class="mi" x="24" y="26">TITLE &#8594; SUBPAGE &#8594; DESCRIPTOR</text>
+
+      <rect class="bx" x="24" y="96" width="150" height="52"/>
+      <text class="hd" x="99" y="127" text-anchor="middle">Hacks</text>
+      <path class="ln fx-line" style="--d:0s" d="M174 122H212V82H250"/>
+      <path class="ln fx-line" style="--d:.85s" d="M174 122H212V162H250"/>
+      <g class="fx" style="--d:.25s">
+        <rect class="bx" x="250" y="58" width="150" height="48"/>
+        <text class="lb" x="325" y="87" text-anchor="middle">Comedy</text>
+      </g>
+      <g class="fx" style="--d:1.1s">
+        <rect class="bx" x="250" y="138" width="150" height="48"/>
+        <text class="lb" x="325" y="167" text-anchor="middle">LGBTQ+</text>
+      </g>
+      <path class="ln fx-line" style="--d:.42s" d="M400 82H462"/>
+      <path class="ln fx-line" style="--d:1.27s" d="M400 162H462"/>
+      <g class="fx" style="--d:.65s">
+        <path class="tick" d="M470 82 462 78 462 86Z"/>
+        <rect class="bx pick" x="470" y="58" width="266" height="48"/>
+        <text class="lb ac" x="603" y="87" text-anchor="middle">Fame gets Feral</text>
+      </g>
+      <g class="fx" style="--d:1.5s">
+        <path class="tick" d="M470 162 462 158 462 166Z"/>
+        <rect class="bx pick" x="470" y="138" width="266" height="48"/>
+        <text class="lb ac" x="603" y="167" text-anchor="middle">Outsiders with Mics</text>
+      </g>
+
+      <rect class="bx" x="24" y="286" width="150" height="52"/>
+      <text class="lb" x="99" y="307" text-anchor="middle">Game of</text>
+      <text class="lb" x="99" y="323" text-anchor="middle">Thrones</text>
+      <path class="ln fx-line" style="--d:1.7s" d="M174 312H212V272H250"/>
+      <path class="ln fx-line" style="--d:2.55s" d="M174 312H212V352H250"/>
+      <g class="fx" style="--d:1.95s">
+        <rect class="bx" x="250" y="248" width="150" height="48"/>
+        <text class="lb" x="325" y="277" text-anchor="middle">Drama</text>
+      </g>
+      <g class="fx" style="--d:2.8s">
+        <rect class="bx" x="250" y="328" width="150" height="48"/>
+        <text class="lb" x="325" y="346" text-anchor="middle">Sci-fi &amp;</text>
+        <text class="lb" x="325" y="362" text-anchor="middle">Fantasy</text>
+      </g>
+      <path class="ln fx-line" style="--d:2.12s" d="M400 272H462"/>
+      <path class="ln fx-line" style="--d:2.97s" d="M400 352H462"/>
+      <g class="fx" style="--d:2.35s">
+        <path class="tick" d="M470 272 462 268 462 276Z"/>
+        <rect class="bx pick" x="470" y="248" width="266" height="48"/>
+        <text class="lb ac" x="603" y="277" text-anchor="middle">Bloodline Betrayal</text>
+      </g>
+      <g class="fx" style="--d:3.2s">
+        <path class="tick" d="M470 352 462 348 462 356Z"/>
+        <rect class="bx pick" x="470" y="328" width="266" height="48"/>
+        <text class="lb ac" x="603" y="357" text-anchor="middle">Ancient Powers Rise</text>
+      </g>
+    </svg>
+  </figure>
 </section>
 
 <!-- 05 -->
@@ -667,7 +694,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 <!-- 06 -->
 <section id="limits">
   <div class="sechead rv"><p class="lab">06 &mdash; Results</p>
-    <h2>Not shipped. Here's how I would measure success.</h2></div>
+    <h2>Not shipped. But here's how I would measure success.</h2></div>
   <div class="stack rv d1">
     <p>The concept preserves surprise while giving viewers enough to take the risk. It was tested with users and presented to product, and it wasn't picked up &mdash; so there is no engagement number to report and I'm not going to invent one.</p>
     <p>Two numbers would carry the experiment: how often a tile gets revealed at all, and how often a reveal turns into a play. Clicks alone would look like success even if every reveal disappointed &mdash; the second number is the one that separates a feature from a toy.</p>
@@ -754,6 +781,26 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   addEventListener("scroll", onScroll, {passive:true});
   addEventListener("resize", onScroll);
   onScroll();
+
+  // flow diagrams: dash each connector to its own length, then run on first view
+  var flows = [].slice.call(document.querySelectorAll(".dgflow"));
+  flows.forEach(function(sv){
+    [].slice.call(sv.querySelectorAll(".fx-line")).forEach(function(path){
+      path.style.setProperty("--len", path.getTotalLength());
+    });
+  });
+  if(reduce){
+    flows.forEach(function(sv){ sv.classList.add("go"); });
+  } else {
+    var flowIO = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(!e.isIntersecting) return;
+        e.target.classList.add("go");
+        flowIO.unobserve(e.target);
+      });
+    }, {threshold:.3});
+    flows.forEach(function(sv){ flowIO.observe(sv); });
+  }
 
   var tiles = [].slice.call(document.querySelectorAll(".tile"));
   var rail = document.getElementById("rail");
