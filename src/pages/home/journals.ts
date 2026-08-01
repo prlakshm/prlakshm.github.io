@@ -16,9 +16,9 @@ export type Artifact = {
   w: number;
   h: number;
   rotate: number;
-  /** Printed photo, polaroid, translucent film, paper note, or a blank
-   *  ruled slip that only peeks from behind the covers. */
-  treatment: "photo" | "polaroid" | "film" | "note" | "slip";
+  /** Printed photo, polaroid, translucent film, paper note, a blank ruled slip
+   *  that only peeks from behind the covers, or a torn scrap of ruled paper. */
+  treatment: "photo" | "polaroid" | "film" | "note" | "slip" | "torn";
 };
 
 export type Journal = {
@@ -26,13 +26,12 @@ export type Journal = {
   number: string;
   title: string;
   descriptor: string;
+  /** Who or what it was for, as it reads on the shelf label after the title
+   *  ("SURPRISE RAIL · HBO MAX"). Shorter than `descriptor` on purpose — the
+   *  label is one line of 14px mono over a notebook, not a spec. */
+  client: string;
   /** Small body-type shelf note shown above the physical notebook. */
   annotation: string;
-  /** Leader line down to the cover: dotted, solid, or dashes that resolve into
-   *  a drawn arrowhead. One of each across the shelf. */
-  arrow: "solid" | "dotted" | "dotted-arrow";
-  /** Second tooltip line, e.g. "IOS APP · SWIFTUI". */
-  tooltipMeta: string;
   closed: string;
   open: string;
   /** Transparent padding below the notebook in each source PNG, as a % of the
@@ -42,8 +41,14 @@ export type Journal = {
   trimClosed: string;
   trimOpen: string;
   alt: string;
-  /** Omitted while a case study is still unpublished. */
+  /** The link exactly as written — NOT auto-prefixed. Hash routes carry their
+   *  own "#" ("#/hbo-max-rtw"); the finished static case studies are real paths
+   *  ("/surprise-rail/") and must not get one. An "http" href is treated as
+   *  off-site and opens in a new tab. Omitted while unpublished. */
   href?: string;
+  /** Tooltip line. Defaults to "VIEW CASE STUDY" — override when the link does
+   *  not go to a case study. */
+  cta?: string;
   /** Desktop render width in px; scaled down by clamp() at smaller widths. */
   width: number;
   /** Vertical stagger. Currently 0 across the board — the notebooks share a
@@ -59,16 +64,15 @@ export const journals: Journal[] = [
     number: "01",
     title: "SURPRISE RAIL",
     descriptor: "HBO MAX · CTV",
+    client: "HBO MAX",
     annotation: "Turning indecision into curiosity.",
-    arrow: "dotted",
-    tooltipMeta: "HBO MAX · CTV",
     closed: "/home/journals/hbomax-closed.png",
     open: "/home/journals/hbomax-open.png",
     trimClosed: "3.86%",
     trimOpen: "7.57%",
     alt:
       "A sandy tan leather journal with HBO Max, eyes and Surprise stickers, tied with twine.",
-    href: "/hbo-max-surprise",
+    href: "/surprise-rail/",
     width: 422,
     offsetY: 0,
     rotate: -1.5,
@@ -115,62 +119,19 @@ export const journals: Journal[] = [
     ],
   },
   {
-    id: "mixr",
-    number: "02",
-    title: "MIXR",
-    descriptor: "NATIVE iOS DJ APP",
-    annotation: "Making remixing feel as easy as editing.",
-    arrow: "solid",
-    tooltipMeta: "IOS APP · SWIFTUI",
-    closed: "/home/journals/mixr-closed.png",
-    open: "/home/journals/mixr-open.png",
-    trimClosed: "6.57%",
-    trimOpen: "5.71%",
-    alt:
-      "A dark brown leather journal with Mixr, headphone and waveform stickers, closed with a brass snap.",
-    width: 480, // flagship — reads ~10% larger than the others
-    offsetY: 0,
-    rotate: 1.2,
-    artifacts: [
-      {
-        src: "/mixr/brand-concepts/mixr-brand-world-v1.png",
-        alt: "Mixr brand world exploration — logo, color and type studies.",
-        x: -148,
-        y: -54,
-        w: 160,
-        h: 120,
-        rotate: -5,
-        treatment: "photo",
-      },
-      {
-        note: "Making remixing feel as approachable as editing a video.",
-        x: -185,
-        y: 106,
-        w: 150,
-        h: 88,
-        rotate: 3,
-        treatment: "note",
-      },
-      // Only one Mixr asset exists so far; the rest stay as paper edges.
-      { x: 165, y: -66, w: 120, h: 158, rotate: 4, treatment: "slip" },
-      { x: 160, y: 112, w: 126, h: 96, rotate: -2, treatment: "slip" },
-    ],
-  },
-  {
     id: "reasons-to-watch",
-    number: "03",
+    number: "02",
     title: "REASONS TO WATCH",
     descriptor: "HBO MAX · AI AGENTS",
+    client: "HBO MAX",
     annotation: "AI agents that explain why a title fits.",
-    arrow: "dotted-arrow",
-    tooltipMeta: "AI AGENTS · PROTOTYPING",
     closed: "/home/journals/red-closed.png",
     open: "/home/journals/red-open.png",
     trimClosed: "12.71%",
     trimOpen: "15.43%",
     alt:
       "A red leather journal representing the Reasons to Watch agent prototype, stuffed with working notes.",
-    href: "/hbo-max-rtw",
+    href: "#/hbo-max-rtw",
     width: 414,
     offsetY: 0,
     rotate: 1.8,
@@ -213,6 +174,43 @@ export const journals: Journal[] = [
         h: 88,
         rotate: -3,
         treatment: "note",
+      },
+    ],
+  },
+  {
+    id: "mixr",
+    number: "03",
+    title: "MIXR",
+    descriptor: "NATIVE iOS DJ APP",
+    client: "iOS DJ APP",
+    annotation: "Making remixing feel as easy as editing.",
+    closed: "/home/journals/mixr-closed.png",
+    open: "/home/journals/mixr-open.png",
+    trimClosed: "6.57%",
+    trimOpen: "5.71%",
+    alt:
+      "A dark brown leather journal with Mixr, headphone and waveform stickers, closed with a brass snap.",
+    /* No case study yet, so the notebook points at where the work is actually
+       being shown. External, which is what puts the arrow on the tooltip. */
+    href: "https://x.com/pranavibuilds",
+    cta: "READ ON X",
+    width: 480, // flagship — reads ~10% larger than the others
+    offsetY: 0,
+    rotate: 1.2,
+    /* One scrap, not four. Until the study is written there is nothing to
+       splay, and a single torn note saying so reads as honest where a fan of
+       blank paper edges read as filler. It splays LEFT: Mixr is the rightmost
+       notebook now and anything thrown right runs off the shelf. */
+    artifacts: [
+      {
+        note:
+          "Case study still in progress. Read about the app on X in the meantime.",
+        x: -172,
+        y: 34,
+        w: 176,
+        h: 120,
+        rotate: -4,
+        treatment: "torn",
       },
     ],
   },

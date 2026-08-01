@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-const pagePath = new URL("../public/cs-final/cs-final.html", import.meta.url);
+const pagePath = new URL("../public/surprise-rail/index.html", import.meta.url);
 
 test("keeps Home and Next past the content edge without shrinking reading progress", async () => {
   const html = await readFile(pagePath, "utf8");

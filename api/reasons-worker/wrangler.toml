@@ -1,0 +1,13 @@
+name = "reasons-to-watch"
+main = "src/worker.js"
+compatibility_date = "2025-06-01"
+
+# The model is a plain var so it can be changed without touching code.
+# claude-sonnet-5 keeps a four-stage run responsive; claude-opus-5 is stronger
+# if you would rather have the quality than the speed.
+[vars]
+MODEL = "claude-sonnet-5"
+
+# ANTHROPIC_API_KEY is NOT here on purpose. It is a secret, set with:
+#   npx wrangler secret put ANTHROPIC_API_KEY
+# Secrets live in Cloudflare, never in this repo.

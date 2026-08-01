@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { animate, inView } from "motion";
 import "../../styles/tokens.css";
-import "./surprise-rail.css";
+import "./surprise-rail-v1.css";
 import { chapters } from "./chapters.js";
 import DescriptorMap from "./DescriptorMap.js";
 
@@ -23,7 +23,7 @@ const reduced = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-function SurpriseRail() {
+function SurpriseRailV1() {
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -456,4 +456,4 @@ function ChapterHead({ index }: { index: number }) {
   );
 }
 
-export default SurpriseRail;
+export default SurpriseRailV1;

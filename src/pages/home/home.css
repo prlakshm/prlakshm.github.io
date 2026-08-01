@@ -584,94 +584,114 @@
    the PNG itself. Add the leader and a ~24px breath and the note lands the
    same distance above every cover at every size. */
 .jr-annotation {
+  /* Width of the number column. The heading starts here and every wrapped line
+     of copy hangs off the same edge, so the block reads as one indented note
+     rather than a title with a paragraph loose underneath. */
+  --label-indent: 30px;
   position: absolute;
   bottom: calc(100cqw * var(--cover-lift) + var(--lead-h) + 31px);
   left: 50%;
   z-index: 4;
-  width: min(226px, 72%);
+  /* Sized off the longest kicker on the shelf — "03 REASONS TO WATCH · HBO MAX"
+     needs 285px with the number column — so every label holds one line at
+     desktop. Still narrower than the narrowest notebook, so a label never
+     reaches into its neighbour's lane. Below 1440 the covers are fluid and the
+     longest one wraps; that is what the kicker's hanging indent is for. The
+     copy keeps its own, shorter measure. */
+  width: min(292px, 92%);
   translate: -50% 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  align-items: flex-start;
+  text-align: left;
+  gap: 5px;
   color: var(--mono-secondary);
   pointer-events: none;
 }
 
+/* Hanging indent: the number sits out in its own column and everything that
+   wraps off the end of "TITLE · CLIENT" falls back to the title's left edge,
+   the same edge the copy below hangs from. */
 .jr-annotation-kicker {
+  padding-left: var(--label-indent);
+  text-indent: calc(-1 * var(--label-indent));
   font-family: var(--font-mono);
   font-weight: 400;
   font-size: 14px;
+  line-height: 1.35;
   letter-spacing: 0.1em;
   color: var(--mono-secondary);
   -webkit-text-stroke: 0.4px currentColor;
 }
 
+/* Fixed-width slot rather than a typed space: the numbers are all two figures
+   today, but the slot is what actually guarantees the heading and the copy
+   below share one left edge. */
+.jr-annotation-num {
+  display: inline-block;
+  width: var(--label-indent);
+  /* text-indent inherits, and this is an inline-block — so without the reset
+     the kicker's hanging indent gets applied a second time INSIDE this box and
+     drags the digits a full column left of the rule that points up at them. */
+  text-indent: 0;
+}
+
 .jr-annotation-copy {
-  max-width: 18ch;
+  /* Measured on the text, not the box: the indent is padding, so this is the
+     line length itself. 21ch keeps two or three lines under every heading
+     without any of them running past the notebook below. */
+  max-width: 21ch;
+  padding-left: var(--label-indent);
   font-family: var(--font-mono);
   font-weight: 400;
   font-size: 13px;
+  line-height: 1.55;
   letter-spacing: 0.04em;
   color: var(--mono-secondary);
   -webkit-text-stroke: 0.35px currentColor;
 }
 
-/* Hangs off the bottom of the note and runs down toward the cover. The sizes
-   below must stay 1:1 with each leader's viewBox in Journal.tsx — they are not
-   free scaling, they are re-stating the intrinsic box, because the global
-   `svg { width: 0; height: 0 }` in home1.css would otherwise collapse it. Any
-   mismatch stretches the drawing and skews the arrowhead. */
+/* The leader: one dotted rule in the number's own column, running from just
+   under the kicker, down past the copy, and on toward the cover — so the eye
+   reads it upward, from the notebook to the number that names it. Dashes come
+   from a gradient rather than an SVG stroke because this line is stretched to
+   whatever height the journal needs; a dasharray would stretch with it and the
+   rhythm would drift between notebooks. */
 .jr-leader {
   position: absolute;
-  top: calc(100% + 7px);
-  color: currentColor;
-  opacity: 0.56;
-  overflow: visible;
+  left: calc(var(--label-indent) * 0.3);
+  top: 24px;
+  bottom: calc(-1 * var(--lead-h));
+  width: 1.3px;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    currentColor 0 4px,
+    transparent 4px 9px
+  );
+  opacity: 0.52;
 }
 
-/* Each leader drops from the edge the note is set against. --lead-h comes from
-   the journal rules below and must equal the variant's viewBox height. */
-.jr-leader--dotted {
-  left: 6px;
-  width: 24px;
-  height: var(--lead-h);
-}
-
-/* The two arrows are wider than the dotted rule because they turn a corner
-   before they rise; the extra width is the horizontal run. */
-.jr-leader--solid {
-  left: 50%;
-  margin-left: -22px;
-  width: 44px;
-  height: var(--lead-h);
-}
-
-.jr-leader--dotted-arrow {
-  right: 2px;
-  width: 52px;
-  height: var(--lead-h);
-}
-
+/* --cover-lift is measured from the PNG (see the note above) and puts the
+   bottom of the line a constant breath above each cover. --lead-h is the free
+   variable: it lengthens the rule AND lifts the note by the same amount, so
+   the three labels sit at slightly different heights — hand-placed, not
+   ruled — while every line still lands on its own notebook. */
 .jr[data-journal="surprise-rail"] .jr-annotation {
   --cover-lift: 1.076;
-  --lead-h: 54px;
+  --lead-h: 62px;
 }
 
 .jr[data-journal="mixr"] .jr-annotation {
   --cover-lift: 0.947;
-  --lead-h: 58px;
-  align-items: center;
-  text-align: center;
+  --lead-h: 27px;
 }
 
-/* The longest leader on the shelf, and that is the photograph's doing: the red
+/* The longest rule on the shelf, and that is the photograph's doing: the red
    notebook's PNG carries ~11% transparent headroom against ~4% for the other
-   two, so its cover starts lower and the arrow has further to travel. */
+   two, so its cover starts lower and the line has further to travel. */
 .jr[data-journal="reasons-to-watch"] .jr-annotation {
   --cover-lift: 0.943;
-  --lead-h: 98px;
-  align-items: flex-end;
-  text-align: right;
+  --lead-h: 87px;
 }
 
 .jr-stage {
@@ -797,6 +817,33 @@
   box-shadow: 0 8px 20px var(--shadow-object);
 }
 
+/* A scrap ripped out of a ruled pad. clip-path takes the border and the
+   box-shadow with it — which is the point, a tear has no ruled edge — so the
+   lift is restored with drop-shadow, which follows the clipped silhouette.
+   Extra bottom padding keeps the copy clear of the tear. */
+.jr-artifact--torn {
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  padding: 13px 15px 26px;
+  background-color: var(--paper);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 15px,
+    color-mix(in srgb, var(--espresso) 13%, transparent) 15px 16px
+  );
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  filter: drop-shadow(0 7px 16px var(--shadow-object));
+  clip-path: polygon(
+    0% 0%, 100% 0%,
+    100% 93%, 94% 98%, 88% 91%, 81% 97%, 74% 90%, 67% 97%,
+    60% 92%, 53% 99%, 46% 91%, 39% 97%, 32% 92%, 25% 98%,
+    18% 91%, 11% 97%, 5% 92%, 0% 97%
+  );
+}
+
 .jr-note {
   font-family: var(--font-mono);
   font-size: 10.5px;
@@ -832,31 +879,11 @@
   box-shadow: 0 4px 12px var(--shadow-soft);
 }
 
-.jr-tooltip-title {
-  font-family: var(--font-mono);
-  font-weight: 400;
-  font-size: 14px;
-  letter-spacing: 0.1em;
-  color: var(--mono-secondary);
-  -webkit-text-stroke: 0.4px currentColor;
-}
-
-.jr-tooltip-meta {
-  font-family: var(--font-mono);
-  font-weight: 400;
-  font-size: 13px;
-  letter-spacing: 0.04em;
-  color: var(--mono-secondary);
-  -webkit-text-stroke: 0.35px currentColor;
-}
-
+/* The tooltip's only line, so no rule above it to divide it from anything. */
 .jr-tooltip-cta {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  margin-top: 5px;
-  padding-top: 6px;
-  border-top: 1px solid color-mix(in srgb, var(--mono-secondary) 28%, transparent);
   font-family: var(--font-mono);
   font-weight: 400;
   font-size: 12px;

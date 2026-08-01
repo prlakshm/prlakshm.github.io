@@ -16,6 +16,9 @@ test("orders the landing notebooks from engagement to building to emerging techn
   assert.match(source, /id: "surprise-rail",[\s\S]*?number: "01"/);
   assert.match(source, /id: "mixr",[\s\S]*?number: "02"/);
   assert.match(source, /id: "reasons-to-watch",[\s\S]*?number: "03"/);
-  assert.match(source, /id: "reasons-to-watch",[\s\S]*?href: "\/hbo-max-rtw"/);
+  /* href is the link exactly as written and is NOT auto-prefixed: hash routes
+     carry their own "#", the finished static case study is a real path. */
+  assert.match(source, /id: "reasons-to-watch",[\s\S]*?href: "#\/hbo-max-rtw"/);
+  assert.match(source, /id: "surprise-rail",[\s\S]*?href: "\/surprise-rail\/"/);
   assert.doesNotMatch(source, /id: "coach"/);
 });

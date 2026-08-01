@@ -13,14 +13,14 @@ import CaseStudyHBOMax1 from './pages/case-study-hbo-max1/CaseStudyHBOMax1.js';
 import CaseStudyHBOMax2 from './pages/case-study-hbo-max2/CaseStudyHBOMax2.js';
 import CaseStudyBinary from './pages/case-study-binary/CaseStudyBinary.js';
 import CaseStudyDreamer from './pages/case-study-dreamer/CaseStudyDreamer.js';
-import SurpriseRail from './pages/surprise-rail/SurpriseRail.js';
+import SurpriseRailV1 from './pages/surprise-rail-v1/SurpriseRailV1.js';
 import './app.css';
 import Fun from './pages/fun/Fun.js';
 
 /* Pages that ship their own nav and footer as part of their surface, so the
    global chrome is suppressed there and kept elsewhere. The worktable homepage
    and the case-study exhibition rooms both own their chrome. */
-const OWN_CHROME = ['/', '/projects', '/about', '/surprise-rail'];
+const OWN_CHROME = ['/', '/projects', '/about', '/surprise-rail-v1'];
 
 function Shell() {
   const { pathname } = useLocation();
@@ -59,9 +59,9 @@ function Shell() {
         <Route path="/projects" element={<Home />} />
         <Route path="/fun" element={<Fun />} />
         <Route path="/hbo-max-surprise" element={<CaseStudyHBOMax1 />} />
-        {/* Prototype of the new "exhibition room" treatment. Lives alongside
-            the existing case study so nothing is lost while it is reviewed. */}
-        <Route path="/surprise-rail" element={<SurpriseRail />} />
+        {/* Superseded by the finished static case study at /surprise-rail/.
+            Kept routed, not linked, so the exhibition-room treatment is not lost. */}
+        <Route path="/surprise-rail-v1" element={<SurpriseRailV1 />} />
         <Route path="/hbo-max-rtw" element={<CaseStudyHBOMax2 />} />
         <Route path="/binary-escape" element={<CaseStudyBinary />} />
         <Route path="/richdreamer" element={<CaseStudyDreamer />} />
