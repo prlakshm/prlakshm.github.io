@@ -63,7 +63,9 @@ function CaseStudyHBOMax2() {
     if (reduceMotion.matches) {
       reveals.forEach((element) => element.classList.add("is-visible"));
       heroVideo.current?.pause();
-      return;
+      return () => {
+        pipelineTimers.current.forEach((timer) => window.clearTimeout(timer));
+      };
     }
 
     const observer = new IntersectionObserver(
