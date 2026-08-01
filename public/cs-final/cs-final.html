@@ -105,6 +105,8 @@ body>.wt-nav,body>.shell{position:relative;z-index:1}
 /* Feathered paper wash — grid layer below, wash above grid, text above wash. */
 :is(.jump,.prog,.wt-nav-inner),main{position:relative;isolation:isolate}
 :is(.jump,.prog,.wt-nav-inner)::before,main::before{content:"";position:absolute;z-index:-1;inset:clamp(-89.6px,-9.8%,-44.8px) clamp(-67.2px,-8.4%,-33.6px);pointer-events:none;background:color-mix(in srgb,var(--ground) 50%,transparent);mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);mask-composite:intersect;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);-webkit-mask-composite:source-in}
+/* Keep the wash's top and side bleed without turning its bottom bleed into scroll. */
+main::before{bottom:0}
 
 .shell{max-width:var(--page-max);margin:0 auto;padding-inline:var(--gutter);
   display:grid;grid-template-columns:var(--side) minmax(0,1fr);gap:clamp(24px,4vw,64px)}
@@ -134,7 +136,8 @@ body>.wt-nav,body>.shell{position:relative;z-index:1}
 .prog .pct{font-variant-numeric:tabular-nums;color:var(--brass);min-width:4ch;text-align:right}
 
 /* ---------------- main column ---------------- */
-main{padding-block:var(--intro-grid-offset) 120px;min-width:0}
+/* Compact end-of-page runway: enough for HOME/NEXT to clear the conclusion. */
+main{padding-block:var(--intro-grid-offset) 130px;min-width:0}
 .case-actions{position:absolute;right:calc(-1 * var(--gutter));bottom:calc(clamp(28px,5vw,64px) + var(--case-actions-grid-nudge));display:flex;
   flex-direction:column;align-items:flex-end;gap:calc(var(--grid-minor) - var(--case-link-h))}
 .case-home,.case-next{display:inline-flex;align-items:flex-end;height:var(--case-link-h);gap:4px;font-family:var(--fm);font-size:var(--fs-micro);line-height:1;
@@ -319,6 +322,22 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   line-height:1;letter-spacing:-.02em;color:var(--ink);white-space:nowrap}
 .stats span{font-family:var(--fm);font-size:var(--fs-body);line-height:1.5;color:var(--body);
   max-width:20ch}
+.results-metrics{margin-top:clamp(19.2px,2.4vw,25.6px)}
+.results-metrics .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(22px,5vw,64px)}
+.results-metrics .result-metric{display:flex;flex-direction:column;align-items:stretch;gap:0}
+/* Second column nudged one minor grid cell left onto the next gridline. A
+   transform rather than a margin: it shifts the rendered column without
+   changing the track, so the first column keeps its width and nothing reflows. */
+.results-metrics .result-metric:nth-child(2){transform:translateX(calc(-1 * var(--grid-minor)))}
+.metric-equation{display:flex;align-items:center;gap:12px}
+.results-metrics .metric-equation b{white-space:normal}
+.results-metrics .fraction{display:inline-grid;grid-template-rows:auto auto;max-width:none;
+  min-width:88px;flex:none;font-family:var(--fm);font-size:var(--fs-body);line-height:1.25;color:var(--body);
+  text-align:center}
+.results-metrics .fraction span{display:block;max-width:none;padding-inline:8px}
+.numerator{border-bottom:1px solid var(--body);padding-bottom:4px}
+.denominator{padding-top:4px}
+.metric-question{margin-top:clamp(19.2px,2.4vw,25.6px);max-width:none;line-height:1.55;color:var(--soft)}
 
 /* decision block */
 .dec{border-top:1px solid var(--rule);padding-top:20px;margin-top:30px}
@@ -432,6 +451,48 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   color:#787884;line-height:1.75;max-width:62ch}
 
 /* flag box */
+/* Artifact links. Emoji, so the icon is an OS glyph and cannot be tinted —
+   it will not match --soft the way the drawn arrow did. */
+.links{display:flex;align-items:center;gap:10px;margin:0;
+  font-family:var(--fm);font-size:var(--fs-body);letter-spacing:.06em;color:var(--body)}
+/* Resting --body, hover --soft: the same pair the nav bar uses. */
+/* block, not inline-flex: as a flex container the anchor would blockify .lbl
+   into a flex item, and its border-bottom would then sit at the bottom of a full
+   line box instead of hugging the word. The sidebar already escaped this with its
+   own display:block; this makes the conclusion pair match. Icon spacing comes
+   from .ico's margin-right, not a flex gap. */
+.links a{display:block;color:var(--body);
+  text-decoration:none;transition:color .18s ease}
+.links a:hover,.links a:focus-visible{color:var(--soft)}
+.links a:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+.links .sep{color:var(--rule)}
+/* In the sidebar the pair mirrors a table-of-contents row: same left indent and
+   rule, and the icon sits in the number column — so the labels line up with the
+   section names rather than with 01/02. Kept OUT of nav#jump on purpose: the
+   scroll-spy runs querySelector on every href in there and a full URL is not a
+   valid selector. */
+/* No rule down the left — that belongs to the section list. The negative
+   margin cancels .side's 22px flex gap down to a deliberate 12px: enough air to
+   set the pair off from the section list without it reading as a separate
+   block. */
+.side .links{flex-direction:column;align-items:stretch;gap:1px;
+  margin-top:calc(12px - 22px)}
+.side .links a{padding:8px 0 8px 14px;letter-spacing:.03em;line-height:1.5}
+/* width:2ch matches "01" exactly in the mono face, so both columns agree */
+.side .n{display:inline-block;width:2ch}
+.links .ico{font-size:var(--fs-micro);margin-right:7px;font-style:normal}
+/* Same gesture as @pranavibuilds on the landing page: a resting underline with a
+   rule that wipes across it on hover, plus the colour shift. Reuses this page's
+   own .nav-rule element rather than a second implementation. The border sits on
+   the label, not the whole row, so it hugs the word and not the icon or the
+   sidebar's indent. */
+.links .lbl{position:relative;
+  border-bottom:1.5px solid color-mix(in srgb,currentColor 48%,transparent)}
+.links .lbl .nav-rule{bottom:-1.5px}
+.links a:hover .nav-rule,.links a:focus-visible .nav-rule{transform:scaleX(1)}
+/* The conclusion box carries the same pair, so the sidebar copy is dropped on
+   mobile rather than being buried in the horizontally scrolling nav strip. */
+@media (max-width:900px){.side .links{display:none}}
 .flag{border:1px solid var(--brass);background:color-mix(in srgb,var(--brass) 7%,var(--ground));
   padding:18px 20px;margin-top:26px;display:flex;flex-direction:column;gap:9px}
 .flag h3{color:var(--ink)}
@@ -455,7 +516,9 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   .wt-wordmark,.wt-nav-links a{font-size:13px;letter-spacing:.07em}
   .wt-nav-links{gap:16px}
 }
-@media (max-width:620px){.two{grid-template-columns:1fr}}
+@media (max-width:620px){
+  .two,.results-metrics .stats{grid-template-columns:1fr}
+}
 @media (prefers-reduced-motion:reduce){
   .dgflow .fx{opacity:1}
   .dgflow .fx-line{stroke-dashoffset:0}
@@ -501,6 +564,10 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
     <a href="#changed"><span class="n">05</span>What changed</a>
     <a href="#limits"><span class="n">06</span>Results</a>
   </nav>
+  <div class="links links--toc">
+    <a href="https://www.figma.com/design/7ALenAe4ALVk0Y6FBKUl74/Surprise-Tiles-Component-Idea?node-id=6006-97068" target="_blank" rel="noreferrer"><span class="n">🔗</span><span class="lbl">Figma<span class="nav-rule" aria-hidden="true"></span></span></a>
+    <a href="https://www.figma.com/proto/XVlsXuMb5tnBTed7jCXIKf/Surprise-Tiles-Component-Idea?page-id=6006%3A97068&amp;node-id=6069-227551&amp;viewport=1022%2C366%2C0.04&amp;t=fJQsBq8Ro4YMNmMp-1&amp;scaling=contain&amp;content-scaling=fixed&amp;starting-point-node-id=6069%3A227551&amp;show-proto-sidebar=1" target="_blank" rel="noreferrer"><span class="n">🔗</span><span class="lbl">Prototype<span class="nav-rule" aria-hidden="true"></span></span></a>
+  </div>
   <div class="prog" id="prog">
     <span>READ</span>
     <span class="track"><i id="bar"></i></span>
@@ -628,7 +695,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
           </div>
         </div>
       </div>
-      <div class="title-font-spec" aria-label="Title Font">Title Font</div>
+      <div class="title-font-spec" aria-label="Title Font">Heading Font</div>
     </section>
   </div>
 </section>
@@ -640,7 +707,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   <div class="stack rv d1">
     <p>AI generates clues from three inputs: title metadata, the subpage it appears, and a copy guide with writing rules.</p>
     <p>AI makes the idea scalable. Instead of writing every variation by hand, the system generates context-specific clues across the catalog.</p>
-    <p>The secret sauce is that the subpage indicates what the user wants. If the user is on the Comedy page, they want comedic themes. We adapt clues based on the user's intent at time of browsing.</p>
+    <p>The secret sauce is that the subpage indicates what the user wants. If the user is on the Comedy page, they want comedic themes. I adapted clues based on the user's intent at time of browsing.</p>
 
   </div>
   <div class="flag rv d2">
@@ -711,7 +778,8 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   <div class="sechead rv"><p class="lab">05 &mdash; What changed</p>
     <h2>Testing killed the idea I liked.</h2></div>
   <div class="stack rv d1">
-    <p>"Blind Date" was a name I was attched to. It landed with 18&ndash;25s (people of my own taste), but was minunderstood by older viewers. They read it literally and expected a movie with a blind date invloved.</p>
+    <p>Only titles within the subpage category can get recommended. I changed the rail heading based on the subpage so users know to expect something different.</p>
+    <p>"Blind Date with a [theme]" was a name I was attched to. It landed with 18&ndash;25s, but was minunderstood by older viewers. They read it literally and expected a movie with dating invloved.</p>
   </div>
   <div class="two rv d2">
     <figure class="shot">
@@ -736,52 +804,53 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
       </div>
     </figure>
   </div>
-  <p>Rejected: "Blind Date with an Indie Film". It landed with 18&ndash;25s, but older viewers read it literally and expected romance. It also overruns the rail heading's fixed width, so it takes two lines everywhere it appears.</p>
+  <p>Rejected: "Blind Date with a [theme]." It didn't land for all ages. It overran the title's fixed width and took up two lines, which was atypical in the app.</p>
   <div class="flag rv d2">
-    <p>Chosen: "Surprise [theme]". Plain enough that nobody misreads it, and short enough to sit on one line inside the heading box &mdash; so the theme word swaps without the promise or the layout changing.</p>
+    <p>Chosen: "Surprise [theme]." Short and sweet. If you were on the Home page, you would see this as a general "Surprise For Me" rail.</p>
   </div>
 </section>
 
 <!-- 06 -->
 <section id="limits">
   <div class="sechead rv"><p class="lab">06 &mdash; Results</p>
-    <h2>Not shipped. But here's how I would measure success.</h2></div>
+    <h2>Not shipped. Still measurable.</h2></div>
   <div class="stack rv d1">
-    <p>The concept preserves surprise while giving viewers enough to take the risk. It was tested with users and presented to product, and it wasn't picked up &mdash; so there is no engagement number to report and I'm not going to invent one.</p>
-    <p>Two numbers would carry the experiment: how often a tile gets revealed at all, and how often a reveal turns into a play. Clicks alone would look like success even if every reveal disappointed &mdash; the second number is the one that separates a feature from a toy.</p>
-    <p>Abandoning straight after a reveal is the inverse of that second number, not a third thing to instrument &mdash; the same population read from the other side. It's worth naming separately only because of what it would mean: a reveal people back out of says the descriptor oversold the title, which is the specific risk you take on when you hide the key art.</p>
-    <p>It would need weeks, not days. Comparing reveal rate in the first week against the fourth is what would show whether the mechanic holds or whether the first number was only novelty wearing off.</p>
+    <p>The concept was tested and presented to product, but it wasn't picked up. If it was shipped, here are the metrics I would measure.</p>
   </div>
-  <figure class="rv d2">
-    <svg class="dg" viewBox="0 0 760 260" role="img"
-         aria-label="Two metrics. One, reveal rate, reveals divided by tiles viewed, rules out that nobody engages. Two, play after reveal, plays divided by reveals, rules out that the tile is only a fidget toy.">
-      <text class="mi" x="22" y="26">WHAT A REAL TEST WOULD INSTRUMENT</text>
-
-      <rect class="bx" x="20" y="48" width="350" height="190"/>
-      <text class="mi ac" x="38" y="80">01</text>
-      <text class="mt" x="38" y="110">Reveal rate</text>
-      <text class="lb" x="38" y="134">reveals &#247; tiles viewed</text>
-      <path class="ln" d="M38 152H352"/>
-      <text class="mi ac" x="38" y="176">RULES OUT</text>
-      <text class="lb" x="38" y="198">Nobody engages. A low rate means the</text>
-      <text class="lb" x="38" y="216">descriptor never earned the look.</text>
-
-      <rect class="bx" x="390" y="48" width="350" height="190"/>
-      <text class="mi ac" x="408" y="80">02</text>
-      <text class="mt" x="408" y="110">Play after reveal</text>
-      <text class="lb" x="408" y="134">plays &#247; reveals</text>
-      <path class="ln" d="M408 152H722"/>
-      <text class="mi ac" x="408" y="176">RULES OUT</text>
-      <text class="lb" x="408" y="198">A fidget toy. Plenty of reveals with</text>
-      <text class="lb" x="408" y="216">few plays means they flip, not watch.</text>
-    </svg>
-    <figcaption>The two that would decide it. Reveal rate is also the novelty check &mdash; read it
-      again in week four and see whether it held.</figcaption>
+  <figure class="findings results-metrics rv d2">
+    <ul class="stats">
+      <li class="result-metric">
+        <div class="metric-equation">
+          <b>Reveal Rate</b>
+          <span class="fraction" aria-label="reveals divided by tiles viewed">
+            <span class="numerator">reveals</span>
+            <span class="denominator">tiles viewed</span>
+          </span>
+        </div>
+        <p class="metric-question">Did the clue earn a click?</p>
+      </li>
+      <li class="result-metric">
+        <div class="metric-equation">
+          <b>Play After Reveal</b>
+          <span class="fraction" aria-label="plays divided by reveals">
+            <span class="numerator">plays</span>
+            <span class="denominator">reveals</span>
+          </span>
+        </div>
+        <p class="metric-question">Did the click earn a play?</p>
+      </li>
+    </ul>
   </figure>
   <div class="stack rv d2">
-    <p>None of this is a number I could collect alone. It means working with engineering to instrument the rail &mdash; the reveal, the play, the session window &mdash; and agreeing up front what each result would license us to do, so the readout ends in a decision instead of a debate.</p>
-    <p>And the decision isn't only ship or kill. If reveal rate opens strong and decays, the honest answer may be that this was never an always-on rail: it's a mechanic for themed takeovers. A Superman takeover of the app gets a Surprise rail for its two weeks and then it goes away &mdash; spent deliberately, before the novelty runs out on its own.</p>
-    <p>Which is the actual proposal here. Not a tile &mdash; a new themed rail for Max, with the tile as its unit and the descriptor as the thing that has to be right.</p>
+    <p>I'd work with engineering to collect data for both events. Then with product to determine if we should keep the rail, modify it, or retire it.</p>
+  </div>
+  <div class="flag rv d2">
+    <p>The Surprise Rail started as an idea. Research shaped it into a scalable, page-aware system built to turn indecision into curiosity.</p>
+    <p class="links">
+      <a href="https://www.figma.com/design/7ALenAe4ALVk0Y6FBKUl74/Surprise-Tiles-Component-Idea?node-id=6006-97068" target="_blank" rel="noreferrer"><i class="ico">🔗</i><span class="lbl">Figma<span class="nav-rule" aria-hidden="true"></span></span></a>
+      <span class="sep" aria-hidden="true">|</span>
+      <a href="https://www.figma.com/proto/XVlsXuMb5tnBTed7jCXIKf/Surprise-Tiles-Component-Idea?page-id=6006%3A97068&amp;node-id=6069-227551&amp;viewport=1022%2C366%2C0.04&amp;t=fJQsBq8Ro4YMNmMp-1&amp;scaling=contain&amp;content-scaling=fixed&amp;starting-point-node-id=6069%3A227551&amp;show-proto-sidebar=1" target="_blank" rel="noreferrer"><i class="ico">🔗</i><span class="lbl">Prototype<span class="nav-rule" aria-hidden="true"></span></span></a>
+    </p>
   </div>
 </section>
 
