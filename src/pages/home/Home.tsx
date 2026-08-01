@@ -11,8 +11,7 @@ import { attachUnderlineWipe, prefersReducedMotion } from "./interactions.js";
 import { journals } from "./journals.js";
 
 // Matches the link the global Header already uses. public/docs also holds
-// Resume_2026.pdf and "New Grad 2026 Resume.pdf" — switch here if this is stale.
-const RESUME_URL = "/docs/Pranavi_Lakshminarayanan_AI_Product_Resume.pdf";
+const RESUME_URL = "/docs/Pranavi_Lakshminarayanan_Resume_2026.pdf";
 
 // public/about/"Profile picture.png" — space encoded for the URL.
 const PORTRAIT = "/about/Profile%20picture.png";

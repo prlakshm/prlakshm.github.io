@@ -487,6 +487,10 @@ function Journal({ journal, index }: Props) {
     "--joffset": `${offsetY}px`,
     "--jrot": `${rotate}deg`,
     "--ji": index,
+    /* The cover's alpha box, so CSS can lay the shelf out by the BOOKS rather
+       than by their picture frames — see the negative margins on .jr. */
+    "--hx0": hit.x0,
+    "--hx1": hit.x1,
   } as React.CSSProperties;
 
   /* Decorative in full: every word in here is either already in the link's

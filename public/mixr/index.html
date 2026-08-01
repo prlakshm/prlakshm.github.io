@@ -194,6 +194,17 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
   padding-left:16px;position:relative}
 .vs li::before{content:"";position:absolute;left:0;top:.62em;width:7px;height:1px;background:var(--soft)}
 .vs div.pick li::before{background:var(--brass)}
+/* Lineage: the references that left a fingerprint. Same hairline grid as .vs,
+   three across; auto-fit means it collapses on its own without a breakpoint. */
+.lin{display:grid;grid-template-columns:repeat(auto-fit,minmax(198px,1fr));gap:1px;
+  background:var(--rule);border:1px solid var(--rule);margin:26px 0}
+.lin > div{background:var(--ground);padding:16px 18px;display:flex;flex-direction:column;gap:9px}
+.lin h4{margin:0;font-family:var(--fd);font-size:var(--fs-lede);font-variation-settings:"wght" 620;
+  color:var(--ink);line-height:1.2}
+.lin .gave{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.13em;
+  text-transform:uppercase;color:var(--brass)}
+.lin p{margin:0;font-family:var(--fm);font-size:var(--fs-body);line-height:1.6;
+  color:var(--body);max-width:none}
 @media (max-width:620px){.vs,.two{grid-template-columns:1fr}}
 
 /* ============ dark product panels ============ */
@@ -529,12 +540,12 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 <aside class="side">
   <div class="who">Mixr<br><span style="color:var(--soft)">Independent &middot; 2026</span></div>
   <nav class="jump" id="jump" aria-label="Sections">
-    <a href="#opportunity"><span class="n">01</span>The opportunity</a>
-    <a href="#model"><span class="n">02</span>The model</a>
-    <a href="#interactions"><span class="n">03</span>The interactions</a>
-    <a href="#build"><span class="n">04</span>The build</a>
-    <a href="#system"><span class="n">05</span>The system</a>
-    <a href="#product"><span class="n">06</span>The product</a>
+    <a href="#problem"><span class="n">01</span>Problem</a>
+    <a href="#insight"><span class="n">02</span>Insights</a>
+    <a href="#decisions"><span class="n">03</span>Decisions</a>
+    <a href="#behavior"><span class="n">04</span>Behavior</a>
+    <a href="#changed"><span class="n">05</span>What changed</a>
+    <a href="#results"><span class="n">06</span>Results</a>
   </nav>
   <div class="prog" id="prog">
     <span>READ</span>
@@ -577,13 +588,13 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 </div>
 
 <!-- 01 -->
-<section id="opportunity">
-  <div class="sechead rv"><p class="lab">01 &mdash; The opportunity</p>
-    <h2>DJing shouldn't require already feeling like a DJ.</h2></div>
+<section id="problem">
+  <div class="sechead rv"><p class="lab">01 &mdash; Problem</p>
+    <h2>DJing shouldn&rsquo;t require already feeling like a DJ.</h2></div>
+
   <div class="stack rv d1">
-    <p>I wanted to learn to DJ. I don't know music theory, I can't play an instrument, and I had never mixed a song. What I do know is how to design and how to code &mdash; so instead of buying a controller, I started building the app I wanted to learn on.</p>
-    <p>Every tool I opened was organized around a booth: EQ knobs, gain staging, cue points, beat grids, routing controls, and a vocabulary that assumes you are performing live. None of that is wrong. It is just aimed at someone who already knows the craft.</p>
-    <p>The very first brief I wrote for the project already had the whole thesis in it &mdash; a landscape iPhone app for song mashups, one large waveform timeline, effects as big colorful cards, and one instruction that everything since has been measured against: <em>as simple as CapCut, not professional DJ software.</em> The product model was five words long: song, timeline, transition, effect, export.</p>
+    <p>I wanted to learn to DJ. No music theory, no instrument, never mixed a song &mdash; so instead of buying a controller I started building the app I wanted to learn on.</p>
+    <p>Every tool I opened was organised around a booth: EQ knobs, cue points, beat grids, and a vocabulary that assumes you are already performing. None of it is wrong. It is aimed at someone who already knows the craft.</p>
   </div>
 
   <div class="vs rv d2">
@@ -613,19 +624,16 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
     <h3>The question the whole project answers</h3>
     <p>What would DJ software look like if it were designed for someone who already knows how to edit a video, but has never touched a turntable?</p>
   </div>
-
-  <div class="stack rv d2" style="margin-top:26px">
-    <p><b style="font-variation-settings:'wght' 600">What I deliberately did not build:</b> decks, a crossfader, hot cues, or per-channel EQ. Every one of them is a real DJ tool, and every one of them asks the beginner to learn the booth before they can hear a result. Cutting them was the decision that made the rest of the product possible.</p>
-  </div>
 </section>
 
 <!-- 02 -->
-<section id="model">
-  <div class="sechead rv"><p class="lab">02 &mdash; The model</p>
+<section id="insight">
+  <div class="sechead rv"><p class="lab">02 &mdash; Insights</p>
     <h2>From live performance to visual composition.</h2></div>
+
   <div class="stack rv d1">
-    <p>Somewhere in the first weeks I realized I wasn't designing a DJ app anymore. I was designing an audio editor. My design questions had quietly turned into music questions: where should one song end and another begin, how long should two songs overlap, should an echo lead into the next track or end cleanly.</p>
-    <p>That reframing is the product. The interface isn't the thing being made &mdash; the remix is. Once the timeline replaced the decks, the mental model shifted from <em>perform two songs live</em> to <em>compose a remix over time</em>, and every other decision got easier to make.</p>
+    <p>A few weeks in I realised I wasn&rsquo;t designing a DJ app. I was designing an audio editor &mdash; my design questions had quietly become music questions: where should one song end, how long should two overlap.</p>
+    <p>That reframing is the product. The interface isn&rsquo;t the thing being made. The remix is.</p>
   </div>
 
   <figure class="rv d2">
@@ -657,7 +665,29 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
   </figure>
 
   <div class="stack rv d2">
-    <p>Concretely: songs become colored waveform lanes, audio becomes draggable clips, effects become cards, sound effects become insertable assets, and the playhead is the anchor every action reads from. Transitions are measured in beats rather than seconds, because a beat is the unit the music is already counting in.</p>
+    <p>The reference set was never DJ software. It was CapCut, Final Cut Pro, Premiere Pro, DaVinci Resolve, TikTok&rsquo;s editor and GarageBand. Three of them left a fingerprint you can point at in the build.</p>
+  </div>
+
+  <figure class="lin rv d2" aria-label="Three references and what each one contributed">
+    <div>
+      <h4>CapCut</h4>
+      <span class="gave">Gave the bar</span>
+      <p>&ldquo;As simple as CapCut&rdquo; was in the first brief, and it handed over the verbs too &mdash; split, duplicate, delete, speed &mdash; already named before I designed them.</p>
+    </div>
+    <div>
+      <h4>Premiere Pro</h4>
+      <span class="gave">Gave the insert edit</span>
+      <p>Drop into a clip and it splits, the halves ripple apart, the new clip lands between. Premiere makes you ask for that with a modifier. Mixr has no mode &mdash; where you let go is the choice.</p>
+    </div>
+    <div>
+      <h4>GarageBand</h4>
+      <span class="gave">Gave the unit</span>
+      <p>A lane per source in its own colour, and time counted in the music&rsquo;s unit rather than the clock&rsquo;s. Transitions are measured in beats because seconds were already the wrong ruler.</p>
+    </div>
+  </figure>
+
+  <div class="stack rv d2">
+    <p>Concretely: songs become coloured waveform lanes, audio becomes draggable clips, effects become cards, and the playhead is the anchor every action reads from.</p>
   </div>
 
   <div class="demo rv d2">
@@ -670,93 +700,13 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 </section>
 
 <!-- 03 -->
-<section id="interactions">
-  <div class="sechead rv"><p class="lab">03 &mdash; The interactions</p>
-    <h2>The timeline should rearrange itself the way you expect.</h2></div>
+<section id="decisions">
+  <div class="sechead rv"><p class="lab">03 &mdash; Decisions</p>
+    <h2>What I left out is what made the rest possible.</h2></div>
+
   <div class="stack rv d1">
-    <p>Split, duplicate, delete, speed and drag are the whole editing language. Naming them was easy &mdash; they are the verbs a CapCut user already has. Deciding how they should <em>behave</em> took two days and was the hardest design work in the project.</p>
-    <p>The specific problem: when a clip is dropped into the middle of other clips, do the neighbors shift left or right, and at what threshold is the direction decided? I tried making the drag feel like sliding along a track. It was predictable and it felt cheap &mdash; nothing was ever picked up, it just slid. So the clip now genuinely lifts: it detaches from the lane, follows the cursor anywhere, raises above everything, and the lanes it cannot land in get a scrim.</p>
-  </div>
-
-  <div class="demo rv d2">
-    <p class="sub">Drop into a clip body</p>
-    <ol class="sb">
-      <li>
-        <div class="sb-stage">
-          <span class="sb-clip" style="--c:var(--mx-pitch);left:6%;width:40%"><i></i></span>
-          <span class="sb-clip" style="--c:var(--mx-echo);left:58%;width:32%"><i></i></span>
-        </div>
-        <b>01 &middot; Resting</b><i class="cap">Two clips, one lane.</i>
-      </li>
-      <li>
-        <div class="sb-stage">
-          <span class="sb-clip" style="--c:var(--mx-pitch);left:6%;width:40%"><i></i></span>
-          <span class="sb-clip lift" style="--c:var(--mx-echo);left:22%;width:32%"><i></i></span>
-        </div>
-        <b>02 &middot; Lifted</b><i class="cap">Detaches, scales 1.04, follows the cursor.</i>
-      </li>
-      <li>
-        <div class="sb-stage">
-          <span class="sb-clip" style="--c:var(--mx-pitch);left:6%;width:40%"><i></i></span>
-          <span class="sb-cut" style="left:26%"></span>
-          <span class="sb-clip lift" style="--c:var(--mx-echo);left:22%;width:32%"><i></i></span>
-        </div>
-        <b>03 &middot; Split previewed</b><i class="cap">The destination shows where it will cut.</i>
-      </li>
-      <li>
-        <div class="sb-stage">
-          <span class="sb-clip" style="--c:var(--mx-pitch);left:6%;width:18%"><i></i></span>
-          <span class="sb-clip" style="--c:var(--mx-echo);left:25%;width:32%"><i></i></span>
-          <span class="sb-clip" style="--c:var(--mx-pitch);left:58%;width:22%"><i></i></span>
-        </div>
-        <b>04 &middot; Sandwiched</b><i class="cap">Destination splits; the clip lands between both halves.</i>
-      </li>
-    </ol>
-    <p class="foot">Drop a clip into the body of another and Mixr splits the destination and inserts between the halves, rather than shoving it aside. It is the behavior you would expect from a layer, and it is the one interaction in the app I could not find a precedent for.</p>
-  </div>
-
-  <div class="stack rv d2">
-    <p>Predictability comes from resolving the drop in a fixed order rather than from one clever rule. Every clip carries two invisible insertion zones, 12&ndash;16&nbsp;pt in from each edge, which extend past the clip boundary on purpose so you never have to hit a one-pixel gap. Anywhere else inside the clip, intent is inferred from position: the first 40% previews <em>insert before</em>, the remaining 60% previews <em>insert after</em>. The pointer is tested against five cases in priority, and the first that matches wins:</p>
-  </div>
-
-  <ol class="ladder rv d2">
-    <li><b>Ghost restore</b><span>Released within a hair of where it started &mdash; put it back, ripple nothing.</span></li>
-    <li><b>Edge snap</b><span>Inside a neighbour's 12&ndash;16&nbsp;pt edge zone &mdash; snap flush before or after it.</span></li>
-    <li><b>Literal gap</b><span>Landed in empty space &mdash; leave it exactly where it was let go.</span></li>
-    <li class="pick"><b>Insert into body</b><span>Inside a clip, past its edge zones &mdash; split there and sandwich.</span></li>
-    <li><b>Free placement</b><span>Anything else &mdash; place it and let the lane reflow.</span></li>
-  </ol>
-
-  <div class="stack rv d2" style="margin-top:22px">
-    <p>Two details do most of the work of making that feel calm. The split point is clamped so neither half can be shorter than a minimum clip length, so you can never accidentally make a sliver. And the whole resolution sits behind a hysteresis check &mdash; if the pointer hasn't moved far enough since the last decision, the previous answer stands, so the preview doesn't flicker between two results while your hand is still.</p>
-    <p>The preview is the contract: whatever the neighbors animate to while you are dragging is exactly what happens when you let go. It took a regression to learn how much that matters. At one point the lift came out and the clip went back to sliding along the lane &mdash; still functional, still &ldquo;correct,&rdquo; and immediately worse. Getting it back was a whole task of its own.</p>
-    <p>Could I have found most of this by opening a video editor and copying it? Absolutely. That is what competitive analysis is for, and I got there the long way.</p>
-  </div>
-</section>
-
-<!-- 04 -->
-<section id="build">
-  <div class="sechead rv"><p class="lab">04 &mdash; The build</p>
-    <h2>The mockup showed where things went. The build showed whether they felt right.</h2></div>
-  <div class="stack rv d1">
-    <p>A mockup can settle structure. It cannot tell you whether a drag feels responsive, whether a glass surface survives being moved, whether a transition sounds natural, or whether two things that are mathematically aligned actually look aligned. Writing the interface in SwiftUI made those answerable the same day I asked them &mdash; which is why I treat the build as the design process rather than the step after it.</p>
-    <p>The work went in passes, and each pass had a scope I wrote down before starting. The design system came first &mdash; a single scrollable screen validating every color, type style, glass material and waveform before any of it touched a real view. Then features, then a formal visual audit of the whole app, then responsiveness.</p>
-  </div>
-
-  <ol class="phases rv d2">
-    <li class="pick"><b>Design system</b><i>Colors, type, glass and waveform, validated on their own screen first.</i></li>
-    <li><b>Timeline &amp; import</b><i>Static mock becomes real audio, real waveforms, real scrolling.</i></li>
-    <li><b>Clip editing</b><i>Split, duplicate, delete, speed, drag and drop, transitions.</i></li>
-    <li><b>Auto &amp; SFX</b><i>Arrangement engine, sound effects, the summary sheet.</i></li>
-    <li><b>Undo &amp; projects</b><i>Project-level undo/redo, multiple remixes, rename and delete.</i></li>
-    <li><b>Final touches</b><i>Party mode, app icon, alert typography, navbar grouping.</i></li>
-    <li class="pick"><b>Visual audit</b><i>A full pass judging cohesion and optical balance &mdash; report before fixes.</i></li>
-    <li><b>Responsive</b><i>iPhone, iPad and resizable windows from one layout.</i></li>
-  </ol>
-
-  <div class="stack rv d2" style="margin-top:26px">
-    <p>The rule that made those passes survivable was writing down what <em>not</em> to touch. Almost every task started with an explicit freeze list &mdash; don't change the waveform, don't change the effect cards, don't change the colors &mdash; because the failure mode of moving fast is a fix that quietly redesigns three things you were happy with.</p>
-    <p>The clearest case is the effects cards. Below is the real component, rebuilt here in CSS from the values in the app's design system. Click one.</p>
+    <p>No decks, no crossfader, no hot cues, no per-channel EQ. Every one is a real DJ tool, and every one asks the beginner to learn the booth before they can hear a result.</p>
+    <p>I built it in passes, each with a scope written down first &mdash; and, more usefully, a freeze list. Almost every task started with what <em>not</em> to touch, because the failure mode of moving fast is a fix that quietly redesigns three things you were happy with.</p>
   </div>
 
   <div class="demo rv d2">
@@ -858,20 +808,13 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
   </div>
 
   <div class="stack rv d2">
-    <p>None of those numbers came from a spec. They came from running the app, looking at the row, and deciding it was uneven &mdash; then again, and again, until it wasn't. Mathematical equality is not visual equality, and the only place to see the difference is on the device.</p>
+    <p>Professional plugins expose parameters that mean something to an engineer and nothing to a beginner, so the set stays small, named and preset-backed &mdash; one intensity each.</p>
+    <p>The red card took longest to name. Warmth described a quality rather than an action. Haze was at least picturable. It ended up Flanger &mdash; the one place I let a technical term stand, because no everyday word for it isn&rsquo;t a lie.</p>
   </div>
 
-  <div class="dec rv d2">
-    <h3 style="margin-top:36px">The play button was centred. It didn't look centred.</h3>
-    <p>For weeks the transport cluster felt slightly off. My first instinct was to nudge the play button, which was wrong &mdash; it was already dead centre. The actual cause was that the time, BPM and key sat to its right and added visual weight on that side, dragging the whole cluster's perceived centre left.</p>
-    <p>The fix was to move everything except the button: shift the entire cluster 20&ndash;30&nbsp;px right, tighten the gaps between time, BPM and key so they read as one compact metadata block, shrink the &ldquo;BPM&rdquo; and &ldquo;KEY&rdquo; labels, and pull the play button's glow radius back 10&ndash;15% because the bloom was making it read larger than it is.</p>
-    <div class="flag">
-      <p>Chosen: optical balance over equal gaps. The navbar is spaced as five groups &mdash; brand, history, playback, metadata, export &mdash; with intentional distances between them rather than one evenly spaced row. Related things sit close; unrelated things get air.</p>
-    </div>
-  </div>
-
-  <div class="stack rv d2" style="margin-top:26px">
-    <p>The segmented control for transition length has the same character. Labelling every option &ldquo;Beats&rdquo; was cluttered; removing the word entirely made the numbers meaningless. The compromise is that only the selected option says it &mdash; which means the pill cannot be a fixed width. It has to measure the chosen label and grow to it, stretching slightly as it slides so it reads as one piece of glass moving inside a recessed track.</p>
+  <div class="flag rv d2">
+    <h3>Why an audio effect is called Blur</h3>
+    <p>I borrowed the name from visual editing so a beginner can predict what it will feel like before hearing it. Someone who has never heard the phrase &ldquo;low-pass filter&rdquo; has definitely blurred a photo, and the guess they make from the word is the right one.</p>
   </div>
 
   <div class="demo rv d2">
@@ -893,14 +836,86 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
     </figure>
     <p class="foot">The same control in the app.</p>
   </div>
+
+  <div class="demo rv d2">
+    <p class="sub">Identity</p>
+    <div class="brand">
+      <img src="art/app-icon.png" alt="The Mixr app icon: a purple gradient tile with the uneven waveform mark." loading="lazy">
+      <ul class="swatches">
+        <li><span style="background:var(--mx-purple)"></span><code>#7C3AED</code></li>
+        <li><span style="background:var(--mx-pitch)"></span><code>#FF5FA2</code></li>
+        <li><span style="background:var(--mx-echo)"></span><code>#8B5CF6</code></li>
+        <li><span style="background:var(--mx-flanger)"></span><code>#EF4444</code></li>
+        <li><span style="background:var(--mx-blur)"></span><code>#EAB308</code></li>
+        <li><span style="background:var(--mx-reverb)"></span><code>#0EA5E9</code></li>
+        <li><span style="background:var(--mx-bg)"></span><code>#050816</code></li>
+      </ul>
+    </div>
+    <p class="foot">Purple is the brand; the other five are the track colors, assigned in order as songs are imported. The near-black ground is what makes six of them legible at once.</p>
+  </div>
 </section>
 
-<!-- 05 -->
-<section id="system">
-  <div class="sechead rv"><p class="lab">05 &mdash; The system</p>
-    <h2>Every visual edit needed an audible equivalent.</h2></div>
+<!-- 04 -->
+<section id="behavior">
+  <div class="sechead rv"><p class="lab">04 &mdash; Behavior</p>
+    <h2>The timeline should rearrange itself the way you expect.</h2></div>
+
   <div class="stack rv d1">
-    <p>The timeline is only honest if the sound follows it. A clip is not just a rectangle &mdash; it carries its own effect settings, and those have to take hold and let go at its boundaries, independently of the track's volume. Splitting a clip has to split its audio. Undo has to restore both the picture and the playback state, or the two drift apart and the app starts lying to you.</p>
+    <p>Split, duplicate, delete, speed and drag are the whole editing language. Naming them was easy. Deciding how they <em>behave</em> took two days and was the hardest design work in the project.</p>
+  </div>
+
+  <div class="demo rv d2">
+    <p class="sub">Drop into a clip body</p>
+    <ol class="sb">
+      <li>
+        <div class="sb-stage">
+          <span class="sb-clip" style="--c:var(--mx-pitch);left:6%;width:40%"><i></i></span>
+          <span class="sb-clip" style="--c:var(--mx-echo);left:58%;width:32%"><i></i></span>
+        </div>
+        <b>01 &middot; Resting</b><i class="cap">Two clips, one lane.</i>
+      </li>
+      <li>
+        <div class="sb-stage">
+          <span class="sb-clip" style="--c:var(--mx-pitch);left:6%;width:40%"><i></i></span>
+          <span class="sb-clip lift" style="--c:var(--mx-echo);left:22%;width:32%"><i></i></span>
+        </div>
+        <b>02 &middot; Lifted</b><i class="cap">Detaches, scales 1.04, follows the cursor.</i>
+      </li>
+      <li>
+        <div class="sb-stage">
+          <span class="sb-clip" style="--c:var(--mx-pitch);left:6%;width:40%"><i></i></span>
+          <span class="sb-cut" style="left:26%"></span>
+          <span class="sb-clip lift" style="--c:var(--mx-echo);left:22%;width:32%"><i></i></span>
+        </div>
+        <b>03 &middot; Split previewed</b><i class="cap">The destination shows where it will cut.</i>
+      </li>
+      <li>
+        <div class="sb-stage">
+          <span class="sb-clip" style="--c:var(--mx-pitch);left:6%;width:18%"><i></i></span>
+          <span class="sb-clip" style="--c:var(--mx-echo);left:25%;width:32%"><i></i></span>
+          <span class="sb-clip" style="--c:var(--mx-pitch);left:58%;width:22%"><i></i></span>
+        </div>
+        <b>04 &middot; Sandwiched</b><i class="cap">Destination splits; the clip lands between both halves.</i>
+      </li>
+    </ol>
+    <p class="foot">Drop a clip into the body of another and Mixr splits the destination and inserts between the halves, rather than shoving it aside. Video editors have done this for years &mdash; but they make you choose it first, with a modifier for insert and a plain drag for overwrite. Here there is no mode to pick.</p>
+  </div>
+
+  <div class="stack rv d2">
+    <p>Predictability comes from resolving the drop in a fixed order rather than from one clever rule. The pointer is tested against five cases in priority, and the first that matches wins.</p>
+  </div>
+
+  <ol class="ladder rv d2">
+    <li><b>Ghost restore</b><span>Released within a hair of where it started &mdash; put it back, ripple nothing.</span></li>
+    <li><b>Edge snap</b><span>Inside a neighbour's 12&ndash;16&nbsp;pt edge zone &mdash; snap flush before or after it.</span></li>
+    <li><b>Literal gap</b><span>Landed in empty space &mdash; leave it exactly where it was let go.</span></li>
+    <li class="pick"><b>Insert into body</b><span>Inside a clip, past its edge zones &mdash; split there and sandwich.</span></li>
+    <li><b>Free placement</b><span>Anything else &mdash; place it and let the lane reflow.</span></li>
+  </ol>
+
+  <div class="stack rv d2">
+    <p>The preview is the contract: whatever the neighbours animate to while you are dragging is exactly what happens when you let go.</p>
+    <p>And the timeline is only honest if the sound follows it. A clip carries its own effect settings, and they have to take hold and let go at its boundaries. Splitting a clip splits its audio. Undo restores both, or the two drift apart and the app starts lying to you.</p>
   </div>
 
   <figure class="rv d2">
@@ -921,9 +936,24 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
     </svg>
     <figcaption>Track volume lives at the mixer; per-clip effects live before it. Keeping them on separate stages is what lets you turn a track down without undoing the echo you put on one clip of it.</figcaption>
   </figure>
+</section>
 
-  <div class="stack rv d2">
-    <p>That structure also decided the effects set. Professional plugins expose parameters that mean something to an engineer and nothing to a beginner, so I kept a small number of named, preset-backed effects with one intensity each. Which ones survived changed as I built.</p>
+<!-- 05 -->
+<section id="changed">
+  <div class="sechead rv"><p class="lab">05 &mdash; What changed</p>
+    <h2>Every one of these felt right until I ran it.</h2></div>
+
+  <div class="stack rv d1">
+    <p>At one point the lift came out and the clip went back to sliding along the lane. Still functional, still &ldquo;correct,&rdquo; and immediately worse &mdash; nothing was ever picked up, it just slid. Getting the lift back was a whole task of its own.</p>
+  </div>
+
+  <div class="dec rv d2">
+    <h3 style="margin-top:36px">The play button was centred. It didn't look centred.</h3>
+    <p>For weeks the transport cluster felt slightly off. My instinct was to nudge the play button, which was wrong &mdash; it was already dead centre. The time, BPM and key sat to its right and dragged the perceived centre left.</p>
+    <p>The fix moved everything except the button: the cluster shifts 20&ndash;30&nbsp;px right, time, BPM and key tighten into one metadata block, their labels shrink, and the play glow pulls back 10&ndash;15% because the bloom made it read larger than it is.</p>
+    <div class="flag">
+      <p>Chosen: optical balance over equal gaps. The navbar is spaced as five groups &mdash; brand, history, playback, metadata, export &mdash; with intentional distances between them rather than one evenly spaced row. Related things sit close; unrelated things get air.</p>
+    </div>
   </div>
 
   <div class="demo rv d2">
@@ -935,14 +965,24 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
   </div>
 
   <div class="stack rv d2">
-    <p>The red card took the longest to name. It started as Warmth, which describes a quality rather than an action. It became Haze, which is at least a thing you can picture &mdash; stage haze, club fog &mdash; and I explicitly kept it red rather than moving it to teal, because teal sat too close to Reverb and weakened the color rhythm across the row. It ended up as Flanger.</p>
-    <p>That is the one place I let a technical term stand. Flanger has no everyday equivalent that isn't a lie, and a beginner who tries it once learns the word from the sound rather than the other way round. Everywhere a plain word existed, I used it.</p>
+    <p>Auto&rsquo;s first version applied effect presets across a whole track. That is decorating, not arranging, and it produced remixes that sounded processed rather than edited. It was rebuilt to do what a person would do: split, trim, duplicate, move and overlap real clips on the real timeline.</p>
   </div>
 
   <div class="flag rv d2">
-    <h3>Why an audio effect is called Blur</h3>
-    <p>I borrowed the name from visual editing so a beginner can predict what it will feel like before hearing it. Someone who has never heard the phrase &ldquo;low-pass filter&rdquo; has definitely blurred a photo, and the guess they make from the word is the right one.</p>
+    <h3>The line that fixed Auto</h3>
+    <p>Preservation is a constraint, not the objective. An Auto remix that only makes one safe change is a failure even though it broke nothing &mdash; and sound effects alone do not count as a transformation. It has to feel intentionally edited in several places, or it hasn't done the job.</p>
   </div>
+
+  <div class="flag rv d2">
+    <h3>The rule Auto is built against</h3>
+    <p>Everything Auto creates has to be something you can see, edit and undo. It writes ordinary clips and ordinary transitions onto the same timeline you edit by hand &mdash; nothing it makes is a special object you are locked out of, and the whole run collapses into a single undo.</p>
+  </div>
+</section>
+
+<!-- 06 -->
+<section id="results">
+  <div class="sechead rv"><p class="lab">06 &mdash; Results</p>
+    <h2>Built, not finished.</h2></div>
 
   <div class="status rv d2">
     <div>
@@ -971,52 +1011,10 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
       </ul>
     </div>
   </div>
-</section>
-
-<!-- 06 -->
-<section id="product">
-  <div class="sechead rv"><p class="lab">06 &mdash; The product</p>
-    <h2>Automation as a starting point, not a final answer.</h2></div>
-  <div class="stack rv d1">
-    <p>Auto is the feature a beginner needs most and the one most likely to take the project away from them. The first version was the lazy version: apply effect presets across a whole track. That is not arranging, it is decorating, and it produced remixes that sounded processed rather than edited.</p>
-    <p>So Auto was rebuilt to do what a person would do &mdash; make clip-level edits on the real timeline. It splits, trims, duplicates, moves and overlaps actual clips, builds blend sections between songs, and applies settings per clip rather than per track. It runs at a scope you choose: one selected clip, the clips under the playhead, or the entire project.</p>
-    <p>The strategy changes with how much you gave it. One song is treated as a remix and stays preservation-first &mdash; it keeps the track recognisable. Two or more is a mashup, built from slot templates that differ for two, three, four and more songs, because &ldquo;how often should it alternate&rdquo; has a different answer at each size.</p>
-  </div>
-
-  <div class="flag rv d2">
-    <h3>The line that fixed Auto</h3>
-    <p>Preservation is a constraint, not the objective. An Auto remix that only makes one safe change is a failure even though it broke nothing &mdash; and sound effects alone do not count as a transformation. It has to feel intentionally edited in several places, or it hasn't done the job.</p>
-  </div>
-
-  <div class="flag rv d2">
-    <h3>The rule Auto is built against</h3>
-    <p>Everything Auto creates has to be something you can see, edit and undo. It writes ordinary clips and ordinary transitions onto the same timeline you edit by hand &mdash; nothing it makes is a special object you are locked out of, and the whole run collapses into a single undo.</p>
-  </div>
 
   <div class="stack rv d2">
-    <p>The identity had to carry the same idea: expressive enough to feel like a creative tool, dark enough that six saturated track colors stay legible on top of it. The mark is the app's own waveform &mdash; uneven bar heights, the way a real signal is, because a symmetrical one reads as a logo of music rather than a picture of your song.</p>
-  </div>
-
-  <div class="demo rv d2">
-    <p class="sub">Identity</p>
-    <div class="brand">
-      <img src="art/app-icon.png" alt="The Mixr app icon: a purple gradient tile with the uneven waveform mark." loading="lazy">
-      <ul class="swatches">
-        <li><span style="background:var(--mx-purple)"></span><code>#7C3AED</code></li>
-        <li><span style="background:var(--mx-pitch)"></span><code>#FF5FA2</code></li>
-        <li><span style="background:var(--mx-echo)"></span><code>#8B5CF6</code></li>
-        <li><span style="background:var(--mx-flanger)"></span><code>#EF4444</code></li>
-        <li><span style="background:var(--mx-blur)"></span><code>#EAB308</code></li>
-        <li><span style="background:var(--mx-reverb)"></span><code>#0EA5E9</code></li>
-        <li><span style="background:var(--mx-bg)"></span><code>#050816</code></li>
-      </ul>
-    </div>
-    <p class="foot">Purple is the brand; the other five are the track colors, assigned in order as songs are imported. The near-black ground is what makes six of them legible at once.</p>
-  </div>
-
-  <div class="stack rv d2" style="margin-top:30px">
-    <p>The last two passes were the unglamorous ones. I made the whole app responsive &mdash; one layout that holds on iPhone, iPad and a resizable Mac window, rather than a phone layout stretched until it breaks. Before starting that, I ran a full visual audit of every screen: a written report on cohesion, hierarchy, optical balance and state consistency, with no code changed until I had read it. Auditing first is what stopped the responsive work from quietly becoming a redesign.</p>
-    <p>Right now I'm waiting to be accepted into the Apple Developer Program so I can put a beta in people's hands. That is the next real test &mdash; everything above is a designer judging a tool built for beginners, and beginners have not used it yet.</p>
+    <p>The last two passes were the unglamorous ones: one layout that holds on iPhone, iPad and a resizable Mac window, and before it a full visual audit &mdash; a written report on cohesion, hierarchy and optical balance, with no code changed until I had read it. Auditing first is what stopped the responsive work quietly becoming a redesign.</p>
+    <p>Now I&rsquo;m waiting on the Apple Developer Program so I can put a beta in people&rsquo;s hands. That is the next real test &mdash; everything above is a designer judging a tool built for beginners, and beginners have not used it yet.</p>
   </div>
 
   <form class="beta rv d2" id="beta" novalidate>

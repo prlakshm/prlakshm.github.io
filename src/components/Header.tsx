@@ -125,7 +125,7 @@ function Header() {
             About
           </a>
           <a
-            href="/docs/Pranavi_Lakshminarayanan_AI_Product_Resume.pdf"
+            href="/docs/Pranavi_Lakshminarayanan_Resume_2026.pdf"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -149,7 +149,7 @@ function Header() {
             About
           </a>
           <a
-            href="/docs/Pranavi_Lakshminarayanan_AI_Product_Resume.pdf"
+            href="/docs/Pranavi_Lakshminarayanan_Resume_2026.pdf"
             target="_blank"
             rel="noopener noreferrer"
           >

@@ -61,8 +61,12 @@
 /* The archive runs one minor grid column (32px) wider than its siblings — 16px
    proud on each side. That whole 32px is handed to the gap between the denim
    and the textiles (see .archive-stage), so the fabrics keep their size and
-   only the breathing room changes. */
-.archive {
+   only the breathing room changes.
+   The shelf matches it so the outer notebooks land on exactly the line the
+   pocket starts from. On the narrower column they stopped 16px short of it at
+   both ends, which read as the row not quite reaching the page's edges. */
+.archive,
+.shelf {
   max-width: calc(var(--page-max) + var(--grid-minor-step));
 }
 
@@ -530,12 +534,23 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  /* An optical nudge on top of the geometry. The row measures dead centre —
+     books flush to the pocket's line at both ends — but reads a touch left, so
+     this buys back 8px by eye. `left`, not `transform`: a transform here would
+     become the containing block for anything fixed inside it.
+     Adjust this, not the alignment above. */
+  position: relative;
+  left: 8px;
   display: flex;
   /* Notebooks share one baseline — see .jr-img, anchored to the stage floor. */
   align-items: flex-end;
-  justify-content: center;
-  /* Wide lanes so splayed artifacts never collide between neighbours. */
-  gap: clamp(18px, 2.8vw, 48px);
+  /* Books flush to the page's own left and right lines — the same column the
+     hero and the archive sit in — with the slack split evenly between them.
+     Only works because .jr below trims its transparent margins out of the
+     layout, so "flush" means the BOOK, not its picture frame. */
+  justify-content: space-between;
+  /* A floor, not the spacing: space-between hands out the free space. */
+  gap: 24px;
   min-height: 672px;
 }
 
@@ -543,6 +558,17 @@
   position: relative;
   width: var(--jw);
   flex-shrink: 0;
+  /* Pull the cover's transparent margins out of the layout box.
+     Every cover PNG frames its book differently — Mixr's sits left with the
+     fanned pages filling the right, Surprise Rail's sits near centre — so
+     laying the row out by picture frames spaced the BOOKS unevenly: 137px
+     between the first two and 213px between the last two, a 76px difference
+     you could see. Negative margins of exactly the transparent margin make the
+     layout box the book itself, and then even spacing really is even.
+     --hx0/--hx1 are the cover's alpha box, written per journal by Journal.tsx
+     from the same `hit` values the hover release uses. */
+  margin-left: calc(var(--jw) * var(--hx0) * -1);
+  margin-right: calc(var(--jw) * (1 - var(--hx1)) * -1);
   --splay: 1;
   transform: translateY(var(--joffset));
   opacity: 0;
@@ -592,7 +618,11 @@
   --label-indent: 25px;
   position: absolute;
   bottom: calc(100cqw * var(--cover-lift) + var(--lead-h) + 31px);
-  left: 50%;
+  /* Centred on the BOOK, not on its picture frame. Each cover sits differently
+     inside its PNG, so plain 50% put Mixr's label 27px right of its notebook
+     and Pinnables' 21px left of its own. --hx0/--hx1 are the cover's alpha box;
+     their midpoint less 0.5 is how far the book's centre is off the frame's. */
+  left: calc(50% + ((var(--hx0) + var(--hx1)) / 2 - 0.5) * var(--jw));
   z-index: 4;
   /* Shrink-to-fit, capped. The cap is the longest kicker on the shelf
      ("02 REASONS TO WATCH · HBO MAX" needs ~282px with the number column) so
@@ -711,22 +741,28 @@
    ruled — while every line still lands on its own notebook. */
 .jr[data-journal="surprise-rail"] .jr-annotation {
   --cover-lift: 1.076;
-  --lead-h: 62px;
+  --lead-h: 36px;
+}
+
+/* Its own optical nudge, on top of the row's. Mixr's book is the widest of the
+   three, so even spacing measured edge to edge leaves it reading a hair left of
+   where the eye wants it. The label rides along, since it is positioned inside
+   this box. */
+.jr[data-journal="mixr"] {
+  left: 4px;
 }
 
 .jr[data-journal="mixr"] .jr-annotation {
   --cover-lift: 0.947;
-  --lead-h: 27px;
+  --lead-h: 20px;
 }
 
-/* The longest rule on the shelf, and that is the photograph's doing: the red
-   notebook's PNG carries ~11% transparent headroom against ~4% for the other
-   two, so its cover starts lower and the line has further to travel.
-   --cover-lift belongs to the PNG, not the project — it stays as measured for
-   as long as Pinnables borrows the red placeholder cover. */
+/* --cover-lift belongs to the artwork, not the project: it is the alpha box of
+   pinnables-closed.webp, measured by scripts/pinnables_notebook/cutout.py.
+   Re-run that and update this if the cover is ever replaced. */
 .jr[data-journal="pinnables"] .jr-annotation {
-  --cover-lift: 0.943;
-  --lead-h: 87px;
+  --cover-lift: 1.018;
+  --lead-h: 25px;
 }
 
 .jr-stage {
@@ -1418,9 +1454,19 @@
     /* Half-row width so exactly two fit; the third wraps and centers. */
     width: min(var(--jw), calc((100% - 24px) / 2));
     max-width: 340px;
+    /* No margin trimming once the row wraps: the compensation is measured
+       against --jw, and the width above is no longer --jw, so it would pull by
+       the wrong amount. Centred boxes are fine at this size anyway. */
+    margin-inline: 0;
     transform: translateY(calc(var(--joffset) * 0.5));
     --splay: 0.55;
   }
+  /* Same reason as the margins above: --jw is no longer the rendered width, so
+     the book-centre offset would push the label the wrong way. */
+  .jr-annotation {
+    left: 50%;
+  }
+
   /* The row drops its min-height here, so the slack the notes were hanging in
      on desktop is gone — without this the first note climbs into the hero's
      contact row. Each journal carries its own headroom instead. */

@@ -183,7 +183,7 @@ export const journals: Journal[] = [
         rotate: 4,
       },
       {
-        note: "DJ software is powerful and intimidating. It doesn't have to be.",
+        note: "DJ software can be intimidating. It doesn't have to be.",
         cx: -0.275,
         cy: 0.055,
         cw: 0.24,
@@ -210,27 +210,28 @@ export const journals: Journal[] = [
     /* No `href` yet, which is what makes the notebook inert and the tooltip
        read IN PROGRESS. Fill it in when there is something to point at. */
     descriptor: "MCP · AI CODING AGENTS",
-    annotation: "Pinning components across pages for AI coding agents.",
-    /* Placeholder art: the UNSTICKERED red notebook, copied out of
-       scripts/red_notebook/base/ — /home/journals/red-*.png is the same shot
-       with the Reasons to Watch stickers composited on and must not be used
-       here. Both files share one silhouette, so the trims and --cover-lift
-       below are the measured values for either; re-measure when Pinnables gets
-       a cover of its own. */
-    closed: "/home/journals/red-plain-closed.png",
-    hit: { x0: 0.1755, x1: 0.844, y0: 0.1129, y1: 0.8729 },
-    open: "/home/journals/red-plain-open.png",
-    trimClosed: "12.71%",
-    trimOpen: "15.43%",
+    annotation: "Pinning components to annotate for coding agents.",
+    /* WebP rather than PNG like its neighbours: these frames arrive at twice
+       their resolution, and WebP keeps all of it for a third of the weight
+       (239KB against the ~590KB the smaller PNGs cost).
+       The closed cover comes from an export that already carried its own alpha;
+       the open one is still keyed off a black backdrop by
+       scripts/pinnables_notebook/cutout.py. Every number below is measured from
+       that script's output — re-run it if either frame is replaced. */
+    closed: "/home/journals/pinnables-closed.webp",
+    hit: { x0: 0.1212, x1: 0.9002, y0: 0.0813, y1: 0.8959 },
+    open: "/home/journals/pinnables-open.webp",
+    trimClosed: "10.41%",
+    trimOpen: "16.34%",
     alt:
-      "A plain red leather journal, standing in for the Pinnables project until its cover is made.",
-    /* Wider than it looks it should be, and deliberately. The red PNG carries
-       ~11% transparent headroom against ~4% for the tan one, so at a matched
-       box width its book renders visibly shorter than its neighbours. The
-       notebooks share a baseline, so height is what the eye compares:
-       visible height = --cover-lift x width, and 0.943 x 478 = 451px puts it
-       level with Surprise Rail (454) and Mixr (455). */
-    width: 478,
+      "A dark red leather journal with pinnables, pushpin and MCP stickers, stuffed with loose pages.",
+    /* The notebooks share a baseline, so height is what the eye compares, and
+       visible height = --cover-lift x width. 1.018 x 463 = 471px — a touch
+       taller than Surprise Rail (464) and Mixr (463) on purpose: at a matched
+       height this cover read a shade small next to them. The open frame is re-framed by the
+       cutout script to the same lift, so the book does not change size when
+       the two covers cross-fade. */
+    width: 463,
     offsetY: 0,
     rotate: 1.8,
     /* One note, dead centre. There is no prototype to show yet, and a single
