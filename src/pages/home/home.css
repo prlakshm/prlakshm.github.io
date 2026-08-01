@@ -530,28 +530,50 @@
   padding-block: clamp(12px, 2vh, 24px) clamp(80px, 14vh, 176px);
 }
 
+/* Three books, three different anchors — which is why this is a grid and not a
+   flex row handing out space evenly:
+
+     · Surprise Rail is flush to the LEFT edge, the line the denim pocket starts
+       from further down the page.
+     · Mixr is centred on the SCREEN. The outer 1fr columns are equal and this
+       container is symmetric in the viewport, so the middle column's centre is
+       the viewport's centre.
+     · Pinnables is flush to the RIGHT edge, where the fabric row ends.
+
+   The gaps that fall out are therefore uneven, and that is the point: each book
+   is answering to its own landmark rather than to its neighbours.
+   All of it depends on .jr below trimming its transparent margins out of the
+   layout, so "flush" and "centred" mean the BOOK, not its picture frame. */
 .shelf-row {
   list-style: none;
   margin: 0;
   padding: 0;
-  /* An optical nudge on top of the geometry. The row measures dead centre —
-     books flush to the pocket's line at both ends — but reads a touch left, so
-     this buys back 8px by eye. `left`, not `transform`: a transform here would
-     become the containing block for anything fixed inside it.
-     Adjust this, not the alignment above. */
+  /* An optical shift on the whole row, applied on top of the anchoring below —
+     so all three keep their relationship to each other and to their landmarks,
+     and the shelf simply sits this far right of them. `left`, not `transform`:
+     a transform here would become the containing block for anything fixed
+     inside it. Nudge this, not the anchors. */
   position: relative;
-  left: 8px;
-  display: flex;
+  left: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   /* Notebooks share one baseline — see .jr-img, anchored to the stage floor. */
-  align-items: flex-end;
-  /* Books flush to the page's own left and right lines — the same column the
-     hero and the archive sit in — with the slack split evenly between them.
-     Only works because .jr below trims its transparent margins out of the
-     layout, so "flush" means the BOOK, not its picture frame. */
-  justify-content: space-between;
-  /* A floor, not the spacing: space-between hands out the free space. */
+  align-items: end;
+  /* A floor between columns; the 1fr tracks do the real spacing. */
   gap: 24px;
   min-height: 672px;
+}
+
+.shelf-row > .jr:first-child {
+  justify-self: start;
+}
+
+.shelf-row > .jr:nth-child(2) {
+  justify-self: center;
+}
+
+.shelf-row > .jr:last-child {
+  justify-self: end;
 }
 
 .jr {
@@ -617,7 +639,12 @@
      advances 0.6em, so 3 chars x 14px x 0.6 = 25.2. Retune if the size does. */
   --label-indent: 25px;
   position: absolute;
-  bottom: calc(100cqw * var(--cover-lift) + var(--lead-h) + 31px);
+  /* --label-drop lowers a label without shortening its dotted rule. --lead-h
+     does both at once, which is fine until a label needs to come down further
+     than its rule can afford to lose. */
+  bottom: calc(
+    100cqw * var(--cover-lift) + var(--lead-h) + 31px - var(--label-drop, 0px)
+  );
   /* Centred on the BOOK, not on its picture frame. Each cover sits differently
      inside its PNG, so plain 50% put Mixr's label 27px right of its notebook
      and Pinnables' 21px left of its own. --hx0/--hx1 are the cover's alpha box;
@@ -739,17 +766,26 @@
    variable: it lengthens the rule AND lifts the note by the same amount, so
    the three labels sit at slightly different heights — hand-placed, not
    ruled — while every line still lands on its own notebook. */
+/* Mixr keeps a small optical nudge of its own on top of the row's — the only
+   one left, since the other two are pinned to landmarks that a nudge would pull
+   them off. This one is centred on the screen, which is a line the eye judges
+   rather than measures. */
+.jr[data-journal="mixr"] {
+  left: -4px;
+}
+
+/* The red cover has more optical mass than its alpha bounds imply. Its source
+   width is reduced in journals.ts; this final desktop-only nudge restores the
+   right-side rhythm without disturbing the wrapped tablet/mobile shelf. */
+@media (min-width: 1024px) {
+  .jr[data-journal="pinnables"] {
+    left: 12px;
+  }
+}
+
 .jr[data-journal="surprise-rail"] .jr-annotation {
   --cover-lift: 1.076;
   --lead-h: 36px;
-}
-
-/* Its own optical nudge, on top of the row's. Mixr's book is the widest of the
-   three, so even spacing measured edge to edge leaves it reading a hair left of
-   where the eye wants it. The label rides along, since it is positioned inside
-   this box. */
-.jr[data-journal="mixr"] {
-  left: 4px;
 }
 
 .jr[data-journal="mixr"] .jr-annotation {
@@ -762,7 +798,14 @@
    Re-run that and update this if the cover is ever replaced. */
 .jr[data-journal="pinnables"] .jr-annotation {
   --cover-lift: 1.018;
-  --lead-h: 25px;
+  --lead-h: 11px;
+  /* Its copy runs to three lines against Surprise Rail's two, so an equal
+     footing floated the block's top well above its neighbour's. Dropped until
+     the two heading lines sit on one line across the shelf — the tops, since
+     that is where both labels start reading.
+     A drop rather than less --lead-h: the rule is already short, and --lead-h
+     would take the same amount off it. */
+  --label-drop: 19px;
 }
 
 .jr-stage {
@@ -791,6 +834,14 @@
 
 .jr-img--open {
   opacity: 0;
+}
+
+/* The open export is intentionally only 3% smaller than its earlier treatment.
+   The left offset keeps its visible alpha centre aligned with the closed cover
+   even though the two source files carry slightly different transparent crop. */
+.jr[data-journal="pinnables"] .jr-img--open {
+  left: 1.5463%;
+  width: 97%;
 }
 
 .jr-shadow {
@@ -1442,8 +1493,11 @@
     margin-top: 20px;
   }
 
-  /* Two notebooks on the first row, the third centered on the second. */
+  /* Two notebooks on the first row, the third centered on the second. Back to
+     flex here: the desktop grid pins each book to a landmark, and none of those
+     landmarks survive the row wrapping. */
   .shelf-row {
+    display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: flex-end;

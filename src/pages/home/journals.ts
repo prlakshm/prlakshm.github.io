@@ -57,7 +57,11 @@ export type Journal = {
   /** Transparent padding below the notebook in each source PNG, as a % of the
    *  image's own height. Applied as translateY so every notebook's *content*
    *  bottom lands on one baseline, and so the cover does not jump when the
-   *  closed and open frames cross-fade. Measured from the alpha bounding box. */
+   *  closed and open frames cross-fade. Measured from the alpha bounding box —
+   *  though `trimOpen` may be pushed past the measured value on purpose: with
+   *  the bottom pinned, every bit of extra height in an open frame escapes
+   *  upward, and a frame that grows a lot on hover reads as the notebook
+   *  leaping up the page rather than opening. */
   trimClosed: string;
   trimOpen: string;
   alt: string;
@@ -222,16 +226,15 @@ export const journals: Journal[] = [
     hit: { x0: 0.1212, x1: 0.9002, y0: 0.0813, y1: 0.8959 },
     open: "/home/journals/pinnables-open.webp",
     trimClosed: "10.41%",
-    trimOpen: "16.34%",
+    trimOpen: "18.90%",
     alt:
       "A dark red leather journal with pinnables, pushpin and MCP stickers, stuffed with loose pages.",
-    /* The notebooks share a baseline, so height is what the eye compares, and
-       visible height = --cover-lift x width. 1.018 x 463 = 471px — a touch
-       taller than Surprise Rail (464) and Mixr (463) on purpose: at a matched
-       height this cover read a shade small next to them. The open frame is re-framed by the
-       cutout script to the same lift, so the book does not change size when
-       the two covers cross-fade. */
-    width: 463,
+    /* The notebooks share a baseline, so height is what the eye compares.
+       Pinnables' saturated red cover and cleaner silhouette give it more
+       visual weight than its measured bounds suggest; rendering it 3% smaller
+       balances it optically with Surprise Rail and Mixr. The open export is
+       reduced by another 3% in home.css and re-centered within this frame. */
+    width: 449,
     offsetY: 0,
     rotate: 1.8,
     /* One note, dead centre. There is no prototype to show yet, and a single
