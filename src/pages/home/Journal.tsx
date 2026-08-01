@@ -95,9 +95,17 @@ function Journal({ journal, index }: Props) {
       layer.querySelectorAll<HTMLElement>(".jr-spill-item")
     );
 
-    // Touch has no hover, which matches the mobile CSS. Checked live so a
-    // resize is picked up.
-    const isTouchLayout = () => window.matchMedia("(max-width: 767px)").matches;
+    /* No spill without a real hover. Gated on the POINTER, not the width: a
+       tablet, a foldable, or a phone in landscape is wider than the phone
+       breakpoint and still cannot hover, and on those a tap fired pointerenter,
+       opened the whole overlay, and left it up until the user tapped something
+       else — with the notebook wobbling under the tap because it is also a
+       link. Width is still checked because a narrow desktop window hides the
+       layer in CSS, and JS must not open something invisible.
+       Checked live so a resize or a device change is picked up. */
+    const isTouchLayout = () =>
+      window.matchMedia("(max-width: 767px)").matches ||
+      !window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const isReduced = () =>
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 

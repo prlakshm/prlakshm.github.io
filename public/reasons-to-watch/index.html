@@ -82,8 +82,14 @@ body>.shell{position:relative;z-index:1}
 .ext-arrow{width:12.5px;height:12.5px;flex:none}
 
 /* Feathered paper wash — grid layer below, wash above grid, text above wash. */
-:is(.jump,.prog,.wt-nav-inner),main{position:relative;isolation:isolate}
-:is(.jump,.prog,.wt-nav-inner)::before,main::before{content:"";position:absolute;z-index:-1;inset:clamp(-89.6px,-9.8%,-44.8px) clamp(-67.2px,-8.4%,-33.6px);pointer-events:none;background:color-mix(in srgb,var(--ground) 50%,transparent);mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);mask-composite:intersect;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);-webkit-mask-composite:source-in}
+:is(.jump,.prog),main{position:relative;isolation:isolate}
+/* The nav is out of the wash. It used to sit at the top of the page where the
+   wash just blended into the paper; now that it actually sticks and slides back
+   over content, that same panel reads as a slab moving across the page. Bare is
+   better here. It also drops the wash's -67.2px side bleed, which was the whole
+   reason body needed overflow-x:clip. */
+.wt-nav-inner{position:relative;isolation:isolate}
+:is(.jump,.prog)::before,main::before{content:"";position:absolute;z-index:-1;inset:clamp(-89.6px,-9.8%,-44.8px) clamp(-67.2px,-8.4%,-33.6px);pointer-events:none;background:color-mix(in srgb,var(--ground) 50%,transparent);mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);mask-composite:intersect;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);-webkit-mask-composite:source-in}
 /* Keep the wash's top and side bleed without turning its bottom bleed into scroll. */
 main::before{bottom:0}
 
@@ -559,7 +565,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 
 <!-- ================= SIDEBAR ================= -->
 <aside class="side">
-  <div class="who">Reasons&nbsp;to&nbsp;Watch<br><span style="color:var(--soft)">HBO Max &middot; 2025</span></div>
+  <div class="who">Reasons&nbsp;to&nbsp;Watch<br><span>HBO Max &middot; 2025</span></div>
   <nav class="jump" id="jump" aria-label="Sections">
     <a href="#problem"><span class="n">01</span>Problem</a>
     <a href="#insight"><span class="n">02</span>Insight</a>

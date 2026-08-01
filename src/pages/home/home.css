@@ -857,6 +857,16 @@
     opacity var(--dur-leave) var(--ease-settle);
 }
 
+/* No hover, no spill — at ANY width. A tablet or a phone in landscape is wider
+   than the phone breakpoint and still cannot hover, and there a tap opened the
+   whole overlay and left it up until the user tapped elsewhere. The width-based
+   rule further down stays for narrow desktop windows, which can hover. */
+@media (hover: none), (pointer: coarse) {
+  .jr-spill {
+    display: none;
+  }
+}
+
 /* --- Spill overlay ------------------------------------------------------- */
 /* Rendered through a portal on <body> (see Journal.tsx), so none of the shelf's
    stacking applies and it can sit over the sticky nav.
@@ -1617,9 +1627,9 @@
     transform: rotate(var(--jrot));
   }
 
-  /* Touch has no hover: the notebook stays closed and nothing spills. The JS
-     already refuses to open below this breakpoint; this is the belt to that
-     brace, and it also covers a desktop window dragged narrow mid-spill. */
+  /* The notebook stays closed and nothing spills. The JS already refuses to
+     open at this width; this is the belt to that brace, and it also covers a
+     desktop window dragged narrow mid-spill. */
   .jr-spill,
   .scrap-tooltip,
   .jr-img--open {

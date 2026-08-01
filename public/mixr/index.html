@@ -83,8 +83,14 @@ body>.shell{position:relative;z-index:1}
 .ext-arrow{width:12.5px;height:12.5px;flex:none}
 
 /* Feathered paper wash */
-:is(.jump,.prog,.wt-nav-inner),main{position:relative;isolation:isolate}
-:is(.jump,.prog,.wt-nav-inner)::before,main::before{content:"";position:absolute;z-index:-1;inset:clamp(-89.6px,-9.8%,-44.8px) clamp(-67.2px,-8.4%,-33.6px);pointer-events:none;background:color-mix(in srgb,var(--ground) 50%,transparent);mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);mask-composite:intersect;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);-webkit-mask-composite:source-in}
+:is(.jump,.prog),main{position:relative;isolation:isolate}
+/* The nav is out of the wash. It used to sit at the top of the page where the
+   wash just blended into the paper; now that it actually sticks and slides back
+   over content, that same panel reads as a slab moving across the page. Bare is
+   better here. It also drops the wash's -67.2px side bleed, which was the whole
+   reason body needed overflow-x:clip. */
+.wt-nav-inner{position:relative;isolation:isolate}
+:is(.jump,.prog)::before,main::before{content:"";position:absolute;z-index:-1;inset:clamp(-89.6px,-9.8%,-44.8px) clamp(-67.2px,-8.4%,-33.6px);pointer-events:none;background:color-mix(in srgb,var(--ground) 50%,transparent);mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);mask-composite:intersect;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);-webkit-mask-composite:source-in}
 main::before{bottom:0}
 
 .shell{max-width:var(--page-max);margin:0 auto;padding-inline:var(--gutter);
@@ -339,15 +345,24 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
              margin-left .682s cubic-bezier(.42,0,.58,1),
              border-color .3s ease;
   margin-left:0}
-.ec-tray.open{width:calc(var(--tw) * var(--k));margin-left:12px;
-  border-color:rgba(255,255,255,.07)}
-.ec-tray .inner{width:calc(var(--tw) * var(--k));height:100%;
+/* The 190/236 in EffectTrayMetrics are, per their own comment, the "fallback
+   width for previews / compact contexts" — the real tray is .frame(maxWidth:
+   .infinity) and fills whatever the panel has left after the focused card. JS
+   sets --tw to that measured leftover; the fallback is only the floor. */
+.ec-tray.open{width:max(calc(var(--tw) * var(--k)),var(--fill,0px));margin-left:12px;
+  /* strokeBorder(effect.color.opacity(0.30), lineWidth: 0.6) — the rim is the
+     effect's own hue, not a neutral white like the cards. */
+  border-color:color-mix(in srgb,var(--c) 30%,transparent);
+  box-shadow:0 2px 6px rgba(0,0,0,.32),
+             0 0 9px color-mix(in srgb,var(--c) 14%,transparent)}
+.ec-tray .inner{width:100%;height:100%;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:7px;padding:0 calc(12px * var(--k));
   transform:translateY(calc(3.5px * var(--k)))}   /* presetContentDownshift */
 /* sliderRowWidthFraction .75 of the tray content width */
 .ec-row{display:flex;align-items:center;gap:9px;width:75%}
-.ec-val{font-family:var(--fm);font-size:11px;color:#5c5c6a;
+.ec-zero{font-family:var(--fm);font-size:9.5px;color:#8b8b99}
+.ec-val{font-family:var(--fm);font-size:9.5px;color:#8b8b99;
   font-variant-numeric:tabular-nums;min-width:3ch;text-align:right}
 .ec-val.on{color:#f2f0ec}
 .ec-tray input[type=range]{-webkit-appearance:none;appearance:none;flex:1;
@@ -632,7 +647,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 
 <!-- ================= SIDEBAR ================= -->
 <aside class="side">
-  <div class="who">Mixr<br><span style="color:var(--soft)">Independent &middot; 2026</span></div>
+  <div class="who">Mixr &middot; iOS&nbsp;DJ&nbsp;app<br><span>Independent &middot; 2026</span></div>
   <nav class="jump" id="jump" aria-label="Sections">
     <a href="#problem"><span class="n">01</span>Problem</a>
     <a href="#insight"><span class="n">02</span>Insights</a>
@@ -654,13 +669,13 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 <header class="rv">
   <p class="lab">Case study</p>
   <h1>Designing Mixr by building it</h1>
-  <p class="lede" style="margin-top:20px">DJ software is powerful and intimidating. <br/>
-    Mixr is an iOS DJ app that turns remixing into something anyone who has edited a video already knows how to do: clips on a timeline, drag and drop, undo. I designed it and wrote it in SwiftUI, so every decision got tested in motion and sound instead of argued over a mockup.</p>
+  <p class="lede" style="margin-top:20px">DJ software can be intimidating. Mixr makes remixing easy by using familiar patterns from video editing apps. <br/>
+    Building the app was an experiment in designing by building: if I could collapse the design and engineering gap by designing as I go.</p>
   <div class="meta">
-    <div><span>Role</span><span>Solo &mdash; design &amp; engineering</span></div>
-    <div><span>Scope</span><span>Product, interaction, brand, iOS build</span></div>
-    <div><span>Built with</span><span>SwiftUI, AVAudioEngine, Cursor</span></div>
-    <div><span>Status</span><span>In progress</span></div>
+    <div><span>Role</span><span>Solo designer &amp; engineer</span></div>
+    <div><span>Scope</span><span>Product, brand, iOS engineering</span></div>
+    <div><span>Built with</span><span>SwiftUI, Claude Code, Cursor</span></div>
+    <div><span>Status</span><span>Beta testing</span></div>
   </div>
   <p class="links links--head">
     <a href="https://x.com/pranavibuilds" target="_blank" rel="noreferrer"><i class="ico">🔗</i><span class="lbl">Designing by Building on X<span class="nav-rule" aria-hidden="true"></span></span></a>
@@ -671,52 +686,28 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
   <div class="demo">
     <div class="rowlab">
       <span class="demo-title">Mixr</span>
-      <span class="hint">IMPORT &middot; ARRANGE &middot; SPLIT &middot; PLAY</span>
+      <span class="hint">IMPORT &middot; ARRANGE &middot; MIX &middot; PLAY</span>
     </div>
     <figure class="device">
-      <video src="art/hero.mp4" poster="art/hero-poster.jpg" autoplay muted loop playsinline
-             aria-label="Mixr running on iPhone: an empty timeline, importing two songs from the file picker, then splitting and dragging a clip on the timeline."></video>
+      <video src="art/editor-hero.mp4" poster="art/editor-hero-poster.jpg" autoplay muted loop playsinline
+             aria-label="Mixr running on iPhone: two songs as coloured waveform lanes on one timeline, the transport and BPM in the nav bar, and the effects row along the bottom."></video>
     </figure>
-    <p class="foot">Recorded on device. Two songs land as colored waveform lanes, then a clip is split and moved &mdash; no decks, no crossfader, no cue points. This reel is from the build at the time, so the effects row still shows Bass Boost and Pitch Up; both changed later, and section 05 covers why.</p>
+    <p class="foot">Recorded on simulator device.</p>
   </div>
 </div>
 
 <!-- 01 -->
 <section id="problem">
   <div class="sechead rv"><p class="lab">01 &mdash; Problem</p>
-    <h2>DJing shouldn&rsquo;t require already feeling like a DJ.</h2></div>
+    <h2>DJing shouldn&rsquo;t require you being a DJ.</h2></div>
 
   <div class="stack rv d1">
-    <p>I wanted to learn to DJ. No music theory, no instrument, never mixed a song &mdash; so instead of buying a controller I started building the app I wanted to learn on.</p>
-    <p>Every tool I opened was organised around a booth: EQ knobs, cue points, beat grids, and a vocabulary that assumes you are already performing. None of it is wrong. It is aimed at someone who already knows the craft.</p>
-  </div>
-
-  <div class="vs rv d2">
-    <div>
-      <h4>Traditional DJ software</h4>
-      <ul>
-        <li>EQ knobs and gain staging</li>
-        <li>Cue points and beat grids</li>
-        <li>Routing controls</li>
-        <li>Beatmatch by ear, in real time</li>
-        <li>One take, performed live</li>
-      </ul>
-    </div>
-    <div class="pick">
-      <h4>Mixr</h4>
-      <ul>
-        <li>One timeline, many lanes</li>
-        <li>Clips you drag, split and delete</li>
-        <li>A playhead you scrub</li>
-        <li>Beat-based transition lengths</li>
-        <li>Composed over time, undoable</li>
-      </ul>
-    </div>
+    <p>I wanted to learn to DJ, but I never learned music theory, played an instrument, or remixed a song. I <em>did</em> know how to code. So instead of buying a controller, I started building an app.</p>
   </div>
 
   <div class="flag rv d2">
-    <h3>The question the whole project answers</h3>
-    <p>What would DJ software look like if it were designed for someone who already knows how to edit a video, but has never touched a turntable?</p>
+    <h3>Question the Whole Project Answers</h3>
+    <p>Can coding agents help me design and build a software for something I know nothing about?</p>
   </div>
 </section>
 
@@ -800,7 +791,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 
   <div class="stack rv d1">
     <p>No decks, no crossfader, no hot cues, no per-channel EQ. Every one is a real DJ tool, and every one asks the beginner to learn the booth before they can hear a result.</p>
-    <p>I built it in passes, each with a scope written down first &mdash; and, more usefully, a freeze list. Almost every task started with what <em>not</em> to touch, because the failure mode of moving fast is a fix that quietly redesigns three things you were happy with.</p>
+    <p>I built it in passes, each starting with a freeze list &mdash; what <em>not</em> to touch. The failure mode of moving fast is a fix that quietly redesigns three things you were happy with.</p>
   </div>
 
   <div class="demo fx-demo rv d2">
@@ -901,6 +892,13 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
     <p class="foot">The same row in the app, selecting Echo. The glow spills onto the neighbouring cards rather than stopping at the card's own edge &mdash; which is the part that only ever looked right in motion.</p>
   </div>
 
+  <figure class="device rv d2" style="margin-top:22px">
+    <video src="art/effect-tray.mp4" poster="art/effect-tray-poster.jpg" autoplay muted loop playsinline
+           aria-label="Reverb selected in Mixr: the card lights, a tray grows beside it with a level slider and Small Room, Hall and Ambient presets."></video>
+    <figcaption>The same control in the app. The cards above are CSS, rebuilt from <code>EffectCard.swift</code> and <code>GlassCardModifier.swift</code> &mdash; this is what they are rebuilt from.</figcaption>
+  </figure>
+
+
   <div class="stack rv d2">
     <p>Professional plugins expose parameters that mean something to an engineer and nothing to a beginner, so the set stays small, named and preset-backed &mdash; one intensity each.</p>
     <p>The red card took longest to name. Warmth described a quality rather than an action. Haze was at least picturable. It ended up Flanger &mdash; the one place I let a technical term stand, because no everyday word for it isn&rsquo;t a lie.</p>
@@ -958,6 +956,13 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
     <p>Split, duplicate, delete, speed and drag are the whole editing language. Naming them was easy. Deciding how they <em>behave</em> took two days and was the hardest design work in the project.</p>
   </div>
 
+  <figure class="device rv d2">
+    <video src="art/clip-menu.mp4" poster="art/clip-menu-poster.jpg" autoplay muted loop playsinline
+           aria-label="A clip selected on the Mixr timeline, showing the Split, Speed, Duplicate and Delete actions."></video>
+    <figcaption>Split, Speed, Duplicate, Delete &mdash; the whole editing language, on the clip itself.</figcaption>
+  </figure>
+
+
   <div class="demo rv d2">
     <p class="sub">Drop into a clip body</p>
     <ol class="sb">
@@ -1009,7 +1014,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 
   <div class="stack rv d2">
     <p>The preview is the contract: whatever the neighbours animate to while you are dragging is exactly what happens when you let go.</p>
-    <p>And the timeline is only honest if the sound follows it. A clip carries its own effect settings, and they have to take hold and let go at its boundaries. Splitting a clip splits its audio. Undo restores both, or the two drift apart and the app starts lying to you.</p>
+    <p>The timeline is only honest if the sound follows it. Splitting a clip splits its audio; undo restores both. Otherwise the two drift apart and the app starts lying to you.</p>
   </div>
 
   <figure class="rv d2">
@@ -1035,7 +1040,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 <!-- 05 -->
 <section id="changed">
   <div class="sechead rv"><p class="lab">05 &mdash; What changed</p>
-    <h2>Every one of these felt right until I ran it.</h2></div>
+    <h2>Four things I was sure of, until I heard them.</h2></div>
 
   <div class="stack rv d1">
     <p>At one point the lift came out and the clip went back to sliding along the lane. Still functional, still &ldquo;correct,&rdquo; and immediately worse &mdash; nothing was ever picked up, it just slid. Getting the lift back was a whole task of its own.</p>
@@ -1107,8 +1112,8 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
   </div>
 
   <div class="stack rv d2">
-    <p>The last two passes were the unglamorous ones: one layout that holds on iPhone, iPad and a resizable Mac window, and before it a full visual audit &mdash; a written report on cohesion, hierarchy and optical balance, with no code changed until I had read it. Auditing first is what stopped the responsive work quietly becoming a redesign.</p>
-    <p>Now I&rsquo;m waiting on the Apple Developer Program so I can put a beta in people&rsquo;s hands. That is the next real test &mdash; everything above is a designer judging a tool built for beginners, and beginners have not used it yet.</p>
+    <p>The last two passes were the unglamorous ones: one layout that holds on iPhone, iPad and a resizable Mac window, and before it a written visual audit with no code changed until I had read it. Auditing first is what stopped responsive work becoming a redesign.</p>
+    <p>Now I&rsquo;m waiting on the Apple Developer Program to put a beta in people&rsquo;s hands. That is the next real test: everything above is a designer judging a tool built for beginners.</p>
   </div>
 
   <form class="beta rv d2" id="beta" novalidate>
@@ -1292,6 +1297,8 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
       var range = document.createElement("input");
       range.type = "range"; range.min = 0; range.max = 100; range.value = 0;
       range.setAttribute("aria-label", name + " level");
+      var zero = document.createElement("span");
+      zero.className = "ec-zero"; zero.textContent = "0";
       var val = document.createElement("span");
       val.className = "ec-val"; val.textContent = "100";
       /* Grey 100 until the slider is touched, then the live value in white —
@@ -1300,7 +1307,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
         val.textContent = range.value;
         val.classList.add("on");
       });
-      row.appendChild(range); row.appendChild(val);
+      row.appendChild(zero); row.appendChild(range); row.appendChild(val);
       inner.appendChild(row);
 
       if(cfg.presets){
@@ -1322,6 +1329,20 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
       }
       tray.replaceChildren(inner);
     }
+
+    /* Leftover panel width after the focused card, which is what the tray
+       actually spans. Recomputed on resize so it keeps filling. */
+    function fillTray(card){
+      var pad = parseFloat(getComputedStyle(rail).paddingLeft) || 0;
+      var gap = parseFloat(getComputedStyle(rail).gap) || 12;
+      var room = rail.clientWidth - pad * 2 - card.getBoundingClientRect().width - gap;
+      tray.style.setProperty("--fill", Math.max(0, room) + "px");
+    }
+    addEventListener("resize", function(){
+      if(!tray.classList.contains("open")) return;
+      var open = cards.find(function(c){ return c.getAttribute("aria-pressed") === "true"; });
+      if(open) fillTray(open);
+    }, {passive:true});
 
     function closeTray(){
       tray.classList.remove("open");
@@ -1345,10 +1366,12 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
            requestAnimationFrame would do it too, but rAF does not fire in a
            backgrounded tab and is throttled elsewhere — the tray would just
            never open. Reading offsetWidth is synchronous and always lands. */
+        fillTray(c);
         void tray.offsetWidth;
         tray.classList.add("open");
-        c.scrollIntoView({ inline:"nearest", block:"nearest",
-          behavior: reduce ? "auto" : "smooth" });
+        // Focused card goes to the head of the row; the rest push off right.
+        rail.scrollTo({ left: c.offsetLeft - rail.offsetLeft,
+                        behavior: reduce ? "auto" : "smooth" });
       });
     });
   }

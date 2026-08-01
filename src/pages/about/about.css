@@ -258,8 +258,12 @@
     text-align: left;
   }
 
+  /* Centred, unlike the copy above it. Stacked on a phone the portrait is the
+     only thing on its row, and left-aligning it left a wedge of dead mat down
+     the right-hand side. The manifesto stays left — that one is reading text
+     and wants a consistent left edge. */
   .ab-portrait {
-    justify-self: start;
+    justify-self: center;
     align-self: auto;
     transform: none;
     width: min(275px, 72.5vw);

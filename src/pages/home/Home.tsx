@@ -516,8 +516,16 @@ function Home() {
       return;
     }
 
-    // The shelf reveals once and stays. Higher threshold so the fade finishes
-    // before the pocket enters its scrub window on tall viewports.
+    /* The shelf reveals once and stays.
+       Triggered on the shelf's top edge crossing a line two thirds down the
+       viewport — NOT on a fraction of the shelf being visible. A ratio
+       threshold is unsatisfiable whenever the element is taller than the
+       viewport, and on a phone the row stacks into a ~1700px column: at
+       390x640 the most of it that can ever be on screen at once is 35.0%
+       against a 0.35 threshold, so the observer never fired and all three
+       notebooks stayed at opacity 0. The rootMargin below reproduces the old
+       desktop trigger point, where the shelf is shorter than the viewport and
+       the ratio was never the binding constraint. */
     const shelfObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -526,7 +534,7 @@ function Home() {
           shelfObserver.unobserve(entry.target);
         });
       },
-      { threshold: 0.35, rootMargin: "0px 0px -8% 0px" }
+      { threshold: 0, rootMargin: "0px 0px -34% 0px" }
     );
     if (shelf) shelfObserver.observe(shelf);
 
