@@ -322,15 +322,31 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   line-height:1;letter-spacing:-.02em;color:var(--ink);white-space:nowrap}
 .stats span{font-family:var(--fm);font-size:var(--fs-body);line-height:1.5;color:var(--body);
   max-width:20ch}
-.results-metrics{margin-top:clamp(19.2px,2.4vw,25.6px)}
+/* Bottom padding matches the top margin exactly, so the figure is inset from the
+   prose by the same amount above and below. Overrides .findings, whose -16px trim
+   suits the observed-session stats: those end on a line-height:1 figure, while
+   these end on a 1.55 question that needs the block to be read as separated. */
+.results-metrics{margin-top:clamp(19.2px,2.4vw,25.6px);
+  padding-bottom:clamp(19.2px,2.4vw,25.6px)}
 .results-metrics .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(22px,5vw,64px)}
 .results-metrics .result-metric{display:flex;flex-direction:column;align-items:stretch;gap:0}
 /* Second column nudged one minor grid cell left onto the next gridline. A
    transform rather than a margin: it shifts the rendered column without
    changing the track, so the first column keeps its width and nothing reflows. */
 .results-metrics .result-metric:nth-child(2){transform:translateX(calc(-1 * var(--grid-minor)))}
-.metric-equation{display:flex;align-items:center;gap:12px}
-.results-metrics .metric-equation b{white-space:normal}
+/* 16px, not the 12px the observed-session stats use between figure and label.
+   Same box gap would read tighter here: the fraction's rule is a hard edge with
+   no side bearing, so it crowds the word in a way a letter's ink does not. Both
+   metrics share the rule, so the two fractions stay on the same offset. */
+.metric-equation{display:flex;align-items:center;gap:16px}
+/* width:min-content, so the box shrinks back to its longest rendered line. Flex
+   shrink otherwise resolves a width and lets the text wrap INSIDE it, leaving
+   "Play After Reveal" with 51.5px of empty box past "Play After" — the fraction
+   then sat 67.5px from the ink while the one-line metric sat at 16px. The nbsp
+   in the markup is what picks the break: min-content splits at every ordinary
+   space, so "Reveal Rate" stays whole and "Play After Reveal" breaks only
+   after "After". */
+.results-metrics .metric-equation b{white-space:normal;width:min-content}
 .results-metrics .fraction{display:inline-grid;grid-template-rows:auto auto;max-width:none;
   min-width:88px;flex:none;font-family:var(--fm);font-size:var(--fs-body);line-height:1.25;color:var(--body);
   text-align:center}
@@ -466,20 +482,17 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 .links a:hover,.links a:focus-visible{color:var(--soft)}
 .links a:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
 .links .sep{color:var(--rule)}
-/* In the sidebar the pair mirrors a table-of-contents row: same left indent and
-   rule, and the icon sits in the number column — so the labels line up with the
-   section names rather than with 01/02. Kept OUT of nav#jump on purpose: the
-   scroll-spy runs querySelector on every href in there and a full URL is not a
-   valid selector. */
-/* No rule down the left — that belongs to the section list. The negative
-   margin cancels .side's 22px flex gap down to a deliberate 12px: enough air to
-   set the pair off from the section list without it reading as a separate
-   block. */
-.side .links{flex-direction:column;align-items:stretch;gap:1px;
-  margin-top:calc(12px - 22px)}
-.side .links a{padding:8px 0 8px 14px;letter-spacing:.03em;line-height:1.5}
-/* width:2ch matches "01" exactly in the mono face, so both columns agree */
+/* Not dead with the links gone: 2ch is narrower than the digits' natural advance,
+   so dropping it lets every section name slide right by ~0.8px. */
 .side .n{display:inline-block;width:2ch}
+/* The pair sits under the meta rows, on one line, immediately above the working
+   prototype — the two artifacts the reader is about to be shown. Same row as the
+   conclusion box uses, so the page opens and closes on the identical gesture.
+   10px, not the 26px below it: .meta div already carries 14px of bottom padding,
+   so this reads as ~27px of true space above against 26px below — the pair sits
+   with the meta rows it belongs to rather than floating between them and the
+   rail. */
+.links--head{margin-top:10px}
 .links .ico{font-size:var(--fs-micro);margin-right:7px;font-style:normal}
 /* Same gesture as @pranavibuilds on the landing page: a resting underline with a
    rule that wipes across it on hover, plus the colour shift. Reuses this page's
@@ -490,9 +503,6 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   border-bottom:1.5px solid color-mix(in srgb,currentColor 48%,transparent)}
 .links .lbl .nav-rule{bottom:-1.5px}
 .links a:hover .nav-rule,.links a:focus-visible .nav-rule{transform:scaleX(1)}
-/* The conclusion box carries the same pair, so the sidebar copy is dropped on
-   mobile rather than being buried in the horizontally scrolling nav strip. */
-@media (max-width:900px){.side .links{display:none}}
 .flag{border:1px solid var(--brass);background:color-mix(in srgb,var(--brass) 7%,var(--ground));
   padding:18px 20px;margin-top:26px;display:flex;flex-direction:column;gap:9px}
 .flag h3{color:var(--ink)}
@@ -564,10 +574,6 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
     <a href="#changed"><span class="n">05</span>What changed</a>
     <a href="#limits"><span class="n">06</span>Results</a>
   </nav>
-  <div class="links links--toc">
-    <a href="https://www.figma.com/design/7ALenAe4ALVk0Y6FBKUl74/Surprise-Tiles-Component-Idea?node-id=6006-97068" target="_blank" rel="noreferrer"><span class="n">🔗</span><span class="lbl">Figma<span class="nav-rule" aria-hidden="true"></span></span></a>
-    <a href="https://www.figma.com/proto/XVlsXuMb5tnBTed7jCXIKf/Surprise-Tiles-Component-Idea?page-id=6006%3A97068&amp;node-id=6069-227551&amp;viewport=1022%2C366%2C0.04&amp;t=fJQsBq8Ro4YMNmMp-1&amp;scaling=contain&amp;content-scaling=fixed&amp;starting-point-node-id=6069%3A227551&amp;show-proto-sidebar=1" target="_blank" rel="noreferrer"><span class="n">🔗</span><span class="lbl">Prototype<span class="nav-rule" aria-hidden="true"></span></span></a>
-  </div>
   <div class="prog" id="prog">
     <span>READ</span>
     <span class="track"><i id="bar"></i></span>
@@ -589,6 +595,11 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
     <div><span>Team</span><span>2 UX researchers, 1 product manager</span></div>
     <div><span>Status</span><span>Tested, not shipped</span></div>
   </div>
+  <p class="links links--head">
+    <a href="https://www.figma.com/design/7ALenAe4ALVk0Y6FBKUl74/Surprise-Tiles-Component-Idea?node-id=6006-97068" target="_blank" rel="noreferrer"><i class="ico">🔗</i><span class="lbl">Figma<span class="nav-rule" aria-hidden="true"></span></span></a>
+    <span class="sep" aria-hidden="true">|</span>
+    <a href="https://www.figma.com/proto/XVlsXuMb5tnBTed7jCXIKf/Surprise-Tiles-Component-Idea?page-id=6006%3A97068&amp;node-id=6069-227551&amp;viewport=1022%2C366%2C0.04&amp;t=fJQsBq8Ro4YMNmMp-1&amp;scaling=contain&amp;content-scaling=fixed&amp;starting-point-node-id=6069%3A227551&amp;show-proto-sidebar=1" target="_blank" rel="noreferrer"><i class="ico">🔗</i><span class="lbl">Prototype<span class="nav-rule" aria-hidden="true"></span></span></a>
+  </p>
 </header>
 
 <div class="rv d1">
@@ -821,20 +832,20 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
     <ul class="stats">
       <li class="result-metric">
         <div class="metric-equation">
-          <b>Reveal Rate</b>
+          <b>Reveal&nbsp;Rate</b>
           <span class="fraction" aria-label="reveals divided by tiles viewed">
-            <span class="numerator">reveals</span>
-            <span class="denominator">tiles viewed</span>
+            <span class="numerator"># of clicks</span>
+            <span class="denominator">total tiles viewed</span>
           </span>
         </div>
         <p class="metric-question">Did the clue earn a click?</p>
       </li>
       <li class="result-metric">
         <div class="metric-equation">
-          <b>Play After Reveal</b>
+          <b>Play&nbsp;After Reveal</b>
           <span class="fraction" aria-label="plays divided by reveals">
-            <span class="numerator">plays</span>
-            <span class="denominator">reveals</span>
+            <span class="numerator"># of plays</span>
+            <span class="denominator">total tiles clicked</span>
           </span>
         </div>
         <p class="metric-question">Did the click earn a play?</p>
@@ -845,7 +856,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
     <p>I'd work with engineering to collect data for both events. Then with product to determine if we should keep the rail, modify it, or retire it.</p>
   </div>
   <div class="flag rv d2">
-    <p>The Surprise Rail started as an idea. Research shaped it into a scalable, page-aware system built to turn indecision into curiosity.</p>
+    <p>The Surprise Rail started as an idea. Research shaped it into a scalable, page-aware system that turned indecision into curiosity.</p>
     <p class="links">
       <a href="https://www.figma.com/design/7ALenAe4ALVk0Y6FBKUl74/Surprise-Tiles-Component-Idea?node-id=6006-97068" target="_blank" rel="noreferrer"><i class="ico">🔗</i><span class="lbl">Figma<span class="nav-rule" aria-hidden="true"></span></span></a>
       <span class="sep" aria-hidden="true">|</span>

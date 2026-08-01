@@ -1,481 +1,558 @@
-import { useEffect, useRef } from "react";
-import Footer from "../../components/Footer.js";
+import { useEffect, useRef, useState } from "react";
 import "./case-study-hbo-max2.css";
 
+const recommendationExamples = [
+  {
+    title: "Succession",
+    signal: "The Righteous Gemstones",
+    reason:
+      "Love the chaos of The Righteous Gemstones? Its corporate cousin is a vicious fight for Daddy’s love where the jokes cut like glass.",
+  },
+  {
+    title: "Beat Bobby Flay",
+    signal: "Friends",
+    reason:
+      "As if Monica Geller from Friends got her own cooking show. All her sassy, competitive fire in a delicious 20-minute duel.",
+  },
+  {
+    title: "House of the Dragon",
+    signal: "Game of Thrones + Succession",
+    reason:
+      "The creators of Game of Thrones bring another epic series of power, politics, and family feuds. It’s Succession with dragons.",
+  },
+];
+
+const sourceLinks = [
+  {
+    label: "Presentation",
+    href: "https://docs.google.com/presentation/d/1re-kPSn8nNVJDsieV3Misp4Xcn-eBrfK/edit?usp=sharing&ouid=116774489859738726779&rtpof=true&sd=true",
+  },
+  {
+    label: "Evaluation prototype",
+    href: "https://www.figma.com/design/lAgF3l2u2gGhCYoctjLi4H/Hyper-personalized-RTW-Wireframes?node-id=3001-26320",
+  },
+  {
+    label: "Prompt guide",
+    href: "https://www.figma.com/design/KKvY674OEM61yypf7u31sW/Pranavi-s-Guide-to-the-Reasons-LLM?node-id=0-1",
+  },
+];
+
+function ArrowIcon() {
+  return (
+    <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+      <path d="M2.25 9.75 9.75 2.25M4.25 2.25h5.5v5.5" />
+    </svg>
+  );
+}
 
 function CaseStudyHBOMax2() {
+  const [activeExample, setActiveExample] = useState(0);
+  const [pipelineStep, setPipelineStep] = useState(0);
+  const heroVideo = useRef<HTMLVideoElement>(null);
+  const pipelineTimers = useRef<number[]>([]);
 
-    // This will run once when the component mounts scroll to top page
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.title = "Personalized Reasons to Watch — Pranavi Ram";
 
-     // Section references
-     const topRef = useRef(null);
-     const contextRef = useRef(null);
-     const problemRef = useRef(null);
-     const iterationsRef = useRef(null);
-     const solutionRef = useRef(null);
-     const evaluationRef = useRef(null);
-     const reflectionRef = useRef(null);
- 
-     // Scroll to section smoothly
-     const scrollToSection = (ref : React.RefObject<HTMLElement>) => {
-         ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-     };
-
-
-    return (
-        <div className="case-study-hbo-max2">
-            <div className="content">
-            <div className="side-nav">
-                <p onClick={() => scrollToSection(topRef)}>Overview</p>
-                <p onClick={() => scrollToSection(contextRef)}>Context</p>
-                    <p onClick={() => scrollToSection(problemRef)}>Problem</p>
-                    <p onClick={() => scrollToSection(iterationsRef)}>Iterations</p>
-                    <p onClick={() => scrollToSection(solutionRef)}>Solution</p>
-                    <p onClick={() => scrollToSection(evaluationRef)}>Evaluation</p>
-                    <p onClick={() => scrollToSection(reflectionRef)}>Reflection</p>
-            </div>
-            <div className="study">
-
-                <div className="main">
-                    <h1>Reasons to Watch LLM</h1>
-                    <div className="overview">
-                    <div className="video-container">
-                    <video
-                            src="/case-study-hbo-max2/rtw-overview2.mp4"
-                            aria-label="Surprise Tail Click Through Animation"
-                            typeof="video/mp4"
-                            autoPlay
-                            muted
-                            loop
-                            playsInline
-                        >
-                            Your browser does not support the video tag.
-                        </video>
-                        </div>
-                    </div>
-                    <div className="overview-info">
-                        <div className="role">
-                            <h3>Role</h3>
-                            <p>Product Designer</p>
-                        </div>
-                        <div className="timeline">
-                            <h3>Timeline</h3>
-                            <p>Jun - Aug 2025</p>
-                        </div>
-                        <div className="team">
-                            <h3>Team</h3>
-                            <p>
-                            <a href="https://www.linkedin.com/in/tracy-oneil/" target="_blank">
-                                <span className="app-link">Tracy O'Neil</span>
-                            </a> (Product Designer), <br />
-                            {" "} <a href="https://www.linkedin.com/in/jeff-romaniuk-7ab4646/" target="_blank">
-                                <span className="app-link">Jeff Romaniuk</span>
-                            </a> (UX Writer), <br />
-                            {" "} <a href="https://www.linkedin.com/in/annahoprofile/" target="_blank">
-                                <span className="app-link">Anna Ho</span>
-                            </a> (UX Research), <br />
-                            {" "} <a href="https://www.linkedin.com/in/hakha-mashayekhi-964b38a/" target="_blank">
-                                <span className="app-link">Hakha Mashayekhi</span>
-                            </a> (Manager) 
-                            </p>
-                        </div>
-                        <div className="skills">
-                            <h3>Skills</h3>
-                            <div className="all-skills">
-                                <div className="skill">
-                                    <h5>ML/ Gen AI</h5>
-                                    </div>
-                                <div className="skill">
-                                    <h5>Prompt Engineering</h5>
-                                    </div>
-                                <div className="skill">
-                                    <h5>Prototyping</h5>
-                                    </div>
-                                    
-                            </div>
-                        </div>
-                    </div>
-                    <div className="overview">
-                        <p>                      
-                        Reasons to Watch (RTW) is a new description that <span className="bold">appears when users focus on a watch recommendation</span>. It's designed to help users <span className="bold">discover content</span> and explains why the title is relevant based on their preferences. 
-                        
-                        <br />
-                        <br />                        
-                        I built a 1st-generation POC for a personalized version of RTW where <span className="bold">descriptions are specific to a user's watch history.</span>
-                        
-                            <div className="seperator" />
-                            <a href="https://docs.google.com/presentation/d/1re-kPSn8nNVJDsieV3Misp4Xcn-eBrfK/edit?usp=sharing&ouid=116774489859738726779&rtpof=true&sd=true" target="_blank">
-                                <span className="app-link bold">Presentation</span>
-                            </a>
-                            <span className="vert-bar">
-                                {" | "}
-                            </span>
-                            <a href="https://drive.google.com/file/d/1-qUXaHEFNvA5jhT4-ZloqK-blHu-Oq2h/view?usp=sharing" target="_blank">
-                                <span className="app-link bold">Recording</span>
-                            </a>
-                            <span className="vert-bar">
-                                {" | "}
-                            </span>
-                            <span className="bold">Technologies used:</span> Python, Gemini API, Typescript, Figma 
-                        </p>
-                    </div>
-                    <div className="pain-points" ref={contextRef} style={{marginTop: "0.5rem"}}>
-                        <h2>Part of a bigger project...</h2>
-                        <p> We did not start with the personalized version of RTW due to <span className="bold">cost and scalability.</span> Instead, the <span className="bold">team was pursuing optimized descriptions through user segmentation</span>.
-                            <br />
-                            <br />
-                            Segments are content-based, where <span className="bold">each segment reflects certain themes or storylines a user is drawn to</span>. A user is assigned a segment based on what their watch history most closely aligns with. 
-                            <br />
-                            <br />
-                            Below are examples of how RTW descriptions could differ across the different user segments.
-                        </p>
-                        {/* <div className="description-section">
-                        <div className="column">
-                            <img
-                            src="/case-study-hbo-max2/gilded-age-key-art.png"
-                            alt="16:9 Key Art for The Gilded Age"
-                            className="show-image"
-                            />
-
-                            <h4>DEFAULT COPY</h4>
-                            <p>
-                                From Julian Fellowes, this sprawling period drama chronicles the great
-                                conflict between old and new in New York's glittering Gilded Age.
-                            </p>
-                            </div>
-                        
-
-                        <div className="column">
-                            <h4>GENERATED DESCRIPTIONS</h4>
-
-                            <div className="segment">
-                            <h5>Prestige Superfans</h5>
-                            <p>
-                                A gripping portrayal of wealth, power, and societal change in old New
-                                York through the lens of layered, elite families.
-                            </p>
-                            </div>
-
-                            <div className="segment">
-                            <h5>Connoisseur-istas</h5>
-                            <p>
-                                Ambitious women navigate intricate relationships and societal pressures
-                                in a fiercely stratified 19th-century New York.
-                            </p>
-                            </div>
-
-                            <div className="segment">
-                            <h5>Armchair Detectives</h5>
-                            <p>
-                                Witness the sweeping transformation of New York through the eyes of
-                                powerful families during a dramatic social upheaval.
-                            </p>
-                            </div>
-                        </div>
-                        </div> */}
-                        <div className="img-container">
-                            <img
-                                src="/case-study-hbo-max2/segmentation-example.png"
-                                alt="Examples of how the RTW description of 'The Gilded Age' can differ if for the user segments 'Prestige Superfans', 'Connoisseur-istas','Armchair Detectives'."
-                            />
-                        </div>
-
-                    </div>
-                    <div className="pain-points" ref={problemRef}>
-                        <h2>Current Problems</h2>
-
-                        <ul>
-                            <li>
-                                <p><span className="bold">Users Are Pigeon-Holed:</span> A user might love slow-burn period dramas on weekdays and lighthearted comedies on weekends. A <span className="bold">single segment doesn't capture the nuances in a user's watch behavior</span>. In addition, recommendations end up feeling repetitive and focusing on the same themes.</p>
-                            </li>
-                            <li>
-                                <p><span className="bold">Feels Too Generic:</span> Every quarter, <span className="bold">HBO Max ranks lowest on PXI</span> (Product Experience Index), a soft CPI metric that measures the extent users feel the app is "designed with them in mind." <span className="bold">Descriptions don’t feel personalized and could easily apply to anyone</span>, which doesn't help our case.</p>
-                            </li>
-                        </ul>
-
-                    </div>
-                    <div className="pain-points" ref={iterationsRef}>
-                        <h2>My POC</h2>
-                        {/* Introducing the Surprise Rail... */}
-                        <p>We wanted to <span className="bold">validate the value of personalized descriptions to determine if it's worth investing in</span> for the future direction of RTW.
-                        
-                        <br />
-                        <br />
-                        
-                        To streamline the manual process and scale efficiently, we wanted to <span className="bold">build an LLM agent to generate RTW descriptions</span>. I implemented the agent with Gemini API. 
-                        
-                        <br />
-                        <br />
-
-                        The tricky part was <span className="bold">constructing a prompt to produce consistent, high-quality outputs</span>.
-                        </p>
-
-                        <h4>First Iteration Results</h4>
-
-                        <div className="img-container">
-                            <img
-                                src="/case-study-hbo-max2/single-agent-prompt.png"
-                                alt="Prompt breakdown with basic specs, core tenents, and good/bad examples"
-                            />
-                        </div>
-                        <div className="table-scroll">
-                        <table className="results-table">
-                        <thead>
-                        <tr>
-                            <th>Watch History</th>
-                            <th>Recommended Title</th>
-                            <th>Generated RTW</th>
-                            <th>Default Copy</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td rowSpan={2} style={{ width: "14rem" }}>
-                                Succession,<br />
-                                The Lord of the Rings: The Fellowship of the Ring,<br />
-                                Friends,<br />
-                                The O.C.,<br />
-                                Game of Thrones,<br />
-                                Big Bang Theory</td>
-                            <td>House of the Dragon</td>
-                            <td>The creators of <span className="italic">Game of Thrones</span> bring another epic series of power, politics, and family feuds. It's <span className="italic">Succession with dragons</span>.</td>
-                            <td>Set 200 years before the events of Game of Thrones, this epic series tells the story of House Targaryen.</td>
-                        </tr>
-                        <tr>
-                            <td>One Tree Hill</td>
-                            <td>From high school halls to intense rivalries, this series explores brotherhood, love, and self-discovery. A perfect watch after <span className="italic">The O.C</span>.</td>
-                            <td>In a small North Carolina town, two estranged half brothers carry on very different lives.</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                    </div>
-                        
-                        <h2>Modifying Inputs</h2>
-
-                        <p>The model kept namedropping titles from the watch history, so I wanted to add limitations on when another title was mentioned. <span className="bold">I added a "Liked List" input</span> to denote which titles can be referenced in RTW descriptions. 
-                        
-                        <br />
-                        <br />
-                        
-                        This is <span className="bold">from HBO Max’s new ratings feature where you can rate titles as "like," "love," or "not for me."</span> So now the inputs are:
-
-                        <br />
-                        <br />
-
-                        <span className="bold">Inputs → Watch History, Liked List</span>
-                        <br /><span className="bold">Outputs → RTW Description</span>
-
-                        
-                        </p>
-
-                        <h4>Testing More Variables</h4>
-
-                        <p> I also tested different <span className="bold">temperatures, character lengths, and external sources</span> to evaluate their impact on blurb writing.</p>
-
-                        <div className="table-scroll">
-                        <table className="results-table">
-                        <thead>
-                            <tr>
-                            <th>Variable</th>
-                            <th>Options Tested</th>
-                            <th>Best Performing</th>
-                            <th>Reason</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                            <td><strong>Temperature</strong></td>
-                            <td>0.5, 0.6, 0.7, 0.8, 0.9</td>
-                            <td>0.7</td>
-                            <td>Creative, varied sentence structures. Best aligned with the core tenet "embrace variation."</td>
-                            </tr>
-                            <tr>
-                            <td><strong>Character Length</strong></td>
-                            <td>135-character, 175-character</td>
-                            <td>135-character</td>
-                            <td>Shorter descriptions were easier to skim and can be just as effective in compelling to press play.</td>
-                            </tr>
-                            <tr>
-                            <td><strong>External Sources</strong></td>
-                            <td>(any combination of) IMDB, OMDB, Wikipedia, Youtube</td>
-                            <td>IMDB, OMDB, and Wikipedia</td>
-                            <td>More sources improved quality, but we ran into YouTube API quota limits so we used these three.</td>
-                            </tr>
-                        </tbody>
-                        </table>
-                        </div>
-
-                        <h4>More Agents...</h4>
-
-                        <p>The blurbs still felt generic and <span className="bold">didn't feel personalized</span>. Additionally, they <span className="bold">didn't always meet the basic specs</span> of being within 135 characters, having no exclamation marks, etc. 
-                            
-                            <br />
-                            <br />
-
-                            I realized the one agent was doing too much. 
-                            
-                            <br />
-                            <br />
-                            
-                            Instead of single agent, I <span className="bold">split the tasks into 3 seperate agents</span>: a pattern anaylst to analyze the watch history, the blurb writer, and the editor to ensure compliance. Then, I added an optional 4th agent too choose the best out of three.</p>
-
-                         <div className="img-container">
-                            <img
-                                src="/case-study-hbo-max2/agent-breakdown.png"
-                                alt="Tasks and Roles of the 4 agents: Pattern Analyst to anaylze watch history, Blurb Writer, Editor to ensure compliance, and Critic to choose best out of 3"
-                            />
-                        </div>
-
-                        <p>You can see my notes and the results from each individual iteration in the Figjam below.</p>
-                        <div className="figma-embed">
-                        <iframe
-                            title="RTW POC — Hyper Personalized Iteration Notes"
-                            src="https://embed.figma.com/board/QSKdEIHPB35s2UbyV7oEyI/RTW-POC-%E2%80%93-Hyper-Personalized?node-id=0-1&embed-host=share"
-                            style={{ border: "1px solid rgba(0, 0, 0, 0.1)" }}
-                            allowFullScreen
-                            loading="lazy"
-                        />
-                        </div>
-                    
-                    </div>
-
-                    <div className="pain-points" ref={solutionRef}>
-                            <h2>Final Results</h2>
-
-                            <p>Below are exmaples of the RTW descriptions generated by the LLM agents I created. We can also see how <span className="bold">themes extracted from the watch history effected the generated output</span>. </p>
-
-                            <div className="img-container">
-                            <img
-                                src="/case-study-hbo-max2/final-result1.png"
-                                alt="Final generated result of House of the Dragon: “The creators of Game of Thrones bring another epic series of power, politics, and family feuds. It's Succession with dragons.”"
-                            />
-                        </div>
-                        <p>Now, the only referenced titles are from the liked list.</p>
-                        <div className="img-container">
-                            <img
-                                src="/case-study-hbo-max2/final-result2.png"
-                                alt="Final result of Succession: “Love the chaos of The Righteous Gemstones? Its corporate cousin is a vicious fight for Daddy's love where the jokes cut like glass.”"
-                            />
-                        </div>
-
-                        <p>Compared to the default copy, these descriptions <span className="bold">feel more personalized</span> and are  <span className="bold">intentially designed to compel the veiwer to press play</span>.</p>
-
-                    </div>
-
-                    <h2 ref={evaluationRef}>Evaluation</h2>
-                    <div className="pain-points">
-                        <p>I worked with design technologist <a href="https://www.linkedin.com/in/travis-swan/" target="_blank">
-                                <span className="app-link">Travis Swan</span>
-                            </a> to build an <span className="bold">internal evalation tool to evaluation the RTW descriptions generated by the LLM agents</span>. We sent this tool to others in the global tech org to help collect data on quality of outputs.</p>
-
-                            <div className="img-caption">
-                            <img
-                               
-                                src="/case-study-hbo-max2/eval-tool1.png"
-                                alt="screenshot of internal eval tool selecting watch history"
-                            />
-                            <h5 style={{transform: "translateY(-2.25rem)"}}>Users first input their watched titles and liked content.</h5>
-                            </div>
-
-                            <div className="img-caption">
-                            <img
-                               
-                                src="/case-study-hbo-max2/eval-tool2.png"
-                                alt="screenshot of internal eval tool ratings page"
-                            />
-                            <h5 style={{transform: "translateY(-2.25rem)"}}>Then, they blindly choose between and rate the default copy and the generated description.</h5>
-                            </div>
-
-                            <p>Below you can see the wireframes I designed for the internal evaluation tool and see the <a href="https://www.figma.com/proto/smeu6Gk9QM7PKQmlMOvii4/Hyper-personalized-RTW-Wireframes?node-id=3001-26320&t=67CCRJtqBsHvYXae-1" target="_blank">
-                                <span className="app-link">Figma Prototype</span>
-                            </a> here.</p>
-                            <div className="figma-embed">
-                        <iframe
-                            title="RTW POC — Internal Evaluation Tool Wireframes"
-                            src="https://embed.figma.com/design/smeu6Gk9QM7PKQmlMOvii4/Hyper-personalized-RTW-Wireframes?node-id=3001-26320&embed-host=share" 
-                            style={{ border: "1px solid rgba(0, 0, 0, 0.1)" }}
-                            allowFullScreen
-                            loading="lazy"
-                        />
-                        </div>
-                        
-
-                        <h4>In the meantime... </h4>
-                        <p>While the internal tool was being tested, I created an <span className="bold">asynchronous spreadsheet to collect feedback faster and compare results</span>.</p>
-
-                        <div className="img-container">
-                            <img
-                                src="/case-study-hbo-max2/synch-spreadsheet.png"
-                                alt="Asynchronous Spreadsheet sheet"
-                            />
-                        </div>
-
-                        <p>The RTW working team and my intern friends evaluated descriptions blind through the spreadsheet.</p>
-
-                        <h4>Findings</h4>
-
-                        <p>With the help of <a href="https://www.linkedin.com/in/annahoprofile/" target="_blank">
-                                <span className="app-link">Anna Ho</span>
-                            </a> from UX Research, I <span className="bold">extracted key insights from the user feedback</span>. Participants repeatedly highlighted that the RTW descriptions stood out because they:</p>
-                        
-                        <div className="table-scroll">
-                            <table className="findings-table">
-                        <thead>
-                        <tr>
-                            <th><div className="findings-heading"><img src="/case-study-hbo-max2/theater-masks.svg"/>Capture preferred mood and tone</div></th>
-                            <th><div className="findings-heading"><img src="/case-study-hbo-max2/thumbs-up.svg"/>Are engaging and fun to read</div></th>
-                            <th><div className="findings-heading"><img src="/case-study-hbo-max2/connections.svg"/>Build trust by linking to past favorites</div></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td>Uses mood-based language, emphasizing themes that match the feelings and atmosphere the user enjoys.</td>
-                            <td>Makes the experience memorable while adding personality and warmth to brand’s voice.</td>
-                            <td>Highlights meaningful connections to past favorite themes and titles, helping users see why this title fits their tastes.</td>
-                        </tr>
-                        <tr>
-                            <td>“Intriguing” <br/> “Very me”  <br/> - Participant </td>
-                            <td>“Hilarious, fun to read, and from what I recall, fairly accurate.” <br /> - Participant </td>
-                            <td>“I love [liked title]. I like how it draws the connection between this title and [liked title]” <br /> - Participant </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                    </div>
-
-                        <p>The POC was sucessful in validating the impact of RTW, and the team is <span className="bold">now identifying touchpoints to bring these personalized descriptions into the HBO Max product experience</span>.
-                        </p>
-                    </div>
-
-                    <h2>Reflection</h2>
-                    <div className="takeaways" ref={reflectionRef}>
-                        {" "}
-                        <ul>
-                            <li>
-                                <p>
-                                    <span className="bold">Requirements Change Constantly:</span> Project leads introduced new requests and changes almost weekly. I <span className="bold">replanned tasks and revised prompts</span> to accommodate updates without slowing down the team's workflow.
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    <span className="bold">Communicate Vision Early and Often:</span> I regularly <span className="bold">synced with teammates to clarify the project’s direction</span>, ensuring everyone was on the same page about the purpose, privacy level, and design of the descriptions. 
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    <span className="bold">Frame Progress for Leadership:</span> I presented the status of the project in a way that aligned with how executives perceived the project. Even when we were weeks ahead, I often had to <span className="bold">step back and show RTW at an earlier state, highlighting progress in a way that matched their understanding</span>.
-                                </p>
-                            </li>
-                        </ul>
-                    </div>
-
-                </div>
-            </div>
-            </div>
-        </div>
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const reveals = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-reveal]"),
     );
+
+    if (reduceMotion.matches) {
+      reveals.forEach((element) => element.classList.add("is-visible"));
+      heroVideo.current?.pause();
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        });
+      },
+      { rootMargin: "0px 0px -12%", threshold: 0.14 },
+    );
+
+    reveals.forEach((element) => observer.observe(element));
+    return () => {
+      observer.disconnect();
+      pipelineTimers.current.forEach((timer) => window.clearTimeout(timer));
+    };
+  }, []);
+
+  const example = recommendationExamples[activeExample];
+  const runPipeline = () => {
+    pipelineTimers.current.forEach((timer) => window.clearTimeout(timer));
+    pipelineTimers.current = [];
+    setPipelineStep(0);
+
+    [1, 2, 3, 4].forEach((step, index) => {
+      const timer = window.setTimeout(() => setPipelineStep(step), 300 + index * 720);
+      pipelineTimers.current.push(timer);
+    });
+  };
+
+  return (
+    <main className="rtw-case">
+      <aside className="rtw-chapter-nav" aria-label="Case study chapters">
+        <p>Reasons to Watch<br /><span>HBO Max · 2025</span></p>
+        <nav>
+          <a href="#problem"><span>01</span>Problem</a>
+          <a href="#insight"><span>02</span>Insight</a>
+          <a href="#decisions"><span>03</span>Decisions</a>
+          <a href="#system"><span>04</span>Behavior</a>
+          <a href="#evaluation"><span>05</span>Evaluation</a>
+          <a href="#results"><span>06</span>Results</a>
+        </nav>
+      </aside>
+
+      <header className="rtw-hero rtw-page" data-reveal>
+        <div className="rtw-hero-copy">
+          <p className="rtw-label">HBO MAX · AI PRODUCT DESIGN</p>
+          <h1>Designing personalized Reasons to Watch for HBO Max</h1>
+          <p className="rtw-hero-deck">
+            One prompt could write a blurb. It couldn’t earn trust. I built a
+            multi-agent system that turned watch behavior into a 135-character
+            reason to press play—and a blind evaluation tool to test whether the
+            copy was actually more useful than the default.
+          </p>
+
+          <dl className="rtw-meta" aria-label="Project details">
+            <div>
+              <dt>Role</dt>
+              <dd>Product designer</dd>
+            </div>
+            <div>
+              <dt>Timeline</dt>
+              <dd>June–August 2025</dd>
+            </div>
+            <div>
+              <dt>Scope</dt>
+              <dd>System design, prompting, prototype, evaluation</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd>Internal POC · Not shipped</dd>
+            </div>
+          </dl>
+          <dl className="rtw-meta rtw-meta-how" aria-label="Working approach">
+            <div>
+              <dt>How I worked</dt>
+              <dd>Model the system → prototype real outputs → evaluate blind</dd>
+            </div>
+          </dl>
+
+          <nav className="rtw-source-links" aria-label="Project source files">
+            {sourceLinks.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {link.label}
+                <ArrowIcon />
+              </a>
+            ))}
+          </nav>
+        </div>
+
+        <figure className="rtw-hero-media">
+          <video
+            ref={heroVideo}
+            src="/case-study-hbo-max2/rtw-overview2.mp4"
+            aria-label="Reasons to Watch appearing when a title receives focus on HBO Max"
+            autoPlay
+            muted
+            loop
+            playsInline
+          >
+            Your browser does not support the video tag.
+          </video>
+          <figcaption>
+            Reasons to Watch appears in the expanded title preview after focus.
+          </figcaption>
+        </figure>
+      </header>
+
+      <section className="rtw-section rtw-reading" id="problem" data-reveal>
+        <div className="rtw-section-head">
+          <p className="rtw-label">01 · PROBLEM</p>
+          <h2>A segment could describe a cohort. It couldn't explain you.</h2>
+        </div>
+        <div className="rtw-copy">
+          <p>
+            Reasons to Watch appears when a viewer focuses on a title. Instead
+            of repeating a synopsis, it explains why that title may be worth
+            their time. Internal research found that Reasons to Watch increased
+            clarity around the recommendation rationale by 4%.
+          </p>
+          <p>
+            The first scalable direction assigned viewers to affinity groups
+            and wrote one version of copy for each group. It was a practical
+            start, but it flattened taste. The same person could want prestige
+            drama, competitive cooking, and a comfort comedy for completely
+            different reasons.
+          </p>
+        </div>
+        <figure className="rtw-figure rtw-product-frame" data-reveal>
+          <img
+            src="/case-study-hbo-max2/segmentation-example.png"
+            alt="The Gilded Age described differently for three audience segments"
+            loading="lazy"
+          />
+          <figcaption>
+            Segment-level copy changed the emphasis, but every person in a
+            segment still received the same reason.
+          </figcaption>
+        </figure>
+        <blockquote className="rtw-question">
+          How might HBO Max turn one viewer’s behavior into a reason that feels
+          specific—without losing the discipline of product copy?
+        </blockquote>
+      </section>
+
+      <section className="rtw-section rtw-reading" id="insight" data-reveal>
+        <div className="rtw-section-head">
+          <p className="rtw-label">02 · INSIGHT</p>
+          <h2>The best recommendation explains the connection.</h2>
+        </div>
+        <div className="rtw-copy">
+          <p>
+            Watch history could reveal patterns. Explicit likes showed which
+            connections a viewer had actually endorsed. I needed both: broad
+            behavior to understand taste, and a smaller permissioned list to
+            decide when another title was worth mentioning.
+          </p>
+          <p>
+            A useful reason had to capture a preferred mood or tone, create one
+            meaningful bridge to something familiar, and still make the new
+            title clear. Personalization was not a name-drop. It was an
+            explanation of fit.
+          </p>
+        </div>
+
+        <div className="rtw-example" data-reveal>
+          <div className="rtw-example-tabs" role="tablist" aria-label="Personalized Reasons to Watch examples">
+            {recommendationExamples.map((item, index) => (
+              <button
+                key={item.title}
+                type="button"
+                role="tab"
+                aria-selected={activeExample === index}
+                className={activeExample === index ? "is-active" : ""}
+                onClick={() => setActiveExample(index)}
+              >
+                {item.title}
+              </button>
+            ))}
+          </div>
+          <div className="rtw-example-stage" role="tabpanel" aria-live="polite">
+            <p className="rtw-label">BECAUSE YOU LIKED · {example.signal}</p>
+            <p className="rtw-reason">“{example.reason}”</p>
+            <p className="rtw-character-note">Written for a 135-character product surface.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="rtw-section rtw-page" id="decisions" data-reveal>
+        <div className="rtw-section-head rtw-reading">
+          <p className="rtw-label">03 · DECISIONS</p>
+          <h2>Three decisions turned a prompt into a system.</h2>
+        </div>
+
+        <article className="rtw-decision rtw-reading" data-reveal>
+          <p className="rtw-decision-number">01</p>
+          <h3>Write a pitch, not a summary.</h3>
+          <div className="rtw-copy">
+            <p>
+              Early prompts produced accurate plot summaries. They described
+              the title, but did not create a reason to choose it. I reframed
+              the task first as a recommendation, then as a 135-character pitch.
+              The shorter brief forced every sentence to earn its place.
+            </p>
+          </div>
+          <div className="rtw-copy-evolution" aria-label="Copy evolved from summary to recommendation to pitch">
+            <div>
+              <span>SUMMARY</span>
+              <p>Accurate, but interchangeable.</p>
+            </div>
+            <div>
+              <span>RECOMMENDATION</span>
+              <p>More directional, still too broad.</p>
+            </div>
+            <div className="is-chosen">
+              <span>135-CHARACTER PITCH</span>
+              <p>Specific enough to intrigue. Short enough to scan.</p>
+            </div>
+          </div>
+        </article>
+
+        <article className="rtw-decision rtw-reading" data-reveal>
+          <p className="rtw-decision-number">02</p>
+          <h3>Use history to find patterns. Use likes to earn permission.</h3>
+          <div className="rtw-copy">
+            <p>
+              The first model kept name-dropping anything it found in watch
+              history. That looked personalized, but the viewer may not have
+              enjoyed the title. I added a Liked List and allowed one familiar
+              title only when the connection score cleared 85.
+            </p>
+          </div>
+          <div className="rtw-signal-flow" aria-label="Watch history and liked titles serve different roles">
+            <div>
+              <span className="rtw-label">WATCH HISTORY</span>
+              <strong>Find patterns</strong>
+              <small>Genres · themes · tone · behavior</small>
+            </div>
+            <span className="rtw-flow-arrow" aria-hidden="true">+</span>
+            <div>
+              <span className="rtw-label">LIKED TITLES</span>
+              <strong>Earn the reference</strong>
+              <small>One title · connection score &gt; 85</small>
+            </div>
+            <span className="rtw-flow-arrow" aria-hidden="true">→</span>
+            <div className="rtw-flow-output">
+              <span className="rtw-label">OUTPUT</span>
+              <strong>A reason, not a name-drop</strong>
+            </div>
+          </div>
+        </article>
+
+        <article className="rtw-decision rtw-reading" data-reveal>
+          <p className="rtw-decision-number">03</p>
+          <h3>One agent was doing four jobs.</h3>
+          <div className="rtw-copy">
+            <p>
+              A single prompt had to research a title, infer taste, write the
+              copy, enforce product rules, and judge its own work. The outputs
+              stayed generic and missed basic specifications. I separated those
+              responsibilities so each stage could have one definition of good.
+            </p>
+          </div>
+          <div className="rtw-before-after">
+            <div className="rtw-before">
+              <span className="rtw-label">BEFORE</span>
+              <strong>One overloaded prompt</strong>
+              <small>Hard to diagnose. Inconsistent by default.</small>
+            </div>
+            <div className="rtw-after">
+              <span className="rtw-label">AFTER</span>
+              <strong>Specialized agents with explicit handoffs</strong>
+              <small>Each failure had an owner and a place to fix it.</small>
+            </div>
+          </div>
+
+          <details className="rtw-tuning">
+            <summary>What I tuned along the way</summary>
+            <div className="rtw-tuning-grid">
+              <p><strong>0.7</strong><span>A temperature of 0.7 created varied structures without losing control.</span></p>
+              <p><strong>135</strong><span>135 characters stayed scannable on the product surface.</span></p>
+              <p><strong>3 sources</strong><span>IMDb, OMDb, and Wikipedia provided useful metadata without overloading the model.</span></p>
+            </div>
+          </details>
+        </article>
+      </section>
+
+      <section className="rtw-section rtw-reading" id="system" data-reveal>
+        <div className="rtw-section-head">
+          <p className="rtw-label">04 · BEHAVIOR</p>
+          <h2>Four agents. One reason to watch.</h2>
+        </div>
+        <div className="rtw-copy">
+          <p>
+            Each agent received only the inputs it needed and returned a
+            structured handoff. That made the system easier to tune: weak
+            connections belonged to analysis, flat language belonged to
+            writing, and broken product rules belonged to editing.
+          </p>
+        </div>
+
+        <div className="rtw-pipeline-prototype" data-reveal>
+          <div className="rtw-pipeline-head">
+            <div>
+              <p className="rtw-label">DESIGN ENGINEERING PROTOTYPE</p>
+              <h3>Trace one output</h3>
+            </div>
+            <button type="button" onClick={runPipeline}>
+              {pipelineStep === 0 ? "Run the pipeline" : "Run it again"}
+            </button>
+          </div>
+          <ol aria-label="Live four-agent handoff">
+            <li className={pipelineStep >= 1 ? "is-complete" : ""}>
+              <span>01</span>
+              <div><strong>Pattern Analyst</strong><small>Finds “family power struggle” + “vicious comedy.”</small></div>
+            </li>
+            <li className={pipelineStep >= 2 ? "is-complete" : ""}>
+              <span>02</span>
+              <div><strong>Blurb Writer</strong><small>Drafts three reasons from the strongest connection.</small></div>
+            </li>
+            <li className={pipelineStep >= 3 ? "is-complete" : ""}>
+              <span>03</span>
+              <div><strong>Editor</strong><small>Checks 135 characters, tone, spoilers, and punctuation.</small></div>
+            </li>
+            <li className={pipelineStep >= 4 ? "is-complete" : ""}>
+              <span>04</span>
+              <div><strong>Critic</strong><small>Selects the most creative, informative candidate.</small></div>
+            </li>
+          </ol>
+          <div className={`rtw-pipeline-output ${pipelineStep >= 4 ? "is-ready" : ""}`} aria-live="polite">
+            <span className="rtw-label">FINAL REASON</span>
+            <p>{pipelineStep >= 4 ? recommendationExamples[0].reason : "Run the pipeline to follow the handoffs."}</p>
+          </div>
+        </div>
+
+        <figure className="rtw-figure rtw-product-frame rtw-agent-artifact" data-reveal>
+          <img
+            src="/case-study-hbo-max2/agent-breakdown.png"
+            alt="Original four-agent workflow artifact showing the Pattern Analyst, Blurb Writer, Editor, and Critic"
+            loading="lazy"
+          />
+          <figcaption>
+            The handoffs made quality debuggable. The agent that created a
+            failure was also the place to correct it.
+          </figcaption>
+        </figure>
+
+        <div className="rtw-rule-strip" data-reveal>
+          <span>135 characters</span>
+          <span>No spoilers</span>
+          <span>No exclamation points</span>
+          <span>One liked-title reference max</span>
+        </div>
+      </section>
+
+      <section className="rtw-section rtw-page" id="evaluation" data-reveal>
+        <div className="rtw-section-head rtw-reading">
+          <p className="rtw-label">05 · EVALUATION</p>
+          <h2>Blind testing separated personalized from better.</h2>
+        </div>
+        <div className="rtw-copy rtw-reading">
+          <p>
+            “Personalized” was not the success criterion. I worked with design
+            technologist Travis Swan to design an internal evaluation tool.
+            Participants added watched and liked titles, then compared the
+            default copy with generated copy without knowing which was which.
+          </p>
+          <p>
+            After each choice, the tool asked what made the copy useful: the
+            balance of plot and theme, a familiar connection, attention, or a
+            sense that the writer understood the content. While the tool was
+            being built, I used an asynchronous spreadsheet to test the same
+            questions sooner.
+          </p>
+        </div>
+
+        <div className="rtw-eval-sequence" data-reveal>
+          <figure>
+            <span className="rtw-label">01 · PROVIDE SIGNALS</span>
+            <img
+              src="/case-study-hbo-max2/eval-tool1.png"
+              alt="Evaluation tool asking for watched and liked HBO Max titles"
+              loading="lazy"
+            />
+            <figcaption>Participants began with their own viewing context.</figcaption>
+          </figure>
+          <figure>
+            <span className="rtw-label">02 · COMPARE BLIND</span>
+            <img
+              src="/case-study-hbo-max2/eval-tool2.png"
+              alt="Blind comparison between default and personalized Reasons to Watch copy"
+              loading="lazy"
+            />
+            <figcaption>Source labels stayed hidden until after the choice.</figcaption>
+          </figure>
+        </div>
+
+        <a
+          className="rtw-inline-link rtw-reading"
+          href="https://www.figma.com/design/lAgF3l2u2gGhCYoctjLi4H/Hyper-personalized-RTW-Wireframes?node-id=3001-26320"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Explore the evaluation flow in Figma <ArrowIcon />
+        </a>
+      </section>
+
+      <section className="rtw-section rtw-reading" id="results" data-reveal>
+        <div className="rtw-section-head">
+          <p className="rtw-label">06 · RESULTS</p>
+          <h2>The POC proved a direction—not product impact.</h2>
+        </div>
+        <div className="rtw-copy">
+          <p>
+            Internal feedback consistently surfaced three qualities in the
+            personalized copy: it captured a preferred mood, it was fun to
+            read, and it built trust by making a credible connection to a past
+            favorite. Those findings gave the team a clearer definition of
+            useful personalization.
+          </p>
+        </div>
+
+        <div className="rtw-findings" data-reveal>
+          <article>
+            <p className="rtw-label">MOOD + TONE</p>
+            <blockquote>“Intriguing.” “Very me.”</blockquote>
+            <p>The copy emphasized the feeling a viewer already sought.</p>
+          </article>
+          <article>
+            <p className="rtw-label">ENGAGING COPY</p>
+            <blockquote>“Hilarious, fun to read, and fairly accurate.”</blockquote>
+            <p>The reason could be useful without sounding like a synopsis.</p>
+          </article>
+          <article>
+            <p className="rtw-label">TRUSTED CONNECTION</p>
+            <blockquote>“I like how it draws the connection.”</blockquote>
+            <p>A relevant favorite made the recommendation easier to believe.</p>
+          </article>
+        </div>
+
+        <div className="rtw-limit" data-reveal>
+          <p className="rtw-label">WHAT REMAINED UNPROVEN</p>
+          <p>
+            This internal POC evaluated comprehension and copy preference. It
+            did not establish that personalized Reasons to Watch would increase
+            playback, reduce time to selection, or improve retention.
+          </p>
+        </div>
+
+        <div className="rtw-next-test" data-reveal>
+          <h3>What I would test next</h3>
+          <ol>
+            <li><strong>Playback starts</strong><span>Did the reason lead to a watch?</span></li>
+            <li><strong>Time to selection</strong><span>Did it help viewers decide faster?</span></li>
+            <li><strong>Sessions without playback</strong><span>Did fewer visits end in indecision?</span></li>
+          </ol>
+        </div>
+
+        <footer className="rtw-reflection" data-reveal>
+          <p className="rtw-label">REFLECTION</p>
+          <h2>AI didn’t make the copy personal. The system did.</h2>
+          <p>
+            The strongest outputs came from treating personalization as
+            information architecture: choose the right signals, separate the
+            responsibilities, define the evidence, and judge the result without
+            knowing where it came from. That was the difference between a blurb
+            that mentioned the viewer and a reason that understood them.
+          </p>
+          <div className="rtw-footer-links">
+            <a href="/#/" aria-label="Return to the portfolio home page">Back to the red notebook</a>
+            <a
+              href="https://www.figma.com/board/nSerysJp3TjLb7C1wgABrw/RTW-POC-%E2%80%93-Hyper-Personalized?node-id=0-1"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              See every prompt iteration <ArrowIcon />
+            </a>
+          </div>
+        </footer>
+      </section>
+    </main>
+  );
 }
 
 export default CaseStudyHBOMax2;
