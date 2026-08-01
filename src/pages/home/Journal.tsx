@@ -245,7 +245,7 @@ function Journal({ journal, index }: Props) {
       <span className="jr-annotation" aria-hidden="true">
         <span className="jr-annotation-kicker">
           <span className="jr-annotation-num">{number}</span>
-          {title} · {client}
+          {client ? `${title} · ${client}` : title}
         </span>
         <span className="jr-annotation-copy">{annotation}</span>
         <span className="jr-leader" />

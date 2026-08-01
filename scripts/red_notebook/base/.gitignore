@@ -1,0 +1,3 @@
+# Pristine, sticker-free covers, kept out of git — restore with:
+#   git show HEAD:public/home/journals/red-closed.png > base/red-closed.png
+*.png

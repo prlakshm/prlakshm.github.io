@@ -1064,13 +1064,27 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
        so you get to look at it before it starts rather than arriving to a diagram
        already drawn. Do not retract until it is mostly gone — a single threshold
        at "fully visible" re-triggers on every small scroll nudge while reading.
-       A diagram taller than the viewport can never reach 0.95, so cap it there. */
-    var PLAY = 0.95, DROP = 0.35;
+       A tall figure can never reach 0.95, so both thresholds are scaled to what
+       it can actually reach: an element H tall in a viewport VH tops out at
+       VH/H. The agent slides run ~1966px against an 860px viewport, a ceiling of
+       0.437 — under the old flat 0.6 gate they could never play and simply sat
+       invisible, and a flat 0.35 retract sat so close to that ceiling it would
+       have snapped straight back off. */
+    var PLAY = 0.95, DROP = 0.3;
+    /* Pulled out of the callback so it can be exercised directly — the gate is
+       the part that broke, and an IntersectionObserver is awkward to test. */
+    function gates(h, vh){
+      var reach = Math.min(1, (vh || 1) / (h || 1));   // most this can ever show
+      return { reach: reach,
+               enter: reach * (reach < 1 ? 0.85 : PLAY),
+               drop: reach * DROP };
+    }
+    window.__flowGates = gates;
     var flowIO = new IntersectionObserver(function(es){
       es.forEach(function(e){
         var sv = e.target;
-        var vh = window.innerHeight || 1;
-        var enter = e.boundingClientRect.height > vh * 0.9 ? 0.6 : PLAY;
+        var g = gates(e.boundingClientRect.height, window.innerHeight);
+        var enter = g.enter, drop = g.drop;
         var playing = sv.classList.contains("go");
         if(!playing && e.intersectionRatio >= enter){
           var k = Math.min(1, scrollVel / FAST_AT);
@@ -1078,12 +1092,14 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
           sv.style.setProperty("--rate", rate.toFixed(3));
           sv.classList.remove("rev");
           sv.classList.add("go");
-        } else if(playing && e.intersectionRatio < DROP){
+        } else if(playing && e.intersectionRatio < drop){
           sv.classList.add("rev");
           sv.classList.remove("go");
         }
       });
-    }, {threshold:[0, .2, .35, .6, .8, .95, 1]});
+    /* Dense list: the gate is now computed per element, so a sparse list could
+       step from .35 straight to .6 and never land on it. */
+    }, {threshold:Array.from({length:21}, function(_,i){ return i / 20; })});
     flows.forEach(function(sv){ flowIO.observe(sv); });
   }
 

@@ -721,8 +721,10 @@
 
 /* The longest rule on the shelf, and that is the photograph's doing: the red
    notebook's PNG carries ~11% transparent headroom against ~4% for the other
-   two, so its cover starts lower and the line has further to travel. */
-.jr[data-journal="reasons-to-watch"] .jr-annotation {
+   two, so its cover starts lower and the line has further to travel.
+   --cover-lift belongs to the PNG, not the project — it stays as measured for
+   as long as Pinnables borrows the red placeholder cover. */
+.jr[data-journal="pinnables"] .jr-annotation {
   --cover-lift: 0.943;
   --lead-h: 87px;
 }
