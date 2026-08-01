@@ -50,10 +50,21 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
     linear-gradient(var(--grid-b) 1px,transparent 1px),
     linear-gradient(90deg,var(--grid-b) 1px,transparent 1px);
   background-size:32px 32px,32px 32px,128px 128px,128px 128px}
-body>.wt-nav,body>.shell{position:relative;z-index:1}
+/* The nav is deliberately NOT in here. This rule exists to lift content above
+   the fixed grid layer (body::before, z-index 0), but position:relative also
+   silently overrode .wt-nav's position:sticky — so the bar had never actually
+   stuck, it just scrolled away with the page. Sticky already establishes its
+   own stacking context, and .wt-nav carries z-index:30, so it needs nothing
+   from this rule. */
+body>.shell{position:relative;z-index:1}
 
 /* Landing-page chrome */
-.wt-nav{position:sticky;top:0;z-index:30;background:none}
+/* Hides on the way down, comes back the moment you scroll up — the nav is only
+   wanted when you are looking for it. transform, not top/height: it composites
+   without laying anything out, so it cannot fight the sticky sidebar. */
+.wt-nav{position:sticky;top:0;z-index:30;background:none;
+  transition:transform .28s cubic-bezier(.22,.61,.36,1)}
+.wt-nav.nav-away{transform:translateY(-100%)}
 .wt-nav-inner{position:relative;isolation:isolate;height:var(--nav-height);display:flex;align-items:center;justify-content:space-between;
   gap:24px;padding-inline:clamp(22px,3.2vw,60px)}
 .wt-wordmark,.wt-nav-links a{font-family:"Berkeley Mono",var(--fm);font-weight:400;font-size:1.1rem;
@@ -296,6 +307,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   .two,.results-metrics .stats{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:reduce){
+  .wt-nav{transition:none}
   .dgflow .fx{opacity:1}
   .dgflow .fx-line{stroke-dashoffset:0}
   html{scroll-behavior:auto}
@@ -1031,6 +1043,38 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
     if(pct) pct.textContent = Math.round(p) + "%";
   }
   addEventListener("scroll", onScroll, {passive:true});
+
+  /* Nav auto-hide. Direction is judged from the last position that actually
+     moved the nav, not the last scroll event — sampling every event makes a
+     slow drag flap, because sub-pixel jitter changes sign constantly.
+     State only changes when the threshold is crossed, so letting go mid-scroll
+     leaves the nav exactly as it was. */
+  var wtNav = document.querySelector(".wt-nav");
+  if(wtNav){
+    var navAnchor = window.scrollY, navHidden = false;
+    var NAV_STEP = 8;                        // px of travel before it reacts
+    addEventListener("scroll", function(){
+      var y = window.scrollY;
+      // At the very top it is always available, whatever the direction.
+      if(y <= 4){
+        if(navHidden){ wtNav.classList.remove("nav-away"); navHidden = false; }
+        navAnchor = y;
+        return;
+      }
+      // Never hide the bar while it holds keyboard focus — that would move
+      // focus off-screen with no way to see where it went.
+      if(wtNav.contains(document.activeElement)){ navAnchor = y; return; }
+      var dy = y - navAnchor;
+      if(Math.abs(dy) < NAV_STEP) return;
+      var down = dy > 0;
+      if(down !== navHidden){
+        wtNav.classList.toggle("nav-away", down);
+        navHidden = down;
+      }
+      navAnchor = y;
+    }, {passive:true});
+  }
+
   addEventListener("resize", onScroll);
   onScroll();
 

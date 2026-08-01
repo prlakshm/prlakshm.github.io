@@ -51,10 +51,21 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
     linear-gradient(var(--grid-b) 1px,transparent 1px),
     linear-gradient(90deg,var(--grid-b) 1px,transparent 1px);
   background-size:32px 32px,32px 32px,128px 128px,128px 128px}
-body>.wt-nav,body>.shell{position:relative;z-index:1}
+/* The nav is deliberately NOT in here. This rule exists to lift content above
+   the fixed grid layer (body::before, z-index 0), but position:relative also
+   silently overrode .wt-nav's position:sticky — so the bar had never actually
+   stuck, it just scrolled away with the page. Sticky already establishes its
+   own stacking context, and .wt-nav carries z-index:30, so it needs nothing
+   from this rule. */
+body>.shell{position:relative;z-index:1}
 
 /* Landing-page chrome */
-.wt-nav{position:sticky;top:0;z-index:30;background:none}
+/* Hides on the way down, comes back the moment you scroll up — the nav is only
+   wanted when you are looking for it. transform, not top/height: it composites
+   without laying anything out, so it cannot fight the sticky sidebar. */
+.wt-nav{position:sticky;top:0;z-index:30;background:none;
+  transition:transform .28s cubic-bezier(.22,.61,.36,1)}
+.wt-nav.nav-away{transform:translateY(-100%)}
 .wt-nav-inner{position:relative;isolation:isolate;height:var(--nav-height);display:flex;align-items:center;justify-content:space-between;
   gap:24px;padding-inline:clamp(22px,3.2vw,60px)}
 .wt-wordmark,.wt-nav-links a{font-family:"Berkeley Mono",var(--fm);font-weight:400;font-size:1.1rem;
@@ -246,10 +257,10 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
    at 11px radius, 10px inset, a 46px icon tile at 12px radius, 22px symbol,
    11px title, 13px bubbles. --k scales the whole card up for the web without
    letting any one number drift off its ratio. */
-.fx-rail{display:flex;gap:12px;overflow-x:auto;padding:10px 8px 14px;
+.fx-rail{--k:1.34;display:flex;gap:12px;overflow-x:auto;padding:10px 8px 14px;
   scrollbar-width:none;-ms-overflow-style:none;scroll-behavior:smooth}
 .fx-rail::-webkit-scrollbar{display:none}
-.ec{--k:1.34;--g:var(--un);
+.ec{--g:var(--un);
   position:relative;flex:0 0 auto;display:flex;align-items:center;
   width:calc(152px * var(--k));height:calc(66px * var(--k));
   border-radius:calc(11px * var(--k));padding:calc(10px * var(--k));
@@ -317,7 +328,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 /* ── control tray ── EffectControlTray.swift.
    height matches the card, width is 190 slider-only / 236 with presets, and the
    whole grow runs at expandAnimationDuration 0.682s. */
-.ec-tray{--k:1.34;flex:0 0 auto;align-self:center;
+.ec-tray{flex:0 0 auto;align-self:center;
   width:0;height:calc(66px * var(--k));overflow:hidden;
   border-radius:calc(11px * var(--k));
   background:rgba(5,8,16,.30);
@@ -389,10 +400,9 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
   box-shadow:0 1px 3px rgba(0,0,0,.55)}
 /* Auto alone gets the iridescent body — it is the one card that stands for all
    the others at once, so it carries every colour rather than one. */
-.ec.is-auto{background:
+.ec.is-auto{background-image:
     linear-gradient(122deg,rgba(124,58,237,.30) 0%,rgba(56,189,248,.16) 34%,
-      rgba(240,171,252,.20) 62%,rgba(124,58,237,.26) 100%),
-    linear-gradient(160deg,#0E1322 0%,#080C14 60%,#05070D 100%)}
+      rgba(240,171,252,.20) 62%,rgba(124,58,237,.26) 100%)}
 
 /* glow-weight table */
 .gw{margin:24px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:11px}
@@ -584,9 +594,10 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
   .wt-nav-inner{padding-inline:16px}
   .wt-wordmark,.wt-nav-links a{font-size:13px;letter-spacing:.07em}
   .wt-nav-links{gap:16px}
-  .ec{--k:1.1}
+  .fx-rail{--k:1.1}
 }
 @media (prefers-reduced-motion:reduce){
+  .wt-nav{transition:none}
   .dgflow .fx{opacity:1}
   .dgflow .fx-line{stroke-dashoffset:0}
   html{scroll-behavior:auto}
@@ -1164,6 +1175,38 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
     if(pct) pct.textContent = Math.round(p) + "%";
   }
   addEventListener("scroll", onScroll, {passive:true});
+
+  /* Nav auto-hide. Direction is judged from the last position that actually
+     moved the nav, not the last scroll event — sampling every event makes a
+     slow drag flap, because sub-pixel jitter changes sign constantly.
+     State only changes when the threshold is crossed, so letting go mid-scroll
+     leaves the nav exactly as it was. */
+  var wtNav = document.querySelector(".wt-nav");
+  if(wtNav){
+    var navAnchor = window.scrollY, navHidden = false;
+    var NAV_STEP = 8;                        // px of travel before it reacts
+    addEventListener("scroll", function(){
+      var y = window.scrollY;
+      // At the very top it is always available, whatever the direction.
+      if(y <= 4){
+        if(navHidden){ wtNav.classList.remove("nav-away"); navHidden = false; }
+        navAnchor = y;
+        return;
+      }
+      // Never hide the bar while it holds keyboard focus — that would move
+      // focus off-screen with no way to see where it went.
+      if(wtNav.contains(document.activeElement)){ navAnchor = y; return; }
+      var dy = y - navAnchor;
+      if(Math.abs(dy) < NAV_STEP) return;
+      var down = dy > 0;
+      if(down !== navHidden){
+        wtNav.classList.toggle("nav-away", down);
+        navHidden = down;
+      }
+      navAnchor = y;
+    }, {passive:true});
+  }
+
   addEventListener("resize", onScroll);
   onScroll();
 
@@ -1239,7 +1282,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 
     function buildTray(card, name){
       var cfg = TRAY[name];
-      tray.style.setProperty("--tw", cfg.w);
+      tray.style.setProperty("--tw", cfg.w + "px");
       tray.style.setProperty("--c", getComputedStyle(card).getPropertyValue("--c"));
       var inner = document.createElement("div");
       inner.className = "inner";
@@ -1282,7 +1325,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 
     function closeTray(){
       tray.classList.remove("open");
-      tray.style.setProperty("--tw", 0);
+      tray.style.setProperty("--tw", "0px");
     }
 
     cards.forEach(function(c){
@@ -1298,12 +1341,14 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
         // immediately after it — siblings get pushed along by the flex row.
         buildTray(c, name);
         c.insertAdjacentElement("afterend", tray);
-        // next frame, or the width transition has no start value to run from
-        requestAnimationFrame(function(){ tray.classList.add("open"); });
-        requestAnimationFrame(function(){
-          c.scrollIntoView({ inline:"nearest", block:"nearest",
-            behavior: reduce ? "auto" : "smooth" });
-        });
+        /* Flush layout so the transition has a start width to run from. A
+           requestAnimationFrame would do it too, but rAF does not fire in a
+           backgrounded tab and is throttled elsewhere — the tray would just
+           never open. Reading offsetWidth is synchronous and always lands. */
+        void tray.offsetWidth;
+        tray.classList.add("open");
+        c.scrollIntoView({ inline:"nearest", block:"nearest",
+          behavior: reduce ? "auto" : "smooth" });
       });
     });
   }

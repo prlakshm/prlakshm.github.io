@@ -226,7 +226,7 @@ export const journals: Journal[] = [
     hit: { x0: 0.1212, x1: 0.9002, y0: 0.0813, y1: 0.8959 },
     open: "/home/journals/pinnables-open.webp",
     trimClosed: "10.41%",
-    trimOpen: "18.90%",
+    trimOpen: "17.62%",
     alt:
       "A dark red leather journal with pinnables, pushpin and MCP stickers, stuffed with loose pages.",
     /* The notebooks share a baseline, so height is what the eye compares.
