@@ -299,11 +299,17 @@
   width: 100%;
 }
 
+.rtw-product-frame picture,
+.rtw-eval-sequence picture {
+  display: block;
+}
+
 .rtw-video-shell {
   position: relative;
 }
 
 .rtw-hero-media video {
+  aspect-ratio: 1103 / 620;
   max-height: 70vh;
   overflow: hidden;
   border-radius: 8px;

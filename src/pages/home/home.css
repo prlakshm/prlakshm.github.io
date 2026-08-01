@@ -770,120 +770,109 @@
     opacity var(--dur-leave) var(--ease-settle);
 }
 
-/* --- Artifacts ----------------------------------------------------------- */
-.jr-artifacts {
-  position: absolute;
-  inset: 0;
-  display: block;
+/* --- Spill overlay ------------------------------------------------------- */
+/* Rendered through a portal on <body> (see Journal.tsx), so none of the shelf's
+   stacking applies and it can sit over the sticky nav.
+   Everything inside is position:fixed, in viewport coordinates: the page
+   scrolls underneath while the scrim, the cards and the tooltip all hold still.
+   NOTHING in the chain from <body> down may take a transform, filter,
+   perspective or `contain` — any of those would become the containing block for
+   these fixed children and they would start scrolling with the page again. */
+.jr-spill {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  z-index: 200;
+  /* Never a click target. The hover that opened this is still being tracked on
+     the notebook underneath, and a scrim that swallowed the pointer would fire
+     pointerleave the instant it faded in — the overlay would strobe. */
+  pointer-events: none;
 }
 
-/* Centred with negative margins, not translate(-50%,-50%): Motion animates
-   x/y/rotate/scale by writing `transform`, which would overwrite any centering
-   baked in there and leave every artifact half its own size off. With margins
-   doing the centering, Motion's x/y are pure offsets from the journal's middle. */
-.jr-artifact {
-  position: absolute;
-  left: 50%;
-  top: 42%;
-  width: var(--aw);
-  height: var(--ah);
-  /* Required, not cosmetic: the margins below centre by --aw/--ah, so the
-     padded treatments (note, polaroid) must not grow past those values or the
-     centring under-compensates by half the padding. */
-  box-sizing: border-box;
-  margin-left: calc(var(--aw) / -2);
-  margin-top: calc(var(--ah) / -2);
-  transform: scale(0.72);
+/* Always exactly the viewport, no JS sizing needed. */
+.jr-spill-scrim {
+  position: fixed;
+  inset: 0;
   opacity: 0;
-  background: var(--paper);
-  border: 1px solid color-mix(in srgb, var(--espresso) 18%, transparent);
-  border-radius: 1px;
-  box-shadow: 0 6px 14px var(--shadow-soft);
-  overflow: hidden;
-  transition: transform var(--dur-leave) var(--ease-settle),
-    opacity calc(var(--dur-leave) * 0.7) var(--ease-settle);
+  background: radial-gradient(
+      120% 90% at 50% 46%,
+      color-mix(in srgb, var(--espresso) 82%, transparent) 0%,
+      color-mix(in srgb, var(--espresso) 93%, transparent) 70%,
+      color-mix(in srgb, #16100b 95%, transparent) 100%
+    );
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+/* left/top/width/height are all written from JS — and left/top are the card's
+   LANDING spot, not its origin, so a landed card sits at transform 0 and holds
+   its place no matter how far the page scrolls beneath it. The transform is
+   Motion's and must not be declared here beyond the initial state, or the two
+   fight over the same property. */
+.jr-spill-item {
+  position: fixed;
+  opacity: 0;
+  transform: scale(0.16);
   will-change: transform, opacity;
 }
 
-.jr-artifact img {
+.jr-spill-item--shot {
+  padding: 6px;
+  background: var(--paper-polaroid);
+  border-radius: 2px;
+  box-shadow:
+    0 2px 4px color-mix(in srgb, #000 22%, transparent),
+    0 26px 60px color-mix(in srgb, #000 46%, transparent);
+}
+
+.jr-spill-item--shot img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
+  border-radius: 1px;
 }
 
-.jr-artifact--photo {
-  background: var(--paper-photo);
+/* Real torn paper, generated in scripts/torn_paper — an alpha sheet with a
+   fractal rip and a fibre fringe, not a clip-path. The drop-shadow follows that
+   alpha, which is why the shadow is a filter here and a box-shadow on the
+   photographs above: box-shadow would trace the element's rectangle and give
+   the tear a straight edge to sit on. */
+.jr-spill-item--note {
+  display: grid;
+  place-items: center;
+  padding: 8% 11%;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  filter: drop-shadow(0 18px 34px color-mix(in srgb, #000 52%, transparent));
 }
 
-.jr-artifact--polaroid {
-  background: var(--paper-polaroid);
-  border-color: color-mix(in srgb, var(--espresso) 14%, transparent);
-  padding: 7px 7px 26px;
-  box-shadow: 0 8px 18px var(--shadow-object);
+.jr-spill-item--note[data-sheet="1"] {
+  background-image: url("/home/journals/notes/torn-1.webp");
+}
+.jr-spill-item--note[data-sheet="2"] {
+  background-image: url("/home/journals/notes/torn-2.webp");
+}
+.jr-spill-item--note[data-sheet="3"] {
+  background-image: url("/home/journals/notes/torn-3.webp");
 }
 
-.jr-artifact--film {
-  background: color-mix(in srgb, var(--paper) 70%, #d8e2de 30%);
-  border-color: color-mix(in srgb, #5a6e69 35%, transparent);
-}
-
-/* A blank ruled slip, for journals whose case study is unwritten. */
-.jr-artifact--slip {
-  background-color: var(--paper);
-  background-image: repeating-linear-gradient(
-    to bottom,
-    transparent 0 17px,
-    color-mix(in srgb, var(--espresso) 14%, transparent) 17px 18px
-  );
-  border-color: color-mix(in srgb, var(--espresso) 14%, transparent);
-}
-
-/* Notes carry text, so they land on top of the covers rather than behind
-   them — the journal is wider than the gutter, and anything tucked behind it
-   would have its copy occluded. */
-.jr-artifact--note {
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  padding: 12px 14px;
-  background: var(--paper);
-  border-color: color-mix(in srgb, var(--espresso) 16%, transparent);
-  box-shadow: 0 8px 20px var(--shadow-object);
-}
-
-/* A scrap ripped out of a ruled pad. clip-path takes the border and the
-   box-shadow with it — which is the point, a tear has no ruled edge — so the
-   lift is restored with drop-shadow, which follows the clipped silhouette.
-   Extra bottom padding keeps the copy clear of the tear. */
-.jr-artifact--torn {
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  padding: 13px 15px 26px;
-  background-color: var(--paper);
-  background-image: repeating-linear-gradient(
-    to bottom,
-    transparent 0 15px,
-    color-mix(in srgb, var(--espresso) 13%, transparent) 15px 16px
-  );
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  filter: drop-shadow(0 7px 16px var(--shadow-object));
-  clip-path: polygon(
-    0% 0%, 100% 0%,
-    100% 93%, 94% 98%, 88% 91%, 81% 97%, 74% 90%, 67% 97%,
-    60% 92%, 53% 99%, 46% 91%, 39% 97%, 32% 92%, 25% 98%,
-    18% 91%, 11% 97%, 5% 92%, 0% 97%
-  );
-}
-
-.jr-note {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  line-height: 1.55;
-  color: var(--secondary);
+/* Scales with the viewport, not fixed at 14px — these notes are a quarter of
+   the screen wide and body-sized copy would look lost on them.
+   No `container-type` here, however tempting: it implies inline-size
+   containment, the copy then contributes nothing to the element's intrinsic
+   width, and as a centred grid item that resolves to zero — every word ends up
+   on its own line. */
+.jr-spill-note {
+  width: 100%;
+  font-family: var(--font-mono-system);
+  font-size: clamp(13px, 1.32vw, 21px);
+  line-height: 1.52;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--espresso);
 }
 
 /* --- Hover / focus: the journal opens ------------------------------------ */
@@ -899,10 +888,15 @@
 /* Follows the cursor (left/top written from Journal.tsx on pointermove).
    Plate chrome shared with .hero-pron / .scrap-tooltip above. */
 .jr-tooltip {
-  position: absolute;
+  /* Fixed, like the rest of the spill layer — left/top are cursor coordinates
+     straight from the pointer event, with no scroll offset. */
+  position: fixed;
   left: 0;
   top: 0;
-  z-index: 20;
+  /* Above the spill cards, always. They are laid out to leave the middle of the
+     screen alone, but the tooltip rides the cursor and the cursor can be
+     anywhere over the notebook — z-index is what actually guarantees it. */
+  z-index: 2;
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -1505,9 +1499,10 @@
     transform: rotate(var(--jrot));
   }
 
-  /* Touch has no hover: the notebook stays closed and nothing splays. */
-  .jr-artifacts,
-  .jr-tooltip,
+  /* Touch has no hover: the notebook stays closed and nothing spills. The JS
+     already refuses to open below this breakpoint; this is the belt to that
+     brace, and it also covers a desktop window dragged narrow mid-spill. */
+  .jr-spill,
   .scrap-tooltip,
   .jr-img--open {
     display: none;

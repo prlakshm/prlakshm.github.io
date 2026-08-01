@@ -42,7 +42,7 @@ test("states the concept, ownership, and evidence boundary in the hero", async (
   const source = await readFile(componentPath, "utf8");
 
   assert.match(source, /Designing personalized Reasons to Watch for HBO Max/);
-  assert.match(source, /Reasons to Watch is the short pitch that appears when someone focuses on a title/);
+  assert.match(source, /Reasons to Watch is the short pitch that appears\s+when someone focuses on a title/);
   assert.match(source, /Product designer/);
   assert.match(source, /System design, prompting, prototype, evaluation/);
   assert.match(source, /Internal POC · Not shipped/);
@@ -55,6 +55,10 @@ test("distinguishes the internal model-backed POC from the public walkthrough", 
   assert.match(source, /built the internal POC with the Gemini API/i);
   assert.match(source, /deterministic walkthrough/i);
   assert.match(source, /optional Critic/i);
+  assert.match(source, /criticReviewed/);
+  assert.match(source, /Run optional critic/);
+  assert.match(source, /\[1, 2, 3\]\.forEach/);
+  assert.doesNotMatch(source, /\[1, 2, 3, 4\]\.forEach/);
   assert.doesNotMatch(source, /Live four-agent handoff/);
 });
 
@@ -66,7 +70,7 @@ test("keeps technical evidence concrete and links the source artifacts", async (
   assert.match(source, /Editor/);
   assert.match(source, /Critic/);
   assert.match(source, /135 characters/);
-  assert.match(source, /temperature of 0\.7/);
+  assert.match(source, /best balance between varied phrasing and repeatable structure/i);
   assert.match(source, /IMDb, OMDb, and Wikipedia/);
   assert.match(source, /lAgF3l2u2gGhCYoctjLi4H/);
   assert.match(source, /KKvY674OEM61yypf7u31sW/);
@@ -78,16 +82,20 @@ test("uses one narrow editorial system with four type levels and explicit spacin
 
   assert.match(css, /--rtw-page: 1120px/);
   assert.match(css, /--rtw-reading: 720px/);
-  assert.match(css, /--rtw-section: 112px/);
+  assert.match(css, /--rtw-section: 104px/);
   assert.match(css, /--rtw-cluster: 40px/);
   assert.match(css, /--rtw-detail: 24px/);
   assert.match(css, /--rtw-sans: "forma-djr-text", sans-serif/);
   assert.match(css, /--rtw-serif: "adobe-text-pro", serif/);
-  assert.match(css, /--rtw-display: clamp\(3\.25rem, 7vw, 5rem\)/);
-  assert.match(css, /--rtw-heading: clamp\(2\.25rem, 5vw, 3\.25rem\)/);
-  assert.match(css, /--rtw-body: clamp\(1\.0625rem, 1\.5vw, 1\.1875rem\)/);
+  assert.match(css, /--rtw-display: clamp\(3rem, 5\.2vw, 4rem\)/);
+  assert.match(css, /--rtw-heading: clamp\(1\.75rem, 3\.3vw, 2\.5rem\)/);
+  assert.match(css, /--rtw-body: clamp\(1\.0625rem, 1\.3vw, 1\.1875rem\)/);
   assert.match(css, /--rtw-label: 0\.8125rem/);
   assert.doesNotMatch(css, /font-family:\s*"(?:Krub|Flotha|punch-holes|GS)"/i);
+  const sizeDeclarations = css.match(/font-size:\s*([^;]+);/g) ?? [];
+  for (const declaration of sizeDeclarations) {
+    assert.match(declaration, /var\(--rtw-(?:display|heading|body|label)\)/);
+  }
 });
 
 test("supports restrained scroll motion and reduced motion", async () => {
@@ -119,8 +127,8 @@ test("matches cs-final with a numbered chapter rail and a How I worked line", as
   assert.match(source, /className="rtw-shell"/);
   assert.match(source, /className="rtw-main"/);
   assert.match(source, /className="rtw-chapter-nav"/);
-  assert.match(source, /01<\/span>Problem/);
-  assert.match(source, /06<\/span>Results/);
+  assert.match(source, /number: "01", label: "Problem"/);
+  assert.match(source, /number: "06", label: "Results"/);
   assert.match(source, /How I worked/);
   assert.match(source, /Model the system → prototype real outputs → evaluate blind/);
   assert.match(css, /\.rtw-shell\s*\{[^}]*display: grid;[^}]*grid-template-columns: 192px minmax\(0, 824px\);[^}]*gap: 64px;[^}]*max-width: 1080px;/s);
@@ -157,7 +165,7 @@ test("adds accessible controls for the looping hero and recommendation tabs", as
 test("uses the cs-final hierarchy without abandoning the portfolio type system", async () => {
   const css = await readFile(cssPath, "utf8");
 
-  assert.match(css, /\.rtw-hero h1\s*\{[^}]*font-family: var\(--rtw-sans\);[^}]*font-size: clamp\(3rem, 5\.2vw, 4rem\);/s);
+  assert.match(css, /\.rtw-hero h1\s*\{[^}]*font-family: var\(--rtw-sans\);[^}]*font-size: var\(--rtw-display\);/s);
   assert.match(css, /\.rtw-section h2\s*\{[^}]*font-family: var\(--rtw-sans\);/s);
   assert.match(css, /\.rtw-meta\s*\{[^}]*grid-template-columns: repeat\(4, minmax\(0, 1fr\)\);/s);
   assert.match(css, /background-image:\s*linear-gradient\(rgba\(225, 29, 72, 0\.055\) 1px, transparent 1px\)/);

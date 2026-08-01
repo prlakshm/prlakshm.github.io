@@ -309,6 +309,7 @@ function CaseStudyHBOMax2() {
             <video
               ref={heroVideo}
               src="/case-study-hbo-max2/rtw-overview2.mp4"
+              poster="/case-study-hbo-max2/preview-image.webp"
               aria-label="Reasons to Watch appearing when a title receives focus on HBO Max"
               autoPlay
               muted
@@ -354,11 +355,17 @@ function CaseStudyHBOMax2() {
           </p>
         </div>
         <figure className="rtw-figure rtw-product-frame" data-reveal>
-          <img
-            src="/case-study-hbo-max2/segmentation-example.png"
-            alt="The Gilded Age described differently for three audience segments"
-            loading="lazy"
-          />
+          <picture>
+            <source srcSet="/case-study-hbo-max2/segmentation-example.webp" type="image/webp" />
+            <img
+              src="/case-study-hbo-max2/segmentation-example.png"
+              alt="The Gilded Age described differently for three audience segments"
+              width="1648"
+              height="927"
+              loading="lazy"
+              decoding="async"
+            />
+          </picture>
           <figcaption>
             Segment-level copy changed the emphasis, but every person in a
             segment still received the same reason.
@@ -576,11 +583,17 @@ function CaseStudyHBOMax2() {
         </div>
 
         <figure className="rtw-figure rtw-product-frame rtw-agent-artifact" data-reveal>
-          <img
-            src="/case-study-hbo-max2/agent-breakdown.png"
-            alt="Original four-agent workflow artifact showing the Pattern Analyst, Blurb Writer, Editor, and Critic"
-            loading="lazy"
-          />
+          <picture>
+            <source srcSet="/case-study-hbo-max2/agent-breakdown.webp" type="image/webp" />
+            <img
+              src="/case-study-hbo-max2/agent-breakdown.png"
+              alt="Original workflow artifact showing the Pattern Analyst, Blurb Writer, Editor, and optional Critic"
+              width="1648"
+              height="927"
+              loading="lazy"
+              decoding="async"
+            />
+          </picture>
           <figcaption>
             Three core agents handled analysis, writing, and editing. An optional
             Critic helped choose among close candidates during exploration.
@@ -658,20 +671,32 @@ function CaseStudyHBOMax2() {
         <div className="rtw-eval-sequence" data-reveal>
           <figure>
             <span className="rtw-label">01 · PROVIDE SIGNALS</span>
-            <img
-              src="/case-study-hbo-max2/eval-tool1.png"
-              alt="Evaluation tool asking for watched and liked HBO Max titles"
-              loading="lazy"
-            />
+            <picture>
+              <source srcSet="/case-study-hbo-max2/eval-tool1.webp" type="image/webp" />
+              <img
+                src="/case-study-hbo-max2/eval-tool1.png"
+                alt="Evaluation tool asking for watched and liked HBO Max titles"
+                width="1648"
+                height="927"
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
             <figcaption>Participants began with their own viewing context.</figcaption>
           </figure>
           <figure>
             <span className="rtw-label">02 · COMPARE BLIND</span>
-            <img
-              src="/case-study-hbo-max2/eval-tool2.png"
-              alt="Blind comparison between default and personalized Reasons to Watch copy"
-              loading="lazy"
-            />
+            <picture>
+              <source srcSet="/case-study-hbo-max2/eval-tool2.webp" type="image/webp" />
+              <img
+                src="/case-study-hbo-max2/eval-tool2.png"
+                alt="Blind comparison between default and personalized Reasons to Watch copy"
+                width="1648"
+                height="927"
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
             <figcaption>Source labels stayed hidden until after the choice.</figcaption>
           </figure>
         </div>

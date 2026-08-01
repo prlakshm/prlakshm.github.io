@@ -3,22 +3,30 @@
    a case study. Artifacts are what emerges from inside on hover — real project
    imagery wherever it exists, neutral paper notes where it does not yet. */
 
-export type Artifact = {
-  /** Image path, or omit for a paper note carrying `note` copy. */
+/* One thing that flies out of a notebook on hover and lands somewhere on the
+   screen. Positions are viewport-relative, not pixels: the spill covers the
+   whole window, so the layout has to hold at 1280 and at 1920 without a second
+   set of numbers. See Journal.tsx for how these resolve. */
+export type SpillItem = {
+  /** Still from the case-study prototype, or omit for a torn paper note. */
   src?: string;
-  alt?: string;
+  /** Note copy. A short selling point in the case study's own voice. */
   note?: string;
-  /** Splayed offset from the journal's centre, in px. Keep
-   *  |x| + w/2 within (journalWidth/2 + 55) so artifacts never cross the
-   *  gutter into the neighbouring journal's lane. */
-  x: number;
-  y: number;
-  w: number;
-  h: number;
+  /** Landing centre, as a fraction of the viewport measured from its middle:
+   *  -0.5 is the left/top edge, +0.5 the right/bottom. Keep |cx| under ~0.38
+   *  and |cy| under ~0.33 or the card hangs off the screen. */
+  cx: number;
+  cy: number;
+  /** Width as a fraction of the layout base (see spillBase in Journal.tsx —
+   *  it is min(vw, vh x 1.6), so a card cannot swell on an ultrawide). */
+  cw: number;
+  /** Aspect ratio, w/h. Must match the source image or it distorts; notes are
+   *  free to pick whatever reads well for their copy length. */
+  ar: number;
+  /** Degrees. Everything lands crooked — nothing on this desk is square. */
   rotate: number;
-  /** Printed photo, polaroid, translucent film, paper note, a blank ruled slip
-   *  that only peeks from behind the covers, or a torn scrap of ruled paper. */
-  treatment: "photo" | "polaroid" | "film" | "note" | "slip" | "torn";
+  /** Which torn sheet backs a note, 1-3. Ignored for images. */
+  sheet?: 1 | 2 | 3;
 };
 
 export type Journal = {
@@ -57,7 +65,9 @@ export type Journal = {
    *  baseline; kept in the model in case the row is loosened again. */
   offsetY: number;
   rotate: number;
-  artifacts: Artifact[];
+  /** What spills across the screen on hover. Empty is legitimate — a project
+   *  with nothing to show yet opens onto an empty desk. */
+  spill: SpillItem[];
 };
 
 export const journals: Journal[] = [
@@ -78,45 +88,51 @@ export const journals: Journal[] = [
     width: 422,
     offsetY: 0,
     rotate: -1.5,
-    artifacts: [
+    /* Stills lifted straight out of /surprise-rail/ — the prototype as it was
+       tested, not a re-render. The two notes are the study's own tagline and
+       the one-line description of what a tile does. */
+    spill: [
       {
-        src: "/case-study-hbo-max1/film-reel-tiles.png",
-        alt: "Hidden and revealed tile prototypes for the Surprise rail.",
-        x: -126,
-        y: -60,
-        w: 164,
-        h: 116,
-        rotate: -4,
-        treatment: "photo",
+        src: "/home/journals/spill/sr-home.webp",
+        cx: -0.255,
+        cy: -0.035,
+        cw: 0.40,
+        ar: 1.335,
+        rotate: -6.5,
       },
       {
-        src: "/case-study-hbo-max1/CTV-Themed-Rail.png",
-        alt: "Themed rail layout on connected TV.",
-        x: -126,
-        y: 104,
-        w: 164,
-        h: 104,
-        rotate: 4,
-        treatment: "film",
+        src: "/home/journals/spill/sr-rail.webp",
+        cx: 0.235,
+        cy: -0.285,
+        cw: 0.46,
+        ar: 3.794,
+        rotate: 4.5,
       },
       {
-        src: "/case-study-hbo-max1/tile-testing-options.png",
-        alt: "Teaser-clue tile explorations from testing.",
-        x: 135,
-        y: -70,
-        w: 138,
-        h: 116,
-        rotate: 5,
-        treatment: "polaroid",
+        src: "/home/journals/spill/sr-tiles.webp",
+        cx: 0.245,
+        cy: 0.235,
+        cw: 0.40,
+        ar: 2.269,
+        rotate: -5,
       },
       {
-        note: "Could curiosity reduce decision paralysis?",
-        x: 130,
-        y: 110,
-        w: 148,
-        h: 88,
-        rotate: -3,
-        treatment: "note",
+        note: "Curiosity didn't kill the cat. It got more clicks.",
+        cx: -0.345,
+        cy: -0.305,
+        cw: 0.205,
+        ar: 1.5,
+        rotate: -10,
+        sheet: 1,
+      },
+      {
+        note: "Tiles that hide the key art and sell the title in three words.",
+        cx: -0.305,
+        cy: 0.305,
+        cw: 0.215,
+        ar: 1.42,
+        rotate: 7,
+        sheet: 2,
       },
     ],
   },
@@ -141,20 +157,44 @@ export const journals: Journal[] = [
     width: 480, // flagship — reads ~10% larger than the others
     offsetY: 0,
     rotate: 1.2,
-    /* One scrap, not four. The study is written but the APP is still being
-       built, so a single torn note saying so reads as honest where a fan of
-       photos would imply a finished, shipped product. It splays LEFT, into the
-       gap before Surprise Rail — Pinnables sits immediately to its right. */
-    artifacts: [
+    /* The timeline shot is cropped free of the iOS home indicator, which rides
+       the right edge of the source screenshot and would otherwise sit in the
+       middle of the screen as a black pill. See scripts note in
+       public/home/journals/spill. */
+    spill: [
       {
-        note:
-          "Still building the app. The case study covers where it stands today.",
-        x: -180,
-        y: 6,
-        w: 176,
-        h: 120,
+        src: "/home/journals/spill/mixr-timeline.webp",
+        cx: 0.16,
+        cy: -0.145,
+        cw: 0.52,
+        ar: 2.078,
         rotate: -4,
-        treatment: "torn",
+      },
+      {
+        src: "/home/journals/spill/mixr-effects.webp",
+        cx: 0.10,
+        cy: 0.275,
+        cw: 0.46,
+        ar: 7.0,
+        rotate: 3.5,
+      },
+      {
+        note: "DJ software is powerful and intimidating.",
+        cx: -0.305,
+        cy: -0.255,
+        cw: 0.21,
+        ar: 1.5,
+        rotate: -8,
+        sheet: 3,
+      },
+      {
+        note: "Clips on a timeline. Drag, drop, undo.",
+        cx: -0.315,
+        cy: 0.13,
+        cw: 0.20,
+        ar: 1.48,
+        rotate: 6,
+        sheet: 1,
       },
     ],
   },
@@ -165,8 +205,8 @@ export const journals: Journal[] = [
     client: "MCP",
     /* No `href` yet, which is what makes the notebook inert and the tooltip
        read IN PROGRESS. Fill it in when there is something to point at. */
-    descriptor: "MCP · CODING AGENTS",
-    annotation: "Pinning components across pages for coding agents.",
+    descriptor: "MCP · AI CODING AGENTS",
+    annotation: "Pinning components across pages for AI coding agents.",
     /* Placeholder art: the UNSTICKERED red notebook, copied out of
        scripts/red_notebook/base/ — /home/journals/red-*.png is the same shot
        with the Reasons to Watch stickers composited on and must not be used
@@ -188,8 +228,19 @@ export const journals: Journal[] = [
     width: 478,
     offsetY: 0,
     rotate: 1.8,
-    // Nothing to splay yet — the cover opens onto an empty desk, which is the
-    // truth. Add scraps here as the work produces them.
-    artifacts: [],
+    /* One note, dead centre. There is no prototype to show yet, and a single
+       scrap in the middle of an empty screen says that more plainly than a
+       spread of placeholders would. */
+    spill: [
+      {
+        note: "In progress.",
+        cx: 0,
+        cy: 0,
+        cw: 0.22,
+        ar: 1.62,
+        rotate: -2.5,
+        sheet: 2,
+      },
+    ],
   },
 ];
