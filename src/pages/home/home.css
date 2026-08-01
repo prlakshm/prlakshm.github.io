@@ -805,7 +805,7 @@
      that is where both labels start reading.
      A drop rather than less --lead-h: the rule is already short, and --lead-h
      would take the same amount off it. */
-  --label-drop: 19px;
+  --label-drop: 16px;
 }
 
 .jr-stage {

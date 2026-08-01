@@ -253,8 +253,16 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
   position:relative;flex:0 0 auto;display:flex;align-items:center;
   width:calc(152px * var(--k));height:calc(66px * var(--k));
   border-radius:calc(11px * var(--k));padding:calc(10px * var(--k));
-  background:linear-gradient(160deg,#0E1322 0%,#080C14 55%,#05070D 100%);
-  border:1px solid rgba(255,255,255,.06);
+  /* GlassBackground, level .default — Mixr/DesignSystem/GlassCardModifier.swift.
+     tintColor glassNavyDefault #050810 at tintOpacity .28, over the
+     .ultraThinMaterial. SwiftUI's material is a vibrancy effect, not just a
+     blur, so backdrop-filter gets a saturate() alongside the 24pt blur
+     (MixrLayout.glassBlurRadius) to stand in for the luminance adaptation.
+     glassBorderDefault is white .06 at glassBorderWidth .5. */
+  background:rgba(5,8,16,.28);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  backdrop-filter:blur(24px) saturate(180%);
+  border:.5px solid rgba(255,255,255,.06);
   cursor:pointer;isolation:isolate;overflow:hidden;
   transition:box-shadow .34s ease,border-color .34s ease}
 /* Rim: the colored lower/side outline. --rim is EffectRimGlow's per-hue pullback. */
@@ -272,6 +280,81 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
   border-color:color-mix(in srgb,var(--c) 34%,transparent);
   box-shadow:0 0 calc(26px * var(--g)) color-mix(in srgb,var(--c) calc(26% * var(--g)),transparent)}
 .ec:focus-visible{outline:2px solid #f2f0ec;outline-offset:3px}
+
+/* The remaining GlassBackground overlays, in SwiftUI's stacking order: the
+   surface-depth highlight, the top-to-bottom white→clear→black pass, and the
+   accent radial anchored at UnitPoint(0.10, 0.05) with a 260 endRadius. */
+.ec::before{content:"";position:absolute;inset:0;border-radius:inherit;
+  pointer-events:none;z-index:0;
+  background:
+    radial-gradient(circle 260px at 10% 5%,rgba(255,255,255,.055),transparent 70%),
+    linear-gradient(to bottom,rgba(255,255,255,.0475),transparent 46%,rgba(0,0,0,.16));
+  transition:background .34s ease}
+/* GlassAsymmetricEdgeReflection: a thin complete rim, so the card reads as a
+   physical pane rather than a filled rectangle. */
+.ec{box-shadow:inset 0 0 0 .55px rgba(255,255,255,.07),
+    0 0 calc(14px * var(--g)) color-mix(in srgb,var(--c) calc(13% * var(--g)),transparent)}
+.ec[aria-pressed="true"]{background:rgba(5,8,16,.30);
+  box-shadow:inset 0 0 0 .75px rgba(255,255,255,.12),
+    0 0 calc(26px * var(--g)) color-mix(in srgb,var(--c) calc(26% * var(--g)),transparent)}
+/* level .selected swaps the accent to primaryPurple and lifts the radial from
+   .055 to .16 — the card is lit from its own top-left corner, not tinted. */
+.ec[aria-pressed="true"]::before{
+  background:
+    radial-gradient(circle 260px at 10% 5%,rgba(124,58,237,.16),transparent 70%),
+    linear-gradient(to bottom,rgba(255,255,255,.057),transparent 46%,rgba(0,0,0,.16))}
+.ec > *{position:relative;z-index:1}
+/* backdrop-filter samples what is painted behind it. Against flat black there
+   is nothing to sample and the glass reads identical to a solid card, so the
+   panel carries the app's own ambient wash (MixrColors.glassAmbientPurple). */
+.fx-demo{position:relative;isolation:isolate}
+.fx-demo::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(120% 90% at 12% 0%,rgba(139,92,246,.16),transparent 62%),
+    radial-gradient(90% 80% at 88% 108%,rgba(14,165,233,.10),transparent 60%)}
+.fx-demo > *{position:relative;z-index:1}
+
+/* ── control tray ── EffectControlTray.swift.
+   height matches the card, width is 190 slider-only / 236 with presets, and the
+   whole grow runs at expandAnimationDuration 0.682s. */
+.ec-tray{--k:1.34;flex:0 0 auto;align-self:center;
+  width:0;height:calc(66px * var(--k));overflow:hidden;
+  border-radius:calc(11px * var(--k));
+  background:rgba(5,8,16,.30);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  backdrop-filter:blur(24px) saturate(180%);
+  border:.5px solid transparent;
+  transition:width .682s cubic-bezier(.42,0,.58,1),
+             margin-left .682s cubic-bezier(.42,0,.58,1),
+             border-color .3s ease;
+  margin-left:0}
+.ec-tray.open{width:calc(var(--tw) * var(--k));margin-left:12px;
+  border-color:rgba(255,255,255,.07)}
+.ec-tray .inner{width:calc(var(--tw) * var(--k));height:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:7px;padding:0 calc(12px * var(--k));
+  transform:translateY(calc(3.5px * var(--k)))}   /* presetContentDownshift */
+/* sliderRowWidthFraction .75 of the tray content width */
+.ec-row{display:flex;align-items:center;gap:9px;width:75%}
+.ec-val{font-family:var(--fm);font-size:11px;color:#5c5c6a;
+  font-variant-numeric:tabular-nums;min-width:3ch;text-align:right}
+.ec-val.on{color:#f2f0ec}
+.ec-tray input[type=range]{-webkit-appearance:none;appearance:none;flex:1;
+  height:2px;border-radius:2px;background:rgba(255,255,255,.16);outline:none}
+.ec-tray input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;
+  width:11px;height:11px;border-radius:50%;background:var(--c);cursor:pointer;
+  box-shadow:0 0 8px color-mix(in srgb,var(--c) 60%,transparent)}
+.ec-tray input[type=range]:focus-visible{outline:2px solid #f2f0ec;outline-offset:4px}
+/* presetSegmentedHeight 28 — same recessed-track pill as the duration control */
+.ec-seg{display:flex;align-items:center;height:calc(28px * var(--k));padding:2px;
+  border-radius:calc(8px * var(--k));background:rgba(0,0,0,.34);
+  border:.5px solid rgba(255,255,255,.06)}
+.ec-seg button{appearance:none;border:0;background:transparent;cursor:pointer;
+  font-family:var(--fm);font-size:10.5px;letter-spacing:.02em;color:#8b8b99;
+  padding:0 10px;height:100%;border-radius:calc(6px * var(--k));white-space:nowrap;
+  transition:background .24s ease,color .24s ease}
+.ec-seg button[aria-pressed="true"]{background:rgba(255,255,255,.09);color:#f2f0ec}
+.ec-seg button:focus-visible{outline:2px solid #f2f0ec;outline-offset:2px}
 /* Icon tile: dark glass with a top-edge and a bottom-edge radial of the hue.
    Centres are MixrEffect.iconGlow, which differs per effect on purpose. */
 .ec-tile{position:relative;flex:0 0 auto;display:grid;place-items:center;
@@ -709,7 +792,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
     <p>I built it in passes, each with a scope written down first &mdash; and, more usefully, a freeze list. Almost every task started with what <em>not</em> to touch, because the failure mode of moving fast is a fix that quietly redesigns three things you were happy with.</p>
   </div>
 
-  <div class="demo rv d2">
+  <div class="demo fx-demo rv d2">
     <div class="rowlab">
       <span class="demo-title">Effects</span>
       <span class="hint">CLICK A CARD &middot; OR TAB AND PRESS ENTER</span>
@@ -1134,11 +1217,93 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
   var rail = document.getElementById("fxrail");
   if(rail){
     var cards = [].slice.call(rail.querySelectorAll(".ec"));
+
+    /* EffectControlTray.swift. Reverb, Echo and Pitch carry preset segmented
+       controls and get presetWidth 236; Flanger and Blur are intensity-only at
+       sliderOnlyWidth 190. Auto opens no tray — it is the arrangement action,
+       not a per-clip effect with a level. Preset titles are the enum's own
+       (ReverbPreset / EchoPreset / PitchDirection in Models/ClipEffects.swift);
+       Pitch reads "Pitch Up" when selected and "Down" when not, which is what
+       PitchDirection.label does. */
+    var TRAY = {
+      Reverb:  { w:236, presets:["Small Room","Hall","Ambient"], sel:0 },
+      Echo:    { w:236, presets:["Classic","Ping Pong","Reverse"], sel:0 },
+      Pitch:   { w:236, presets:["Pitch Up","Down"], sel:0 },
+      Flanger: { w:190, presets:null },
+      Blur:    { w:190, presets:null }
+    };
+
+    var tray = document.createElement("div");
+    tray.className = "ec-tray";
+    rail.appendChild(tray);
+
+    function buildTray(card, name){
+      var cfg = TRAY[name];
+      tray.style.setProperty("--tw", cfg.w);
+      tray.style.setProperty("--c", getComputedStyle(card).getPropertyValue("--c"));
+      var inner = document.createElement("div");
+      inner.className = "inner";
+
+      var row = document.createElement("div");
+      row.className = "ec-row";
+      var range = document.createElement("input");
+      range.type = "range"; range.min = 0; range.max = 100; range.value = 0;
+      range.setAttribute("aria-label", name + " level");
+      var val = document.createElement("span");
+      val.className = "ec-val"; val.textContent = "100";
+      /* Grey 100 until the slider is touched, then the live value in white —
+         showsCurrentValue in the tray. */
+      range.addEventListener("input", function(){
+        val.textContent = range.value;
+        val.classList.add("on");
+      });
+      row.appendChild(range); row.appendChild(val);
+      inner.appendChild(row);
+
+      if(cfg.presets){
+        var seg = document.createElement("div");
+        seg.className = "ec-seg";
+        cfg.presets.forEach(function(label, i){
+          var b = document.createElement("button");
+          b.type = "button"; b.textContent = label;
+          b.setAttribute("aria-pressed", String(i === cfg.sel));
+          b.addEventListener("click", function(){
+            cfg.sel = i;
+            [].slice.call(seg.children).forEach(function(o, j){
+              o.setAttribute("aria-pressed", String(j === i));
+            });
+          });
+          seg.appendChild(b);
+        });
+        inner.appendChild(seg);
+      }
+      tray.replaceChildren(inner);
+    }
+
+    function closeTray(){
+      tray.classList.remove("open");
+      tray.style.setProperty("--tw", 0);
+    }
+
     cards.forEach(function(c){
       c.addEventListener("click", function(){
         var was = c.getAttribute("aria-pressed") === "true";
         cards.forEach(function(o){ o.setAttribute("aria-pressed","false"); });
         c.setAttribute("aria-pressed", was ? "false" : "true");
+
+        var name = (c.querySelector(".ec-name") || {}).textContent || "";
+        if(was || !TRAY[name]){ closeTray(); return; }
+
+        // The tray grows out of the card it belongs to, so it has to sit
+        // immediately after it — siblings get pushed along by the flex row.
+        buildTray(c, name);
+        c.insertAdjacentElement("afterend", tray);
+        // next frame, or the width transition has no start value to run from
+        requestAnimationFrame(function(){ tray.classList.add("open"); });
+        requestAnimationFrame(function(){
+          c.scrollIntoView({ inline:"nearest", block:"nearest",
+            behavior: reduce ? "auto" : "smooth" });
+        });
       });
     });
   }
