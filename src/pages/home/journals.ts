@@ -14,15 +14,19 @@ export type SpillItem = {
   note?: string;
   /** Landing centre, as a fraction of the viewport measured from its middle:
    *  -0.5 is the left/top edge, +0.5 the right/bottom. Keep |cx| under ~0.38
-   *  and |cy| under ~0.33 or the card hangs off the screen. */
+   *  and |cy| under ~0.33 or the card hangs off the screen.
+   *  Scatter these. Photos on one side and notes on the other reads as a
+   *  layout; paper thrown on a desk lands at uneven distances, drifts toward
+   *  the middle, and sometimes catches a corner of what is already there. */
   cx: number;
   cy: number;
   /** Width as a fraction of the layout base (see spillBase in Journal.tsx —
    *  it is min(vw, vh x 1.6), so a card cannot swell on an ultrawide). */
   cw: number;
-  /** Aspect ratio, w/h. Must match the source image or it distorts; notes are
-   *  free to pick whatever reads well for their copy length. */
-  ar: number;
+  /** Aspect ratio, w/h. Images only, and it must match the source or the shot
+   *  distorts. Notes leave this off: a torn sheet is sized to hug its own copy
+   *  (see measure() in Journal.tsx), so it never carries blank paper. */
+  ar?: number;
   /** Degrees. Everything lands crooked — nothing on this desk is square. */
   rotate: number;
   /** Which torn sheet backs a note, 1-3. Ignored for images. */
@@ -44,6 +48,12 @@ export type Journal = {
   annotation: string;
   closed: string;
   open: string;
+  /** The cover art's alpha bounding box inside its PNG, as fractions of the
+   *  rendered image box. The hover target is the whole journal column, which is
+   *  far wider than the book — these are what let the spill release the moment
+   *  the cursor leaves the NOTEBOOK rather than the column. Measured from the
+   *  PNG (see the note in Journal.tsx); re-measure if a cover is replaced. */
+  hit: { x0: number; x1: number; y0: number; y1: number };
   /** Transparent padding below the notebook in each source PNG, as a % of the
    *  image's own height. Applied as translateY so every notebook's *content*
    *  bottom lands on one baseline, and so the cover does not jump when the
@@ -79,6 +89,7 @@ export const journals: Journal[] = [
     client: "HBO MAX",
     annotation: "Designing a themed rail for HBO Max.",
     closed: "/home/journals/hbomax-closed.png",
+    hit: { x0: 0.1379, x1: 0.887, y0: 0.0357, y1: 0.96 },
     open: "/home/journals/hbomax-open.png",
     trimClosed: "3.86%",
     trimOpen: "7.57%",
@@ -89,49 +100,41 @@ export const journals: Journal[] = [
     offsetY: 0,
     rotate: -1.5,
     /* Stills lifted straight out of /surprise-rail/ — the prototype as it was
-       tested, not a re-render. The two notes are the study's own tagline and
-       the one-line description of what a tile does. */
+       tested, not a re-render. Two shots, not three: the full home-screen grab
+       carried the same film-reel tiles as the rail does and read as a duplicate
+       at this size. The notes are the study's own tagline and the one-line
+       description of what a tile actually does. */
     spill: [
       {
-        src: "/home/journals/spill/sr-home.webp",
-        cx: -0.255,
-        cy: -0.035,
-        cw: 0.40,
-        ar: 1.335,
-        rotate: -6.5,
-      },
-      {
         src: "/home/journals/spill/sr-rail.webp",
-        cx: 0.235,
-        cy: -0.285,
-        cw: 0.46,
+        cx: 0.02,
+        cy: -0.28,
+        cw: 0.54,
         ar: 3.794,
-        rotate: 4.5,
+        rotate: 3,
       },
       {
         src: "/home/journals/spill/sr-tiles.webp",
-        cx: 0.245,
-        cy: 0.235,
-        cw: 0.40,
-        ar: 2.269,
+        cx: 0.17,
+        cy: 0.17,
+        cw: 0.46,
+        ar: 2.243,
         rotate: -5,
       },
       {
         note: "Curiosity didn't kill the cat. It got more clicks.",
-        cx: -0.345,
-        cy: -0.305,
-        cw: 0.205,
-        ar: 1.5,
-        rotate: -10,
+        cx: -0.28,
+        cy: -0.03,
+        cw: 0.23,
+        rotate: -11,
         sheet: 1,
       },
       {
-        note: "Tiles that hide the key art and sell the title in three words.",
-        cx: -0.305,
-        cy: 0.305,
-        cw: 0.215,
-        ar: 1.42,
-        rotate: 7,
+        note: "Key art hidden and replaced with 2\u2060-\u20603 word descriptors.",
+        cx: -0.16,
+        cy: 0.30,
+        cw: 0.23,
+        rotate: 6,
         sheet: 2,
       },
     ],
@@ -144,16 +147,17 @@ export const journals: Journal[] = [
     client: "iOS DJ APP",
     annotation: "Building a DJ app for beginners.",
     closed: "/home/journals/mixr-closed.png",
+    hit: { x0: 0.0974, x1: 0.79, y0: 0.0457, y1: 0.9329 },
     open: "/home/journals/mixr-open.png",
     trimClosed: "6.57%",
     trimOpen: "5.71%",
     alt:
       "A dark brown leather journal with Mixr, headphone and waveform stickers, closed with a brass snap.",
     /* Real path, not a hash route — the study is a standalone document in
-       public/, same as the other two. The build is still ongoing, so the tooltip
-       says so rather than implying a finished project. */
+       public/, same as the other two. No `cta` override: the study is written,
+       so the tooltip is the plain default. That the app itself is still being
+       built is the torn note's job to say, not the cursor's. */
     href: "/mixr/",
-    cta: "IN PROGRESS, VIEW CASE STUDY",
     width: 480, // flagship — reads ~10% larger than the others
     offsetY: 0,
     rotate: 1.2,
@@ -164,36 +168,36 @@ export const journals: Journal[] = [
     spill: [
       {
         src: "/home/journals/spill/mixr-timeline.webp",
-        cx: 0.16,
-        cy: -0.145,
+        cx: 0.09,
+        cy: -0.20,
         cw: 0.52,
         ar: 2.078,
-        rotate: -4,
+        rotate: -3.5,
       },
       {
         src: "/home/journals/spill/mixr-effects.webp",
-        cx: 0.10,
-        cy: 0.275,
+        cx: 0.145,
+        cy: 0.26,
         cw: 0.46,
         ar: 7.0,
-        rotate: 3.5,
+        rotate: 4,
       },
       {
-        note: "DJ software is powerful and intimidating.",
-        cx: -0.305,
-        cy: -0.255,
-        cw: 0.21,
-        ar: 1.5,
-        rotate: -8,
+        note: "DJ software is powerful and intimidating. It doesn't have to be.",
+        cx: -0.275,
+        cy: 0.055,
+        cw: 0.24,
+        rotate: -9,
         sheet: 3,
       },
       {
-        note: "Clips on a timeline. Drag, drop, undo.",
-        cx: -0.315,
-        cy: 0.13,
+        note: "My venture into vibe coding.",
+        // Far enough left that it only catches the corner of the effects strip
+        // — any closer and it starts covering the "Effects" label on it.
+        cx: -0.175,
+        cy: 0.315,
         cw: 0.20,
-        ar: 1.48,
-        rotate: 6,
+        rotate: 7,
         sheet: 1,
       },
     ],
@@ -214,6 +218,7 @@ export const journals: Journal[] = [
        below are the measured values for either; re-measure when Pinnables gets
        a cover of its own. */
     closed: "/home/journals/red-plain-closed.png",
+    hit: { x0: 0.1755, x1: 0.844, y0: 0.1129, y1: 0.8729 },
     open: "/home/journals/red-plain-open.png",
     trimClosed: "12.71%",
     trimOpen: "15.43%",
@@ -233,11 +238,11 @@ export const journals: Journal[] = [
        spread of placeholders would. */
     spill: [
       {
-        note: "In progress.",
+        note:
+          "This notebook is still being written! Read my other case studies in the meantime.",
         cx: 0,
         cy: 0,
-        cw: 0.22,
-        ar: 1.62,
+        cw: 0.29,
         rotate: -2.5,
         sheet: 2,
       },

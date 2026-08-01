@@ -59,6 +59,7 @@ function Journal({ journal, index }: Props) {
     client,
     annotation,
     closed,
+    hit,
     open,
     trimClosed,
     trimOpen,
@@ -74,6 +75,9 @@ function Journal({ journal, index }: Props) {
   const rootRef = useRef<HTMLLIElement>(null);
   const spillRef = useRef<HTMLDivElement>(null);
   const isOpenRef = useRef(false);
+  /** Bumped on every open/close so a settle timer from an earlier toggle can
+   *  recognise that it has been superseded and do nothing. */
+  const settleRef = useRef(0);
 
   useLayoutEffect(() => {
     const root = rootRef.current;
@@ -116,21 +120,50 @@ function Journal({ journal, index }: Props) {
     /* Sizes the cards and fixes their landing spots in VIEWPORT pixels. The
        whole overlay is position:fixed, so the page scrolls underneath it and
        the spread stays put — nothing here is in document space. Re-run on open
-       and on resize, since every number is derived from the live viewport. */
+       and on resize, since every number is derived from the live viewport.
+
+       clientWidth/clientHeight, NOT innerWidth/innerHeight. A fixed element
+       resolves against the initial containing block, which excludes the
+       scrollbar — innerWidth includes it. Centring on innerWidth/2 puts the
+       whole spread half a scrollbar off to one side, every card shifted by the
+       same amount in the same direction. */
     const measure = () => {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
+      const vw = document.documentElement.clientWidth;
+      const vh = document.documentElement.clientHeight;
       const base = spillBase(vw, vh);
 
       cards.forEach((card, i) => {
         const item = spill[i];
         if (!item) return;
         const w = item.cw * base;
-        const h = w / item.ar;
+        card.style.width = `${w}px`;
+
+        let h: number;
+        if (item.src) {
+          /* The aspect ratio belongs to the PICTURE, not to the card, and the
+             card is border-box with a photo mount around it. Sizing the card to
+             `ar` leaves the image area a slightly different shape from the
+             source, and object-fit: cover then crops the difference off — which
+             is how a border deliberately added to a shot ends up shaved. Take
+             the mount out first, apply the ratio, put it back. */
+          const cs = getComputedStyle(card);
+          const padX =
+            parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+          const padY =
+            parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+          h = (w - padX) / (item.ar ?? 1) + padY;
+          card.style.height = `${h}px`;
+        } else {
+          /* Notes hug their copy. Sizing the sheet to the text is what stops a
+             short note from being a big empty rectangle — the torn background
+             stretches to whatever height the words need, and the padding is
+             then the only margin around them. */
+          card.style.height = "auto";
+          h = card.offsetHeight;
+        }
+
         const landX = vw / 2 + item.cx * vw;
         const landY = vh / 2 + item.cy * vh;
-        card.style.width = `${w}px`;
-        card.style.height = `${h}px`;
         // left/top ARE the landing spot. Motion only ever drives the offset
         // back to the notebook, which is what keeps a landed card immune to
         // the origin moving under it.
@@ -170,9 +203,14 @@ function Journal({ journal, index }: Props) {
       /* The closed cover has to leave, or it sits at full opacity behind the
          open one for the whole interaction — the two carry different footer
          trims, so it shows around the edges rather than hiding underneath.
-         Deliberately not a symmetric cross-fade: opening, it clears fast so the
-         two covers are never both readable; closing, it waits for the open one
-         to get out of the way before coming back. */
+
+         NO DELAY on the way back in, and this is the whole reason the notebook
+         used to vanish. The closed cover used to wait 120ms for the open one to
+         clear, but the open one rides a spring that is most of the way to zero
+         inside 100ms — so for a moment BOTH covers were transparent and the
+         notebook was simply not there. Interrupt that window with a re-entry
+         and it could stay that way. They cross-fade over each other now, so
+         their opacities always sum to about one. */
       if (closedImg) {
         animate(
           closedImg,
@@ -180,15 +218,35 @@ function Journal({ journal, index }: Props) {
           reduced
             ? { duration: 0 }
             : visible
-              ? { duration: 0.16, ease: [0.4, 0, 1, 1] }
-              : { duration: 0.26, ease: [0, 0, 0.2, 1], delay: 0.12 }
+              ? { duration: 0.2, ease: [0.4, 0, 1, 1] }
+              : { duration: 0.3, ease: [0, 0, 0.2, 1] }
         );
       }
 
+      /* Belt to that brace. Motion animations get cancelled mid-flight every
+         time the pointer crosses the edge twice in quick succession, and a
+         cancelled fade leaves the element wherever it happened to be. This
+         forces the canonical resting state once the transition has had time to
+         land — and the generation check means a stale timer from an older
+         toggle can never stomp a newer one. */
+      const settleAt = ++settleRef.current;
+      window.setTimeout(
+        () => {
+          if (settleRef.current !== settleAt || isOpenRef.current !== visible)
+            return;
+          if (closedImg) closedImg.style.opacity = visible ? "0" : "1";
+          if (openImg) openImg.style.opacity = visible ? "1" : "0";
+        },
+        reduced ? 30 : 520
+      );
+
       if (scrim) {
-        // Going out, the scrim waits for the cards to be most of the way home
-        // before it starts lifting, so the page never reappears under paper
-        // that is still in flight.
+        /* No delay on the way out. The scrim used to wait 240ms for the cards
+           to get clear, and since it is the largest thing on screen that read
+           as the whole overlay ignoring the cursor for a quarter of a second.
+           It starts lifting immediately now and holds its darkness through a
+           slow-start curve instead, which protects the in-flight paper the same
+           way without the dead beat. */
         animate(
           scrim,
           { opacity: visible ? 1 : 0 },
@@ -196,7 +254,7 @@ function Journal({ journal, index }: Props) {
             ? { duration: 0 }
             : visible
               ? { duration: 0.46, ease: [0.22, 0.61, 0.36, 1] }
-              : { duration: 0.4, ease: [0.4, 0, 0.2, 1], delay: 0.24 }
+              : { duration: 0.56, ease: [0.65, 0, 0.6, 1] }
         );
       }
 
@@ -230,36 +288,43 @@ function Journal({ journal, index }: Props) {
         }
 
         if (visible) {
-          /* Deliberately unhurried — nearly a second per card with a real
-             stagger, so the spill reads as paper being laid out rather than a
-             layout snapping into place. The mid keyframe overshoots the
-             rotation and undershoots the travel, which is what gives it the
-             flick of something tossed onto a desk. */
+          /* TWO keyframes per property, never three. A cubic-bezier ease is
+             applied to each SEGMENT of a keyframe list independently, so a
+             three-stop path eases in and out twice — the card decelerates at
+             the midpoint and sets off again, which is the two-step motion this
+             used to have. One segment, one ease, one throw.
+             Deliberately unhurried at nearly a second, with a stagger, so the
+             spill reads as paper being laid out rather than a layout snapping
+             into place. Opacity gets its own much shorter timing: on the full
+             curve the card spends half its flight semi-transparent. */
           animate(
             card,
             {
-              opacity: [0, 1, 1],
-              x: [ox, ox * 0.38, 0],
-              y: [oy, oy * 0.42 - 30, 0],
-              rotate: [0, item.rotate * 1.7, item.rotate],
-              scale: [0.16, 0.88, 1],
+              opacity: [0, 1],
+              x: [ox, 0],
+              y: [oy, 0],
+              rotate: [0, item.rotate],
+              scale: [0.16, 1],
             },
             {
-              duration: 0.86,
-              ease: [0.22, 0.68, 0.28, 1],
+              duration: 0.88,
+              ease: [0.17, 0.72, 0.24, 1],
               delay: 0.08 + i * 0.09,
+              opacity: {
+                duration: 0.3,
+                ease: [0.4, 0, 0.4, 1],
+                delay: 0.08 + i * 0.09,
+              },
             }
           );
         } else {
-          /* One curve, one duration, no stagger and no delay. The exit used to
-             stagger like the entrance and ride a hard ease-in, and between the
-             cards leaving at five different moments and each one whipping at
-             the end it read as stepping rather than gliding. Everything leaves
-             together on a symmetric ease now, slower than it arrived. */
+          /* Single target values, so Motion runs one segment from wherever the
+             card currently is — one curve, no stagger, no delay, and it starts
+             on the same frame the pointer left. */
           animate(
             card,
             { opacity: 0, x: ox, y: oy, rotate: 0, scale: 0.16 },
-            { duration: 0.62, ease: [0.4, 0, 0.2, 1] }
+            { duration: 0.54, ease: [0.4, 0, 0.2, 1] }
           );
         }
       });
@@ -281,15 +346,50 @@ function Journal({ journal, index }: Props) {
       card.style.transform = "scale(0.16)";
     });
 
+    /* Is the pointer over the BOOK, as opposed to the column the book sits in?
+       The hover target has to be the whole journal for the click area to make
+       sense, but each cover PNG carries a different amount of transparent
+       margin — Mixr's book sits left in its frame with the fanned pages on the
+       right, leaving 47px of dead column on one side and 101px on the other.
+       Hovering was therefore released a long way past the notebook, and by a
+       different distance on each side of each book. `hit` is the cover's alpha
+       box, so this is the real silhouette. */
+    const GRACE = 6; // a hair of slack so the edge is not twitchy
+    const overBook = (x: number, y: number) => {
+      if (!closedImg) return true;
+      const r = closedImg.getBoundingClientRect();
+      return (
+        x >= r.left + hit.x0 * r.width - GRACE &&
+        x <= r.left + hit.x1 * r.width + GRACE &&
+        y >= r.top + hit.y0 * r.height - GRACE &&
+        y <= r.top + hit.y1 * r.height + GRACE
+      );
+    };
+
+    /* Runs only while the pointer is somewhere in this journal's column, so it
+       is not a global mousemove tax. It both opens and closes: entering the
+       column is not enough, and leaving the book has to release even though
+       pointerleave will not fire for another half a notebook's width. */
+    let tracking = false;
+    const track = (e: PointerEvent) => {
+      const on = overBook(e.clientX, e.clientY);
+      if (on) placeTooltip(e.clientX, e.clientY);
+      setOpen(on);
+    };
     const enter = (e: PointerEvent) => {
-      placeTooltip(e.clientX, e.clientY);
-      setOpen(true);
+      if (!tracking) {
+        tracking = true;
+        window.addEventListener("pointermove", track, { passive: true });
+      }
+      track(e);
     };
-    const move = (e: PointerEvent) => {
-      if (!isOpenRef.current) return;
-      placeTooltip(e.clientX, e.clientY);
+    const leave = () => {
+      if (tracking) {
+        tracking = false;
+        window.removeEventListener("pointermove", track);
+      }
+      setOpen(false);
     };
-    const leave = () => setOpen(false);
     const onFocus = () => {
       // No cursor on keyboard focus — anchor near the top centre of the link.
       const rect = target.getBoundingClientRect();
@@ -308,8 +408,11 @@ function Journal({ journal, index }: Props) {
       measure();
     };
 
+    /* pointerenter/leave still bound to the column, not the book: they are what
+       start and stop the tracking above. Leaving the column is a hard release —
+       it also covers the pointer leaving the window entirely, which never
+       produces a pointermove. */
     target.addEventListener("pointerenter", enter);
-    target.addEventListener("pointermove", move);
     target.addEventListener("pointerleave", leave);
     target.addEventListener("focusin", onFocus);
     target.addEventListener("focusout", leave);
@@ -317,13 +420,13 @@ function Journal({ journal, index }: Props) {
 
     return () => {
       target.removeEventListener("pointerenter", enter);
-      target.removeEventListener("pointermove", move);
       target.removeEventListener("pointerleave", leave);
       target.removeEventListener("focusin", onFocus);
       target.removeEventListener("focusout", leave);
       window.removeEventListener("resize", onResize);
+      window.removeEventListener("pointermove", track);
     };
-  }, [spill]);
+  }, [spill, hit]);
 
   const isExternal = href?.startsWith("http") ?? false;
   const ctaLabel = cta ?? "VIEW CASE STUDY";
