@@ -18,7 +18,7 @@ test("uses the red notebook as the stable entry to the finished RTW case study",
 
   assert.match(
     journals,
-    /id: "reasons-to-watch",[\s\S]*?closed: "\/home\/journals\/red-closed\.png",[\s\S]*?href: "#\/hbo-max-rtw"/,
+    /id: "reasons-to-watch",[\s\S]*?closed: "\/home\/journals\/red-closed\.png",[\s\S]*?href: "\/reasons-to-watch\/"/,
   );
 });
 

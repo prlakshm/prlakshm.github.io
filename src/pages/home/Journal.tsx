@@ -230,7 +230,11 @@ function Journal({ journal, index }: Props) {
 
   // With the caption gone, this is the only text naming the project.
   const accessibleName = href
-    ? `${title} — ${descriptor}. ${ctaLabel}${isExternal ? ", opens in a new tab" : ""}.`
+    ? `${title} — ${descriptor}. ${ctaLabel}${
+        // The tooltip can say "IN PROGRESS", which tells a screen reader
+        // nothing about where the link goes — so name the destination.
+        isExternal ? `, opens ${new URL(href).hostname} in a new tab` : ""
+      }.`
     : `${title} — ${descriptor}. Case study in progress.`;
 
   const inner = (

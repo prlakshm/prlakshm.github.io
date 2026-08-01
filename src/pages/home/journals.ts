@@ -131,7 +131,7 @@ export const journals: Journal[] = [
     trimOpen: "15.43%",
     alt:
       "A red leather journal representing the Reasons to Watch agent prototype, stuffed with working notes.",
-    href: "#/hbo-max-rtw",
+    href: "/reasons-to-watch/",
     width: 414,
     offsetY: 0,
     rotate: 1.8,
@@ -193,7 +193,7 @@ export const journals: Journal[] = [
     /* No case study yet, so the notebook points at where the work is actually
        being shown. External, which is what puts the arrow on the tooltip. */
     href: "https://x.com/pranavibuilds",
-    cta: "READ ON X",
+    cta: "IN PROGRESS, READ ON X",
     width: 480, // flagship — reads ~10% larger than the others
     offsetY: 0,
     rotate: 1.2,
@@ -205,8 +205,8 @@ export const journals: Journal[] = [
       {
         note:
           "Case study still in progress. Read about the app on X in the meantime.",
-        x: -172,
-        y: 34,
+        x: -180,
+        y: 6,
         w: 176,
         h: 120,
         rotate: -4,

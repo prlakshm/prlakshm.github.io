@@ -587,18 +587,24 @@
   /* Width of the number column. The heading starts here and every wrapped line
      of copy hangs off the same edge, so the block reads as one indented note
      rather than a title with a paragraph loose underneath. */
-  --label-indent: 30px;
+  /* Two figures plus one space at the label's own metrics: the system mono
+     advances 0.6em, so 3 chars x 14px x 0.6 = 25.2. Retune if the size does. */
+  --label-indent: 25px;
   position: absolute;
   bottom: calc(100cqw * var(--cover-lift) + var(--lead-h) + 31px);
   left: 50%;
   z-index: 4;
-  /* Sized off the longest kicker on the shelf — "03 REASONS TO WATCH · HBO MAX"
-     needs 285px with the number column — so every label holds one line at
-     desktop. Still narrower than the narrowest notebook, so a label never
-     reaches into its neighbour's lane. Below 1440 the covers are fluid and the
-     longest one wraps; that is what the kicker's hanging indent is for. The
-     copy keeps its own, shorter measure. */
-  width: min(292px, 92%);
+  /* Shrink-to-fit, capped. The cap is the longest kicker on the shelf
+     ("02 REASONS TO WATCH · HBO MAX" needs ~282px with the number column) so
+     every label holds one line at desktop, and is still narrower than the
+     narrowest notebook so a label never reaches into its neighbour's lane.
+     Below 1440 the covers are fluid and the longest one wraps; that is what
+     the kicker's hanging indent is for.
+     max-content rather than a fixed width because the wash below is drawn from
+     this box: at a fixed width it would trail a pale rectangle past the end of
+     the shorter labels. The copy's own 21ch measure caps what it contributes. */
+  width: max-content;
+  max-width: min(292px, 92%);
   translate: -50% 0;
   display: flex;
   flex-direction: column;
@@ -609,19 +615,45 @@
   pointer-events: none;
 }
 
-/* Hanging indent: the number sits out in its own column and everything that
+/* Same grid-softening wash as .hero-title / .hero-col, for the same reason:
+   the cutting-mat rules run straight through the copy otherwise. Feathered on
+   all four sides so it reads as paper soaking through rather than a panel.
+   Sits behind the label but inside its stacking context, so it covers the mat
+   and nothing else. */
+.jr-annotation::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -9px -15px -11px -14px;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--parchment) 50%, transparent);
+  mask-image:
+    linear-gradient(to right, transparent 0%, #000 10%, #000 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%);
+  mask-composite: intersect;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, #000 10%, #000 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%);
+  -webkit-mask-composite: source-in;
+}
+
+/* Type is the case studies' body copy, exactly: `p { font-family: var(--fm);
+   font-size: 14px; line-height: 1.9 }` in public/<study>/index.html, set in the
+   system mono rather than Berkeley, with no tracking. The shelf label is the
+   first line of the study, so it is set in the study's voice — if --fs-body or
+   the `p` rule moves over there, move these with it.
+   Hanging indent: the number sits out in its own column and everything that
    wraps off the end of "TITLE · CLIENT" falls back to the title's left edge,
    the same edge the copy below hangs from. */
 .jr-annotation-kicker {
   padding-left: var(--label-indent);
   text-indent: calc(-1 * var(--label-indent));
-  font-family: var(--font-mono);
+  font-family: var(--font-mono-system);
   font-weight: 400;
   font-size: 14px;
-  line-height: 1.35;
-  letter-spacing: 0.1em;
+  line-height: 1.9;
+  letter-spacing: normal;
   color: var(--mono-secondary);
-  -webkit-text-stroke: 0.4px currentColor;
 }
 
 /* Fixed-width slot rather than a typed space: the numbers are all two figures
@@ -642,13 +674,12 @@
      without any of them running past the notebook below. */
   max-width: 21ch;
   padding-left: var(--label-indent);
-  font-family: var(--font-mono);
+  font-family: var(--font-mono-system);
   font-weight: 400;
-  font-size: 13px;
-  line-height: 1.55;
-  letter-spacing: 0.04em;
+  font-size: 14px;
+  line-height: 1.9;
+  letter-spacing: normal;
   color: var(--mono-secondary);
-  -webkit-text-stroke: 0.35px currentColor;
 }
 
 /* The leader: one dotted rule in the number's own column, running from just
@@ -660,7 +691,9 @@
 .jr-leader {
   position: absolute;
   left: calc(var(--label-indent) * 0.3);
-  top: 24px;
+  /* Clears the kicker's line box (14px x 1.9 = 26.6) so the rule starts level
+     with the first line of copy, never crossing the heading. */
+  top: 27px;
   bottom: calc(-1 * var(--lead-h));
   width: 1.3px;
   background-image: repeating-linear-gradient(

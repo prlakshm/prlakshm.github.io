@@ -25,6 +25,11 @@
   --font-text: "forma-djr-text", "Forma DJR Text", system-ui, sans-serif;
   --font-mono: "Berkeley Mono", "Berkeley Mono Trial", ui-monospace, "SF Mono",
     Menlo, "Roboto Mono", monospace;
+  /* The published case studies set body copy in the system mono, NOT Berkeley
+     — this mirrors --fm in public/<study>/index.html character for character.
+     Anything on the site that has to read as case-study body type uses this;
+     keep the two stacks identical or they will drift apart. */
+  --font-mono-system: ui-monospace, "SF Mono", Menlo, monospace;
 
   /* Forma DJR Display ships 400 and 700 only in kit ovs8xoo — no 650. */
   --weight-display: 700;
