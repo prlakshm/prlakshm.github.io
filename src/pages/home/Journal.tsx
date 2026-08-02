@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { animate } from "motion";
-import { SPRING_HEAVY } from "./interactions.js";
+import { SPRING_HEAVY, joinShelf } from "./interactions.js";
 import type { Journal as JournalData } from "./journals.js";
 
 /* A single journal on the worktable. Hovering it opens the cover and spills the
@@ -78,6 +78,13 @@ function Journal({ journal, index }: Props) {
   /** Bumped on every open/close so a settle timer from an earlier toggle can
    *  recognise that it has been superseded and do nothing. */
   const settleRef = useRef(0);
+  /** Does the pointer want this notebook open right now? Re-read when a handoff
+   *  elapses — by then the pointer may have swept on to another notebook, or
+   *  off the shelf entirely. */
+  const wantsRef = useRef(false);
+  /** Serialises open/close across the whole shelf, so two notebooks are never
+   *  animating at once. See joinShelf in interactions.ts. */
+  const shelfRef = useRef(joinShelf(id));
 
   useLayoutEffect(() => {
     const root = rootRef.current;
@@ -87,6 +94,8 @@ function Journal({ journal, index }: Props) {
     const target = root.querySelector<HTMLElement>(".jr-link");
     if (!target) return;
 
+    const shelf = shelfRef.current;
+
     const openImg = root.querySelector<HTMLElement>(".jr-img--open");
     const closedImg = root.querySelector<HTMLElement>(".jr-img--closed");
     const scrim = layer.querySelector<HTMLElement>(".jr-spill-scrim");
@@ -95,17 +104,23 @@ function Journal({ journal, index }: Props) {
       layer.querySelectorAll<HTMLElement>(".jr-spill-item")
     );
 
-    /* No spill without a real hover. Gated on the POINTER, not the width: a
-       tablet, a foldable, or a phone in landscape is wider than the phone
-       breakpoint and still cannot hover, and on those a tap fired pointerenter,
-       opened the whole overlay, and left it up until the user tapped something
-       else — with the notebook wobbling under the tap because it is also a
-       link. Width is still checked because a narrow desktop window hides the
-       layer in CSS, and JS must not open something invisible.
+    /* A notebook with no case study to open. It is the only one that may spill
+       on a tap: the other two are links, so a tap navigates and their overlay
+       would flash and vanish behind the new page. */
+    const inert = !href;
+
+    /* Capability, not width. A tablet, a foldable, or a phone in landscape is
+       wider than the phone breakpoint and still cannot hover.
        Checked live so a resize or a device change is picked up. */
-    const isTouchLayout = () =>
-      window.matchMedia("(max-width: 767px)").matches ||
-      !window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const canHover = () =>
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const narrow = () => window.matchMedia("(max-width: 767px)").matches;
+
+    /* May the spill open at all right now? CSS hides the layer for a coarse
+       pointer or a narrow window — except on the inert notebook, which stays
+       available everywhere because tapping it costs nothing. */
+    const spillAllowed = () => inert || (canHover() && !narrow());
+
     const isReduced = () =>
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -140,12 +155,35 @@ function Journal({ journal, index }: Props) {
       const vh = document.documentElement.clientHeight;
       const base = spillBase(vw, vh);
 
+      /* THREE passes, not one loop. Sizing a card and then reading its height
+         in the same iteration is write-read-write, and every read after a write
+         forces a synchronous layout — four cards meant four reflows, landing on
+         exactly the frame the spill starts. Batched, the first read costs one
+         layout and the rest are free. */
+      const widths: number[] = [];
+      const heights: number[] = [];
+
       cards.forEach((card, i) => {
         const item = spill[i];
         if (!item) return;
-        const w = item.cw * base;
+        let w = item.cw * base;
+        if (!item.src) {
+          /* A note has to stay readable. These widths are fractions tuned on a
+             desktop, and on a phone the base collapses far enough that the
+             fraction leaves a scrap barely wider than one word. Floor it. */
+          w = Math.max(w, Math.min(vw * 0.74, 320));
+        }
+        widths[i] = w;
         card.style.width = `${w}px`;
+        // Notes hug their copy, so they have to be let go before being read.
+        if (!item.src) card.style.height = "auto";
+      });
 
+      // ── reads ──
+      cards.forEach((card, i) => {
+        const item = spill[i];
+        if (!item) return;
+        const w = widths[i];
         let h: number;
         if (item.src) {
           /* The aspect ratio belongs to the PICTURE, not to the card, and the
@@ -160,15 +198,23 @@ function Journal({ journal, index }: Props) {
           const padY =
             parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
           h = (w - padX) / (item.ar ?? 1) + padY;
-          card.style.height = `${h}px`;
         } else {
           /* Notes hug their copy. Sizing the sheet to the text is what stops a
              short note from being a big empty rectangle — the torn background
              stretches to whatever height the words need, and the padding is
              then the only margin around them. */
-          card.style.height = "auto";
           h = card.offsetHeight;
         }
+        heights[i] = h;
+      });
+
+      // ── writes ──
+      cards.forEach((card, i) => {
+        const item = spill[i];
+        if (!item) return;
+        const w = widths[i];
+        const h = heights[i];
+        if (item.src) card.style.height = `${h}px`;
 
         const landX = vw / 2 + item.cx * vw;
         const landY = vh / 2 + item.cy * vh;
@@ -184,7 +230,7 @@ function Journal({ journal, index }: Props) {
     };
 
     const setOpen = (visible: boolean) => {
-      if (isTouchLayout() || isOpenRef.current === visible) return;
+      if (!spillAllowed() || isOpenRef.current === visible) return;
       isOpenRef.current = visible;
       /* Opening measures everything. Closing only re-reads where the notebook
          is now: the overlay is fixed, so any scrolling since it opened has
@@ -249,6 +295,10 @@ function Journal({ journal, index }: Props) {
       );
 
       if (scrim) {
+        /* Blur off before the fade starts, back on only once it has landed.
+           See .jr-spill-scrim.is-blurred — a backdrop-filter re-blurs the whole
+           viewport on every frame its element's alpha moves. */
+        if (!visible) scrim.classList.remove("is-blurred");
         /* No delay on the way out. The scrim used to wait 240ms for the cards
            to get clear, and since it is the largest thing on screen that read
            as the whole overlay ignoring the cursor for a quarter of a second.
@@ -264,6 +314,18 @@ function Journal({ journal, index }: Props) {
               ? { duration: 0.46, ease: [0.22, 0.61, 0.36, 1] }
               : { duration: 0.56, ease: [0.65, 0, 0.6, 1] }
         );
+        if (visible) {
+          /* Reuses the settle generation so a fade that got interrupted by the
+             pointer leaving can never switch the blur on afterwards. */
+          const blurAt = settleAt;
+          window.setTimeout(
+            () => {
+              if (settleRef.current !== blurAt || !isOpenRef.current) return;
+              scrim.classList.add("is-blurred");
+            },
+            reduced ? 0 : 480
+          );
+        }
       }
 
       if (tooltip) {
@@ -382,9 +444,13 @@ function Journal({ journal, index }: Props) {
     const track = (e: PointerEvent) => {
       const on = overBook(e.clientX, e.clientY);
       if (on) placeTooltip(e.clientX, e.clientY);
-      setOpen(on);
+      wantsRef.current = on;
+      shelf.want(on, () => wantsRef.current, setOpen);
     };
     const enter = (e: PointerEvent) => {
+      // Touch fires pointerenter on tap too. That path is handled by onTap
+      // below, which toggles rather than tracking a cursor that is not there.
+      if (!canHover()) return;
       if (!tracking) {
         tracking = true;
         window.addEventListener("pointermove", track, { passive: true });
@@ -392,25 +458,56 @@ function Journal({ journal, index }: Props) {
       track(e);
     };
     const leave = () => {
+      if (!canHover()) return;
       if (tracking) {
         tracking = false;
         window.removeEventListener("pointermove", track);
       }
-      setOpen(false);
+      wantsRef.current = false;
+      shelf.want(false, () => false, setOpen);
+    };
+
+    /* Touch, inert notebook only: tap toggles the spill, and a tap anywhere
+       else puts it away.
+       Deliberately NOT built on pointerenter/pointerleave. A touch pointer
+       "leaves" the instant the finger lifts, so the hover path would open the
+       overlay on touchdown and close it on touchup — a flash. A tap is a
+       discrete event and wants discrete handling. */
+    const onTap = (e: Event) => {
+      if (canHover() || !inert) return;
+      e.preventDefault();
+      const next = !isOpenRef.current;
+      if (next) {
+        const rect = target.getBoundingClientRect();
+        placeTooltip(rect.left + rect.width * 0.5, rect.top + 24);
+      }
+      wantsRef.current = next;
+      // A tap has already happened, so the intent cannot go stale — the gate
+      // only has to wait for whatever is open to get out of the way.
+      shelf.want(next, () => true, setOpen);
+    };
+    const onTapOutside = (e: PointerEvent) => {
+      if (canHover() || !isOpenRef.current) return;
+      if (target.contains(e.target as Node)) return; // onTap owns that case
+      wantsRef.current = false;
+      shelf.want(false, () => false, setOpen);
     };
     const onFocus = () => {
       // No cursor on keyboard focus — anchor near the top centre of the link.
       const rect = target.getBoundingClientRect();
       placeTooltip(rect.left + rect.width * 0.5, rect.top + 24);
-      setOpen(true);
+      wantsRef.current = true;
+      // Focus, not the cursor, is the thing that can move on during a handoff.
+      shelf.want(true, () => target.contains(document.activeElement), setOpen);
     };
     /* A resize mid-spill invalidates every number measure() produced. Because
        left/top now carry the landing spot, re-measuring is enough — the cards
        are sitting at transform 0 and simply follow their new spots. */
     const onResize = () => {
       if (!isOpenRef.current) return;
-      if (isTouchLayout()) {
-        setOpen(false);
+      if (!spillAllowed()) {
+        wantsRef.current = false;
+        shelf.want(false, () => false, setOpen);
         return;
       }
       measure();
@@ -424,6 +521,9 @@ function Journal({ journal, index }: Props) {
     target.addEventListener("pointerleave", leave);
     target.addEventListener("focusin", onFocus);
     target.addEventListener("focusout", leave);
+    target.addEventListener("click", onTap);
+    // Capture, so a tap on anything else closes before that thing handles it.
+    document.addEventListener("pointerdown", onTapOutside, true);
     window.addEventListener("resize", onResize);
 
     return () => {
@@ -431,10 +531,13 @@ function Journal({ journal, index }: Props) {
       target.removeEventListener("pointerleave", leave);
       target.removeEventListener("focusin", onFocus);
       target.removeEventListener("focusout", leave);
+      target.removeEventListener("click", onTap);
+      document.removeEventListener("pointerdown", onTapOutside, true);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("pointermove", track);
+      shelf.release();
     };
-  }, [spill, hit]);
+  }, [spill, hit, href, id]);
 
   const isExternal = href?.startsWith("http") ?? false;
   const ctaLabel = cta ?? "VIEW CASE STUDY";
@@ -506,7 +609,15 @@ function Journal({ journal, index }: Props) {
      whole layer hidden keeps a screen reader from walking a pile of images and
      pull quotes that appear and vanish on a pointer it does not have. */
   const spillLayer = (
-    <div className="jr-spill" data-journal={id} aria-hidden="true" ref={spillRef}>
+    <div
+      className="jr-spill"
+      data-journal={id}
+      /* Marks the layer that survives on a touch device: with no case study to
+         navigate to, a tap can open it without stealing anything. */
+      data-inert={href ? undefined : "true"}
+      aria-hidden="true"
+      ref={spillRef}
+    >
       <div className="jr-spill-scrim" />
       {spill.map((item, i) => (
         <div

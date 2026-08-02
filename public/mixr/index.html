@@ -100,8 +100,16 @@ main::before{bottom:0}
 .side{position:sticky;top:var(--nav-height);align-self:start;height:calc(100vh - var(--nav-height));
   padding-block:var(--intro-grid-offset) clamp(28px,5vw,64px);
   display:flex;flex-direction:column;gap:22px}
+/* Keep both rows on the same raster phase and the same local ground. A page-grid
+   rule otherwise passes through the first row and makes identical brass text
+   render darker than the second row. */
 .side .who{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.16em;text-transform:uppercase;
-  color:var(--brass)}
+  line-height:21px;color:var(--brass);position:relative;isolation:isolate;width:max-content}
+.side .who::before{content:"";position:absolute;z-index:-1;inset:-8px -14px;background:var(--ground);
+  -webkit-mask-image:radial-gradient(ellipse at center,#000 64%,transparent 100%);
+  mask-image:radial-gradient(ellipse at center,#000 64%,transparent 100%);pointer-events:none}
+.side .who>span{display:block;color:inherit}
+.side .who>span+span{font-weight:600}
 .jump{display:flex;flex-direction:column;gap:1px;border-left:1px solid var(--rule)}
 .jump a{position:relative;font-family:var(--fm);font-size:var(--fs-body);line-height:1.5;
   letter-spacing:.03em;color:var(--soft);text-decoration:none;padding:8px 0 8px 14px;
@@ -180,6 +188,37 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
   border-bottom:1.5px solid color-mix(in srgb,currentColor 48%,transparent)}
 .links .lbl .nav-rule{bottom:-1.5px}
 .links a:hover .nav-rule,.links a:focus-visible .nav-rule{transform:scaleX(1)}
+
+/* Fun fact — reads as a sibling of the link next to it, but it goes nowhere,
+   so it is a button. Hover reveals it on a mouse; click pins it, which is the
+   only thing that works on a touch screen where "hover" lasts one frame. */
+.ff-wrap{position:relative;display:inline-flex}
+.links .ff{display:block;background:none;border:0;padding:0;cursor:pointer;
+  font:inherit;color:var(--body);transition:color .18s ease}
+.links .ff:hover,.links .ff:focus-visible,.links .ff[aria-expanded="true"]{color:var(--soft)}
+.links .ff:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+.links .ff:hover .nav-rule,
+.links .ff:focus-visible .nav-rule,
+.links .ff[aria-expanded="true"] .nav-rule{transform:scaleX(1)}
+/* The landing page's cursor tip plate, same recipe: opaque page-colour fill so
+   the cutting-mat grid does not read through it, a 12% hairline, a 1px radius,
+   13px mono. No nib — it follows the pointer rather than pointing at a word,
+   so an arrow would aim at nothing. Position comes from JS. */
+.ff-tip{position:fixed;left:0;top:0;z-index:40;
+  max-width:min(408px,68vw);
+  opacity:0;pointer-events:none;
+  background:var(--ground);
+  border:1px solid color-mix(in srgb,var(--ink) 12%,transparent);
+  border-radius:1px;
+  padding:9px 13px;
+  font-family:var(--fm);font-size:13px;font-weight:400;line-height:1.65;
+  letter-spacing:.03em;color:var(--body);text-align:left;
+  box-shadow:0 4px 12px color-mix(in srgb,var(--ink) 14%,transparent);
+  transition:opacity .18s ease}
+/* Italic only — no colour shift. The emphasis is the slant; recolouring it too
+   makes one word look like a link in the middle of a sentence. */
+.ff-tip em{font-style:italic;color:inherit}
+.ff-tip.on{opacity:1}
 
 /* decision + flag blocks */
 .dec{border-top:1px solid var(--rule);padding-top:20px;margin-top:30px}
@@ -439,24 +478,40 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 .sg-lab{font-family:var(--fsf);font-size:15px;font-weight:500;color:#fff}
 /* Recessed track: darker in the centre, brighter inner rim, so the pill reads as
    sitting INSIDE something rather than on top of a flat rectangle. */
-.sg{position:relative;display:flex;align-items:center;padding:3px;border-radius:9px;
-  background:radial-gradient(120% 180% at 50% 50%,rgba(3,4,9,.96),rgba(9,12,22,.9));
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.075),
+.sg{--tint:var(--mx-echo);
+  position:relative;display:flex;align-items:center;padding:3px;border-radius:9px;
+  background:
+    linear-gradient(180deg,color-mix(in srgb,var(--tint) 9%,transparent),
+                           color-mix(in srgb,var(--tint) 4%,transparent)),
+    radial-gradient(120% 180% at 50% 50%,rgba(3,4,9,.96),rgba(9,12,22,.9));
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--tint) 16%,rgba(255,255,255,.075)),
              inset 0 1px 2px rgba(0,0,0,.55)}
 /* The pill's rim is deliberately asymmetric — one light source, upper left.
    Ratios are the ones I settled on in the app: left 100%, top ~40%, right ~55%,
    bottom ~12%. A rim that is even all the way round stops reading as glass and
    starts reading as a stroked rectangle. */
+/* Tinted, not neutral. In the app this pill carries the TRACK's colour through
+   its whole stack — TLTransitionSettingsSegmentedControl takes a `trackColor`
+   and threads it through the body fill (.13 → clear → .07), the rim gradients
+   (white .42 → white .20 → trackColor .19 → white .08), the inner highlight
+   (trackColor .12 at 18%) and both shadows (trackColor .08). A neutral glass
+   pill loses the one thing the control is saying: which lane you are editing.
+   The demo is set to the purple track; change --tint to retint the whole thing. */
 .sg-pill{position:absolute;top:3px;bottom:3px;left:0;width:0;border-radius:7px;pointer-events:none;
-  background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.085) 34%,
-    rgba(255,255,255,.045) 62%,rgba(0,0,0,.12));
+  background:
+    linear-gradient(180deg,color-mix(in srgb,var(--tint) 13%,transparent),
+                           transparent 52%,
+                           color-mix(in srgb,var(--tint) 7%,transparent)),
+    linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.085) 34%,
+      rgba(255,255,255,.045) 62%,rgba(0,0,0,.12));
   box-shadow:
     inset  1px 0 0 rgba(255,255,255,.42),   /* left rim   — 100% */
     inset  0 1px 0 rgba(255,255,255,.17),   /* top rim    — ~40% */
-    inset -1px 0 0 rgba(255,255,255,.23),   /* right rim  — ~55% */
-    inset  0 -1px 0 rgba(255,255,255,.05),  /* bottom rim — ~12% */
+    inset -1px 0 0 color-mix(in srgb,var(--tint) 34%,rgba(255,255,255,.23)),
+    inset  0 -1px 0 color-mix(in srgb,var(--tint) 26%,rgba(255,255,255,.05)),
     0 2px 8px rgba(0,0,0,.32),
-    0 0 10px color-mix(in srgb,var(--mx-echo) 16%,transparent);
+    0 2px 8px color-mix(in srgb,var(--tint) 22%,transparent),
+    0 0 14px color-mix(in srgb,var(--tint) 30%,transparent);
   transition:left .38s cubic-bezier(.32,.72,.24,1),width .38s cubic-bezier(.32,.72,.24,1)}
 .sg button{position:relative;z-index:1;background:none;border:0;cursor:pointer;
   font-family:var(--fsf);font-size:14px;font-weight:500;
@@ -579,7 +634,16 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 .beta button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .beta button[disabled]{opacity:.55;cursor:default}
 .beta-note{font-family:var(--fm);font-size:var(--fs-micro);line-height:1.75;color:var(--soft);
-  margin:0;min-height:1.75em}
+  margin:0}
+/* Empty = almost no footprint, so the panel is only as tall as the form until
+   there is something to say, then grows to whatever the message needs. With no
+   content the box is already 0 tall; this cancels all but 2px of .beta's 12px
+   flex gap, leaving the input a hair more room to breathe above the padding
+   than the message state gets.
+   Deliberately NOT display:none — this is the aria-live region, and screen
+   readers announce it far more reliably when it has been in the accessibility
+   tree since load rather than being inserted along with its first message. */
+.beta-note:empty{margin-top:-10px}
 .beta-note a{color:var(--body)}
 .beta-note[data-state="err"]{color:#8a3b2a}
 
@@ -609,8 +673,328 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
   .wt-nav-inner{padding-inline:16px}
   .wt-wordmark,.wt-nav-links a{font-size:13px;letter-spacing:.07em}
   .wt-nav-links{gap:16px}
+  /* Phone: no section list. At 900px it becomes a horizontally scrolling strip,
+     and on a phone that strip sits directly under the nav and competes with the
+     page for the first swipe — you flick to read on and scrub the chapters
+     instead. The heading is enough to say where you are; the read-progress bar
+     is already hidden here for the same reason.
+     Back to a column so the heading spans the full measure rather than being
+     squeezed into a row it no longer shares. */
+  /* HOME and NEXT hang a full gutter outside the shell on desktop, where the
+     sidebar leaves room for it. On a phone there is no such margin, so they
+     drift past the conclusion box — pull them flush with its right edge. */
+  .case-actions{right:0}
+  .side .jump{display:none}
+  .side{flex-direction:column;align-items:stretch;gap:0;overflow-x:visible}
+  /* Halve the run-in under the heading. The 67px there was .shell's 24px
+     row-gap plus main's 43px intro offset — sized for when the section list
+     sat between them. With the list gone the heading is the only thing above
+     "Case study", and that much air reads as a dropped element. */
+  .shell{row-gap:11px}
+  main{padding-top:19px}
   .fx-rail{--k:1.1}
 }
+/* ============================================================================
+   Recreated app surfaces — everything below is rebuilt in CSS/JS from the
+   Swift it ships as, not redrawn by eye. Each block names its source file.
+   ========================================================================= */
+
+/* ---- kept / changed, and before / after --------------------------------- */
+/* Same hairline grid as .vs, but two labelled halves where the right one is
+   the outcome. .ba is used where the story is a revision of my own work and
+   "rejected" would be wrong — nothing was rejected, it just changed. */
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);
+  border:1px solid var(--rule);margin:22px 0 0}
+.ba > div{background:var(--ground);padding:15px 17px;display:flex;flex-direction:column;gap:8px}
+.ba h4{margin:0;font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.14em;
+  text-transform:uppercase;font-weight:400;color:var(--soft)}
+.ba div.pick{background:color-mix(in srgb,var(--brass) 11%,var(--ground))}
+.ba div.pick h4{color:var(--brass)}
+.ba p{margin:0;font-family:var(--fm);font-size:var(--fs-body);line-height:1.62;color:var(--body)}
+@media (max-width:620px){.ba{grid-template-columns:1fr}}
+
+/* ---- recreated: the design system --------------------------------------- */
+/* Values are MixrColors.swift, MixrTypography.swift, DesignTokens.swift and
+   GlassCardModifier.swift. The code chips print the literal Swift so the page
+   can be checked against the repo rather than trusted. */
+.ds{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:20px}
+.ds-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:11px}
+.ds-card h5{margin:0;font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.13em;
+  text-transform:uppercase;font-weight:400;color:#8f96a6}
+.ds-sw{display:flex;flex-direction:column;gap:7px;margin:0;padding:0;list-style:none}
+.ds-sw li{display:grid;grid-template-columns:26px minmax(0,1fr) auto;align-items:center;gap:10px}
+.ds-sw i{width:26px;height:26px;border-radius:7px;display:block;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+.ds-sw b{font-family:var(--fsf);font-size:12px;font-weight:500;color:#d8d8de;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ds-sw code{font-family:var(--fm);font-size:11px;color:#7f8694;letter-spacing:.02em}
+/* The type scale renders at the real px sizes and weights, so the row heights
+   are the specimen — do not normalise them. */
+.ds-type{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
+.ds-type li{display:flex;flex-direction:column;gap:3px;
+  border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:11px}
+.ds-type li:last-child{border-bottom:0;padding-bottom:0}
+.ds-type .spec{font-family:var(--fsf);color:#fff}
+.ds-type .meta{font-family:var(--fm);font-size:11px;color:#7f8694;letter-spacing:.04em}
+/* Four glass levels, drawn with the modifier's own numbers. */
+.ds-glass{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:11px;
+  margin:0;padding:0;list-style:none}
+.ds-glass li{display:flex;flex-direction:column;gap:8px}
+.ds-glass .sw{height:66px;border-radius:16px;position:relative;overflow:hidden;
+  background:linear-gradient(155deg,rgba(255,255,255,var(--hi)),rgba(255,255,255,var(--lo)));
+  box-shadow:inset 0 0 0 1px var(--bd),0 6px 20px rgba(0,0,0,.2)}
+.ds-glass .sw::after{content:"";position:absolute;inset:0;border-radius:16px;
+  background:color-mix(in srgb,var(--tint) calc(var(--fill) * 100%),transparent)}
+.ds-glass .cap{font-family:var(--fm);font-size:11px;color:#8f96a6;line-height:1.6}
+.ds-glass .cap b{display:block;color:#d8d8de;font-weight:400;font-size:12px}
+
+/* Buttons, rebuilt from MixrButtonStyles.swift at their shipped metrics. */
+.ds-btns{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:2px}
+.mx-btn{font-family:var(--fsf);font-size:12px;font-weight:500;color:#fff;border:0;cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px;padding:10px 16px;border-radius:12px;
+  transition:transform .16s ease,filter .16s ease}
+.mx-btn:active{transform:scale(.97)}
+.mx-btn svg{width:14px;height:14px;fill:currentColor;flex:0 0 auto}
+.mx-btn--primary{background:linear-gradient(135deg,#A78BFA,#8B5CF6);
+  box-shadow:0 0 30px rgba(139,92,246,.20)}
+.mx-btn--primary:hover{filter:brightness(1.07)}
+.mx-btn--glass{background:rgba(5,8,16,.75);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.mx-btn--glass:hover{background:rgba(10,15,26,.85)}
+.mx-btn--icon{width:40px;height:40px;padding:0;justify-content:center;border-radius:20px;
+  background:rgba(5,8,16,.75);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.mx-btn--icon.is-play{background:linear-gradient(135deg,#A78BFA,#7C3AED);
+  box-shadow:0 0 30px rgba(139,92,246,.28)}
+.mx-btn--toggle{width:32px;height:40px;padding:0;justify-content:center;border-radius:16px;
+  background:rgba(5,8,16,.75);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+  font-size:12px;color:#9CA3AF}
+.mx-btn--toggle[aria-pressed="true"]{color:#fff;background:rgba(124,58,237,.22);
+  box-shadow:inset 0 0 0 1px rgba(124,58,237,.42)}
+.ds-note{font-family:var(--fm);font-size:11px;color:#7f8694;line-height:1.7;margin:0}
+
+/* ---- recreated: the effect control tray --------------------------------- */
+/* EffectControlTray.swift — a single intensity slider, and presets only where
+   the effect has them. This is the whole parameter surface of the app. */
+.tray{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:16px}
+.tray-glass{flex:1 1 320px;min-width:0;border-radius:16px;padding:14px 18px;
+  background:rgba(23,30,46,.65);box-shadow:inset 0 0 0 1px rgba(255,255,255,.10),
+  0 6px 20px rgba(0,0,0,.20)}
+/* EffectControlTray always centres the slider and presets in the glass rather
+   than letting them span it — a full-width slider reads as a progress bar. */
+.tray-glass > *{max-width:420px;margin-inline:auto}
+.tray-row{display:flex;align-items:center;gap:8px}
+.tray-row svg{width:15px;height:15px;fill:#9CA3AF;flex:0 0 auto}
+.tray-val{font-family:var(--fm);font-size:12px;color:#d8d8de;width:34px;text-align:right;
+  flex:0 0 auto}
+.tray input[type=range]{flex:1 1 auto;min-width:0;appearance:none;-webkit-appearance:none;
+  height:4px;border-radius:2px;background:linear-gradient(90deg,
+    var(--c) 0 var(--p,50%),rgba(255,255,255,.12) var(--p,50%) 100%);cursor:pointer}
+.tray input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
+  width:15px;height:15px;border-radius:50%;background:#fff;
+  box-shadow:0 1px 4px rgba(0,0,0,.5),0 0 10px color-mix(in srgb,var(--c) 60%,transparent)}
+.tray input[type=range]::-moz-range-thumb{width:15px;height:15px;border:0;border-radius:50%;
+  background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+.tray input[type=range]:focus-visible{outline:2px solid #f2f0ec;outline-offset:4px}
+.tray-presets{display:flex;gap:3px;margin-top:11px;padding:3px;border-radius:9px;
+  background:radial-gradient(120% 180% at 50% 50%,rgba(3,4,9,.96),rgba(9,12,22,.9));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.075)}
+.tray-presets button{flex:1 1 0;background:none;border:0;cursor:pointer;border-radius:7px;
+  font-family:var(--fsf);font-size:12px;font-weight:500;color:#8f96a6;padding:7px 6px;
+  transition:color .24s ease,background .24s ease}
+.tray-presets button[aria-pressed="true"]{color:#fff;
+  background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.045));
+  box-shadow:inset 1px 0 0 rgba(255,255,255,.42),inset 0 1px 0 rgba(255,255,255,.17)}
+.tray-presets button:focus-visible{outline:2px solid #f2f0ec;outline-offset:2px}
+/* The rejected half: what a pro plugin asks a beginner to understand. */
+.tray--pro{opacity:.92}
+.tray--pro .pro-row{display:grid;grid-template-columns:78px minmax(0,1fr) 40px;
+  align-items:center;gap:10px;margin-bottom:9px}
+.tray--pro .pro-row:last-child{margin-bottom:0}
+.tray--pro label{font-family:var(--fsf);font-size:11px;color:#9CA3AF}
+.tray--pro .pro-track{height:3px;border-radius:2px;background:rgba(255,255,255,.12);position:relative}
+.tray--pro .pro-track i{position:absolute;top:50%;width:11px;height:11px;margin-top:-5.5px;
+  margin-left:-5.5px;border-radius:50%;background:#6b7280;left:var(--p)}
+.tray--pro .pro-val{font-family:var(--fm);font-size:11px;color:#7f8694;text-align:right}
+
+/* ---- recreated: the live drop-resolution timeline ----------------------- */
+/* The JS below is a direct port of MixrTimeline.resolveClipDrop. Geometry is
+   TLK/WaveformStyle: 48pt lane, 10pt radius, 8pt inner padding, 0.55 clip
+   opacity, 2pt bars at 1pt spacing. */
+.tl{margin-top:18px;border-radius:10px;overflow:hidden;position:relative;
+  background:linear-gradient(180deg,#080B16,#050816);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);
+  touch-action:none;user-select:none;-webkit-user-select:none}
+.tl-lane{position:relative;height:104px}
+.tl-lane::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(90deg,rgba(42,49,66,.62) 1px,transparent 1px);
+  background-size:calc(100% / 26) 100%}
+/* Edge snap zones, drawn only while dragging so the rule is visible, not just
+   described. Width is the real 10pt zone converted to a % of the lane. */
+.tl-zone{position:absolute;top:0;bottom:0;pointer-events:none;opacity:0;
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.10) 0 3px,transparent 3px 6px);
+  transition:opacity .18s ease}
+.tl.is-drag .tl-zone{opacity:1}
+.tl-clip{position:absolute;top:28px;height:48px;border-radius:10px;cursor:grab;
+  background:color-mix(in srgb,var(--c) 22%,transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 48%,transparent);
+  transition:left .38s cubic-bezier(.32,.72,.24,1),width .38s cubic-bezier(.32,.72,.24,1),
+             transform .22s cubic-bezier(.32,.72,.24,1),opacity .22s ease}
+/* The waveform is a FILLED MIRRORED SILHOUETTE, not a bar pattern — see
+   WaveformSilhouettePath.build in WaveformStyle.swift. An even stripe reads as
+   a loading bar; the whole point of the lane is that you can see the shape of
+   the song in it. The <svg> is generated in JS at the clip's real pixel size so
+   innerPadding (8) and the tail inset stay true pt values instead of being
+   stretched by a viewBox. */
+.tl-clip .wave{position:absolute;inset:0;display:block;overflow:visible}
+.tl-clip .wave svg{display:block;width:100%;height:100%}
+/* The label sits over the waveform, so it carries its own shadow rather than a
+   plate — a chip behind it would read as a second object on the clip. */
+.tl-clip .tag{position:absolute;left:9px;top:5px;font-family:var(--fsf);font-size:10px;
+  font-weight:500;color:rgba(255,255,255,.9);letter-spacing:.04em;pointer-events:none;
+  text-shadow:0 1px 3px rgba(0,0,0,.85),0 0 8px rgba(0,0,0,.6)}
+.tl-clip.is-moving{cursor:grabbing;z-index:5;transform:translateY(-6px) scale(1.05);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 92%,transparent),
+             0 10px 18px rgba(0,0,0,.6),
+             0 0 22px color-mix(in srgb,var(--c) 36%,transparent);
+  transition:transform .22s cubic-bezier(.32,.72,.24,1)}
+.tl-clip.is-ghost{opacity:.28;z-index:0;cursor:grab}
+.tl-cut{position:absolute;top:22px;bottom:22px;width:1.5px;background:#fff;z-index:6;
+  opacity:0;pointer-events:none;box-shadow:0 0 8px rgba(255,255,255,.7);
+  transition:opacity .16s ease,left .1s linear}
+.tl-cut.on{opacity:1}
+.tl-readout{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-top:14px}
+.tl-rule{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.05em;
+  padding:6px 11px;border-radius:6px;background:rgba(255,255,255,.05);color:#8f96a6;
+  transition:background .2s ease,color .2s ease}
+.tl-rule.on{background:color-mix(in srgb,var(--mx-purple) 30%,transparent);color:#fff}
+.tl-nums{font-family:var(--fm);font-size:11px;color:#7f8694;letter-spacing:.03em}
+.tl-reset{font-family:var(--fm);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  background:none;border:1px solid rgba(255,255,255,.16);color:#9CA3AF;border-radius:6px;
+  padding:6px 12px;cursor:pointer;transition:color .18s ease,border-color .18s ease}
+.tl-reset:hover{color:#fff;border-color:rgba(255,255,255,.36)}
+.tl-reset:focus-visible,.tl-clip:focus-visible{outline:2px solid #f2f0ec;outline-offset:3px}
+
+/* ---- recreated: the navbar, geometric vs optical centre ----------------- */
+.nb{position:relative;border-radius:12px;padding:11px 14px;margin-top:16px;
+  background:linear-gradient(180deg,#0B0B16,#050816);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.nb-row{display:flex;align-items:center;gap:10px;position:relative}
+.nb-brand{font-family:var(--fsf);font-size:14px;font-weight:600;color:#fff;letter-spacing:-.01em}
+.nb-spacer{flex:1 1 auto}
+/* The cluster is what moves. --shift is 0 in the before state and the real
+   20-30px correction in the after state. */
+.nb-cluster{display:flex;align-items:center;gap:10px;
+  transform:translateX(var(--shift,0px));transition:transform .5s cubic-bezier(.32,.72,.24,1)}
+.nb-play{width:34px;height:34px;border-radius:50%;border:0;flex:0 0 auto;
+  background:linear-gradient(135deg,#A78BFA,#7C3AED);display:grid;place-items:center;
+  box-shadow:0 0 var(--glow,30px) rgba(139,92,246,var(--glowa,.30));
+  transition:box-shadow .5s ease}
+.nb-play svg{width:12px;height:12px;fill:#fff;margin-left:2px}
+.nb-skip{width:22px;height:22px;display:grid;place-items:center;flex:0 0 auto}
+.nb-skip svg{width:13px;height:13px;fill:#9CA3AF}
+/* Before: three loose metadata columns. After: one block, smaller labels. */
+.nb-meta{display:flex;align-items:center;gap:var(--metagap,18px);
+  transition:gap .5s cubic-bezier(.32,.72,.24,1)}
+.nb-meta div{display:flex;flex-direction:column;align-items:center;line-height:1.15}
+.nb-meta b{font-family:var(--fm);font-size:12px;font-weight:400;color:#fff}
+.nb-meta span{font-family:var(--fsf);font-size:var(--metalab,9px);font-weight:500;
+  color:#7F8694;letter-spacing:.08em;transition:font-size .5s ease}
+/* The centre marks: geometric centre of the bar, and where the cluster's mass
+   actually sits. Showing both is the whole point of the demo. */
+.nb-tick{position:absolute;top:-11px;bottom:-11px;width:1px;pointer-events:none;
+  transition:left .5s cubic-bezier(.32,.72,.24,1)}
+.nb-tick.geo{background:repeating-linear-gradient(180deg,rgba(255,255,255,.4) 0 3px,transparent 3px 6px)}
+.nb-tick.opt{background:var(--mx-pitch);box-shadow:0 0 8px color-mix(in srgb,var(--mx-pitch) 60%,transparent)}
+.nb-key{display:flex;flex-wrap:wrap;gap:16px;margin-top:12px;font-family:var(--fm);
+  font-size:11px;color:#7f8694}
+.nb-key i{display:inline-block;width:16px;height:1px;vertical-align:middle;margin-right:6px}
+.nb-key .k1 i{background:rgba(255,255,255,.4)}
+.nb-key .k2 i{background:var(--mx-pitch)}
+/* Held for one synchronous measure/restore cycle so the correction can be
+   computed against the layout the bar is ABOUT to have, not the one it is
+   still animating out of. Never present across a frame the user sees. */
+.nb-measuring,.nb-measuring *{transition:none !important}
+@media (max-width:620px){.nb-meta{--metagap:10px}.nb-brand{display:none}}
+
+/* ---- the three app icons ------------------------------------------------- */
+.icons{margin:18px 0 0;padding:0;list-style:none;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:18px}
+.icons > li{display:flex;flex-direction:column;gap:7px;padding:15px 15px 16px;border-radius:14px;
+  background:rgba(255,255,255,.035);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.icons li.pick{background:color-mix(in srgb,var(--mx-purple) 13%,transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--mx-purple) 42%,transparent)}
+.icons figure{margin:0 0 4px}
+.icons img{display:block;width:128px;max-width:100%;height:auto;border:0;border-radius:26px}
+.icons b{font-family:var(--fsf);font-size:15px;font-weight:600;color:#fff}
+.icons i{font-family:var(--fm);font-size:var(--fs-micro);font-style:normal;line-height:1.65;
+  color:#8f96a6}
+.icons .v{margin-top:auto;padding-top:8px;font-family:var(--fm);font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:#7f8694}
+.icons li.pick .v{color:#C084FC}
+/* The 40px row — an app icon is chosen on a home screen, not on an artboard. */
+.icons--sm{display:flex;gap:14px;margin-top:14px}
+.icons--sm > li{padding:0;background:none;box-shadow:none;flex:0 0 auto}
+.icons--sm li.pick{background:none;box-shadow:none}
+.icons--sm img{width:40px;border-radius:9px}
+
+/* ---- the effect A/B: one dry loop, then each card at full strength -------- */
+.fxa{margin-top:18px}
+.fxa-src{display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;align-items:center;
+  padding:14px 16px;border-radius:12px;background:rgba(255,255,255,.045);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.09)}
+.fxa-rows{margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:1px;
+  background:rgba(255,255,255,.07);border-radius:12px;overflow:hidden}
+.fxa-row{display:grid;grid-template-columns:44px 44px minmax(0,1.15fr) minmax(0,1.6fr);
+  gap:14px;align-items:center;padding:13px 16px;background:var(--max-ink)}
+.fxa-ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
+  background:color-mix(in srgb,var(--c) 16%,transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 34%,transparent),
+             0 0 16px color-mix(in srgb,var(--c) 20%,transparent)}
+.fxa-ico svg{width:21px;height:21px;fill:var(--c)}
+.fxa-txt b{display:block;font-family:var(--fsf);font-size:14px;font-weight:600;color:#fff;
+  line-height:1.25}
+.fxa-txt span{display:block;font-family:var(--fm);font-size:var(--fs-micro);line-height:1.6;
+  color:#8f96a6;margin-top:3px}
+/* The speaker button. It is the only affordance in the row, so it gets the
+   effect's own colour rather than a neutral grey. */
+.fxa-play{width:44px;height:44px;border-radius:50%;border:0;cursor:pointer;display:grid;
+  place-items:center;background:color-mix(in srgb,var(--c) 20%,transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 42%,transparent);
+  transition:background .18s ease,transform .16s ease}
+.fxa-play:hover{background:color-mix(in srgb,var(--c) 34%,transparent)}
+.fxa-play:active{transform:scale(.94)}
+.fxa-play:focus-visible{outline:2px solid #f2f0ec;outline-offset:3px}
+.fxa-play svg{width:17px;height:17px;fill:#fff}
+.fxa-play .ic-pause{display:none}
+.fxa-play[aria-pressed="true"] .ic-play{display:none}
+.fxa-play[aria-pressed="true"] .ic-pause{display:block}
+.fxa-play[aria-pressed="true"]{background:color-mix(in srgb,var(--c) 46%,transparent)}
+/* The waveform of the PROCESSED clip, from peaks.json — so echo's repeats and
+   reverb's tail are visible before you press anything. */
+/* color, NOT fill — the svg is generated with fill="currentColor", so without
+   this every silhouette inherits the page's brown ink and all six rows come
+   out the same muddy colour instead of the effect's own. */
+.fxa-wave{position:relative;height:44px;min-width:0;border-radius:6px;overflow:hidden;
+  color:var(--c);background:rgba(255,255,255,.035)}
+.fxa-wave svg{display:block;width:100%;height:100%}
+.fxa-wave .pw{position:absolute;inset:0 100% 0 0;background:rgba(255,255,255,.16);
+  pointer-events:none}
+@media (max-width:760px){
+  .fxa-row{grid-template-columns:40px 40px minmax(0,1fr);row-gap:10px}
+  .fxa-wave{grid-column:1 / -1;height:38px}
+}
+
+/* A plain two-state switch, reused by every before/after demo in section 05. */
+.tog{display:inline-flex;padding:3px;border-radius:9px;margin-top:2px;
+  background:radial-gradient(120% 180% at 50% 50%,rgba(3,4,9,.96),rgba(9,12,22,.9));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.075)}
+.tog button{background:none;border:0;cursor:pointer;border-radius:7px;font-family:var(--fsf);
+  font-size:13px;font-weight:500;color:#8f96a6;padding:7px 15px;transition:color .24s ease,background .24s ease}
+.tog button[aria-pressed="true"]{color:#fff;
+  background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.045));
+  box-shadow:inset 1px 0 0 rgba(255,255,255,.42),inset 0 1px 0 rgba(255,255,255,.17)}
+.tog button:focus-visible{outline:2px solid #f2f0ec;outline-offset:2px}
+
 @media (prefers-reduced-motion:reduce){
   .wt-nav{transition:none}
   .dgflow .fx{opacity:1}
@@ -618,6 +1002,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
   html{scroll-behavior:auto}
   .rv{opacity:1;transform:none;transition:none}
   .sb-clip,.sg-pill{transition:none}
+  .tl-clip,.nb-cluster,.nb-tick,.nb-play,.nb-meta,.nb-meta span{transition:none}
 }
 </style>
 
@@ -647,7 +1032,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 
 <!-- ================= SIDEBAR ================= -->
 <aside class="side">
-  <div class="who">Mixr &middot; iOS&nbsp;DJ&nbsp;app<br><span>Independent &middot; 2026</span></div>
+  <div class="who"><span>Mixr &middot; iOS&nbsp;DJ&nbsp;app</span><span>Independent &middot; 2026</span></div>
   <nav class="jump" id="jump" aria-label="Sections">
     <a href="#problem"><span class="n">01</span>Problem</a>
     <a href="#insight"><span class="n">02</span>Insights</a>
@@ -668,7 +1053,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 
 <header class="rv">
   <p class="lab">Case study</p>
-  <h1>Designing Mixr by building it</h1>
+  <h1>Building Mixr, a DJ app</h1>
   <p class="lede" style="margin-top:20px">DJ software can be intimidating. Mixr makes remixing easy by using familiar patterns from video editing apps. <br/>
     Building the app was an experiment in designing by building: if I could collapse the design and engineering gap by designing as I go.</p>
   <div class="meta">
@@ -678,7 +1063,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
     <div><span>Status</span><span>Beta testing</span></div>
   </div>
   <p class="links links--head">
-    <a href="https://x.com/pranavibuilds" target="_blank" rel="noreferrer"><i class="ico">🔗</i><span class="lbl">Designing by Building on X<span class="nav-rule" aria-hidden="true"></span></span></a>
+    <a href="https://x.com/pranavibuilds" target="_blank" rel="noreferrer"><i class="ico">🔗</i><span class="lbl">Read my Mixr journey on X<span class="nav-rule" aria-hidden="true"></span></span></a>
   </p>
 </header>
 
@@ -717,6 +1102,31 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
     <h2>From live performance to visual composition.</h2></div>
 
   <div class="stack rv d1">
+    <p>It started with a mock ChatGPT generated. I keep going back to it for interface mocks &mdash; it is the one tool whose UI images don&rsquo;t look AI-generated. Nothing is melting, the type is real type, and the spacing is close enough to build from.</p>
+  </div>
+
+  <figure class="rv d2">
+    <img src="art/origin-mock.webp" alt="The first ChatGPT mock of Mixr: a dark editor with a song list down the left, five colored waveform lanes on a timeline, solo and mute buttons down the right, an Effects panel along the bottom holding Reverb, Echo, Bass Boost, Pitch Up, Flanger and Chorus, and a purple AI Suggestions button floating in the bottom right corner." loading="lazy">
+    <figcaption>Day one. Everything in this case study is downstream of this image.</figcaption>
+  </figure>
+
+  <div class="stack rv d2">
+    <p>I knew immediately what I wanted to change. AI Suggestions was a floating button in the corner, which makes the app&rsquo;s most interesting feature feel bolted on &mdash; it belonged in the effects row as its own card, next to everything else you can apply. Bass Boost and Chorus didn&rsquo;t survive either.</p>
+    <p>But the layout was right, and I never seriously moved it. Controls on the sides, timeline in the middle, effects along the bottom. It felt intuitive before I could explain why, and the reason turned out to be the whole insight below: that is an editor&rsquo;s layout, not a DJ&rsquo;s.</p>
+  </div>
+
+  <div class="ba rv d2">
+    <div>
+      <h4>Kept from the mock</h4>
+      <p>Song list left, lanes centre, solo and mute right, effects along the bottom. A colour per song, carried by its waveform. The near-black ground.</p>
+    </div>
+    <div class="pick">
+      <h4>Changed on the way</h4>
+      <p>AI became the Auto card at the head of the effects row. Bass Boost and Chorus were cut. &ldquo;Pitch Up&rdquo; became Pitch once it could go both ways.</p>
+    </div>
+  </div>
+
+  <div class="stack rv d2">
     <p>A few weeks in I realised I wasn&rsquo;t designing a DJ app. I was designing an audio editor &mdash; my design questions had quietly become music questions: where should one song end, how long should two overlap.</p>
     <p>That reframing is the product. The interface isn&rsquo;t the thing being made. The remix is.</p>
   </div>
@@ -899,8 +1309,133 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
   </figure>
 
 
+  <div class="dec rv d2">
+    <h3 style="margin-top:36px">Expose the parameters, or pick the one number that matters?</h3>
+    <p>Every real audio plugin opens onto a wall of controls. Each is honest, and each asks the beginner to already know what a Q curve or a wet/dry ratio does before they can hear anything change.</p>
+    <p>Rejected: the parameter panel. Not because it is wrong &mdash; it is what a professional wants &mdash; but because it moves the moment of feedback behind a lesson. The first thing you touch should make a sound you can judge.</p>
+
+    <div class="demo" style="margin-top:20px">
+      <p class="sub">Rejected &mdash; one effect, five parameters</p>
+      <div class="tray tray--pro">
+        <div class="tray-glass">
+          <div class="pro-row"><label>Room size</label><div class="pro-track" style="--p:62%"><i></i></div><span class="pro-val">0.62</span></div>
+          <div class="pro-row"><label>Damping</label><div class="pro-track" style="--p:38%"><i></i></div><span class="pro-val">0.38</span></div>
+          <div class="pro-row"><label>Pre-delay</label><div class="pro-track" style="--p:24%"><i></i></div><span class="pro-val">18ms</span></div>
+          <div class="pro-row"><label>Wet / dry</label><div class="pro-track" style="--p:45%"><i></i></div><span class="pro-val">45%</span></div>
+          <div class="pro-row"><label>Diffusion</label><div class="pro-track" style="--p:71%"><i></i></div><span class="pro-val">0.71</span></div>
+        </div>
+      </div>
+      <p class="foot">Five numbers, none of which tell you what the room will sound like. This one is a drawing &mdash; it never got built.</p>
+
+      <p class="sub" style="margin-top:30px">Chosen &mdash; one intensity, three rooms</p>
+      <div class="tray" id="tray" data-effect="reverb">
+        <div class="tray-glass" style="--c:var(--mx-reverb)">
+          <div class="tray-row">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 16 0 1 1 0 0 1-2 0 6 6 0 0 0-12 0 1 1 0 0 1-2 0zm3.2 0a4.8 4.8 0 0 1 9.6 0 1 1 0 0 1-2 0 2.8 2.8 0 0 0-5.6 0 1 1 0 0 1-2 0z"/></svg>
+            <label class="visually-hidden" for="tray-int">Reverb intensity</label>
+            <input id="tray-int" type="range" min="0" max="100" value="45" style="--p:45%">
+            <span class="tray-val" id="tray-val">45%</span>
+          </div>
+          <div class="tray-presets" id="tray-presets" role="group" aria-label="Reverb preset">
+            <button type="button" aria-pressed="true"  data-v="28">Small Room</button>
+            <button type="button" aria-pressed="false" data-v="62">Hall</button>
+            <button type="button" aria-pressed="false" data-v="84">Ambient</button>
+          </div>
+        </div>
+      </div>
+      <p class="foot">Live &mdash; drag the slider or pick a room. Rebuilt from <code>EffectControlTray.swift</code>. The presets are not shortcuts to a hidden panel; they <em>are</em> the panel, and each one just moves the single slider to a value that sounds like its name. Flanger and Blur ship with no presets at all &mdash; slider only.</p>
+    </div>
+
+    <div class="flag">
+      <p>Chosen: one intensity per effect, presets where a name is more useful than a number. The set stays small, named and preset-backed &mdash; and every control produces a sound before it asks a question.</p>
+    </div>
+  </div>
+
+  <div class="demo rv d2">
+    <div class="rowlab">
+      <span class="demo-title">Hear the effects</span>
+      <span class="hint">EACH ONE AT 100% &middot; SAME LOOP EVERY TIME</span>
+    </div>
+
+    <div class="fxa">
+      <div class="fxa-src" style="--c:#9CA3AF">
+        <button type="button" class="fxa-play" data-clip="original" aria-pressed="false" aria-label="Play the original loop">
+          <svg class="ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2a1 1 0 0 1 1.53-.85l9 6.8a1 1 0 0 1 0 1.7l-9 6.8A1 1 0 0 1 8 18.8z"/></svg>
+          <svg class="ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h3.4v16H7zm6.6 0H17v16h-3.4z"/></svg>
+        </button>
+        <div>
+          <div class="fxa-txt"><b>Original</b><span>The dry loop. Nothing applied &mdash; this is what the six below are doing it to.</span></div>
+          <div class="fxa-wave" data-wave="original" style="margin-top:9px;height:34px"><span class="pw"></span></div>
+        </div>
+      </div>
+
+      <ul class="fxa-rows">
+        <li class="fxa-row" style="--c:var(--mx-auto)">
+          <span class="fxa-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11.2 2.4a.5.5 0 0 1 .95 0l1.1 3.1a3 3 0 0 0 1.8 1.8l3.1 1.1a.5.5 0 0 1 0 .95l-3.1 1.1a3 3 0 0 0-1.8 1.8l-1.1 3.1a.5.5 0 0 1-.95 0l-1.1-3.1a3 3 0 0 0-1.8-1.8l-3.1-1.1a.5.5 0 0 1 0-.95l3.1-1.1a3 3 0 0 0 1.8-1.8zM18 14.6a.32.32 0 0 1 .6 0l.55 1.6a1.6 1.6 0 0 0 .98.98l1.6.55a.32.32 0 0 1 0 .6l-1.6.55a1.6 1.6 0 0 0-.98.98l-.55 1.6a.32.32 0 0 1-.6 0l-.55-1.6a1.6 1.6 0 0 0-.98-.98l-1.6-.55a.32.32 0 0 1 0-.6l1.6-.55a1.6 1.6 0 0 0 .98-.98z"/></svg></span>
+          <button type="button" class="fxa-play" data-clip="auto" aria-pressed="false" aria-label="Play Auto">
+            <svg class="ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2a1 1 0 0 1 1.53-.85l9 6.8a1 1 0 0 1 0 1.7l-9 6.8A1 1 0 0 1 8 18.8z"/></svg>
+            <svg class="ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h3.4v16H7zm6.6 0H17v16h-3.4z"/></svg>
+          </button>
+          <span class="fxa-txt"><b>Auto</b><span>Splits, trims and reorders into a new arrangement. The only card here that isn&rsquo;t a filter &mdash; it writes clips.</span></span>
+          <span class="fxa-wave" data-wave="auto"><span class="pw"></span></span>
+        </li>
+
+        <li class="fxa-row" style="--c:var(--mx-reverb)">
+          <span class="fxa-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.6 7.2c1.4 0 1.4-1.6 2.8-1.6s1.4 1.6 2.8 1.6 1.4-1.6 2.8-1.6 1.4 1.6 2.8 1.6 1.4-1.6 2.8-1.6 1.4 1.6 2.8 1.6a1 1 0 0 1 0 2c-1.4 0-1.4-1.6-2.8-1.6s-1.4 1.6-2.8 1.6-1.4-1.6-2.8-1.6-1.4 1.6-2.8 1.6-1.4-1.6-2.8-1.6-1.4 1.6-2.8 1.6a1 1 0 0 1 0-2zm0 5c1.4 0 1.4-1.6 2.8-1.6s1.4 1.6 2.8 1.6 1.4-1.6 2.8-1.6 1.4 1.6 2.8 1.6 1.4-1.6 2.8-1.6 1.4 1.6 2.8 1.6a1 1 0 0 1 0 2c-1.4 0-1.4-1.6-2.8-1.6s-1.4 1.6-2.8 1.6-1.4-1.6-2.8-1.6-1.4 1.6-2.8 1.6-1.4-1.6-2.8-1.6-1.4 1.6-2.8 1.6a1 1 0 0 1 0-2z"/></svg></span>
+          <button type="button" class="fxa-play" data-clip="reverb" aria-pressed="false" aria-label="Play Reverb">
+            <svg class="ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2a1 1 0 0 1 1.53-.85l9 6.8a1 1 0 0 1 0 1.7l-9 6.8A1 1 0 0 1 8 18.8z"/></svg>
+            <svg class="ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h3.4v16H7zm6.6 0H17v16h-3.4z"/></svg>
+          </button>
+          <span class="fxa-txt"><b>Reverb</b><span>Puts the loop in a room. Watch the tail after the last hit &mdash; that is the room answering back.</span></span>
+          <span class="fxa-wave" data-wave="reverb"><span class="pw"></span></span>
+        </li>
+
+        <li class="fxa-row" style="--c:var(--mx-echo)">
+          <span class="fxa-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.4a1 1 0 0 1 1-1h9.1a1.9 1.9 0 1 0-1.85-2.32 1 1 0 1 1-1.95-.43A3.9 3.9 0 1 1 13.1 9.4H4a1 1 0 0 1-1-1zm0 4.4a1 1 0 0 1 1-1h13.3a3.9 3.9 0 1 1-3.8 4.75 1 1 0 1 1 1.95-.43 1.9 1.9 0 1 0 1.85-2.32H4a1 1 0 0 1-1-1zm0 4.6a1 1 0 0 1 1-1h5.2a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1z"/></svg></span>
+          <button type="button" class="fxa-play" data-clip="echo" aria-pressed="false" aria-label="Play Echo">
+            <svg class="ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2a1 1 0 0 1 1.53-.85l9 6.8a1 1 0 0 1 0 1.7l-9 6.8A1 1 0 0 1 8 18.8z"/></svg>
+            <svg class="ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h3.4v16H7zm6.6 0H17v16h-3.4z"/></svg>
+          </button>
+          <span class="fxa-txt"><b>Echo</b><span>Repeats one <em>beat</em> behind, not one second. The repeats are the extra humps in the shape.</span></span>
+          <span class="fxa-wave" data-wave="echo"><span class="pw"></span></span>
+        </li>
+
+        <li class="fxa-row" style="--c:var(--mx-pitch)">
+          <span class="fxa-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.4l2.66 6.03 6.55.62a.5.5 0 0 1 .29.87l-4.95 4.36 1.45 6.42a.5.5 0 0 1-.74.54L12 18.02l-5.26 3.22a.5.5 0 0 1-.74-.54l1.45-6.42-4.95-4.36a.5.5 0 0 1 .29-.87l6.55-.62z"/></svg></span>
+          <button type="button" class="fxa-play" data-clip="pitch" aria-pressed="false" aria-label="Play Pitch">
+            <svg class="ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2a1 1 0 0 1 1.53-.85l9 6.8a1 1 0 0 1 0 1.7l-9 6.8A1 1 0 0 1 8 18.8z"/></svg>
+            <svg class="ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h3.4v16H7zm6.6 0H17v16h-3.4z"/></svg>
+          </button>
+          <span class="fxa-txt"><b>Pitch</b><span>Up a fifth, same length. Shifting pitch without changing tempo is the whole trick.</span></span>
+          <span class="fxa-wave" data-wave="pitch"><span class="pw"></span></span>
+        </li>
+
+        <li class="fxa-row" style="--c:var(--mx-flanger)">
+          <span class="fxa-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.9 2.1c.3 2.6-.7 4.1-2 5.4-1.4 1.4-3.1 2.7-3.9 5.2a6.9 6.9 0 0 0 2.2 7.6c-.5-1.7-.3-3.3 1-4.7.7-.8 1.6-1.4 2.2-2.4.4 1.5 1.4 2.3 2.2 3.3.9 1.1 1.1 2.4.6 3.8a6.6 6.6 0 0 0 3.6-6.6c-.3-2.8-2-4.4-3.2-6.2-1-1.5-1.6-3.2-2.7-5.4z"/></svg></span>
+          <button type="button" class="fxa-play" data-clip="flanger" aria-pressed="false" aria-label="Play Flanger">
+            <svg class="ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2a1 1 0 0 1 1.53-.85l9 6.8a1 1 0 0 1 0 1.7l-9 6.8A1 1 0 0 1 8 18.8z"/></svg>
+            <svg class="ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h3.4v16H7zm6.6 0H17v16h-3.4z"/></svg>
+          </button>
+          <span class="fxa-txt"><b>Flanger</b><span>A copy of itself a few milliseconds behind, swept slowly. The whoosh is the two copies cancelling.</span></span>
+          <span class="fxa-wave" data-wave="flanger"><span class="pw"></span></span>
+        </li>
+
+        <li class="fxa-row" style="--c:var(--mx-blur)">
+          <span class="fxa-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6c3.6 4.3 6.6 8 6.6 11.4A6.6 6.6 0 0 1 12 20.6a6.6 6.6 0 0 1-6.6-6.6C5.4 10.6 8.4 6.9 12 2.6z"/></svg></span>
+          <button type="button" class="fxa-play" data-clip="blur" aria-pressed="false" aria-label="Play Blur">
+            <svg class="ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2a1 1 0 0 1 1.53-.85l9 6.8a1 1 0 0 1 0 1.7l-9 6.8A1 1 0 0 1 8 18.8z"/></svg>
+            <svg class="ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h3.4v16H7zm6.6 0H17v16h-3.4z"/></svg>
+          </button>
+          <span class="fxa-txt"><b>Blur</b><span>A low-pass closed most of the way. Everything bright goes, and the hats disappear first.</span></span>
+          <span class="fxa-wave" data-wave="blur"><span class="pw"></span></span>
+        </li>
+      </ul>
+    </div>
+
+    <p class="foot">The loop is synthesised for this page &mdash; 124&nbsp;BPM in G minor, matching the tempo and key in the app&rsquo;s own transport bar. Mixr was built against commercial masters, and none of those can ship on a public site, so the page writes its own source and runs the six effects over it. Every clip is levelled to the same peak: an A/B where one option is simply louder isn&rsquo;t an A/B. What changes is timbre and time, and that survives levelling. Reverb is a Freeverb topology at .965 feedback, Echo is one beat of delay at .58, Pitch is an overlap-add shift of +7 semitones, Flanger sweeps a 1&ndash;6&nbsp;ms delay, Blur is two cascaded low-pass biquads at 420&nbsp;Hz. See <code>scripts/mixr_effect_clips/generate.py</code>.</p>
+  </div>
+
   <div class="stack rv d2">
-    <p>Professional plugins expose parameters that mean something to an engineer and nothing to a beginner, so the set stays small, named and preset-backed &mdash; one intensity each.</p>
     <p>The red card took longest to name. Warmth described a quality rather than an action. Haze was at least picturable. It ended up Flanger &mdash; the one place I let a technical term stand, because no everyday word for it isn&rsquo;t a lie.</p>
   </div>
 
@@ -922,6 +1457,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
       </div>
     </div>
     <p class="foot">Beats, not seconds &mdash; suggested by people following the build on X, and obviously right once said out loud. A transition is counted in the music's own unit.</p>
+    <p class="foot" style="margin-top:12px">The pill is tinted with the <em>track's</em> colour, not left neutral. <code>TLTransitionSettingsSegmentedControl</code> takes a <code>trackColor</code> and threads it through the whole stack &mdash; body fill at .13, the rim gradient, an inner highlight at .12, and both shadows at .08. It is set to the purple track here. Plain glass would have been easier and slightly cleaner, and it would have thrown away the one thing the control says before you read it: which lane you are about to change.</p>
     <figure style="margin-top:22px">
       <video src="art/segmented.mp4" muted loop playsinline controls
              aria-label="The transition duration segmented control in the app, with the glass pill sliding and resizing between 1 Beat, 2, 4 and 8."></video>
@@ -944,6 +1480,159 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
       </ul>
     </div>
     <p class="foot">Purple is the brand; the other five are the track colors, assigned in order as songs are imported. The near-black ground is what makes six of them legible at once.</p>
+  </div>
+
+  <div class="stack rv d2">
+    <p>The app carries a real design system, and it was the first thing built &mdash; before a single screen. Tokens, then components, then layouts. Doing it in that order is what let a coding agent make changes for weeks without the interface drifting.</p>
+    <p>What follows is that system rebuilt in the browser, in the same order the app&rsquo;s own <code>DesignSystemPreviewView</code> lists it. Every number is read out of the Swift, not measured off a screenshot.</p>
+  </div>
+
+  <div class="demo rv d2">
+    <div class="rowlab">
+      <span class="demo-title">Design system</span>
+      <span class="hint">REBUILT FROM THE SOURCE &middot; NOT A SCREENSHOT</span>
+    </div>
+
+    <p class="sub">Color palette &middot; <code>MixrColors.swift</code></p>
+    <div class="ds">
+      <div class="ds-card">
+        <h5>Surfaces &amp; text</h5>
+        <ul class="ds-sw">
+          <li><i style="background:#050816"></i><b>Background</b><code>#050816</code></li>
+          <li><i style="background:#080B16"></i><b>Background Secondary</b><code>#080B16</code></li>
+          <li><i style="background:#111827"></i><b>Surface</b><code>#111827</code></li>
+          <li><i style="background:#171E2E"></i><b>Elevated Surface</b><code>#171E2E</code></li>
+          <li><i style="background:#2A3142"></i><b>Divider</b><code>#2A3142</code></li>
+          <li><i style="background:#9CA3AF"></i><b>Text Secondary</b><code>#9CA3AF</code></li>
+        </ul>
+      </div>
+      <div class="ds-card">
+        <h5>Accent</h5>
+        <ul class="ds-sw">
+          <li><i style="background:#7C3AED"></i><b>Primary Purple</b><code>#7C3AED</code></li>
+          <li><i style="background:#8B5CF6"></i><b>Secondary Purple</b><code>#8B5CF6</code></li>
+        </ul>
+        <p class="ds-note">Two purples, and the app never invents a third. Primary is the brand and every committing action; secondary is the same hue lifted for gradients and glows.</p>
+      </div>
+      <div class="ds-card">
+        <h5>Waveform base</h5>
+        <ul class="ds-sw">
+          <li><i style="background:#FF5FA2"></i><b>Pink</b><code>#FF5FA2</code></li>
+          <li><i style="background:#8B5CF6"></i><b>Purple</b><code>#8B5CF6</code></li>
+          <li><i style="background:#EF4444"></i><b>Red</b><code>#EF4444</code></li>
+          <li><i style="background:#EAB308"></i><b>Yellow</b><code>#EAB308</code></li>
+          <li><i style="background:#0EA5E9"></i><b>Blue</b><code>#0EA5E9</code></li>
+        </ul>
+        <p class="ds-note">Handed out in this order as songs import. Five, because a sixth lane is where the colours stop being tellable apart at clip size.</p>
+      </div>
+    </div>
+
+    <p class="sub" style="margin-top:32px">Typography &middot; <code>MixrTypography.swift</code></p>
+    <ul class="ds-type">
+      <li><span class="spec" style="font-size:24px;font-weight:600;letter-spacing:-.01em">Mixr</span><span class="meta">DISPLAY LOGO &middot; 24 / SEMIBOLD</span></li>
+      <li><span class="spec" style="font-size:15px;font-weight:600">Effects</span><span class="meta">SECTION TITLE &middot; 15 / SEMIBOLD</span></li>
+      <li><span class="spec" style="font-size:13px;font-weight:600">Blinding Lights</span><span class="meta">SONG TITLE &middot; 13 / SEMIBOLD</span></li>
+      <li><span class="spec" style="font-size:12px;font-weight:400">Adjust reverb and echo levels</span><span class="meta">BODY &middot; 12 / REGULAR</span></li>
+      <li><span class="spec" style="font-size:12px;font-weight:500">Import Songs</span><span class="meta">BUTTON &middot; 12 / MEDIUM</span></li>
+      <li><span class="spec" style="font-size:12px;font-weight:500;font-family:var(--fm)">1:24 / 3:45</span><span class="meta">TIMECODE &middot; 12 / MEDIUM / MONOSPACED</span></li>
+      <li><span class="spec" style="font-size:10px;font-weight:500">The Weeknd &middot; 03:20 &middot; 124 BPM</span><span class="meta">METADATA &middot; 10 / MEDIUM</span></li>
+      <li><span class="spec" style="font-size:9px;font-weight:400">KEY</span><span class="meta">CAPTION &middot; 9 / REGULAR</span></li>
+    </ul>
+    <p class="foot">Eight styles, rendered here at their real sizes and weights &mdash; the row heights are the specimen. Timecode is the only monospaced one, because a clock that changes width as it counts is the fastest way to make a transport bar feel cheap. Nothing in the app sets a font size inline; a view names a style and gets all four properties.</p>
+
+    <p class="sub" style="margin-top:32px">Glass &middot; <code>GlassCardModifier.swift</code></p>
+    <ul class="ds-glass">
+      <li>
+        <span class="sw" style="--tint:#050810;--fill:.28;--hi:.08;--lo:.05;--bd:rgba(255,255,255,.06)"></span>
+        <span class="cap"><b>Default</b>tint .28 &middot; mat .08<br>border white .06</span>
+      </li>
+      <li>
+        <span class="sw" style="--tint:#050810;--fill:.30;--hi:.07;--lo:.06;--bd:rgba(124,58,237,.42)"></span>
+        <span class="cap"><b>Selected</b>tint .30 &middot; mat .07<br>border purple .42</span>
+      </li>
+      <li>
+        <span class="sw" style="--tint:#0A0F1A;--fill:.34;--hi:.10;--lo:.075;--bd:rgba(255,255,255,.08)"></span>
+        <span class="cap"><b>Elevated</b>tint .34 &middot; mat .10<br>border white .08</span>
+      </li>
+      <li>
+        <span class="sw" style="--tint:#0A0F1A;--fill:.42;--hi:.12;--lo:.09;--bd:rgba(255,255,255,.10)"></span>
+        <span class="cap"><b>Strong</b>tint .42 &middot; mat .12<br>border white .10</span>
+      </li>
+    </ul>
+    <p class="foot">Four levels, and the only one that changes hue is Selected &mdash; its border goes purple rather than getting brighter. That is the entire selection language of the app: a card, a preset, a track row and a toggle all say &ldquo;this one&rdquo; the same way. <code>edgeHighlightOpacity</code> also jumps .16&nbsp;&rarr;&nbsp;.24 and <code>lowerReflectionOpacity</code> .08&nbsp;&rarr;&nbsp;.36 on selection, which is what makes the lit card look like it caught the light rather than turned on.</p>
+
+    <p class="sub" style="margin-top:32px">Buttons &middot; <code>MixrButtonStyles.swift</code></p>
+    <div class="ds-btns">
+      <button type="button" class="mx-btn mx-btn--primary">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a1 1 0 0 1 1 1v8.6l2.3-2.3a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4l2.3 2.3V4a1 1 0 0 1 1-1zM5 18a1 1 0 0 1 1-1h12a1 1 0 0 1 0 2H6a1 1 0 0 1-1-1z"/></svg>
+        Export
+      </button>
+      <button type="button" class="mx-btn mx-btn--glass">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h5V4a1 1 0 0 1 2 0v6a1 1 0 0 1-2 0V8H4a1 1 0 0 1 0-2zm9 0h7a1 1 0 0 1 0 2h-7a1 1 0 0 1 0-2zm-9 10h7a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm11-2a1 1 0 0 1 2 0v2h3a1 1 0 0 1 0 2h-3v2a1 1 0 0 1-2 0z"/></svg>
+        Mixer
+      </button>
+      <button type="button" class="mx-btn mx-btn--icon is-play" aria-label="Play">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2a1 1 0 0 1 1.53-.85l9 6.8a1 1 0 0 1 0 1.7l-9 6.8A1 1 0 0 1 8 18.8z"/></svg>
+      </button>
+      <button type="button" class="mx-btn mx-btn--icon" aria-label="Mixer panel">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px"><path d="M4 6h5V4a1 1 0 0 1 2 0v6a1 1 0 0 1-2 0V8H4a1 1 0 0 1 0-2zm9 0h7a1 1 0 0 1 0 2h-7a1 1 0 0 1 0-2zm-9 10h7a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm11-2a1 1 0 0 1 2 0v2h3a1 1 0 0 1 0 2h-3v2a1 1 0 0 1-2 0z"/></svg>
+      </button>
+      <button type="button" class="mx-btn mx-btn--toggle" aria-pressed="true" data-toggle>S</button>
+      <button type="button" class="mx-btn mx-btn--toggle" aria-pressed="false" data-toggle>M</button>
+    </div>
+    <p class="foot">Live &mdash; press them. Primary is the only gradient fill in the app and it is spent on one thing per screen. Everything else is Glass Default, which is why the bar reads as one material with a single bright object in it. Metrics: <code>MixrRadius.button 12</code>, <code>icon 20</code>, <code>MixrLayout.buttonPaddingH 16 / V 10</code>, <code>iconButtonSize 40</code>, <code>toggleButtonWidth 32</code>. Solo and mute are the toggles &mdash; selected state is the purple border again, not a fill.</p>
+
+    <p class="sub" style="margin-top:32px">Radius &amp; spacing &middot; <code>DesignTokens.swift</code></p>
+    <p class="foot" style="margin-top:0">
+      <code>MixrSpacing</code> &mdash; xxs 2 &middot; xs 4 &middot; sm 8 &middot; md 12 &middot; lg 16 &middot; xl 24.<br>
+      <code>MixrRadius</code> &mdash; glass 16 &middot; button 12 &middot; icon 20 &middot; toggle 16 &middot; waveform 10.<br>
+      <code>WaveformStyle</code> &mdash; lane height 48 &middot; corner 10 &middot; inner padding 8 &middot; clip opacity 0.55 &middot; bar 2 at 1 spacing &middot; fade 15%.<br>
+      Six spacing steps and five radii for the whole app. A component that needs a seventh is usually a component that is wrong.
+    </p>
+  </div>
+
+  <div class="dec rv d2">
+    <h3 style="margin-top:36px">And the fun one: three app icons.</h3>
+    <p>The last decision, and the only one I made purely on instinct. All three carry the same waveform mark &mdash; the argument was about what surrounds it.</p>
+
+    <div class="demo" style="margin-top:20px">
+      <div class="rowlab">
+        <span class="demo-title">Three icons</span>
+        <span class="hint">SHOWN AT THE SIZE THAT ACTUALLY DECIDES IT</span>
+      </div>
+      <ul class="icons">
+        <li>
+          <figure><img src="art/icon-disco.webp" alt="Icon option one: the waveform mark inside an iridescent soap-bubble sphere, on near-black." loading="lazy"></figure>
+          <b>Disco</b>
+          <i>Inspired by Spotify's disco takeover. An iridescent bubble around the mark.</i>
+          <span class="v">Rejected</span>
+        </li>
+        <li class="pick">
+          <figure><img src="art/icon-simple.webp" alt="Icon option two: the waveform mark alone, glowing purple on a dark glass tile." loading="lazy"></figure>
+          <b>Simple</b>
+          <i>The mark, the glass tile, nothing else.</i>
+          <span class="v">Chosen</span>
+        </li>
+        <li>
+          <figure><img src="art/icon-controller.webp" alt="Icon option three: a DJ controller with a jog wheel, two knobs, a play button and a crossfader, the waveform mark on the platter." loading="lazy"></figure>
+          <b>DJ controller</b>
+          <i>Inspired by the Frig app icon. A whole turntable, knobs and crossfader included.</i>
+          <span class="v">Rejected</span>
+        </li>
+      </ul>
+      <p class="foot">Shown here at 128&nbsp;px and again at 40. The small one is the real test &mdash; nobody chooses an app icon at the size a designer draws it at.</p>
+      <ul class="icons icons--sm" aria-hidden="true">
+        <li><img src="art/icon-disco.webp" alt="" loading="lazy"></li>
+        <li class="pick"><img src="art/icon-simple.webp" alt="" loading="lazy"></li>
+        <li><img src="art/icon-controller.webp" alt="" loading="lazy"></li>
+      </ul>
+    </div>
+
+    <p>Rejected: both of the interesting ones, for the same reason. The disco bubble is the prettiest thing I made for this project and it turns into a grey smudge at 40&nbsp;px. The controller is worse &mdash; it is a picture of exactly the equipment the whole app exists to avoid, and it promises a booth to someone who opened this because they didn&rsquo;t want one.</p>
+
+    <div class="flag">
+      <p>Chosen: the plain one. It survives the small size, and it is the only one of the three that doesn&rsquo;t make a promise the app then has to talk you out of.</p>
+    </div>
   </div>
 </section>
 
@@ -1000,17 +1689,49 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
     <p class="foot">Drop a clip into the body of another and Mixr splits the destination and inserts between the halves, rather than shoving it aside. Video editors have done this for years &mdash; but they make you choose it first, with a modifier for insert and a plain drag for overwrite. Here there is no mode to pick.</p>
   </div>
 
+  <div class="dec rv d2">
+    <h3 style="margin-top:36px">Hold a modifier, or infer it from where you let go?</h3>
+    <p>Premiere and Final Cut both do the insert edit, and both make you ask for it &mdash; a modifier held during the drag switches between overwrite and insert. It is precise, it is teachable, and it is a mode.</p>
+    <p>Rejected: the modifier. A beginner does not know the mode exists, so they never find the behaviour; and on a touch screen there is no key to hold in the first place.</p>
+    <div class="flag">
+      <p>Chosen: the drop position <em>is</em> the choice. Let go over a clip&rsquo;s edge and it snaps flush; let go over its middle and it cuts in. Nothing to hold, nothing to learn &mdash; the two intentions already live in two different places on screen.</p>
+    </div>
+  </div>
+
   <div class="stack rv d2">
-    <p>Predictability comes from resolving the drop in a fixed order rather than from one clever rule. The pointer is tested against five cases in priority, and the first that matches wins.</p>
+    <p>That only works if the reading of &ldquo;where you let go&rdquo; is never surprising. Predictability comes from resolving the drop in a fixed order rather than from one clever rule. The pointer is tested against five cases in priority, and the first that matches wins.</p>
   </div>
 
   <ol class="ladder rv d2">
-    <li><b>Ghost restore</b><span>Released within a hair of where it started &mdash; put it back, ripple nothing.</span></li>
-    <li><b>Edge snap</b><span>Inside a neighbour's 12&ndash;16&nbsp;pt edge zone &mdash; snap flush before or after it.</span></li>
-    <li><b>Literal gap</b><span>Landed in empty space &mdash; leave it exactly where it was let go.</span></li>
-    <li class="pick"><b>Insert into body</b><span>Inside a clip, past its edge zones &mdash; split there and sandwich.</span></li>
+    <li><b>Ghost restore</b><span>Released within the snap zone of where it started &mdash; put it back, ripple nothing.</span></li>
+    <li><b>Edge snap</b><span>Inside a neighbour's 10&nbsp;pt edge zone &mdash; snap flush before or after it.</span></li>
+    <li><b>Literal gap</b><span>Leading edge landed in empty space &mdash; leave it exactly where it was let go.</span></li>
+    <li class="pick"><b>Insert into body</b><span>Pointer inside a clip, past its edge zones &mdash; split there and sandwich.</span></li>
     <li><b>Free placement</b><span>Anything else &mdash; place it and let the lane reflow.</span></li>
   </ol>
+
+  <div class="demo rv d2">
+    <div class="rowlab">
+      <span class="demo-title">Try the five rules</span>
+      <span class="hint">DRAG A CLIP &middot; OR TAB AND USE ARROW KEYS</span>
+    </div>
+    <div class="tl" id="tl">
+      <div class="tl-lane" id="tl-lane">
+        <span class="tl-cut" id="tl-cut"></span>
+      </div>
+    </div>
+    <div class="tl-readout">
+      <span class="tl-rule" data-rule="ghost">Ghost restore</span>
+      <span class="tl-rule" data-rule="snap">Edge snap</span>
+      <span class="tl-rule" data-rule="gap">Literal gap</span>
+      <span class="tl-rule" data-rule="insert">Insert into body</span>
+      <span class="tl-rule" data-rule="free">Free placement</span>
+      <button type="button" class="tl-reset" id="tl-reset">Reset lane</button>
+    </div>
+    <p class="tl-nums" id="tl-nums" role="status" aria-live="polite">Pick up a clip to see which rule resolves.</p>
+    <p class="foot">This is not an animation of the behaviour &mdash; it is the behaviour. <code>resolveClipDrop</code> is ported line for line out of <code>MixrTimeline.swift</code>, including the priority order, the hysteresis that stops the result flickering between two rules mid-drag, and the <code>minClipLengthUnits</code> clamp that stops a split leaving a two-unit sliver. Constants are the shipped ones: a 10&nbsp;pt snap zone, 8&nbsp;pt of hysteresis, 20&nbsp;pt of neighbour shift, 0.28 ghost opacity, a 1.05 lift. The hatched bands are the edge zones, drawn only while you are dragging.</p>
+    <p class="foot" style="margin-top:12px">The one thing to try: pick up the blue clip and let go over the <em>middle</em> of the purple one. Then do it again, but let go near the purple clip's left edge. Same gesture, two different intentions, and you never told the app which one you meant.</p>
+  </div>
 
   <div class="stack rv d2">
     <p>The preview is the contract: whatever the neighbours animate to while you are dragging is exactly what happens when you let go.</p>
@@ -1046,25 +1767,123 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
     <p>At one point the lift came out and the clip went back to sliding along the lane. Still functional, still &ldquo;correct,&rdquo; and immediately worse &mdash; nothing was ever picked up, it just slid. Getting the lift back was a whole task of its own.</p>
   </div>
 
+  <div class="ba rv d2">
+    <div>
+      <h4>Before &mdash; slide</h4>
+      <p>The clip tracked the finger along the lane at rest height. Nothing wrong with it. It just never felt held.</p>
+    </div>
+    <div class="pick">
+      <h4>After &mdash; lift</h4>
+      <p>6&nbsp;pt up, scaled 1.05, a shadow at radius 18. The clip leaves the surface, and the lane it came from goes to 0.28.</p>
+    </div>
+  </div>
+
   <div class="dec rv d2">
     <h3 style="margin-top:36px">The play button was centred. It didn't look centred.</h3>
     <p>For weeks the transport cluster felt slightly off. My instinct was to nudge the play button, which was wrong &mdash; it was already dead centre. The time, BPM and key sat to its right and dragged the perceived centre left.</p>
     <p>The fix moved everything except the button: the cluster shifts 20&ndash;30&nbsp;px right, time, BPM and key tighten into one metadata block, their labels shrink, and the play glow pulls back 10&ndash;15% because the bloom made it read larger than it is.</p>
+
+    <div class="demo" style="margin-top:20px">
+      <div class="rowlab">
+        <span class="demo-title">Optical centre</span>
+        <span class="hint">SWITCH BETWEEN THE TWO BUILDS</span>
+      </div>
+      <div class="tog" id="nb-tog" role="group" aria-label="Navbar build">
+        <button type="button" aria-pressed="true"  data-state="before">Before</button>
+        <button type="button" aria-pressed="false" data-state="after">After</button>
+      </div>
+      <div class="nb" id="nb">
+        <span class="nb-tick geo" id="nb-geo"></span>
+        <span class="nb-tick opt" id="nb-opt"></span>
+        <!-- The real bar is five groups: brand, history, playback, metadata,
+             export. All five have to be here or the balance being demonstrated
+             is not the balance the app actually has. -->
+        <div class="nb-row">
+          <span class="nb-brand">Mixr</span>
+          <span class="nb-skip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 7H14a5 5 0 0 1 0 10h-3a1 1 0 0 1 0-2h3a3 3 0 0 0 0-6H8.5l1.8 1.8a1 1 0 1 1-1.4 1.4l-3.5-3.5a1 1 0 0 1 0-1.4l3.5-3.5a1 1 0 1 1 1.4 1.4z"/></svg></span>
+          <span class="nb-skip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 7H10a5 5 0 0 0 0 10h3a1 1 0 0 0 0-2h-3a3 3 0 0 1 0-6h5.5l-1.8 1.8a1 1 0 1 0 1.4 1.4l3.5-3.5a1 1 0 0 0 0-1.4l-3.5-3.5a1 1 0 1 0-1.4 1.4z"/></svg></span>
+          <span class="nb-spacer"></span>
+          <div class="nb-cluster" id="nb-cluster">
+            <span class="nb-skip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 6a1 1 0 0 1 2 0v4.3l7.5-4.9A1 1 0 0 1 18 6.3v11.4a1 1 0 0 1-1.5.9L9 13.7V18a1 1 0 0 1-2 0z"/></svg></span>
+            <button type="button" class="nb-play" aria-label="Play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2a1 1 0 0 1 1.53-.85l9 6.8a1 1 0 0 1 0 1.7l-9 6.8A1 1 0 0 1 8 18.8z"/></svg></button>
+            <span class="nb-skip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 6a1 1 0 0 0-2 0v4.3L7.5 5.4A1 1 0 0 0 6 6.3v11.4a1 1 0 0 0 1.5.9l7.5-4.9V18a1 1 0 0 0 2 0z"/></svg></span>
+            <div class="nb-meta" id="nb-meta">
+              <div><b>01:24</b><span>/ 03:45</span></div>
+              <div><b>124</b><span>BPM</span></div>
+              <div><b>Gm</b><span>KEY</span></div>
+            </div>
+          </div>
+          <span class="nb-spacer"></span>
+          <button type="button" class="mx-btn mx-btn--glass" style="padding:7px 12px">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h5V4a1 1 0 0 1 2 0v6a1 1 0 0 1-2 0V8H4a1 1 0 0 1 0-2zm9 0h7a1 1 0 0 1 0 2h-7a1 1 0 0 1 0-2zm-9 10h7a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm11-2a1 1 0 0 1 2 0v2h3a1 1 0 0 1 0 2h-3v2a1 1 0 0 1-2 0z"/></svg>
+            Mixer
+          </button>
+          <button type="button" class="mx-btn mx-btn--primary" style="padding:7px 12px">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a1 1 0 0 1 1 1v8.6l2.3-2.3a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4l2.3 2.3V4a1 1 0 0 1 1-1z"/></svg>
+            Export
+          </button>
+        </div>
+      </div>
+      <p class="nb-key">
+        <span class="k1"><i></i>Geometric centre of the bar</span>
+        <span class="k2"><i></i>Centre of the cluster's mass</span>
+      </p>
+      <p class="tl-nums" id="nb-nums" role="status" aria-live="polite"></p>
+      <p class="foot">The pink mark is measured off the live DOM on every switch, not hard-coded &mdash; it is the centre of the transport cluster's bounding box, which is roughly where the eye puts the group. All five groups are here, because the balance being shown is a balance between them: with brand and history on the left and Mixer and Export on the right, the cluster's mass does not sit where the maths says the middle is. The after state closes the gap by moving everything except the button, then this readout checks that it actually landed. The correction is recomputed at whatever width you are reading this &mdash; so the number above is this recreation's, not the app's 20&ndash;30&nbsp;px.</p>
+    </div>
+
     <div class="flag">
       <p>Chosen: optical balance over equal gaps. The navbar is spaced as five groups &mdash; brand, history, playback, metadata, export &mdash; with intentional distances between them rather than one evenly spaced row. Related things sit close; unrelated things get air.</p>
     </div>
   </div>
 
+  <div class="ba rv d2">
+    <div>
+      <h4>Before &mdash; six effects</h4>
+      <p>Auto, Reverb, Echo, Bass Boost, Pitch Up, Flanger. Two of those are not creative choices.</p>
+    </div>
+    <div class="pick">
+      <h4>After &mdash; six effects</h4>
+      <p>Auto, Reverb, Echo, Pitch, Flanger, Blur. Same count, and every card now changes the character of a clip rather than correcting it.</p>
+    </div>
+  </div>
+
   <div class="demo rv d2">
-    <p class="sub">Then</p>
+    <p class="sub">Before</p>
     <figure><img src="art/effects-then.png" alt="An earlier build's effects drawer: Auto, Reverb, Echo, Bass Boost, Pitch Up and the edge of a red card." loading="lazy"></figure>
-    <p class="sub" style="margin-top:26px">Now</p>
+    <p class="sub" style="margin-top:26px">After</p>
     <figure><img src="art/effects-now.png" alt="Today's effects drawer: Auto, Reverb, Echo, Pitch, Flanger and the edge of Blur." loading="lazy"></figure>
     <p class="foot">Bass Boost is gone &mdash; it is a mix correction, not a creative choice, and it made every remix louder rather than more interesting. &ldquo;Pitch Up&rdquo; became &ldquo;Pitch&rdquo; once the control could go both ways.</p>
   </div>
 
   <div class="stack rv d2">
     <p>Auto&rsquo;s first version applied effect presets across a whole track. That is decorating, not arranging, and it produced remixes that sounded processed rather than edited. It was rebuilt to do what a person would do: split, trim, duplicate, move and overlap real clips on the real timeline.</p>
+  </div>
+
+  <div class="demo rv d2">
+    <div class="rowlab">
+      <span class="demo-title">What Auto writes</span>
+      <span class="hint">SAME LANE, TWO GENERATIONS</span>
+    </div>
+    <p class="sub">Before &mdash; presets over a whole track</p>
+    <div class="tl" style="pointer-events:none">
+      <div class="tl-lane" style="height:84px">
+        <span class="tl-clip" style="--c:var(--mx-pitch);left:2%;width:94%;top:18px"><span class="wave"></span><span class="tag">REVERB 40% &middot; ECHO 25% &middot; WHOLE TRACK</span></span>
+      </div>
+    </div>
+    <p class="foot">One clip, untouched, with a wash over the top of it. Nothing was arranged, so there is nothing on the timeline to grab, trim or undo separately.</p>
+
+    <p class="sub" style="margin-top:30px">After &mdash; real clips on the real timeline</p>
+    <div class="tl" style="pointer-events:none">
+      <div class="tl-lane" style="height:84px">
+        <span class="tl-clip" style="--c:var(--mx-pitch);left:2%;width:20%;top:18px"><span class="wave"></span></span>
+        <span class="tl-clip" style="--c:var(--mx-echo);left:23.5%;width:17%;top:18px"><span class="wave"></span></span>
+        <span class="tl-clip" style="--c:var(--mx-pitch);left:42%;width:12%;top:18px"><span class="wave"></span></span>
+        <span class="tl-clip" style="--c:var(--mx-blur);left:55.5%;width:21%;top:18px"><span class="wave"></span></span>
+        <span class="tl-clip" style="--c:var(--mx-echo);left:78%;width:18%;top:18px"><span class="wave"></span></span>
+      </div>
+    </div>
+    <p class="foot">Split, trimmed, duplicated, reordered, overlapped. Every one of these is an ordinary clip &mdash; you can drag it with the demo above, and the whole run collapses into a single undo.</p>
   </div>
 
   <div class="flag rv d2">
@@ -1081,44 +1900,30 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 <!-- 06 -->
 <section id="results">
   <div class="sechead rv"><p class="lab">06 &mdash; Results</p>
-    <h2>Built, not finished.</h2></div>
-
-  <div class="status rv d2">
-    <div>
-      <h4>Working today</h4>
-      <ul>
-        <li>Import, with artwork and metadata</li>
-        <li>Waveform, BPM and key analysis</li>
-        <li>Split, duplicate, delete, speed</li>
-        <li>Drag, drop and sandwich insertion</li>
-        <li>Beat-based transitions with curves</li>
-        <li>Effects and sound-effect insertion</li>
-        <li>Solo, mute, per-track volume</li>
-        <li>Undo, redo and multiple projects</li>
-        <li>Responsive across iPhone, iPad and Mac</li>
-      </ul>
-    </div>
-    <div class="next">
-      <h4>Still building</h4>
-      <ul>
-        <li>Full per-clip DSP on every effect</li>
-        <li>Export reliability at length</li>
-        <li>Playback performance under load</li>
-        <li>Testing with actual beginners</li>
-        <li>Onboarding for a first remix</li>
-        <li>TestFlight beta, once the developer account clears</li>
-      </ul>
-    </div>
-  </div>
+    <h2>Finished building, waiting approval.</h2></div>
 
   <div class="stack rv d2">
-    <p>The last two passes were the unglamorous ones: one layout that holds on iPhone, iPad and a resizable Mac window, and before it a written visual audit with no code changed until I had read it. Auditing first is what stopped responsive work becoming a redesign.</p>
-    <p>Now I&rsquo;m waiting on the Apple Developer Program to put a beta in people&rsquo;s hands. That is the next real test: everything above is a designer judging a tool built for beginners.</p>
+    <p>The last two passes were adding responsive layout for iPad and Mac and accessibility testing. I performed a visual audit with no code changes until I read it. Auditing first is what stopped responsive work from becoming a redesign. Claude Code tended to change components I finalized without asking.</p>
+    <p>I&rsquo;m now waiting for approval from the Apple Developer Program to release TestFlight Beta. Everything so far reflects my own judgment. The real test is whether other people can use and understand Mixr.</p>
+  </div>
+
+  <div class="flag rv d2">
+    <p>The intimidating part of learning a new skill is the interface scaring you away. Building Mixr taught me anyone can do it: not just DJing, but building an app. So get on a coding agent and make something that excites you!</p>
+    <p class="links">
+      <a href="https://x.com/pranavibuilds" target="_blank" rel="noreferrer"><i class="ico">🔗</i><span class="lbl">Read my Mixr journey on X<span class="nav-rule" aria-hidden="true"></span></span></a>
+      <span class="sep" aria-hidden="true">|</span>
+      <span class="ff-wrap">
+        <button type="button" class="ff" id="ff" aria-expanded="false" aria-controls="ff-tip">
+          <i class="ico">🎉</i><span class="lbl">Fun Fact<span class="nav-rule" aria-hidden="true"></span></span>
+        </button>
+        <span class="ff-tip" id="ff-tip" role="tooltip">This is also my first time coding in Swift! Coding agents are just <em>that</em> cool.</span>
+      </span>
+    </p>
   </div>
 
   <form class="beta rv d2" id="beta" novalidate>
-    <h3>Get the Mixr beta</h3>
-    <p>Leave your email and I'll send a TestFlight invite as soon as the beta is out.</p>
+    <h3>Get Mixr Beta</h3>
+    <p>Sign up for the mailing list to get Mixr Beta when it's released.</p>
     <div class="beta-row">
       <label class="visually-hidden" for="beta-email">Email address</label>
       <input id="beta-email" name="email" type="email" inputmode="email" autocomplete="email"
@@ -1127,13 +1932,6 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
     </div>
     <p class="beta-note" id="beta-note" role="status" aria-live="polite"></p>
   </form>
-
-  <div class="flag rv d2">
-    <p>Mixr is still being built, and that is the honest state to show it in. What it has proved so far is that the intimidating part of DJ software was never the audio &mdash; it was the interface asking you to be a performer before it would let you make anything.</p>
-    <p class="links">
-      <a href="https://x.com/pranavibuilds" target="_blank" rel="noreferrer"><i class="ico">🔗</i><span class="lbl">Designing by Building on X<span class="nav-rule" aria-hidden="true"></span></span></a>
-    </p>
-  </div>
 </section>
 
 <div class="case-actions">
@@ -1376,14 +2174,23 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
     });
   }
 
-  /* Beta signup.
-     BETA_ENDPOINT is the only thing to fill in — paste the POST URL from
-     whatever list you use (Formspree, Buttondown, Mailchimp, your own function).
-     It is deliberately empty by default: with no endpoint the form must NOT
-     print "you're on the list", because nothing would have been recorded. It
-     falls back to handing the address over via a mail link instead, so the
-     signup is always real, just manual until the endpoint is set. */
-  var BETA_ENDPOINT = "";
+  /* Beta signup → pranaviram2@gmail.com.
+     This page is static (GitHub Pages), so it cannot send mail itself; the
+     address has to be handed to a form backend. FormSubmit is addressed BY
+     the destination email rather than by an account, which is why it is the
+     one used here — there is no dashboard to keep and no key to rotate.
+
+     TWO THINGS TO KNOW:
+     1. The form is dormant until it is activated once. The first submission
+        after deploy sends a confirmation mail to the address below; click the
+        link in it and every later submission lands in the inbox. Until then
+        nothing is recorded, which is what the success check below guards.
+     2. That address is in the page source, so scrapers can read it. The site
+        otherwise publishes the Brown address (see ContactIcons.tsx), not this
+        one. The activation mail contains a random alias that FormSubmit will
+        accept in place of the address — paste it over the email here and the
+        gmail leaves the source entirely. Nothing else needs to change. */
+  var BETA_ENDPOINT = "https://formsubmit.co/ajax/pranaviram2@gmail.com";
   var BETA_FALLBACK = "https://x.com/pranavibuilds";
 
   var beta = document.getElementById("beta");
@@ -1402,12 +2209,12 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
       // Deliberately loose: the server is the real validator, and an overly
       // strict pattern rejects legitimate addresses.
       if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-        say("That doesn't look like an email address &mdash; mind checking it?", "err");
+        say("That doesn't look like an email address. Mind checking it?", "err");
         betaInput.focus();
         return;
       }
       if(!BETA_ENDPOINT){
-        say("The list isn't wired up yet &mdash; message me on "
+        say("The list isn't wired up yet. Message me on "
           + "<a href=\"" + BETA_FALLBACK + "\" target=\"_blank\" rel=\"noreferrer\">X</a>"
           + " and I'll add you to the beta by hand.");
         return;
@@ -1417,13 +2224,35 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
       fetch(BETA_ENDPOINT, {
         method: "POST",
         headers: {"Content-Type": "application/json", "Accept": "application/json"},
-        body: JSON.stringify({email: email})
+        /* _subject titles the mail so signups are filterable in the inbox;
+           _captcha off because an AJAX post cannot show a captcha page. */
+        body: JSON.stringify({
+          email: email,
+          _subject: "Mixr beta signup",
+          _captcha: "false"
+        })
       }).then(function(r){
         if(!r.ok) throw new Error(r.status);
+        /* A 200 is not proof on its own: an unactivated form answers 200 and
+           records nothing. Trust the body when there is one and it is explicit,
+           and only fall back to the status when the body is unreadable. */
+        return r.json().then(function(d){
+          if(d && String(d.success) === "false") throw new Error(d.message || "not activated");
+        }, function(){ /* not JSON — the status is all there is */ });
+      }).then(function(){
         beta.reset();
-        say("You're on the list. I'll send a TestFlight invite when the beta is out.");
-      }).catch(function(){
-        say("That didn't go through &mdash; try again, or message me on "
+        say("You're on the list! Message me on "
+          + "<a href=\"" + BETA_FALLBACK + "\" target=\"_blank\" rel=\"noreferrer\">X</a>"
+          + " if you have any more questions.");
+      }).catch(function(err){
+        /* The visitor gets one plain sentence; the real reason goes to the
+           console. Worth the line: every distinct failure here — form not yet
+           activated, network down, service 500 — looks identical on the page,
+           and without this there is no way to tell them apart after the fact. */
+        if(window.console && console.warn){
+          console.warn("Mixr beta signup failed:", (err && err.message) || err);
+        }
+        say("That didn't go through. Try again, or message me on "
           + "<a href=\"" + BETA_FALLBACK + "\" target=\"_blank\" rel=\"noreferrer\">X</a>.", "err");
       }).then(function(){
         betaBtn.disabled = false;
@@ -1467,6 +2296,695 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
       var cur = btns.filter(function(b){ return b.getAttribute("aria-pressed") === "true"; })[0];
       if(cur) paint(cur);
     });
+  }
+
+  /* ======================================================================
+     Effect control tray — EffectControlTray.swift
+     One intensity, and presets that are just named positions on it.
+     ==================================================================== */
+  var tray = document.getElementById("tray");
+  if(tray){
+    var slider  = document.getElementById("tray-int");
+    var readout = document.getElementById("tray-val");
+    var presets = [].slice.call(document.querySelectorAll("#tray-presets button"));
+    function paintTray(v, fromPreset){
+      slider.style.setProperty("--p", v + "%");
+      readout.textContent = v + "%";
+      /* A preset stays lit only while the slider is still sitting on it —
+         drag away and the row goes quiet rather than lying about the state. */
+      presets.forEach(function(b){
+        b.setAttribute("aria-pressed", (fromPreset && +b.dataset.v === v) ? "true" : "false");
+      });
+    }
+    slider.addEventListener("input", function(){ paintTray(+slider.value, false); });
+    presets.forEach(function(b){
+      b.addEventListener("click", function(){
+        slider.value = b.dataset.v;
+        paintTray(+b.dataset.v, true);
+      });
+    });
+    paintTray(+slider.value, false);
+  }
+
+  /* Solo / mute toggles in the design-system row. */
+  [].slice.call(document.querySelectorAll("[data-toggle]")).forEach(function(b){
+    b.addEventListener("click", function(){
+      b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") === "true" ? "false" : "true");
+    });
+  });
+
+  /* ======================================================================
+     Waveform silhouette — a port of WaveformSilhouettePath.build.
+     The app does NOT draw bars. It fills one continuous polygon mirrored
+     about the centre line, so the clip shows the shape of the song. Metrics
+     are WaveformMetrics / WaveformSilhouetteStyle: innerPadding 8, maxFill
+     .86, amplitude clamped to .05-.98, smoothingRadius 1, tailWidth 28.
+     ==================================================================== */
+  var WAVE_PEAK = {   // MixrWaveformColor.peakColor, keyed by its base hex
+    "#ff5fa2":"#FF7FB8", "#8b5cf6":"#C084FC", "#ef4444":"#F87171",
+    "#eab308":"#FACC15", "#0ea5e9":"#38BDF8", "#7c3aed":"#C084FC"
+  };
+  var WAVE_PAD = 8, WAVE_MAXFILL = 0.86, WAVE_TAIL = 28;
+
+  function waveAmplitudes(seed, n){
+    var s = seed >>> 0, a = [], i;
+    function rnd(){ s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }
+    for(i = 0; i < n; i++){
+      var t = i / (n - 1);
+      // A song-shaped envelope rather than flat noise — quiet in, body, tail.
+      // The floor is deliberately high: real audio at this zoom is dense and
+      // close to full height, and a low floor reads as a sparse blob.
+      var env = 0.62 + 0.38 * Math.pow(Math.sin(Math.PI * t), 0.5);
+      var v = env * (0.62 + 0.38 * rnd());
+      a.push(Math.min(0.98, Math.max(0.05, v)));   // max / minAmplitude
+    }
+    return a.map(function(v, j){                    // smoothingRadius 1
+      return (a[Math.max(0, j - 1)] + v + a[Math.min(n - 1, j + 1)]) / 3;
+    });
+  }
+
+  var waveUid = 0;
+  function paintWave(el){
+    var clip = el.parentElement;
+    var W = Math.round(clip.getBoundingClientRect().width);
+    var H = Math.round(clip.getBoundingClientRect().height);
+    if(W < 6 || H < 6) return;
+    // Skip the rebuild when nothing about the geometry changed — this runs on
+    // every commit and resize, and the path is ~100 points.
+    if(el.dataset.w === String(W) && el.dataset.h === String(H)) return;
+    el.dataset.w = W; el.dataset.h = H;
+
+    var base = (getComputedStyle(clip).getPropertyValue("--c") || "").trim();
+    var peak = WAVE_PEAK[base.toLowerCase()] || base || "#8B5CF6";
+    var seed = el.dataset.seed || (el.dataset.seed = String(
+      Math.abs((clip.textContent || "x").split("").reduce(function(h, c){
+        return ((h << 5) - h + c.charCodeAt(0)) | 0; }, 7)) + 11));
+
+    var n = Math.max(28, Math.round(W / 2.2));
+    var amp = waveAmplitudes(+seed, n);
+    var cy  = H / 2;
+    var maxHalf = (H - WAVE_PAD * 2) / 2 * WAVE_MAXFILL;
+    var tailInset = WAVE_TAIL * 0.35;
+    var drawable = Math.max(1, W - WAVE_PAD * 2 - tailInset);
+    var xAt = function(i){ return WAVE_PAD + drawable * i / (n - 1); };
+
+    var d = "M" + xAt(0).toFixed(2) + " " + (cy - maxHalf * amp[0]).toFixed(2);
+    for(var i = 1; i < n; i++) d += "L" + xAt(i).toFixed(2) + " " + (cy - maxHalf * amp[i]).toFixed(2);
+    for(var j = n - 1; j >= 0; j--) d += "L" + xAt(j).toFixed(2) + " " + (cy + maxHalf * amp[j]).toFixed(2);
+    d += "Z";
+
+    // The tail guide lines — WaveformWedgeShape, drawn inside the tail region.
+    var tailStart = W - WAVE_TAIL, tipX = W - 2;
+    var wedge = (tailStart > WAVE_PAD)
+      ? '<path d="M' + tailStart + ' 1V' + (H - 1) + 'M' + tailStart + ' 1L' + tipX + ' ' + cy +
+        'M' + tailStart + ' ' + (H - 1) + 'L' + tipX + ' ' + cy +
+        '" fill="none" stroke="' + peak + '" stroke-opacity=".22" stroke-width="1"/>'
+      : "";
+
+    var gid = "wg" + (++waveUid);
+    el.innerHTML =
+      /* preserveAspectRatio="none": the clip's width transitions over .38s
+         while this path is regenerated at the FINAL width the moment the drop
+         commits. With the default "meet" the wave letterboxes for the whole
+         animation; stretching a mirrored noise shape horizontally is
+         invisible, so it fills instead. */
+      '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none"' +
+      ' aria-hidden="true" focusable="false">' +
+        '<defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0" stop-color="' + peak + '" stop-opacity=".94"/>' +
+          '<stop offset=".5" stop-color="' + base + '"/>' +
+          '<stop offset="1" stop-color="' + peak + '"/>' +
+        '</linearGradient></defs>' +
+        wedge +
+        '<path d="' + d + '" fill="url(#' + gid + ')"/>' +
+      '</svg>';
+  }
+
+  function paintAllWaves(){
+    [].slice.call(document.querySelectorAll(".tl-clip .wave")).forEach(paintWave);
+  }
+
+  /* ======================================================================
+     Live timeline — a port of MixrTimeline.resolveClipDrop.
+     The priority order, the hysteresis and the min-length clamp are the
+     Swift's; only the rendering is new. Units are the app's own: the lane
+     is MixrTimeline.totalUnits (130) wide regardless of pixel width, so
+     the pt-based constants convert the same way they do on device.
+     ==================================================================== */
+  var tl = document.getElementById("tl");
+  if(tl){
+    var TOTAL_UNITS = 130,      // MixrTimeline.totalUnits
+        MIN_LEN     = 2,        // MixrTimeline.minClipLengthUnits
+        EPS         = 0.001,    // MixrTimeline.clipEdgeEpsilon
+        SNAP_PT     = 10,       // TLK.clipInsertionSnapZone
+        HYST_PT     = 8,        // TLK.clipInsertionSnapHysteresis
+        SHIFT_PT    = 20;       // TLK.clipDragNeighborShift
+
+    var START = [
+      { id:"a", c:"var(--mx-pitch)",   name:"Blinding Lights", start:4,  len:30 },
+      { id:"b", c:"var(--mx-echo)",    name:"Levitating",      start:42, len:36 },
+      { id:"c", c:"var(--mx-reverb)",  name:"Heat Waves",      start:92, len:26 }
+    ];
+    var clips = START.map(function(c){ return Object.assign({}, c); });
+
+    var lane   = document.getElementById("tl-lane"),
+        cut    = document.getElementById("tl-cut"),
+        nums   = document.getElementById("tl-nums"),
+        reset  = document.getElementById("tl-reset"),
+        chips  = [].slice.call(document.querySelectorAll(".tl-rule")),
+        nodes  = {},
+        zones  = [];
+
+    var pct = function(u){ return (u / TOTAL_UNITS) * 100 + "%"; };
+    function laneW(){ return lane.getBoundingClientRect().width || 1; }
+    function snapUnits(){ return (SNAP_PT / laneW()) * TOTAL_UNITS; }
+    function hystUnits(){ return (HYST_PT / laneW()) * TOTAL_UNITS; }
+
+    /* ---- the port ---------------------------------------------------- */
+    function bestSnapTarget(kind, pointerUnit, others, snapZone){
+      var best = null;
+      others.forEach(function(c){
+        if(c.len <= EPS) return;
+        var edge = kind === "before" ? c.start : c.start + c.len;
+        var d = Math.abs(pointerUnit - edge);
+        if(d > snapZone + EPS) return;
+        if(!best || d < best.d - EPS) best = { clip:c, d:d };
+      });
+      return best && best.clip;
+    }
+
+    function insertTarget(pointerUnit, others, snapZone){
+      for(var i = 0; i < others.length; i++){
+        var c = others[i];
+        if(c.len <= MIN_LEN * 2 + EPS) continue;
+        if(pointerUnit > c.start + snapZone + EPS &&
+           pointerUnit < c.start + c.len - snapZone - EPS) return c;
+      }
+      return null;
+    }
+
+    function resolveClipDrop(o){
+      // Hysteresis first — this is what stops the readout strobing between
+      // two rules when the pointer sits on a boundary.
+      if(o.prev && o.prevPointer != null &&
+         Math.abs(o.pointerUnit - o.prevPointer) < o.hyst) return o.prev;
+
+      var moving = o.clips.filter(function(c){ return c.id === o.id; })[0];
+      if(!moving) return { rule:"free", start:Math.max(0, o.rawStart) };
+      var others = o.clips.filter(function(c){ return c.id !== o.id; });
+
+      // 1 — ghost restore
+      if(o.originalStart != null &&
+         Math.abs(o.rawStart - o.originalStart) <= o.snap + EPS)
+        return { rule:"ghost", start:o.originalStart };
+
+      // 2 — clip-edge snap, before then after
+      var before = bestSnapTarget("before", o.pointerUnit, others, o.snap);
+      if(before){
+        var prefixEnd = others.reduce(function(m, c){
+          return (c.id !== before.id && c.start < before.start - EPS)
+            ? Math.max(m, c.start + c.len) : m;
+        }, 0);
+        return { rule:"snap", start:Math.max(0, Math.max(prefixEnd, before.start - moving.len)) };
+      }
+      var after = bestSnapTarget("after", o.pointerUnit, others, o.snap);
+      if(after) return { rule:"snap", start:Math.max(0, after.start + after.len) };
+
+      // 3 — literal gap: the LEADING EDGE, not the pointer, decides this one
+      var clamped = Math.max(0, o.rawStart);
+      var startsInClip = others.some(function(c){
+        return clamped > c.start + EPS && clamped < c.start + c.len - EPS;
+      });
+      if(!startsInClip) return { rule:"gap", start:clamped };
+
+      // 4 — insert into body
+      var target = insertTarget(o.pointerUnit, others, o.snap);
+      if(target){
+        var minSplit = target.start + MIN_LEN,
+            maxSplit = target.start + target.len - MIN_LEN,
+            splitUnit = Math.min(Math.max(o.pointerUnit, minSplit), maxSplit);
+        return { rule:"insert", start:splitUnit, targetId:target.id, splitUnit:splitUnit };
+      }
+
+      // 5 — free placement
+      return { rule:"free", start:clamped };
+    }
+
+    /* Commit: reflowedClips, pushing only what the new range overlaps. */
+    function reflowed(id, proposedStart, list){
+      var moving = list.filter(function(c){ return c.id === id; })[0];
+      if(!moving) return list.slice();
+      var anchored = Math.max(0, proposedStart);
+      var movingEnd = anchored + moving.len;
+      var others = list.filter(function(c){ return c.id !== id; })
+                       .sort(function(a, b){ return a.start - b.start; });
+      var out = [], suffix = [], prefixEnd = 0;
+      others.forEach(function(c){
+        if(c.start + c.len <= anchored + EPS){
+          var p = Object.assign({}, c);
+          if(p.start < prefixEnd - EPS) p.start = prefixEnd;
+          prefixEnd = Math.max(prefixEnd, p.start + p.len);
+          out.push(p);
+        } else suffix.push(c);
+      });
+      out.push(Object.assign({}, moving, { start:anchored }));
+      var cursor = movingEnd;
+      suffix.forEach(function(c){
+        var n = Object.assign({}, c);
+        if(n.start < cursor - EPS) n.start = cursor;
+        cursor = Math.max(cursor, n.start + n.len);
+        out.push(n);
+      });
+      return out.sort(function(a, b){ return a.start - b.start; });
+    }
+
+    /* Commit: applyInsertIntoClip — split the destination, sandwich between. */
+    function applyInsert(id, res, list){
+      var moving = list.filter(function(c){ return c.id === id; })[0];
+      var target = list.filter(function(c){ return c.id === res.targetId; })[0];
+      if(!moving || !target) return reflowed(id, res.start, list);
+      var leadLen  = Math.max(MIN_LEN, res.splitUnit - target.start);
+      var tailStart = res.splitUnit + moving.len;
+      var tailLen  = Math.max(MIN_LEN, (target.start + target.len) - res.splitUnit);
+      var rest = list.filter(function(c){ return c.id !== id && c.id !== target.id; });
+      var out = rest.concat([
+        Object.assign({}, target, { id:target.id, start:target.start, len:leadLen }),
+        Object.assign({}, moving, { start:res.splitUnit }),
+        Object.assign({}, target, { id:target.id + "-t", start:tailStart, len:tailLen })
+      ]).sort(function(a, b){ return a.start - b.start; });
+      // Re-run the ripple so anything downstream of the new tail gets pushed.
+      var cursor = 0;
+      out.forEach(function(c){
+        if(c.start < cursor - EPS) c.start = cursor;
+        cursor = Math.max(cursor, c.start + c.len);
+      });
+      return out;
+    }
+
+    /* ---- rendering ---------------------------------------------------- */
+    function build(){
+      lane.querySelectorAll(".tl-clip,.tl-zone").forEach(function(n){ n.remove(); });
+      nodes = {}; zones = [];
+      clips.forEach(function(c){
+        var el = document.createElement("span");
+        el.className = "tl-clip";
+        el.style.setProperty("--c", c.c);
+        el.tabIndex = 0;
+        el.setAttribute("role", "button");
+        el.setAttribute("aria-label", c.name + " clip. Press arrow keys to move.");
+        el.innerHTML = '<span class="wave"></span><span class="tag">' + c.name + '</span>';
+        lane.appendChild(el);
+        nodes[c.id] = el;
+        // Two hatched bands per clip, at its real 10pt edge zones.
+        ["l", "r"].forEach(function(side){
+          var z = document.createElement("span");
+          z.className = "tl-zone";
+          lane.appendChild(z);
+          zones.push({ el:z, id:c.id, side:side });
+        });
+      });
+      paint();
+    }
+
+    function paint(shifts){
+      clips.forEach(function(c){
+        var el = nodes[c.id]; if(!el) return;
+        el.style.left  = pct(c.start);
+        el.style.width = pct(c.len);
+        var s = (shifts && shifts[c.id]) || 0;
+        if(!el.classList.contains("is-moving"))
+          el.style.transform = s ? "translateX(" + s + "px)" : "";
+      });
+      var sz = snapUnits();
+      zones.forEach(function(z){
+        var c = clips.filter(function(x){ return x.id === z.id; })[0];
+        if(!c){ z.el.style.width = "0"; return; }
+        z.el.style.left  = pct(z.side === "l" ? c.start : c.start + c.len - sz);
+        z.el.style.width = pct(sz);
+      });
+      // Widths just changed, so the silhouettes have to be redrawn at the new
+      // pixel size. paintWave no-ops when the geometry is unchanged, which is
+      // what keeps this cheap during a drag (position moves, width does not).
+      paintAllWaves();
+    }
+
+    function light(rule){
+      chips.forEach(function(ch){ ch.classList.toggle("on", ch.dataset.rule === rule); });
+    }
+
+    var RULE_TEXT = {
+      ghost:  "Ghost restore — back where it started, nothing rippled.",
+      snap:   "Edge snap — flush against a neighbour.",
+      gap:    "Literal gap — left exactly where you let go.",
+      insert: "Insert into body — the destination splits and takes it between the halves.",
+      free:   "Free placement — dropped, and the lane reflows around it."
+    };
+    function say(res, pointerUnit){
+      nums.textContent = RULE_TEXT[res.rule] +
+        "   pointer " + pointerUnit.toFixed(1) + "u" +
+        "   → start " + res.start.toFixed(1) + "u";
+    }
+
+    /* ---- drag --------------------------------------------------------- */
+    var drag = null;
+    function onDown(e){
+      var el = e.target.closest(".tl-clip"); if(!el) return;
+      var id = Object.keys(nodes).filter(function(k){ return nodes[k] === el; })[0];
+      var c  = clips.filter(function(x){ return x.id === id; })[0]; if(!c) return;
+      var laneRect = lane.getBoundingClientRect();
+      var unitsPerPx = TOTAL_UNITS / laneRect.width;
+      drag = {
+        id: id,
+        originalStart: c.start,
+        // Where inside the clip it was grabbed — the pointer unit is the
+        // leading edge plus this, exactly as ClipDragState computes it.
+        grabUnits: (e.clientX - laneRect.left) * unitsPerPx - c.start,
+        prev: null, prevPointer: null, res: null
+      };
+      el.classList.add("is-moving");
+      el.setPointerCapture && el.setPointerCapture(e.pointerId);
+      tl.classList.add("is-drag");
+      e.preventDefault();
+    }
+
+    function onMove(e){
+      if(!drag) return;
+      var laneRect = lane.getBoundingClientRect();
+      var unitsPerPx = TOTAL_UNITS / laneRect.width;
+      var pointerAbs = (e.clientX - laneRect.left) * unitsPerPx;
+      var rawStart   = pointerAbs - drag.grabUnits;
+      var pointerUnit = Math.max(0, rawStart + drag.grabUnits);
+
+      var res = resolveClipDrop({
+        id: drag.id, rawStart: rawStart, pointerUnit: pointerUnit, clips: clips,
+        snap: snapUnits(), hyst: hystUnits(),
+        prev: drag.prev, prevPointer: drag.prevPointer,
+        originalStart: drag.originalStart
+      });
+      drag.prev = res; drag.prevPointer = pointerUnit; drag.res = res;
+
+      // Preview only — never mutate the model during a drag.
+      var el = nodes[drag.id];
+      el.style.left = pct(Math.max(0, rawStart));
+      el.classList.add("is-ghost-src");
+
+      // Neighbours shift by the real 20pt, one each way around the landing.
+      var shifts = {}, ins = res.start;
+      var sorted = clips.filter(function(c){ return c.id !== drag.id; })
+                        .sort(function(a, b){ return a.start - b.start; });
+      var prevC = null, nextC = null;
+      sorted.forEach(function(c){
+        if(c.start + c.len <= ins + EPS) prevC = c;
+        else if(!nextC && c.start >= ins - EPS) nextC = c;
+      });
+      if(prevC) shifts[prevC.id] = -SHIFT_PT;
+      if(nextC) shifts[nextC.id] =  SHIFT_PT;
+      paint(shifts);
+      el.style.left = pct(Math.max(0, rawStart));
+
+      cut.classList.toggle("on", res.rule === "insert");
+      if(res.rule === "insert") cut.style.left = pct(res.splitUnit);
+      light(res.rule);
+      say(res, pointerUnit);
+    }
+
+    function onUp(){
+      if(!drag) return;
+      var res = drag.res, id = drag.id;
+      var el = nodes[id];
+      el.classList.remove("is-moving", "is-ghost-src");
+      tl.classList.remove("is-drag");
+      cut.classList.remove("on");
+      if(res){
+        clips = res.rule === "insert" ? applyInsert(id, res, clips)
+                                      : reflowed(id, res.start, clips);
+      }
+      drag = null;
+      build();
+    }
+
+    lane.addEventListener("pointerdown", onDown);
+    addEventListener("pointermove", onMove);
+    addEventListener("pointerup", onUp);
+    addEventListener("pointercancel", onUp);
+
+    /* Keyboard equivalent — the demo is a real control, so it has to be
+       reachable without a pointer. One unit per press, commit on each. */
+    lane.addEventListener("keydown", function(e){
+      if(e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      var el = e.target.closest(".tl-clip"); if(!el) return;
+      var id = Object.keys(nodes).filter(function(k){ return nodes[k] === el; })[0];
+      var c  = clips.filter(function(x){ return x.id === id; })[0]; if(!c) return;
+      e.preventDefault();
+      var step = e.key === "ArrowLeft" ? -2 : 2;
+      var rawStart = c.start + step;
+      var res = resolveClipDrop({
+        id:id, rawStart:rawStart, pointerUnit:Math.max(0, rawStart + c.len / 2),
+        clips:clips, snap:snapUnits(), hyst:0,
+        prev:null, prevPointer:null, originalStart:null
+      });
+      clips = res.rule === "insert" ? applyInsert(id, res, clips)
+                                    : reflowed(id, res.start, clips);
+      light(res.rule); say(res, rawStart + c.len / 2);
+      build();
+      var again = nodes[id]; if(again) again.focus();
+    });
+
+    reset.addEventListener("click", function(){
+      clips = START.map(function(c){ return Object.assign({}, c); });
+      light(null);
+      nums.textContent = "Lane reset. Pick up a clip to see which rule resolves.";
+      build();
+    });
+
+    addEventListener("resize", function(){ paint(); });
+    build();
+  }
+
+  /* The static lanes in section 05 carry the same silhouette. They are plain
+     markup, so they need one pass on load and one per resize. */
+  paintAllWaves();
+  addEventListener("resize", paintAllWaves);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(paintAllWaves);
+
+  /* Fun fact tooltip. Hover is handled in CSS; this is the click path, which
+     is the one that matters on touch. Escape and an outside tap both close it,
+     so it can never end up pinned open with no way to dismiss it. */
+  var ff = document.getElementById("ff");
+  if(ff){
+    var ffTip = document.getElementById("ff-tip");
+
+    /* Same behaviour as the landing page's pronunciation tip: the plate rides
+       the pointer. Placed with fixed coordinates and clamped to the viewport,
+       so it never hangs off an edge no matter where the word wraps to. */
+    function place(x, y){
+      var r = ffTip.getBoundingClientRect();
+      var vw = document.documentElement.clientWidth;
+      var vh = document.documentElement.clientHeight;
+      var L = Math.min(Math.max(8, x + 14), vw - r.width - 8);
+      var T = y + 18;
+      if(T + r.height > vh - 8) T = y - r.height - 14;   // flip above near the fold
+      ffTip.style.left = L + "px";
+      ffTip.style.top  = Math.max(8, T) + "px";
+    }
+    function show(x, y){ ffTip.classList.add("on"); place(x, y); }
+    function hide(){
+      ffTip.classList.remove("on");
+      ff.setAttribute("aria-expanded", "false");
+    }
+
+    var pinned = false;
+    ff.addEventListener("pointerenter", function(e){
+      if(e.pointerType !== "mouse" || pinned) return;
+      show(e.clientX, e.clientY);
+    });
+    ff.addEventListener("pointermove", function(e){
+      if(e.pointerType !== "mouse" || pinned) return;
+      place(e.clientX, e.clientY);
+    });
+    ff.addEventListener("pointerleave", function(e){
+      if(e.pointerType !== "mouse" || pinned) return;
+      ffTip.classList.remove("on");
+    });
+
+    /* Click pins it — the only thing that works on a touch screen, where a
+       hover lasts exactly as long as the finger is down. */
+    ff.addEventListener("click", function(e){
+      e.stopPropagation();
+      pinned = ff.getAttribute("aria-expanded") !== "true";
+      ff.setAttribute("aria-expanded", pinned ? "true" : "false");
+      if(pinned){
+        var b = ff.getBoundingClientRect();
+        show(b.left + b.width / 2 - 14, b.bottom - 4);
+      } else {
+        ffTip.classList.remove("on");
+      }
+    });
+    // Keyboard: focus shows it near the trigger, blur takes it away.
+    ff.addEventListener("focus", function(){
+      var b = ff.getBoundingClientRect();
+      show(b.left - 14, b.bottom - 4);
+    });
+    ff.addEventListener("blur", function(){ if(!pinned) ffTip.classList.remove("on"); });
+
+    document.addEventListener("click", function(e){
+      if(!ff.contains(e.target)){ pinned = false; hide(); }
+    });
+    document.addEventListener("keydown", function(e){
+      if(e.key === "Escape"){ pinned = false; hide(); }
+    });
+    addEventListener("scroll", function(){ if(pinned){ pinned = false; hide(); } }, { passive: true });
+  }
+
+  /* ======================================================================
+     Effect A/B player. One <audio> for all seven, so pressing a second row
+     always stops the first — comparing two effects means hearing them one
+     after another, never on top of each other.
+     ==================================================================== */
+  var fxa = document.querySelector(".fxa");
+  if(fxa){
+    var players = [].slice.call(fxa.querySelectorAll(".fxa-play"));
+    var audio = new Audio();
+    audio.preload = "none";
+    var current = null, raf = 0;
+
+    function drawWave(el, amps){
+      var W = 300, H = 44, pad = 3;
+      var cy = H / 2, maxHalf = (H - pad * 2) / 2 * 0.94;
+      var n = amps.length;
+      var xAt = function(i){ return pad + (W - pad * 2) * i / (n - 1); };
+      var d = "M" + xAt(0).toFixed(1) + " " + (cy - maxHalf * amps[0]).toFixed(1);
+      for(var i = 1; i < n; i++) d += "L" + xAt(i).toFixed(1) + " " + (cy - maxHalf * amps[i]).toFixed(1);
+      for(var j = n - 1; j >= 0; j--) d += "L" + xAt(j).toFixed(1) + " " + (cy + maxHalf * amps[j]).toFixed(1);
+      d += "Z";
+      var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">' +
+                '<path d="' + d + '" fill="currentColor" fill-opacity=".78"/></svg>';
+      el.insertAdjacentHTML("afterbegin", svg);
+    }
+
+    // The envelopes are shipped alongside the audio, so the shape of each
+    // effect is readable before anything is downloaded or played.
+    fetch("audio/peaks.json").then(function(r){ return r.json(); }).then(function(p){
+      [].slice.call(fxa.querySelectorAll(".fxa-wave")).forEach(function(el){
+        var k = el.dataset.wave;
+        if(p[k] && p[k].length) drawWave(el, p[k]);
+      });
+    }).catch(function(){ /* envelopes are decoration; the players still work */ });
+
+    function progress(){
+      if(!current) return;
+      var el = fxa.querySelector('.fxa-wave[data-wave="' + current + '"] .pw');
+      if(el && audio.duration){
+        el.style.inset = "0 " + (100 - (audio.currentTime / audio.duration) * 100).toFixed(1) + "% 0 0";
+      }
+      raf = requestAnimationFrame(progress);
+    }
+
+    function stop(){
+      cancelAnimationFrame(raf);
+      audio.pause();
+      players.forEach(function(b){ b.setAttribute("aria-pressed", "false"); });
+      [].slice.call(fxa.querySelectorAll(".pw")).forEach(function(p){ p.style.inset = "0 100% 0 0"; });
+      current = null;
+    }
+
+    players.forEach(function(b){
+      b.addEventListener("click", function(){
+        var clip = b.dataset.clip;
+        if(current === clip){ stop(); return; }
+        stop();
+        current = clip;
+        audio.src = "audio/" + clip + ".mp3";
+        b.setAttribute("aria-pressed", "true");
+        audio.play().then(function(){ raf = requestAnimationFrame(progress); })
+                    .catch(function(){ stop(); });
+      });
+    });
+    audio.addEventListener("ended", stop);
+  }
+
+  /* ======================================================================
+     Navbar: geometric centre vs the cluster's centre of mass.
+     The pink mark is MEASURED, not authored — so the demo cannot claim a
+     correction it did not actually make.
+     ==================================================================== */
+  var nb = document.getElementById("nb");
+  if(nb){
+    var nbCluster = document.getElementById("nb-cluster"),
+        nbGeo     = document.getElementById("nb-geo"),
+        nbOpt     = document.getElementById("nb-opt"),
+        nbNums    = document.getElementById("nb-nums"),
+        nbBtns    = [].slice.call(document.querySelectorAll("#nb-tog button"));
+
+    var play = nbCluster.querySelector(".nb-play");
+    function applyProps(after){
+      nb.style.setProperty("--metagap", after ? "10px" : "18px");
+      nb.style.setProperty("--metalab", after ? "8px"  : "9px");
+      play.style.setProperty("--glow",  after ? "26px" : "30px");
+      play.style.setProperty("--glowa", after ? ".26"  : ".30");
+    }
+
+    /* How far the cluster's centre of mass sits from the bar's centre, in the
+       target layout. Measured with transitions suppressed and then restored
+       inside the same synchronous block, so nothing the user sees ever shows
+       the probe — and so this does NOT depend on an animation frame arriving,
+       which a backgrounded tab will never deliver. */
+    function offsetInTargetLayout(after){
+      var prevGap   = nb.style.getPropertyValue("--metagap"),
+          prevLab   = nb.style.getPropertyValue("--metalab"),
+          prevShift = nbCluster.style.getPropertyValue("--shift");
+      nb.classList.add("nb-measuring");
+      applyProps(after);
+      nbCluster.style.setProperty("--shift", "0px");
+      void nb.offsetWidth;                       // force layout
+      var bar = nb.getBoundingClientRect(), cl = nbCluster.getBoundingClientRect();
+      var d = (cl.left + cl.width / 2) - bar.left - bar.width / 2;
+      nb.style.setProperty("--metagap", prevGap);
+      nb.style.setProperty("--metalab", prevLab);
+      nbCluster.style.setProperty("--shift", prevShift);
+      void nb.offsetWidth;
+      nb.classList.remove("nb-measuring");
+      return { d:d, barW:bar.width };
+    }
+
+    function setState(state){
+      var after = state === "after";
+      var m = offsetInTargetLayout(after);
+      // The correction is derived, not authored: in the after state the cluster
+      // moves by exactly the gap that was measured, so it lands on centre at
+      // whatever width the page happens to be.
+      var shift = after ? -m.d : 0;
+      applyProps(after);
+      nbCluster.style.setProperty("--shift", shift.toFixed(1) + "px");
+      var resid = m.d + shift;                   // 0 in the after state, by construction
+      nbGeo.style.left = (m.barW / 2) + "px";
+      nbOpt.style.left = (m.barW / 2 + resid) + "px";
+      nbNums.textContent = Math.abs(resid) < 0.5
+        ? "Cluster centre is on the bar's centre — balanced."
+        : "Cluster centre sits " + Math.abs(resid).toFixed(1) + "px " +
+          (resid >= 0 ? "right" : "left") + " of the bar's centre.";
+    }
+
+    nbBtns.forEach(function(b){
+      b.addEventListener("click", function(){
+        nbBtns.forEach(function(x){ x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+        setState(b.dataset.state);
+      });
+    });
+    addEventListener("resize", function(){
+      var cur = nbBtns.filter(function(b){ return b.getAttribute("aria-pressed") === "true"; })[0];
+      if(cur) setState(cur.dataset.state);
+    });
+    // Paint once now so the marks are never missing, then again once the face
+    // has loaded — the metadata block's width moves with it, and the whole
+    // demo is about where that block's edge lands.
+    setState("before");
+    if(document.fonts && document.fonts.ready){
+      document.fonts.ready.then(function(){
+        var cur = nbBtns.filter(function(b){ return b.getAttribute("aria-pressed") === "true"; })[0];
+        setState(cur ? cur.dataset.state : "before");
+      });
+    }
   }
 })();
 </script>

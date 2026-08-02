@@ -1,7 +1,7 @@
 {
   "name": "pranaviln.com",
   "version": "1.0.0",
-  "homepage": "https://pranaviln.com/#",
+  "homepage": "https://pranaviram.com/#",
   "type": "module",
   "scripts": {
     "predeploy": "npm run build",

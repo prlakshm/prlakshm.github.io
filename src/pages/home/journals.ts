@@ -179,10 +179,14 @@ export const journals: Journal[] = [
         rotate: -3.5,
       },
       {
+        /* cx moves right by half the width increase, so the strip grows
+           RIGHTWARD only and its left edge stays put. Growing it evenly would
+           push that edge into the note below-left, which is placed against it
+           on purpose — see the note's own comment. */
         src: "/home/journals/spill/mixr-effects.webp",
-        cx: 0.145,
+        cx: 0.1698,
         cy: 0.26,
-        cw: 0.46,
+        cw: 0.5096,
         ar: 7.0,
         rotate: 4,
       },

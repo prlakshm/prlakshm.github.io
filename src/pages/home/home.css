@@ -858,11 +858,12 @@
 }
 
 /* No hover, no spill — at ANY width. A tablet or a phone in landscape is wider
-   than the phone breakpoint and still cannot hover, and there a tap opened the
-   whole overlay and left it up until the user tapped elsewhere. The width-based
-   rule further down stays for narrow desktop windows, which can hover. */
+   than the phone breakpoint and still cannot hover, and there a tap on a LINKED
+   notebook opens the overlay and then navigates out from under it.
+   [data-inert] is exempt: that notebook goes nowhere on tap, so it is the one
+   that can spill from a tap instead (see onTap in Journal.tsx). */
 @media (hover: none), (pointer: coarse) {
-  .jr-spill {
+  .jr-spill:not([data-inert]) {
     display: none;
   }
 }
@@ -899,6 +900,17 @@
       color-mix(in srgb, var(--espresso) 93%, transparent) 70%,
       color-mix(in srgb, #16100b 95%, transparent) 100%
     );
+}
+
+/* The blur is applied ONLY while the scrim is sitting still, never while its
+   opacity is animating. A backdrop-filter has to re-sample and re-blur the
+   whole viewport on every frame the element's own alpha changes, so fading a
+   full-screen blurred layer is the most expensive thing in this interaction —
+   and the close fade is the longest of the two, which is why leaving glitched
+   worse than arriving. Toggling it at the ends costs nothing visually: by the
+   time it appears or disappears the gradient over it is already 82-95% opaque,
+   so 2px of blur on the remaining sliver is not something you can see. */
+.jr-spill-scrim.is-blurred {
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
@@ -1452,18 +1464,24 @@
 }
 
 @media (max-width: 1023px) {
-  /* Keep the title's centered max-content start. Body stacks inside that
-     same block (shifts right vs full-bleed), so edges still match. */
+  /* Centred from here down, where desktop is left-aligned.
+     On desktop the block is a centred slab of max-content whose contents share
+     one left edge — that edge is the structure, and the title's own width is
+     what makes it legible. Once the columns stack, the title wraps, the copy
+     wraps, and the two no longer end at the same place: the shared edge stops
+     reading as alignment and starts reading as ragged. Centring each element
+     on the stack's own axis is what holds it together at these widths. */
   .hero-block {
     width: max-content;
     max-width: 100%;
     align-self: center;
+    text-align: center;
   }
 
   .hero-title {
     width: max-content;
     max-width: 100%;
-    text-align: left;
+    text-align: center;
   }
 
   /* Stack: copy → PREV → contacts. Tighter under Brown; roomier under HBO Max. */
@@ -1473,21 +1491,24 @@
       "copy"
       "prev"
       "tiles";
-    justify-content: start;
-    justify-items: start;
+    justify-content: center;
+    justify-items: center;
     row-gap: 0;
     width: 0;
     min-width: 100%;
-    text-align: left;
+    text-align: center;
   }
 
+  /* justify-items above shrink-wraps each column to its text, so the parchment
+     wash on ::before stays tight around the words instead of stretching across
+     the full stack width. */
   .hero-col,
   .hero-col--copy,
   .hero-col--prev {
     width: auto;
     max-width: 100%;
-    align-items: flex-start;
-    text-align: left;
+    align-items: center;
+    text-align: center;
   }
 
   .hero-col--copy .line {
@@ -1499,7 +1520,8 @@
   }
 
   .hero-intro > .tiles--hero {
-    justify-self: start;
+    justify-self: center;
+    justify-content: center;
     margin-top: 20px;
   }
 
@@ -1596,7 +1618,16 @@
     padding-inline: 16px;
   }
 
-  .line,
+  /* Matched to the notebook labels (.jr-annotation-*, 14px and not responsive)
+     so the two blocks of mono on a phone screen are the same size. At 12px the
+     hero read as a caption under the title while the labels below it read as
+     body — the reverse of their actual importance. Both are mono at the same
+     px, so they measure the same even across the two families.
+     The footer stays at 12px: it is a legal line, not body copy. */
+  .line {
+    font-size: 14px;
+  }
+
   .foot-name {
     font-size: 12px;
   }
@@ -1630,7 +1661,7 @@
   /* The notebook stays closed and nothing spills. The JS already refuses to
      open at this width; this is the belt to that brace, and it also covers a
      desktop window dragged narrow mid-spill. */
-  .jr-spill,
+  .jr-spill:not([data-inert]),
   .scrap-tooltip,
   .jr-img--open {
     display: none;

@@ -100,8 +100,14 @@ main::before{bottom:0}
 .side{position:sticky;top:var(--nav-height);align-self:start;height:calc(100vh - var(--nav-height));
   padding-block:var(--intro-grid-offset) clamp(28px,5vw,64px);
   display:flex;flex-direction:column;gap:22px}
+/* line-height is pinned to a whole pixel, NOT left to inherit 1.62. At 13px
+   that computes to 21.06px, which lands the second line 0.11 of a device pixel
+   off the grid: its stems rasterise across two pixel rows at half coverage
+   each, so it renders lighter and softer than the line above it even though
+   both are the same --brass. 21px puts both lines on the same subpixel phase.
+   Keep it an integer if --fs-micro ever changes. */
 .side .who{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.16em;text-transform:uppercase;
-  color:var(--brass)}
+  line-height:21px;color:var(--brass)}
 .jump{display:flex;flex-direction:column;gap:1px;border-left:1px solid var(--rule)}
 .jump a{position:relative;font-family:var(--fm);font-size:var(--fs-body);line-height:1.5;
   letter-spacing:.03em;color:var(--soft);text-decoration:none;padding:8px 0 8px 14px;
@@ -308,9 +314,32 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   .wt-nav-inner{padding-inline:16px}
   .wt-wordmark,.wt-nav-links a{font-size:13px;letter-spacing:.07em}
   .wt-nav-links{gap:16px}
+  /* Phone: no section list. At 900px it becomes a horizontally scrolling strip,
+     and on a phone that strip sits directly under the nav and competes with the
+     page for the first swipe — you flick to read on and scrub the chapters
+     instead. The heading is enough to say where you are; the read-progress bar
+     is already hidden here for the same reason.
+     Back to a column so the heading spans the full measure rather than being
+     squeezed into a row it no longer shares. */
+  /* HOME and NEXT hang a full gutter outside the shell on desktop, where the
+     sidebar leaves room for it. On a phone there is no such margin, so they
+     drift past the conclusion box — pull them flush with its right edge. */
+  .case-actions{right:0}
+  .side .jump{display:none}
+  .side{flex-direction:column;align-items:stretch;gap:0;overflow-x:visible}
+  /* Halve the run-in under the heading. The 67px there was .shell's 24px
+     row-gap plus main's 43px intro offset — sized for when the section list
+     sat between them. With the list gone the heading is the only thing above
+     "Case study", and that much air reads as a dropped element. */
+  .shell{row-gap:11px}
+  main{padding-top:19px}
 }
 @media (max-width:620px){
   .two,.results-metrics .stats{grid-template-columns:1fr}
+  /* The second metric is nudged one grid cell left so it lands on a gridline
+     beside the first. Stacked, there is nothing to align to and the transform
+     just walks it off the left edge. */
+  .results-metrics .result-metric:nth-child(2){transform:none}
 }
 @media (prefers-reduced-motion:reduce){
   .wt-nav{transition:none}
