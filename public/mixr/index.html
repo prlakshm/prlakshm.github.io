@@ -270,7 +270,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
   line-height:1;color:#fff}
 .hint{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.13em;color:#7a7a88}
 .demo .foot{margin-top:16px;font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.04em;
-  color:#787884;line-height:1.75;max-width:62ch}
+  color:#7a7a88;line-height:1.75;max-width:62ch}
 .demo figure{margin:0}
 .demo img,.demo video{border:1px solid rgba(255,255,255,.14)}
 
@@ -408,6 +408,71 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
          drop-shadow(0 0 calc(15px * var(--sel)) color-mix(in srgb,var(--c) calc(46% * var(--sel)),transparent))}
 
 .ec > *{position:relative;z-index:1}
+/* ---- the card's light: blob, orb, dot ------------------------------------
+   EffectLightingLayer + EffectLightingLayout. NOT three identical bubbles —
+   three different objects, at a per-effect position and size, computed in the
+   Swift as a base cluster (blob .44/.67, orb .58/.43, dot .74/.40) plus a
+   per-effect cluster nudge and a per-bubble horizontal spread. This is the
+   "different bubble locations each card" the X post is about, and it is data,
+   not decoration. --lb is intensity x EffectUnselectedGlow. */
+.ec-blob,.ec-orb,.ec-dot{position:absolute;border-radius:50%;pointer-events:none;
+  transform:translate(-50%,-50%);z-index:0}
+.ec-blob{width:var(--s);height:var(--s);left:var(--x);top:var(--y);filter:blur(2.4px);
+  background:radial-gradient(circle at 50% 50%,
+    rgba(255,255,255,calc(.055 * var(--lb))) 0%,
+    color-mix(in srgb,var(--c) calc(26% * var(--lb)),transparent) 38%,
+    color-mix(in srgb,var(--c) calc(8% * var(--lb)),transparent) 68%,
+    transparent 100%)}
+.ec-orb{width:var(--s);height:var(--s);left:var(--x);top:var(--y);filter:blur(.55px);
+  background:radial-gradient(circle at 50% 50%,
+    rgba(255,255,255,calc(.18 * var(--lb))) 0%,
+    color-mix(in srgb,var(--c) calc(50% * var(--lb)),transparent) 42%,
+    color-mix(in srgb,var(--c) calc(14% * var(--lb)),transparent) 74%,
+    transparent 100%)}
+.ec-dot{width:var(--s);height:var(--s);left:var(--x);top:var(--y);
+  background:radial-gradient(circle at 42% 38%,rgba(255,255,255,.75),
+    color-mix(in srgb,var(--c) 62%,transparent) 70%,transparent);
+  box-shadow:0 0 2.5px color-mix(in srgb,var(--c) 55%,transparent)}
+
+/* ---- ClearGlassBubble + EffectReflectionArc + GlassMarble ----------------
+   All three cluster bottom-right: bubble and arc share a centre at
+   (w-17, h-16), the marble sits at (w-24, h-15). reflectionArcSize 28,
+   glassBubbleSize 13. */
+.ec-glass{position:absolute;width:28px;height:28px;right:3px;bottom:2px;border-radius:50%;
+  pointer-events:none;z-index:1;
+  background:rgba(255,255,255,.018);
+  box-shadow:0 1px 2px rgba(0,0,0,.30)}
+.ec-glass::before{content:"";position:absolute;inset:0;border-radius:50%;
+  padding:1px;background:linear-gradient(to bottom right,
+    rgba(255,255,255,.18),rgba(255,255,255,.055) 50%,rgba(255,255,255,.02));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude}
+/* The arc is a 195°-345° stroke, i.e. the TOP of the circle only. Drawn as a
+   conic wedge masked to a ring, since CSS has no partial-circle stroke. */
+.ec-glass::after{content:"";position:absolute;inset:0;border-radius:50%;
+  padding:.9px;
+  background:
+    conic-gradient(from 195deg,
+      color-mix(in srgb,var(--c) 18%,rgba(255,255,255,.24)) 0deg,
+      rgba(255,255,255,.24) 60deg,
+      rgba(255,255,255,.03) 150deg,
+      transparent 150deg 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  filter:drop-shadow(0 0 2px color-mix(in srgb,var(--c) 10%,transparent))}
+
+/* GlassMarble — a lit sphere, not a flat dot: dark rim, radial body off-centre
+   at (.45,.40), a 0.6px white stroke, and a sharp 3.1px specular up-left. */
+.ec-marble{position:absolute;width:13px;height:13px;right:17px;bottom:9px;
+  border-radius:50%;pointer-events:none;z-index:2;
+  background:radial-gradient(circle at 45% 40%,
+    rgba(255,255,255,.98) 0%,rgba(255,255,255,.88) 55%,rgba(255,255,255,.78) 100%);
+  box-shadow:0 0 0 .6px rgba(255,255,255,.55),
+             0 1.5px 3px rgba(0,0,0,.50),
+             0 0 .8px 1.5px rgba(0,0,0,.52)}
+.ec-marble::after{content:"";position:absolute;width:3.1px;height:3.1px;border-radius:50%;
+  left:calc(50% - 2.6px - 1.55px);top:calc(50% - 2.6px - 1.55px);
+  background:#fff;filter:blur(.3px)}
 /* backdrop-filter samples what is painted behind it. Against flat black there
    is nothing to sample and the glass reads identical to a solid card, so the
    panel carries the app's own ambient wash (MixrColors.glassAmbientPurple). */
@@ -968,6 +1033,23 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 .nb-measuring,.nb-measuring *{transition:none !important}
 @media (max-width:620px){.nb-meta{--metagap:10px}.nb-brand{display:none}}
 
+/* ---- two devices side by side -------------------------------------------
+   Same bezel as .device, minus the phone-specific hardware: no volume pair,
+   no power button, and a shallower radius, because an iPad and a Mac window
+   do not have an iPhone's corner. Deliberately smaller than the hero shots —
+   by this point the reader has seen this interface several times, and the
+   claim being made is "it holds at another size", not "look at the UI". */
+.devices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:clamp(14px,2.4vw,28px);align-items:start;margin-top:20px}
+.devices figure{margin:0}
+.devices .device{border-radius:clamp(10px,1.6vw,18px);padding:calc(5px + .5%)}
+/* The nubs belong to the phone. */
+.devices .device::before,.devices .device::after{content:none}
+.devices .device > img{border-radius:clamp(5px,1vw,11px)}
+.devices figcaption{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.13em;
+  text-transform:uppercase;color:#7f8694;margin-top:10px;text-align:center}
+@media (max-width:640px){.devices{grid-template-columns:1fr;gap:22px}}
+
 /* ---- recreated: the sound-effects menu ----------------------------------- */
 /* SFXComponents.swift / SFXMetrics, rendered at the real pt sizes rather than
    scaled — a 200x138 card here is a 200x138 card on device, so this is
@@ -1190,8 +1272,8 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
       <span class="hint">IMPORT &middot; ARRANGE &middot; MIX &middot; PLAY</span>
     </div>
     <figure class="device">
-      <video src="art/editor-hero.mp4" poster="art/editor-hero-poster.jpg" autoplay muted loop playsinline
-             aria-label="Mixr running on iPhone: two songs as coloured waveform lanes on one timeline, the transport and BPM in the nav bar, and the effects row along the bottom."></video>
+      <video data-eager src="art/editor-hero.mp4" poster="art/editor-hero-poster.jpg" autoplay muted loop playsinline
+             aria-label="Mixr running on iPhone: an empty project, then the file picker with five songs, then STAY and Heat Waves landing on the timeline as coloured waveform lanes and playing back, with the transport and BPM in the nav bar and the effects row along the bottom."></video>
     </figure>
     <p class="foot">Recorded on simulator device.</p>
   </div>
@@ -1215,108 +1297,63 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 <!-- 02 -->
 <section id="insight">
   <div class="sechead rv"><p class="lab">02 &mdash; Ideation</p>
-    <h2>From live performance to visual composition.</h2></div>
-
-  <div class="stack rv d1">
-    <p>It started with a mock ChatGPT generated. I keep going back to it for interface mocks &mdash; it is the one tool whose UI images don&rsquo;t look AI-generated. Nothing is melting, the type is real type, and the spacing is close enough to build from.</p>
-  </div>
-
-  <figure class="rv d2">
-    <img src="art/origin-mock.webp" alt="The first ChatGPT mock of Mixr: a dark editor with a song list down the left, five colored waveform lanes on a timeline, solo and mute buttons down the right, an Effects panel along the bottom holding Reverb, Echo, Bass Boost, Pitch Up, Flanger and Chorus, and a purple AI Suggestions button floating in the bottom right corner." loading="lazy">
-    <figcaption>Day one. Everything in this case study is downstream of this image.</figcaption>
-  </figure>
+    <h2>Choosing the right references.</h2></div>
 
   <div class="stack rv d2">
-    <p>I knew immediately what I wanted to change. AI Suggestions was a floating button in the corner, which makes the app&rsquo;s most interesting feature feel bolted on &mdash; it belonged in the effects row as its own card, next to everything else you can apply. Bass Boost and Chorus didn&rsquo;t survive either.</p>
-    <p>But the layout was right, and I never seriously moved it. Controls on the sides, timeline in the middle, effects along the bottom. It felt intuitive before I could explain why, and the reason turned out to be the whole insight below: that is an editor&rsquo;s layout, not a DJ&rsquo;s.</p>
-  </div>
-
-  <div class="ba rv d2">
-    <div>
-      <h4>Kept from the mock</h4>
-      <p>Song list left, lanes centre, solo and mute right, effects along the bottom. A colour per song, carried by its waveform. The near-black ground.</p>
-    </div>
-    <div class="pick">
-      <h4>Changed on the way</h4>
-      <p>AI became the Auto card at the head of the effects row. Bass Boost and Chorus were cut. &ldquo;Pitch Up&rdquo; became Pitch once it could go both ways.</p>
-    </div>
-  </div>
-
-  <div class="stack rv d2">
-    <p>A few weeks in I realised I wasn&rsquo;t designing a DJ app. I was designing an audio editor &mdash; my design questions had quietly become music questions: where should one song end, how long should two overlap.</p>
-    <p>That reframing is the product. The interface isn&rsquo;t the thing being made. The remix is.</p>
-  </div>
-
-  <figure class="rv d2">
-    <svg class="dg dgflow" viewBox="0 0 760 216" role="img"
-         aria-label="Mental model shift. Before: two decks, a crossfader and a live take, performed once. After: lanes, clips, a playhead and undo, composed over time.">
-      <text class="mi" x="24" y="26">DECK MODEL &#8594; TIMELINE MODEL</text>
-
-      <rect class="bx" x="24" y="60" width="196" height="110"/>
-      <text class="lb" x="122" y="96" text-anchor="middle">Two decks</text>
-      <text class="lb" x="122" y="118" text-anchor="middle">Crossfader</text>
-      <text class="lb" x="122" y="140" text-anchor="middle">One live take</text>
-
-      <path class="ln fx-line" style="--d:.15" d="M220 115H300"/>
-      <g class="fx" style="--d:.5">
-        <path class="tick" d="M308 115 300 111 300 119Z"/>
-        <rect class="bx" x="316" y="88" width="150" height="54"/>
-        <text class="lb" x="391" y="120" text-anchor="middle">Same audio</text>
-      </g>
-      <path class="ln fx-line" style="--d:.85" d="M466 115H540"/>
-      <g class="fx" style="--d:1.2">
-        <path class="tick" d="M548 115 540 111 540 119Z"/>
-        <rect class="bx pick" x="548" y="60" width="188" height="110"/>
-        <text class="lb ac" x="642" y="96" text-anchor="middle">Lanes and clips</text>
-        <text class="lb ac" x="642" y="118" text-anchor="middle">A playhead</text>
-        <text class="lb ac" x="642" y="140" text-anchor="middle">Undo</text>
-      </g>
-    </svg>
-    <figcaption>The audio never changed. What changed is what the user is asked to be good at.</figcaption>
-  </figure>
-
-  <div class="stack rv d2">
-    <p>The reference set was never DJ software. It was CapCut, Final Cut Pro, Premiere Pro, DaVinci Resolve, TikTok&rsquo;s editor and GarageBand. Three of them left a fingerprint you can point at in the build.</p>
+    <p>I wanted to give beginners a familiar place to start. The reference wasn't DJ software. It was video editors like CapCut, Final Cut Pro, Premiere Pro, DaVinci Resolve, and GarageBand.</p>
+    <p>These products share a familiar interaction model: import media, arrange clips on a timeline, edit them directly, preview, and undo.</p>
   </div>
 
   <figure class="lin rv d2" aria-label="Three references and what each one contributed">
     <div>
       <h4>CapCut</h4>
-      <span class="gave">Gave the bar</span>
-      <p>&ldquo;As simple as CapCut&rdquo; was in the first brief, and it handed over the verbs too &mdash; split, duplicate, delete, speed &mdash; already named before I designed them.</p>
+      <span class="gave">Set the benchmark</span>
+      <p>&ldquo;As simple as CapCut&rdquo; was in the first prompt. It gave me actions like split, duplicate, and delete that I needed to incorporate in timeline editing.</p>
     </div>
     <div>
       <h4>Premiere Pro</h4>
-      <span class="gave">Gave the insert edit</span>
-      <p>Drop into a clip and it splits, the halves ripple apart, the new clip lands between. Premiere makes you ask for that with a modifier. Mixr has no mode &mdash; where you let go is the choice.</p>
+      <span class="gave">Defined the inituition</span>
+      <p>With a background in video editing, this was the editor I knew best. Drag-and-drop and the SFX (sound effects) library were all inspired by Premiere Pro.</p>
     </div>
     <div>
       <h4>GarageBand</h4>
       <span class="gave">Gave the unit</span>
-      <p>A lane per source in its own colour, and time counted in the music&rsquo;s unit rather than the clock&rsquo;s. Transitions are measured in beats because seconds were already the wrong ruler.</p>
+      <p>Taught me to use the music's unit rather than the clock's. Transitions are measured in beats rather than seconds so timing aligns with tempo.</p>
     </div>
   </figure>
 
+
+  <div class="stack rv d1">
+    <p>I started by asking ChatGPT for mocks. I find it has the best image generation capabilities and doesn't return UI that looks AI-generated.</p>
+  </div>
+
+  <figure class="rv d2">
+    <img src="art/origin-mock.webp" alt="The first ChatGPT mock of Mixr: a dark editor with a song list down the left, five colored waveform lanes on a timeline, solo and mute buttons down the right, an Effects panel along the bottom holding Reverb, Echo, Bass Boost, Pitch Up, Flanger and Chorus, and a purple AI Suggestions button floating in the bottom right corner." loading="lazy">
+    <figcaption>Day 1. Everything below is a downstream of this image.</figcaption>
+  </figure>
+
   <div class="stack rv d2">
-    <p>Concretely: songs become coloured waveform lanes, audio becomes draggable clips, effects become cards, and the playhead is the anchor every action reads from.</p>
+    <p>I knew what I wanted to change. "AI Suggestions" was a floating button and belonged in the effects tray. It should also be called "Auto" like iPhone photo editing. The "Mixr" button on the top had no indication of what it did. It needed to go.</p>
+    <p>But the layout was right, and I never looked back. Controls on the sides, timeline in the middle, effects along the bottom. It felt intuitive because it resembled video editing software, not a DJ's.</p>
   </div>
 
   <div class="demo rv d2">
     <p class="sub">The interface, today's build</p>
     <figure class="device">
-      <img src="art/build-now.png" alt="The Mixr editor in landscape: a nav bar with project name, transport, BPM and key; a Tracks panel listing four imported songs with artwork; four colored waveform lanes on a timeline with a playhead; a Controls panel of solo, mute and volume per track; and an Effects drawer along the bottom." loading="lazy">
+      <video preload="none" data-src="art/build-now.mp4" poster="art/build-now-poster.jpg" autoplay muted loop playsinline
+             aria-label="The Mixr editor in landscape, playing: five coloured waveform lanes with the playhead moving, a Tracks panel listing STAY, Heat Waves, good 4 u and Cut To The Feeling, solo, mute and volume down the right, and the Effects drawer along the bottom."></video>
     </figure>
-    <p class="foot">Four songs imported. Left: the track list. Centre: the lanes and playhead. Right: solo, mute and volume. Bottom: effects. Every song gets its own color, and that color is reused by its waveform, its clip outline, its volume slider and its transition geometry &mdash; so the lane you are editing is never ambiguous.</p>
+    <p class="foot">Recorded on simulator device. Each waveform gets its own color from the brand palette.</p>
   </div>
 </section>
 
 <!-- 03 -->
 <section id="behavior">
   <div class="sechead rv"><p class="lab">03 &mdash; Behavior</p>
-    <h2>The timeline should rearrange itself the way you expect.</h2></div>
+    <h2>Trying not to get sued.</h2></div>
 
   <div class="stack rv d1">
-    <p>Copyright decided the shape of the app before I designed anything. Mixr can&rsquo;t stream from a library and it can&rsquo;t host anyone&rsquo;s masters, so the whole thing is built around import and export: you bring your own files in, you take your remix out, and nothing lives on a server in between.</p>
+    <p>I considered copyright before designed anything. Mixr can&rsquo;t stream from a library and it can&rsquo;t host anyone&rsquo;s masters, so the whole thing is built around import and export: you bring your own files in, you take your remix out, and nothing lives on a server in between.</p>
     <p>For building and testing it I pulled tracks off Spotify as files through <a href="https://spotdown.org" target="_blank" rel="noreferrer">spotdown.org</a>, which is also the honest answer to how a beginner gets audio into an app like this at all.</p>
   </div>
 
@@ -1325,9 +1362,9 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
   </div>
 
   <figure class="device rv d2">
-    <video src="art/clip-menu.mp4" poster="art/clip-menu-poster.jpg" autoplay muted loop playsinline
-           aria-label="A clip selected on the Mixr timeline, showing the Split, Speed, Duplicate and Delete actions."></video>
-    <figcaption>Split, Speed, Duplicate, Delete &mdash; the whole editing language, on the clip itself.</figcaption>
+    <video preload="none" data-src="art/clip-menu.mp4" poster="art/clip-menu-poster.jpg" autoplay muted loop playsinline
+           aria-label="A clip on the Mixr timeline: selected, showing the Split, Speed, Duplicate and Delete actions, then split into pieces, then one piece lifted and dragged to a new position on the lane."></video>
+    <figcaption>Split, Speed, Duplicate, Delete &mdash; the whole editing language, on the clip itself. Then the split, and the drag that follows it.</figcaption>
   </figure>
 
 
@@ -1459,10 +1496,11 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
           <svg viewBox="0 0 24 24"><path d="M11.2 2.4a.5.5 0 0 1 .95 0l1.1 3.1a3 3 0 0 0 1.8 1.8l3.1 1.1a.5.5 0 0 1 0 .95l-3.1 1.1a3 3 0 0 0-1.8 1.8l-1.1 3.1a.5.5 0 0 1-.95 0l-1.1-3.1a3 3 0 0 0-1.8-1.8l-3.1-1.1a.5.5 0 0 1 0-.95l3.1-1.1a3 3 0 0 0 1.8-1.8zM18 14.6a.32.32 0 0 1 .6 0l.55 1.6a1.6 1.6 0 0 0 .98.98l1.6.55a.32.32 0 0 1 0 .6l-1.6.55a1.6 1.6 0 0 0-.98.98l-.55 1.6a.32.32 0 0 1-.6 0l-.55-1.6a1.6 1.6 0 0 0-.98-.98l-1.6-.55a.32.32 0 0 1 0-.6l1.6-.55a1.6 1.6 0 0 0 .98-.98zM5.4 15.1a.26.26 0 0 1 .5 0l.42 1.2a1.3 1.3 0 0 0 .8.8l1.2.42a.26.26 0 0 1 0 .5l-1.2.42a1.3 1.3 0 0 0-.8.8l-.42 1.2a.26.26 0 0 1-.5 0l-.42-1.2a1.3 1.3 0 0 0-.8-.8l-1.2-.42a.26.26 0 0 1 0-.5l1.2-.42a1.3 1.3 0 0 0 .8-.8z"/></svg>
         </span>
         <span class="ec-name">Auto</span>
-        <span class="ec-bub" style="width:20px;height:20px;left:47%;top:52%" aria-hidden="true"></span>
-        <span class="ec-bub" style="width:11px;height:11px;left:63%;top:31%" aria-hidden="true"></span>
-        <span class="ec-bub" style="width:5px;height:5px;left:73%;top:20%" aria-hidden="true"></span>
-        <span class="ec-knob" aria-hidden="true"></span>
+        <span class="ec-blob" style="--x:47%;--y:66%;--s:24px;--lb:0.8" aria-hidden="true"></span>
+        <span class="ec-orb"  style="--x:62%;--y:43%;--s:11px;--lb:0.8" aria-hidden="true"></span>
+        <span class="ec-dot"  style="--x:72%;--y:28%;--s:3.8px" aria-hidden="true"></span>
+        <span class="ec-glass" aria-hidden="true"></span>
+        <span class="ec-marble" aria-hidden="true"></span>
       </button>
 
       <button class="ec" aria-pressed="false"
@@ -1471,10 +1509,11 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
           <svg viewBox="0 0 24 24"><path d="M2.6 7.2c1.4 0 1.4-1.6 2.8-1.6s1.4 1.6 2.8 1.6 1.4-1.6 2.8-1.6 1.4 1.6 2.8 1.6 1.4-1.6 2.8-1.6 1.4 1.6 2.8 1.6a1 1 0 0 1 0 2c-1.4 0-1.4-1.6-2.8-1.6s-1.4 1.6-2.8 1.6-1.4-1.6-2.8-1.6-1.4 1.6-2.8 1.6-1.4-1.6-2.8-1.6-1.4 1.6-2.8 1.6a1 1 0 0 1 0-2zm0 5c1.4 0 1.4-1.6 2.8-1.6s1.4 1.6 2.8 1.6 1.4-1.6 2.8-1.6 1.4 1.6 2.8 1.6 1.4-1.6 2.8-1.6 1.4 1.6 2.8 1.6a1 1 0 0 1 0 2c-1.4 0-1.4-1.6-2.8-1.6s-1.4 1.6-2.8 1.6-1.4-1.6-2.8-1.6-1.4 1.6-2.8 1.6-1.4-1.6-2.8-1.6-1.4 1.6-2.8 1.6a1 1 0 0 1 0-2zm0 5c1.4 0 1.4-1.6 2.8-1.6s1.4 1.6 2.8 1.6 1.4-1.6 2.8-1.6 1.4 1.6 2.8 1.6 1.4-1.6 2.8-1.6 1.4 1.6 2.8 1.6a1 1 0 0 1 0 2c-1.4 0-1.4-1.6-2.8-1.6s-1.4 1.6-2.8 1.6-1.4-1.6-2.8-1.6-1.4 1.6-2.8 1.6-1.4-1.6-2.8-1.6-1.4 1.6-2.8 1.6a1 1 0 0 1 0-2z"/></svg>
         </span>
         <span class="ec-name">Reverb</span>
-        <span class="ec-bub" style="width:19px;height:19px;left:44%;top:56%" aria-hidden="true"></span>
-        <span class="ec-bub" style="width:10px;height:10px;left:58%;top:34%" aria-hidden="true"></span>
-        <span class="ec-bub" style="width:4.5px;height:4.5px;left:74%;top:36%" aria-hidden="true"></span>
-        <span class="ec-knob" aria-hidden="true"></span>
+        <span class="ec-blob" style="--x:45%;--y:69%;--s:25px;--lb:0.82" aria-hidden="true"></span>
+        <span class="ec-orb"  style="--x:64%;--y:45%;--s:11px;--lb:0.82" aria-hidden="true"></span>
+        <span class="ec-dot"  style="--x:82%;--y:42%;--s:3.8px" aria-hidden="true"></span>
+        <span class="ec-glass" aria-hidden="true"></span>
+        <span class="ec-marble" aria-hidden="true"></span>
       </button>
 
       <button class="ec" aria-pressed="false"
@@ -1483,10 +1522,11 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
           <svg viewBox="0 0 24 24"><path d="M3 8.4a1 1 0 0 1 1-1h9.1a1.9 1.9 0 1 0-1.85-2.32 1 1 0 1 1-1.95-.43A3.9 3.9 0 1 1 13.1 9.4H4a1 1 0 0 1-1-1zm0 4.4a1 1 0 0 1 1-1h13.3a3.9 3.9 0 1 1-3.8 4.75 1 1 0 1 1 1.95-.43 1.9 1.9 0 1 0 1.85-2.32H4a1 1 0 0 1-1-1zm0 4.6a1 1 0 0 1 1-1h5.2a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1z"/></svg>
         </span>
         <span class="ec-name">Echo</span>
-        <span class="ec-bub" style="width:19px;height:19px;left:49%;top:50%" aria-hidden="true"></span>
-        <span class="ec-bub" style="width:10px;height:10px;left:66%;top:38%" aria-hidden="true"></span>
-        <span class="ec-bub" style="width:4.5px;height:4.5px;left:78%;top:26%" aria-hidden="true"></span>
-        <span class="ec-knob" aria-hidden="true"></span>
+        <span class="ec-blob" style="--x:39%;--y:72%;--s:22px;--lb:0.76" aria-hidden="true"></span>
+        <span class="ec-orb"  style="--x:59%;--y:48%;--s:12px;--lb:0.76" aria-hidden="true"></span>
+        <span class="ec-dot"  style="--x:76%;--y:45%;--s:4.2px" aria-hidden="true"></span>
+        <span class="ec-glass" aria-hidden="true"></span>
+        <span class="ec-marble" aria-hidden="true"></span>
       </button>
 
       <button class="ec" aria-pressed="false"
@@ -1495,10 +1535,11 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
           <svg viewBox="0 0 24 24"><path d="M12 2.4l2.66 6.03 6.55.62a.5.5 0 0 1 .29.87l-4.95 4.36 1.45 6.42a.5.5 0 0 1-.74.54L12 18.02l-5.26 3.22a.5.5 0 0 1-.74-.54l1.45-6.42-4.95-4.36a.5.5 0 0 1 .29-.87l6.55-.62z"/></svg>
         </span>
         <span class="ec-name">Pitch</span>
-        <span class="ec-bub" style="width:19px;height:19px;left:46%;top:54%" aria-hidden="true"></span>
-        <span class="ec-bub" style="width:10px;height:10px;left:61%;top:36%" aria-hidden="true"></span>
-        <span class="ec-bub" style="width:4.5px;height:4.5px;left:76%;top:31%" aria-hidden="true"></span>
-        <span class="ec-knob" aria-hidden="true"></span>
+        <span class="ec-blob" style="--x:42%;--y:70%;--s:23px;--lb:0.6669" aria-hidden="true"></span>
+        <span class="ec-orb"  style="--x:55%;--y:46%;--s:11px;--lb:0.6669" aria-hidden="true"></span>
+        <span class="ec-dot"  style="--x:74%;--y:43%;--s:3.7px" aria-hidden="true"></span>
+        <span class="ec-glass" aria-hidden="true"></span>
+        <span class="ec-marble" aria-hidden="true"></span>
       </button>
 
       <button class="ec" aria-pressed="false"
@@ -1507,10 +1548,11 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
           <svg viewBox="0 0 24 24"><path d="M12.9 2.1c.3 2.6-.7 4.1-2 5.4-1.4 1.4-3.1 2.7-3.9 5.2a6.9 6.9 0 0 0 2.2 7.6c-.5-1.7-.3-3.3 1-4.7.7-.8 1.6-1.4 2.2-2.4.4 1.5 1.4 2.3 2.2 3.3.9 1.1 1.1 2.4.6 3.8a6.6 6.6 0 0 0 3.6-6.6c-.3-2.8-2-4.4-3.2-6.2-1-1.5-1.6-3.2-2.7-5.4z"/></svg>
         </span>
         <span class="ec-name">Flanger</span>
-        <span class="ec-bub" style="width:19px;height:19px;left:45%;top:53%" aria-hidden="true"></span>
-        <span class="ec-bub" style="width:10px;height:10px;left:60%;top:35%" aria-hidden="true"></span>
-        <span class="ec-bub" style="width:4.5px;height:4.5px;left:75%;top:29%" aria-hidden="true"></span>
-        <span class="ec-knob" aria-hidden="true"></span>
+        <span class="ec-blob" style="--x:42%;--y:69%;--s:24px;--lb:0.6678" aria-hidden="true"></span>
+        <span class="ec-orb"  style="--x:54%;--y:45%;--s:10px;--lb:0.6678" aria-hidden="true"></span>
+        <span class="ec-dot"  style="--x:76%;--y:42%;--s:3.4px" aria-hidden="true"></span>
+        <span class="ec-glass" aria-hidden="true"></span>
+        <span class="ec-marble" aria-hidden="true"></span>
       </button>
 
       <button class="ec" aria-pressed="false"
@@ -1519,10 +1561,11 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
           <svg viewBox="0 0 24 24"><path d="M12 2.6c3.6 4.3 6.6 8 6.6 11.4A6.6 6.6 0 0 1 12 20.6a6.6 6.6 0 0 1-6.6-6.6C5.4 10.6 8.4 6.9 12 2.6z"/></svg>
         </span>
         <span class="ec-name">Blur</span>
-        <span class="ec-bub" style="width:19px;height:19px;left:44%;top:55%" aria-hidden="true"></span>
-        <span class="ec-bub" style="width:10px;height:10px;left:59%;top:37%" aria-hidden="true"></span>
-        <span class="ec-bub" style="width:4.5px;height:4.5px;left:74%;top:33%" aria-hidden="true"></span>
-        <span class="ec-knob" aria-hidden="true"></span>
+        <span class="ec-blob" style="--x:47%;--y:66%;--s:21px;--lb:0.554" aria-hidden="true"></span>
+        <span class="ec-orb"  style="--x:62%;--y:42%;--s:10.5px;--lb:0.554" aria-hidden="true"></span>
+        <span class="ec-dot"  style="--x:79%;--y:39%;--s:3.6px" aria-hidden="true"></span>
+        <span class="ec-glass" aria-hidden="true"></span>
+        <span class="ec-marble" aria-hidden="true"></span>
       </button>
     </div>
     <p class="foot">Rebuilt in CSS from <code>EffectCard.swift</code> &mdash; 152&times;66 at an 11px radius, a 46px icon tile, 13px bubbles, and per-effect glow centres. Scroll for the rest.</p>
@@ -1538,16 +1581,14 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
     </ul>
     <p class="foot">Not one glow value shared across six cards. Yellow reads brightest at any given number, then red, then pink, so each is pulled back until the row looks evenly lit. Auto gets pushed the other way on selection &mdash; it is the card I want people to press.</p>
 
-    <figure style="margin-top:30px">
-      <video src="art/effects-cards.mp4" poster="art/effects-poster.jpg" muted loop playsinline controls
-             aria-label="The effects drawer in the app, with Echo being selected and its glow and rim lifting."></video>
-    </figure>
-    <p class="foot">The same row in the app, selecting Echo. The glow spills onto the neighbouring cards rather than stopping at the card's own edge &mdash; which is the part that only ever looked right in motion.</p>
+    <p class="sub" style="margin-top:30px">The glow does not stop at the card&rsquo;s edge</p>
+    <div class="fx-rail" id="fxspill" aria-hidden="true"></div>
+    <p class="foot">Rebuilt rather than filmed. The capture of this was 1046px wide rendering into 1606 device pixels on a retina screen &mdash; stretched half again past its own resolution, and no bitrate fixes detail that was never recorded. <code>EffectCardSpillGlow</code> draws outside the card&rsquo;s bounds on purpose (w+48 &times; h+18, blurred 11) and is never clipped, so a lit card washes onto the two beside it. Echo is selected here; watch Reverb on its left and Pitch on its right pick up the purple. That spill is the third thing in the X post, and it is the one that only ever looked right in motion.</p>
   </div>
 
   <figure class="device rv d2" style="margin-top:22px">
-    <video src="art/effect-tray.mp4" poster="art/effect-tray-poster.jpg" autoplay muted loop playsinline
-           aria-label="Reverb selected in Mixr: the card lights, a tray grows beside it with a level slider and Small Room, Hall and Ambient presets."></video>
+    <video preload="none" data-src="art/effect-tray.mp4" poster="art/effect-tray-poster.jpg" autoplay muted loop playsinline
+           aria-label="Effect cards opening in Mixr, one after another: Reverb with Small Room, Hall and Ambient presets, Echo with Classic, Ping Pong and Reverse, Pitch with Pitch Up and Down, then Flanger and Blur which are slider-only. Each card lights and a tray grows beside it."></video>
     <figcaption>The same control in the app. The cards above are CSS, rebuilt from <code>EffectCard.swift</code> and <code>GlassCardModifier.swift</code> &mdash; this is what they are rebuilt from.</figcaption>
   </figure>
 
@@ -1692,9 +1733,9 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
     </div>
     <p class="foot">Beats, not seconds &mdash; suggested by people following the build on X, and obviously right once said out loud. A transition is counted in the music's own unit.</p>
     <p class="foot" style="margin-top:12px">The pill is tinted with the <em>track's</em> colour, not left neutral. <code>TLTransitionSettingsSegmentedControl</code> takes a <code>trackColor</code> and threads it through the whole stack &mdash; body fill at .13, the rim gradient, an inner highlight at .12, and both shadows at .08. It is set to the purple track here. Plain glass would have been easier and slightly cleaner, and it would have thrown away the one thing the control says before you read it: which lane you are about to change.</p>
-    <figure style="margin-top:22px">
-      <video src="art/segmented.mp4" muted loop playsinline controls
-             aria-label="The transition duration segmented control in the app, with the glass pill sliding and resizing between 1 Beat, 2, 4 and 8."></video>
+    <figure style="margin-top:22px;max-width:500px">
+      <video preload="none" data-src="art/segmented.mp4" poster="art/segmented-poster.jpg" muted loop playsinline controls
+             aria-label="The Crossfade panel in the app: the Duration pill sliding and resizing across 1 Beat, 2, 4 and 8, then the Curve control switching between Linear, Ease In/Out and Ease Out."></video>
     </figure>
     <p class="foot">The same control in the app.</p>
   </div>
@@ -1928,7 +1969,24 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 <!-- 05 -->
 <section id="changed">
   <div class="sechead rv"><p class="lab">05 &mdash; Coding Agents</p>
-    <h2>Claude vs. Codex vs. Cursor.</h2></div>
+    <h2>Claude vs. Codex vs. Cursor</h2>
+    <p>The last two passes were adding responsive layout for iPad and Mac and accessibility testing. I performed a visual audit with no code changes until I read it. Auditing first is what stopped responsive work from becoming a redesign. Claude Code tended to change components I finalized without asking.</p>
+
+    <div class="devices rv d2">
+      <figure>
+        <div class="device">
+          <img src="art/responsive-ipad.webp" alt="Mixr on iPad: six coloured waveform lanes across the timeline, the track list down the left with artwork and BPM, solo, mute and volume down the right, and the Effects drawer along the bottom." loading="lazy">
+        </div>
+        <figcaption>iPad</figcaption>
+      </figure>
+      <figure>
+        <div class="device">
+          <img src="art/responsive-mac.webp" alt="Mixr on Mac: the same six lanes in a narrower window, with the track list, controls column and Effects drawer all still in place." loading="lazy">
+        </div>
+        <figcaption>Mac</figcaption>
+      </figure>
+    </div>
+  </div>
 
   <div class="stack rv d1">
     <p>At one point the lift came out and the clip went back to sliding along the lane. Still functional, still &ldquo;correct,&rdquo; and immediately worse &mdash; nothing was ever picked up, it just slid. Getting the lift back was a whole task of its own.</p>
@@ -2070,8 +2128,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
     <h2>Finished building, waiting approval.</h2></div>
 
   <div class="stack rv d2">
-    <p>The last two passes were adding responsive layout for iPad and Mac and accessibility testing. I performed a visual audit with no code changes until I read it. Auditing first is what stopped responsive work from becoming a redesign. Claude Code tended to change components I finalized without asking.</p>
-    <p>I&rsquo;m now waiting for approval from the Apple Developer Program to release TestFlight Beta. Everything so far reflects my own judgment. The real test is whether other people can use and understand Mixr.</p>
+    <p>The app is fully built. I&rsquo;m now waiting for approval from the Apple Developer Program to release TestFlight Beta. Everything so far reflects my own judgment. The real test is whether other people can use and understand Mixr.</p>
   </div>
 
   <div class="flag rv d2">
@@ -2933,6 +2990,57 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
   paintAllWaves();
   addEventListener("resize", paintAllWaves);
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(paintAllWaves);
+
+  /* ======================================================================
+     Lazy video. Every autoplaying clip on this page used to be fetched in
+     full within ~50ms of load — all four at once, competing with the hero for
+     bandwidth, whether or not the reader ever scrolled to sections 3 and 4.
+     That is 1.2MB spent before anyone has read a sentence.
+
+     Here the src is parked in data-src and only attached when the clip comes
+     within a screen of the viewport. The poster is frame 0 of its own video,
+     so the still and the first played frame are the same picture and swapping
+     one for the other is invisible.
+
+     The hero is deliberately exempt (data-eager): it is the first thing on
+     the page and deferring it would only add a delay.
+     ==================================================================== */
+  var lazyVids = [].slice.call(document.querySelectorAll("video[data-src]"));
+  if(lazyVids.length){
+    var attach = function(v){
+      if(v.dataset.loaded) return;
+      v.dataset.loaded = "1";
+      v.src = v.dataset.src;
+      // autoplay only fires on attach if the markup asked for it
+      if(v.hasAttribute("autoplay")) v.play().catch(function(){});
+    };
+    if("IntersectionObserver" in window){
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if(e.isIntersecting){ attach(e.target); io.unobserve(e.target); }
+        });
+      }, { rootMargin: "100% 0px" });   // one screen of runway
+      lazyVids.forEach(function(v){ io.observe(v); });
+    } else {
+      lazyVids.forEach(attach);          // no observer: just load them
+    }
+  }
+
+  /* The spill-glow rail: a clone of the main effects rail with Echo already
+     lit, so the wash onto its neighbours is visible without asking the reader
+     to press anything. Cloned rather than authored twice — one source of truth
+     for the card markup, and it cannot drift from the rail above it. */
+  var spill = document.getElementById("fxspill");
+  var srcRail = document.getElementById("fxrail");
+  if(spill && srcRail){
+    spill.innerHTML = srcRail.innerHTML;
+    [].slice.call(spill.querySelectorAll(".ec")).forEach(function(c, i){
+      c.setAttribute("aria-pressed", i === 2 ? "true" : "false");  // Echo
+      c.tabIndex = -1;                       // decorative: aria-hidden on the rail
+    });
+    // No tray in this one — it is about the glow between cards, not the control.
+    [].slice.call(spill.querySelectorAll(".ec-tray")).forEach(function(t){ t.remove(); });
+  }
 
   /* Collapsible demo panels. Generic over [class=fold] + aria-controls, so a
      second one costs no JS. */
