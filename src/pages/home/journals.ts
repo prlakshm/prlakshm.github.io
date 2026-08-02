@@ -75,8 +75,8 @@ export type Journal = {
   cta?: string;
   /** Desktop render width in px; scaled down by clamp() at smaller widths. */
   width: number;
-  /** Vertical stagger. Currently 0 across the board — the notebooks share a
-   *  baseline; kept in the model in case the row is loosened again. */
+  /** Small vertical optical correction applied to the complete notebook,
+   *  including its annotation and both cover states. */
   offsetY: number;
   rotate: number;
   /** What spills across the screen on hover. Empty is legitimate — a project
@@ -239,7 +239,7 @@ export const journals: Journal[] = [
        balances it optically with Surprise Rail and Mixr. The open export is
        reduced by another 3% in home.css and re-centered within this frame. */
     width: 449,
-    offsetY: 0,
+    offsetY: -2,
     rotate: 1.8,
     /* One note, dead centre. There is no prototype to show yet, and a single
        scrap in the middle of an empty screen says that more plainly than a

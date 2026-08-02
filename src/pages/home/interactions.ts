@@ -231,3 +231,15 @@ export function joinShelf(id: string): ShelfHandle {
 
 /** Test seam — lets a harness assert which notebook the shelf thinks is open. */
 export const __shelfState = () => ({ openId, pendingId, restIn: restAt - Date.now() });
+
+/* ── Pinned tooltips ────────────────────────────────────────────────────────
+   Both the fabric-strip labels and the pronunciation note are raised by hover
+   on a mouse and by a tap on touch. A tap has to pin, because there is no
+   hover to hold them open — and a pin has to let go on its own, or the label
+   just sits there. Shared so the two cannot end up with different rhythms. */
+
+/** How long a pinned label stays before fading on its own. */
+export const PIN_MS = 2600;
+/** Cursor travel that counts as "moved on". A click carries a pixel or two of
+ *  drift, so a bare inequality would drop the pin on the click that made it. */
+export const PIN_SLOP = 6;

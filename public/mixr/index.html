@@ -296,68 +296,117 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 .device-cap{font-family:var(--fm);font-size:var(--fs-micro);line-height:1.7;color:#787884;
   margin:11px 0 0}
 
-/* ---- recreated: the effects rail ---- */
-/* Geometry is EffectCardMetrics in Mixr/DesignSystem/EffectCard.swift — 152x66
-   at 11px radius, 10px inset, a 46px icon tile at 12px radius, 22px symbol,
-   11px title, 13px bubbles. --k scales the whole card up for the web without
-   letting any one number drift off its ratio. */
-.fx-rail{--k:1.34;display:flex;gap:12px;overflow-x:auto;padding:10px 8px 14px;
+/* ---- recreated: the effects rail ----------------------------------------
+   Rebuilt against EffectCard.swift layer for layer, at 1:1 — a 152x66 card
+   here is a 152x66 card on device.
+
+   The earlier pass here was wrong in a way worth naming: it used
+   GlassCardModifier, the app's GENERIC glass. Effect cards do not use it.
+   They carry their own EffectCardGlassBackground with different values
+   (#05070D at .56, not #050810 at .28) and a different overlay order, and
+   Auto has a separate background again. That is why they never quite matched.
+
+   Stack, bottom to top, as in EffectCard.body:
+     EffectCardSpillGlow ....... behind, active only  (::before on the wrapper)
+     EffectCardGlassBackground . base fill + 3 overlays + .45px rim
+     cardBloom ................. radial at (.78,.48) r90 — Auto gets 4 radials
+     foregroundContent ......... 46px tile, 9px gap, 11px semibold title
+     glassBubbleDecoration ..... marble + clear bubble + reflection arc
+     EffectCardBorderGlow ...... white rim + coloured rim
+     two shadows ............... black .32 r6 y2, then colour at its own radius
+
+   Per-effect multipliers are the Swift's: EffectUnselectedGlow (--un),
+   EffectSelectedGlow (--sel), EffectRimGlow (--rim). */
+/* --k is 1: the card's children (tile, title, knob, tray) are all expressed as
+   pt * --k, and 1:1 is the point of this pass. Raise it only to zoom the whole
+   component uniformly — never to fix one element. */
+.fx-rail{--k:1;display:flex;gap:12px;overflow-x:auto;padding:16px 10px 20px;
   scrollbar-width:none;-ms-overflow-style:none;scroll-behavior:smooth}
 .fx-rail::-webkit-scrollbar{display:none}
+
 .ec{--g:var(--un);
-  position:relative;flex:0 0 auto;display:flex;align-items:center;
-  width:calc(152px * var(--k));height:calc(66px * var(--k));
-  border-radius:calc(11px * var(--k));padding:calc(10px * var(--k));
-  /* GlassBackground, level .default — Mixr/DesignSystem/GlassCardModifier.swift.
-     tintColor glassNavyDefault #050810 at tintOpacity .28, over the
-     .ultraThinMaterial. SwiftUI's material is a vibrancy effect, not just a
-     blur, so backdrop-filter gets a saturate() alongside the 24pt blur
-     (MixrLayout.glassBlurRadius) to stand in for the luminance adaptation.
-     glassBorderDefault is white .06 at glassBorderWidth .5. */
-  background:rgba(5,8,16,.28);
-  -webkit-backdrop-filter:blur(24px) saturate(180%);
-  backdrop-filter:blur(24px) saturate(180%);
-  border:.5px solid rgba(255,255,255,.06);
-  cursor:pointer;isolation:isolate;overflow:hidden;
-  transition:box-shadow .34s ease,border-color .34s ease}
-/* Rim: the colored lower/side outline. --rim is EffectRimGlow's per-hue pullback. */
-.ec::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-  border:1px solid transparent;
-  background:linear-gradient(150deg,
-      color-mix(in srgb,var(--c) calc(22% * var(--g) * var(--rim)),transparent),
-      transparent 46%,
-      color-mix(in srgb,var(--c) calc(30% * var(--g) * var(--rim)),transparent)) border-box;
-  -webkit-mask:linear-gradient(#000 0 0) padding-box,linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor;mask-composite:exclude;
-  transition:background .34s ease}
-.ec{box-shadow:0 0 calc(14px * var(--g)) color-mix(in srgb,var(--c) calc(13% * var(--g)),transparent)}
-.ec[aria-pressed="true"]{--g:var(--sel);
-  border-color:color-mix(in srgb,var(--c) 34%,transparent);
-  box-shadow:0 0 calc(26px * var(--g)) color-mix(in srgb,var(--c) calc(26% * var(--g)),transparent)}
+  position:relative;flex:0 0 auto;display:flex;align-items:flex-start;
+  width:152px;height:66px;border-radius:11px;
+  padding:9px 0 0 10px;                     /* inset 10, top inset-1 */
+  cursor:pointer;isolation:isolate;border:0;background:none;
+  transition:filter .16s ease}
 .ec:focus-visible{outline:2px solid #f2f0ec;outline-offset:3px}
 
-/* The remaining GlassBackground overlays, in SwiftUI's stacking order: the
-   surface-depth highlight, the top-to-bottom white→clear→black pass, and the
-   accent radial anchored at UnitPoint(0.10, 0.05) with a 260 endRadius. */
-.ec::before{content:"";position:absolute;inset:0;border-radius:inherit;
-  pointer-events:none;z-index:0;
+/* EffectCardSpillGlow — the "glow reflects onto neighbouring cards" layer.
+   Deliberately OUTSIDE the card's bounds (w+48 x h+18, blur 11) and not
+   clipped, which is the whole point: it lands on the cards either side. */
+.ec::before{content:"";position:absolute;z-index:0;pointer-events:none;
+  left:-24px;right:-24px;top:-9px;bottom:-9px;border-radius:19px;
+  background:radial-gradient(circle 92px at 52% 60%,
+    color-mix(in srgb,var(--c) calc(15.4% * var(--spill,0)),transparent),
+    color-mix(in srgb,var(--c) calc(6.1% * var(--spill,0)),transparent) 55%,
+    transparent 78%);
+  filter:blur(11px);transition:background .16s ease}
+.ec[aria-pressed="true"]{--spill:calc(1 * var(--sel))}
+
+/* EffectCardGlassBackground + cardBloom, in SwiftUI's overlay order. */
+.ec::after{content:"";position:absolute;inset:0;z-index:0;border-radius:inherit;
+  pointer-events:none;
   background:
-    radial-gradient(circle 260px at 10% 5%,rgba(255,255,255,.055),transparent 70%),
-    linear-gradient(to bottom,rgba(255,255,255,.0475),transparent 46%,rgba(0,0,0,.16));
-  transition:background .34s ease}
-/* GlassAsymmetricEdgeReflection: a thin complete rim, so the card reads as a
-   physical pane rather than a filled rectangle. */
-.ec{box-shadow:inset 0 0 0 .55px rgba(255,255,255,.07),
-    0 0 calc(14px * var(--g)) color-mix(in srgb,var(--c) calc(13% * var(--g)),transparent)}
-.ec[aria-pressed="true"]{background:rgba(5,8,16,.30);
-  box-shadow:inset 0 0 0 .75px rgba(255,255,255,.12),
-    0 0 calc(26px * var(--g)) color-mix(in srgb,var(--c) calc(26% * var(--g)),transparent)}
-/* level .selected swaps the accent to primaryPurple and lifts the radial from
-   .055 to .16 — the card is lit from its own top-left corner, not tinted. */
-.ec[aria-pressed="true"]::before{
+    /* cardBloom — radial at UnitPoint(.78,.48), endRadius 90 */
+    radial-gradient(circle 90px at 78% 48%,
+      color-mix(in srgb,var(--c) calc(4.5% * var(--g)),transparent),transparent 74%),
+    /* white .045 -> clear at (.18,.04), endRadius 82 */
+    radial-gradient(circle 82px at 18% 4%,rgba(255,255,255,.045),transparent 72%),
+    /* effect colour, bottomLeading -> topTrailing */
+    linear-gradient(to top right,
+      color-mix(in srgb,var(--c) calc(3.5% * var(--un)),transparent),transparent 62%),
+    /* white .075 -> white .016 -> black .18, top -> bottom */
+    linear-gradient(to bottom,rgba(255,255,255,.075),rgba(255,255,255,.016) 48%,rgba(0,0,0,.18)),
+    /* base fill #05070D at .56 */
+    linear-gradient(rgba(5,7,13,.56),rgba(5,7,13,.56));
+  box-shadow:inset 0 0 0 .45px rgba(255,255,255,.045),   /* glass rim */
+             inset 0 0 0 .55px rgba(255,255,255,.075);   /* border-glow rim */
+  transition:background .16s ease,box-shadow .16s ease}
+
+.ec[aria-pressed="true"]::after{
   background:
-    radial-gradient(circle 260px at 10% 5%,rgba(124,58,237,.16),transparent 70%),
-    linear-gradient(to bottom,rgba(255,255,255,.057),transparent 46%,rgba(0,0,0,.16))}
+    radial-gradient(circle 90px at 78% 48%,
+      color-mix(in srgb,var(--c) calc(10% * var(--sel)),transparent),transparent 74%),
+    radial-gradient(circle 82px at 18% 4%,rgba(255,255,255,.045),transparent 72%),
+    linear-gradient(to top right,color-mix(in srgb,var(--c) 10%,transparent),transparent 62%),
+    linear-gradient(to bottom,rgba(255,255,255,.075),rgba(255,255,255,.016) 48%,rgba(0,0,0,.18)),
+    linear-gradient(rgba(5,7,13,.56),rgba(5,7,13,.56));
+  box-shadow:inset 0 0 0 .45px rgba(255,255,255,.045),
+             inset 0 0 0 .72px rgba(255,255,255,.11)}
+
+/* Auto is a different background entirely: #05070D at .34, a violet/blue/pink
+   cross-wash, and AutoIridescentBloom's four radials — violet top-left, pink
+   bottom-left, yellow bottom-right, blue top-right. This is the card the X
+   post is about, and it is the reason no two corners look the same. */
+.ec.is-auto::after{
+  background:
+    radial-gradient(circle 86px at 26% 24%,rgba(167,139,250,calc(.225 * var(--ab,1))),
+      rgba(167,139,250,calc(.062 * var(--ab,1))) 46%,transparent 72%),
+    radial-gradient(circle 76px at 18% 96%,rgba(255,95,162,calc(.225 * var(--ab,1))),
+      rgba(255,95,162,calc(.056 * var(--ab,1))) 46%,transparent 72%),
+    radial-gradient(circle 68px at 92% 92%,rgba(234,179,8,calc(.16 * var(--ab,1))),
+      rgba(234,179,8,calc(.040 * var(--ab,1))) 46%,transparent 72%),
+    radial-gradient(circle 82px at 96% 14%,rgba(56,189,248,calc(.19 * var(--ab,1))),
+      rgba(56,189,248,calc(.050 * var(--ab,1))) 46%,transparent 72%),
+    radial-gradient(circle 72px at 15% 4%,rgba(255,255,255,.045),transparent 70%),
+    linear-gradient(to bottom left,rgba(56,189,248,.045),transparent 50%,rgba(255,95,162,.050)),
+    linear-gradient(to bottom right,rgba(255,255,255,.075),rgba(167,139,250,.020) 50%,rgba(0,0,0,.10)),
+    linear-gradient(rgba(5,7,13,.34),rgba(5,7,13,.34));
+  box-shadow:inset 0 0 0 .45px rgba(255,255,255,.07),
+             inset 0 0 0 .55px rgba(255,255,255,.075)}
+.ec.is-auto[aria-pressed="true"]::after{--ab:calc(1.4 * var(--sel))}
+
+/* The two card shadows, both on the element itself. */
+.ec{filter:drop-shadow(0 2px 6px rgba(0,0,0,.32))
+           drop-shadow(0 0 calc(5px * var(--g)) color-mix(in srgb,var(--c) calc(7% * var(--g)),transparent))}
+.ec[aria-pressed="true"]{
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.32))
+         drop-shadow(0 0 calc(11px * var(--sel)) color-mix(in srgb,var(--c) calc(26.4% * var(--sel)),transparent))}
+.ec.is-auto[aria-pressed="true"]{
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.32))
+         drop-shadow(0 0 calc(15px * var(--sel)) color-mix(in srgb,var(--c) calc(46% * var(--sel)),transparent))}
+
 .ec > *{position:relative;z-index:1}
 /* backdrop-filter samples what is painted behind it. Against flat black there
    is nothing to sample and the glass reads identical to a solid card, so the
@@ -691,7 +740,11 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
      "Case study", and that much air reads as a dropped element. */
   .shell{row-gap:11px}
   main{padding-top:19px}
-  .fx-rail{--k:1.1}
+  /* Left at 1 on a phone too. --k used to bump here because the rail was
+     rendering at 1.34 and the phone needed a different ratio; now that the
+     card is 1:1 with the device, scaling it up would be the one thing this
+     rebuild exists to avoid. */
+  .fx-rail{--k:1}
 }
 /* ============================================================================
    Recreated app surfaces — everything below is rebuilt in CSS/JS from the
@@ -1077,7 +1130,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
         <li><a href="/#/projects">WORK<span class="nav-rule" aria-hidden="true"></span></a></li>
         <li><a href="/#/about">ABOUT<span class="nav-rule" aria-hidden="true"></span></a></li>
         <li>
-          <a href="/docs/Pranavi_Lakshminarayanan_AI_Product_Resume.pdf" target="_blank" rel="noreferrer">
+          <a href="/docs/Pranavi_Ram_Resume_2026.pdf" target="_blank" rel="noreferrer">
             RESUME
             <svg class="ext-arrow" viewBox="0 0 10 10" aria-hidden="true" focusable="false">
               <path d="M2.5 7.5 L7.5 2.5 M3.6 2.5 H7.5 V6.4" fill="none"

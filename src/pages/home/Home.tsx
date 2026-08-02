@@ -7,11 +7,11 @@ import "../about/about.css";
 import Journal from "./Journal.js";
 import ContactIcons from "./ContactIcons.js";
 import Manifesto from "../about/Manifesto.js";
-import { attachUnderlineWipe, prefersReducedMotion } from "./interactions.js";
+import { attachUnderlineWipe, prefersReducedMotion, PIN_MS, PIN_SLOP } from "./interactions.js";
 import { journals } from "./journals.js";
 
 // Matches the link the global Header already uses. public/docs also holds
-const RESUME_URL = "/docs/Pranavi_Lakshminarayanan_Resume_2026.pdf";
+const RESUME_URL = "/docs/Pranavi_Ram_Resume_2026.pdf";
 
 // public/about/"Profile picture.png" — space encoded for the URL.
 const PORTRAIT = "/about/Profile%20picture.png";
@@ -318,30 +318,111 @@ function Home() {
     const pron = title?.querySelector<HTMLElement>(".hero-pron");
     if (title && pron) {
       const reduced = prefersReducedMotion();
+      let byTouch = false;
+      let pinned = false;
+      let pinTimer = 0;
+      let pinX = 0;
+      let pinY = 0;
+      let pinByTouch = false;
+      let pronW = 0;
+      let pronH = 0;
+
+      /* Absolute inside .hero-title, so the clamp is worked out in viewport
+         space and then converted back — the note has to stay on screen, not
+         merely inside the heading. */
       const place = (clientX: number, clientY: number) => {
         const rect = title.getBoundingClientRect();
-        pron.style.left = `${clientX - rect.left + 14}px`;
-        pron.style.top = `${clientY - rect.top + 18}px`;
+        const pad = 8;
+        let vx = clientX + 14;
+        // Above the finger on touch: +18 puts it under the thumb that tapped.
+        let vy = byTouch ? clientY - pronH - 16 : clientY + 18;
+        vx = Math.min(Math.max(pad, vx), window.innerWidth - pronW - pad);
+        vy = Math.min(Math.max(pad, vy), window.innerHeight - pronH - pad);
+        pron.style.left = `${vx - rect.left}px`;
+        pron.style.top = `${vy - rect.top}px`;
       };
-      const show = (on: boolean) =>
-        animate(
+      const show = (on: boolean) => {
+        title.classList.toggle("is-pron", on);
+        return animate(
           pron,
           { opacity: on ? 1 : 0 },
           reduced ? { duration: 0 } : { type: "spring", stiffness: 460, damping: 24 }
         );
+      };
+      const measure = () => {
+        pronW = pron.offsetWidth;
+        pronH = pron.offsetHeight;
+      };
+      const unpin = () => {
+        if (pinTimer) {
+          window.clearTimeout(pinTimer);
+          pinTimer = 0;
+        }
+        if (!pinned) return;
+        pinned = false;
+        show(false);
+      };
+
       const enter = (e: PointerEvent) => {
+        byTouch = e.pointerType === "touch";
+        measure();
         place(e.clientX, e.clientY);
         show(true);
       };
-      const move = (e: PointerEvent) => place(e.clientX, e.clientY);
-      const leave = () => show(false);
+      const move = (e: PointerEvent) => {
+        if (pinned) return; // a pinned note stays where it was put
+        byTouch = e.pointerType === "touch";
+        place(e.clientX, e.clientY);
+        if (!title.classList.contains("is-pron")) show(true);
+      };
+      const leave = () => {
+        if (pinned) return;
+        show(false);
+      };
+      const down = (e: PointerEvent) => {
+        byTouch = e.pointerType === "touch";
+      };
+      /* Tap to raise it, exactly as the fabric strips do — on a phone there is
+         no hover, so without this the note is unreachable. */
+      const click = (e: MouseEvent) => {
+        if (pinned) {
+          unpin();
+          return;
+        }
+        measure();
+        place(e.clientX, e.clientY);
+        show(true);
+        pinned = true;
+        pinX = e.clientX;
+        pinY = e.clientY;
+        pinByTouch = byTouch;
+        pinTimer = window.setTimeout(unpin, PIN_MS);
+      };
+      /* A pin made by a finger ends on the timer alone: browsers emit a
+         compatibility mouse move after a tap, and reacting to it would dismiss
+         the note before it could be read. */
+      const drift = (e: PointerEvent) => {
+        if (!pinned || pinByTouch || e.pointerType === "touch") return;
+        const dx = e.clientX - pinX;
+        const dy = e.clientY - pinY;
+        if (dx * dx + dy * dy < PIN_SLOP * PIN_SLOP) return;
+        unpin();
+      };
+
+      title.addEventListener("pointerdown", down);
       title.addEventListener("pointerenter", enter);
       title.addEventListener("pointermove", move);
       title.addEventListener("pointerleave", leave);
+      title.addEventListener("click", click);
+      document.addEventListener("pointermove", drift, { passive: true });
       cleanups.push(() => {
+        title.removeEventListener("pointerdown", down);
         title.removeEventListener("pointerenter", enter);
         title.removeEventListener("pointermove", move);
         title.removeEventListener("pointerleave", leave);
+        title.removeEventListener("click", click);
+        document.removeEventListener("pointermove", drift);
+        if (pinTimer) window.clearTimeout(pinTimer);
       });
     }
 
@@ -371,11 +452,6 @@ function Home() {
        event's type instead of the pin's would dismiss the label on a phone
        before it had been read. */
     let pinByTouch = false;
-
-    /** A pin is a peek, not a mode — it lets go on its own. */
-    const PIN_MS = 2600;
-    /** A click can carry a pixel or two of drift; only real travel counts. */
-    const PIN_SLOP = 6;
 
     const unpin = () => {
       if (pinTimer) {
