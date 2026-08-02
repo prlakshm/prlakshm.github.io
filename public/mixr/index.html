@@ -221,6 +221,9 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 
 /* decision + flag blocks */
 .dec{border-top:1px solid var(--rule);padding-top:20px;margin-top:30px}
+/* The rule separates decisions from each other, so the first one under a
+   section heading does not get one — there is nothing above it to separate. */
+.dec--lead{border-top:0;padding-top:0;margin-top:0}
 /* p carries margin:0 globally, so consecutive prose inside a decision block
    would otherwise run together as one wall. */
 .dec p + p{margin-top:14px}
@@ -2005,23 +2008,36 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 <!-- 05 -->
 <section id="changed">
   <div class="sechead rv"><p class="lab">05 &mdash; Coding Agents</p>
-    <h2>Claude vs. Codex vs. Cursor</h2>
-    <p>The last two passes were adding responsive layout for iPad and Mac and accessibility testing. I performed a visual audit with no code changes until I read it. Auditing first is what stopped responsive work from becoming a redesign. Claude tended to change components I finalized without asking.</p>
+    <h2>How I worked with coding agents.</h2></div>
 
-    <div class="devices rv d2">
-      <figure>
-        <div class="device">
-          <img src="art/responsive-ipad.webp" alt="Mixr on iPad: six coloured waveform lanes across the timeline, the track list down the left with artwork and BPM, solo, mute and volume down the right, and the Effects drawer along the bottom." loading="lazy">
-        </div>
-        <figcaption>iPad</figcaption>
-      </figure>
-      <figure>
-        <div class="device device--mac">
-          <img src="art/responsive-mac.webp" alt="Mixr on Mac: the same six lanes in a narrower window, with the track list, controls column and Effects drawer all still in place." loading="lazy">
-        </div>
-        <figcaption>Mac laptop</figcaption>
-      </figure>
-    </div>
+  <div class="dec dec--lead rv d1">
+    <h3>I religiously used Plan Mode.</h3>
+    <p>For big tasks, I used Plan Mode. No code changes until I reviewed and approved the plan. I used this heavily for my last two phases: responsive layout and accessibility testing. Auditing stopped agents from undoing previous work and changing components I already finalized.</p>
+  </div>
+
+  <div class="devices rv d2">
+    <figure>
+      <div class="device">
+        <img src="art/responsive-ipad.webp" alt="Mixr on iPad: six coloured waveform lanes across the timeline, the track list down the left with artwork and BPM, solo, mute and volume down the right, and the Effects drawer along the bottom." loading="lazy">
+      </div>
+      <figcaption>iPad</figcaption>
+    </figure>
+    <figure>
+      <div class="device device--mac">
+        <img src="art/responsive-mac.webp" alt="Mixr on Mac: the same six lanes in a narrower window, with the track list, controls column and Effects drawer all still in place." loading="lazy">
+      </div>
+      <figcaption>Mac laptop</figcaption>
+    </figure>
+  </div>
+
+  <div class="dec rv d1">
+    <h3>One focus per agent.</h3>
+    <p>I started a new chat for each major component like effects cards, drag-and-drop, SFX, etc. Each agent had less to remember. It stayed focused and learned that component’s behavior in depth.</p>
+  </div>
+
+  <div class="dec rv d1">
+    <h3>Claude Code vs. Codex vs. Cursor</h3>
+    <p>Each is good at different tasks. Codex is good at planning, research, and visual exploration. Claude Code is good at grunt work coding. Cursor is if I don't want to switch between an agent chat and code editor. My best setup is to talk through plans with ChatGPT's free tier, then pay for Claude Code or Cursor to build.</p>
   </div>
 </section>
 
