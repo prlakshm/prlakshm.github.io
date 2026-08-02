@@ -183,6 +183,27 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 .links .sep{color:var(--rule)}
 .links--head{margin-top:10px}
 .links .ico{font-size:var(--fs-micro);margin-right:7px;font-style:normal}
+
+/* Links in body copy. Without a rule they fall back to the browser's default
+   #0000EE, which reads as a rendering fault rather than a link.
+   Every one of them reuses the @pranavibuilds gesture from the landing page
+   whole: a resting 1.5px underline at 48% of the running colour, a rule that
+   wipes across it on hover, and the word settling to a lifted tone. */
+section p:not(.links) a,.icons i a{position:relative;color:inherit;text-decoration:none;
+  border-bottom:1.5px solid color-mix(in srgb,currentColor 48%,transparent);
+  transition:color .24s cubic-bezier(.22,.61,.36,1)}
+section p:not(.links) a .nav-rule,.icons i a .nav-rule{bottom:-1.5px}
+section p:not(.links) a:hover .nav-rule,section p:not(.links) a:focus-visible .nav-rule,
+.icons i a:hover .nav-rule,.icons i a:focus-visible .nav-rule{transform:scaleX(1)}
+section p:not(.links) a:hover,section p:not(.links) a:focus-visible{color:var(--soft)}
+/* Captions inside the demo panels run on Mixr's near-black, where the sepia
+   would vanish. That one lifts its own grey toward white by the same distance
+   the sepia lifts the brown — going all the way to white overpowers a 13px
+   caption sitting next to an app icon. */
+.icons i a:hover,.icons i a:focus-visible{color:color-mix(in srgb,#8f96a6 60%,#fff)}
+
+section p:not(.links) a:focus-visible,.icons i a:focus-visible{
+  outline:2px solid var(--brass);outline-offset:3px;border-radius:2px}
 .links .lbl{position:relative;
   border-bottom:1.5px solid color-mix(in srgb,currentColor 48%,transparent)}
 .links .lbl .nav-rule{bottom:-1.5px}
@@ -1142,9 +1163,13 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
    rather than a heading with a stray arrow parked next to it. */
 .fold{display:inline-flex;align-items:center;gap:9px;background:none;border:0;padding:0;
   cursor:pointer;color:inherit;font:inherit;text-align:left}
+/* Half a turn needs longer than the quarter turn this used to be, or the
+   chevron snaps through the sweep faster than the panel it is describing. */
 .fold .chev{width:22px;height:22px;fill:#8f96a6;flex:0 0 auto;
-  transition:transform .26s cubic-bezier(.32,.72,.24,1),fill .18s ease}
-.fold[aria-expanded="false"] .chev{transform:rotate(-90deg)}
+  transition:transform .46s cubic-bezier(.32,.72,.24,1),fill .18s ease}
+/* Collapsed points up, not sideways: the chevron shows which way the panel
+   moves — down to open it out, up to fold it back into the title. */
+.fold[aria-expanded="false"] .chev{transform:rotate(180deg)}
 .fold:hover .chev{fill:#fff}
 .fold:focus-visible{outline:2px solid #f2f0ec;outline-offset:4px;border-radius:4px}
 .fold[aria-expanded="false"] + .hint{opacity:.55}
@@ -1389,11 +1414,12 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 <!-- 03 -->
 <section id="behavior">
   <div class="sechead rv"><p class="lab">03 &mdash; Behavior</p>
-    <h2>Three pivotal points in defining behavior. Trying not to get sued.</h2></div>
+    <h2>Three pivotal points in defining behavior.</h2></div>
 
   <div class="stack rv d1">
+    <h3>Trying not to get sued.</h3>
     <p>I considered copyright before designed anything. Mixr can&rsquo;t stream from a library and it can&rsquo;t host anyone&rsquo;s masters, so the whole thing is built around import and export: you bring your own files in, you take your remix out, and nothing lives on a server in between.</p>
-    <p>For building and testing it I pulled tracks off Spotify as files through <a href="https://spotdown.org" target="_blank" rel="noreferrer">spotdown.org</a>, which is also the honest answer to how a beginner gets audio into an app like this at all.</p>
+    <p>For building and testing it I pulled tracks off Spotify as files through <a href="https://spotdown.org" target="_blank" rel="noreferrer">spotdown.org<span class="nav-rule" aria-hidden="true"></span></a>, which is also the honest answer to how a beginner gets audio into an app like this at all.</p>
   </div>
 
   <div class="stack rv d2">
@@ -1953,11 +1979,6 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
     <div class="flag">
       <p>Chosen: the same charcoal-indigo glass the effect cards use, with the pearl tile as the only bright object. A component can be beautiful and still be wrong, and the test is not how it looks on its own &mdash; it is whether you can tell it belongs to this app with the label covered up.</p>
     </div>
-  </div>
-
-  <div class="dec rv d2">
-    <h3 style="margin-top:36px">And the fun one: three app icons.</h3>
-    <p>The last decision, and the only one I made purely on instinct. All three carry the same waveform mark &mdash; the argument was about what surrounds it.</p>
 
     <div class="demo" style="margin-top:20px">
       <div class="rowlab">
@@ -1965,43 +1986,31 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
           <span class="demo-title">Icon Designs</span>
           <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.3 8.6a1 1 0 0 1 1.4 0L12 13.9l5.3-5.3a1 1 0 1 1 1.4 1.42l-6 6a1 1 0 0 1-1.4 0l-6-6a1 1 0 0 1 0-1.42z"/></svg>
         </button>
-        <span class="hint">SHOWN AT THE SIZE THAT ACTUALLY DECIDES IT</span>
       </div>
       <div id="icons-body">
       <ul class="icons">
-        <li>
-          <figure><img src="art/icon-disco.webp" alt="Icon option one: the waveform mark inside an iridescent soap-bubble sphere, on near-black." loading="lazy"></figure>
-          <b>Disco</b>
-          <i>Inspired by Spotify's disco takeover. An iridescent bubble around the mark.</i>
-          <span class="v">Rejected</span>
-        </li>
         <li class="pick">
           <figure><img src="art/icon-simple.webp" alt="Icon option two: the waveform mark alone, glowing purple on a dark glass tile." loading="lazy"></figure>
           <b>Simple</b>
-          <i>The mark, the glass tile, nothing else.</i>
+          <i>Purple waveform on glass tile.</i>
           <span class="v">Chosen</span>
+        </li>
+        <li>
+          <figure><img src="art/icon-disco.webp" alt="Icon option one: the waveform mark inside an iridescent soap-bubble sphere, on near-black." loading="lazy"></figure>
+          <b>Disco</b>
+          <i>Inspired by Spotify's disco takeover.</i>
+          <span class="v">Rejected</span>
         </li>
         <li>
           <figure><img src="art/icon-controller.webp" alt="Icon option three: a DJ controller with a jog wheel, two knobs, a play button and a crossfader, the waveform mark on the platter." loading="lazy"></figure>
           <b>DJ controller</b>
-          <i>Inspired by the Frig app icon. A whole turntable, knobs and crossfader included.</i>
+          <i>Inspired by <a href="https://recent.design/i/v9qpcdh-frig-app-icon" target="_blank" rel="noreferrer">Frig<span class="nav-rule" aria-hidden="true"></span></a>'s utility app icon. </i>
           <span class="v">Rejected</span>
         </li>
-      </ul>
-      <p class="foot">Shown here at 128&nbsp;px and again at 40. The small one is the real test &mdash; nobody chooses an app icon at the size a designer draws it at.</p>
-      <ul class="icons icons--sm" aria-hidden="true">
-        <li><img src="art/icon-disco.webp" alt="" loading="lazy"></li>
-        <li class="pick"><img src="art/icon-simple.webp" alt="" loading="lazy"></li>
-        <li><img src="art/icon-controller.webp" alt="" loading="lazy"></li>
       </ul>
       </div>
     </div>
 
-    <p>Rejected: both of the interesting ones, for the same reason. The disco bubble is the prettiest thing I made for this project and it turns into a grey smudge at 40&nbsp;px. The controller is worse &mdash; it is a picture of exactly the equipment the whole app exists to avoid, and it promises a booth to someone who opened this because they didn&rsquo;t want one.</p>
-
-    <div class="flag">
-      <p>Chosen: the plain one. It survives the small size, and it is the only one of the three that doesn&rsquo;t make a promise the app then has to talk you out of.</p>
-    </div>
   </div>
 </section>
 

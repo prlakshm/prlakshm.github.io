@@ -245,6 +245,7 @@
 .x-name-link:hover .x-name,
 .x-timestamp:hover {
   text-decoration: underline;
+  text-decoration-thickness: 1.5px;
 }
 
 .x-actions {

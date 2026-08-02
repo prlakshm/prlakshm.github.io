@@ -108,6 +108,7 @@ html {
   color: #e11d48;
   background-color: #fff1f2;
   text-decoration: underline;
+  text-decoration-thickness: 1.5px;
   text-decoration-color: #f43f5e;
   text-shadow: 0 1px 5px rgba(225, 29, 72, 0.1);
 }
@@ -205,6 +206,7 @@ a {
 .header a:active {
   color: #e11d48;
   text-decoration: underline;
+  text-decoration-thickness: 1.5px;
   text-decoration-color: #f43f5e;
   transform: translateY(-0.5px);
   text-shadow: 0 2px 6px rgba(225, 29, 72, 0.1);

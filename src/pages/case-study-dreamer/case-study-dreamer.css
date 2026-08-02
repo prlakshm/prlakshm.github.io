@@ -34,12 +34,14 @@
   letter-spacing: 1px;
   line-height: 1.6rem;
   text-decoration: underline;
+  text-decoration-thickness: 1.5px;
   text-decoration-color: #fda4af;
 }
 
 .case-study-dreamer .side-nav p:hover {
   color: #e11d48;
   text-decoration: underline;
+  text-decoration-thickness: 1.5px;
   text-decoration-color: #f43f5e;
 }
 
@@ -224,6 +226,7 @@
   color: #f43f5e;;
   font-weight: 550;
   text-decoration: underline;
+  text-decoration-thickness: 1.5px;
   text-decoration-color: #fda4af;
   letter-spacing: 1px;
   line-height: 1.6rem;
@@ -235,6 +238,7 @@
   font-size: 1.1rem;
   font-weight: 625;
   text-decoration: underline;
+  text-decoration-thickness: 1.5px;
   text-decoration-color: #f43f5e;
   color: #e11d48;
 }
