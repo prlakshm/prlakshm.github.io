@@ -551,6 +551,12 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   padding:18px 20px;margin-top:26px;display:flex;flex-direction:column;gap:9px}
 .flag h3{color:var(--ink)}
 
+/* HOME and NEXT hang one gutter beyond the content while the centered shell
+   has room around it. As soon as the shell reaches the viewport edge, bring
+   them into the main column so they align with the conclusion box. */
+@media (max-width:1248px){
+  .case-actions{right:0}
+}
 @media (max-width:900px){
   /* minmax(0,1fr), not 1fr: a bare 1fr is minmax(auto,1fr), so the track refuses
      to shrink below its content's min-content width and any wide child pushes the
@@ -576,10 +582,6 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
      is already hidden here for the same reason.
      Back to a column so the heading spans the full measure rather than being
      squeezed into a row it no longer shares. */
-  /* HOME and NEXT hang a full gutter outside the shell on desktop, where the
-     sidebar leaves room for it. On a phone there is no such margin, so they
-     drift past the conclusion box — pull them flush with its right edge. */
-  .case-actions{right:0}
   .side .jump{display:none}
   .side{flex-direction:column;align-items:stretch;gap:0;overflow-x:visible}
   /* Halve the run-in under the heading. The 67px there was .shell's 24px

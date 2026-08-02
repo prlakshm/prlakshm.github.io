@@ -771,6 +771,12 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
 .swatches code{font-family:var(--fm);font-size:11px;letter-spacing:.04em;color:#a6a6b0}
 
+/* HOME and NEXT hang one gutter beyond the content while the centered shell
+   has room around it. As soon as the shell reaches the viewport edge, bring
+   them into the main column so they align with the conclusion boxes. */
+@media (max-width:1248px){
+  .case-actions{right:0}
+}
 @media (max-width:900px){
   .shell{grid-template-columns:minmax(0,1fr)}
   .side{position:static;height:auto;flex-direction:row;align-items:center;gap:14px;
@@ -793,10 +799,6 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
      is already hidden here for the same reason.
      Back to a column so the heading spans the full measure rather than being
      squeezed into a row it no longer shares. */
-  /* HOME and NEXT hang a full gutter outside the shell on desktop, where the
-     sidebar leaves room for it. On a phone there is no such margin, so they
-     drift past the conclusion box — pull them flush with its right edge. */
-  .case-actions{right:0}
   .side .jump{display:none}
   .side{flex-direction:column;align-items:stretch;gap:0;overflow-x:visible}
   /* Halve the run-in under the heading. The 67px there was .shell's 24px

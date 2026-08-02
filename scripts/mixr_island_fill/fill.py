@@ -19,22 +19,23 @@ Method, per frame:
      re-detected per frame and the result asserted against the expected box,
      because a silent drift would corrupt every later step.
 
-  Pass A — background. Extend the columns immediately left of the island
-  rightwards across it. Between the rows the Controls column has no vertical
-  structure, so this reconstructs the ground and its hairline dividers exactly.
-  Runs on every frame, including ones with no Controls column at all.
+  Pass A — background, on EVERY frame. A donor strip either side of the island
+  gives the ground colour per scanline; the fill ramps between them, so the
+  hairline row dividers and any horizontal gradient carry across unbroken. A
+  strip is used only where it is flat, since structure inside it means it is
+  sitting on content, and extending content sideways invents detail.
 
-  Pass B — sliders, painted over Pass A.
-  2. Find the Controls rows from the S/M buttons. They sit LEFT of the island
-     and are never occluded, so they give reliable row centres even while the
-     track list scrolls.
-  3. Read each row's track colour from its waveform lane, left of the column.
-     Self-correcting: if the list scrolls and a different song occupies a row,
-     the colour follows it.
+  Pass B — sliders, painted over Pass A, and only while the editor is actually
+  on screen (the system Files sheet covers it for two seconds mid-clip).
+  2. Find the Controls rows from the track lanes, bounded to the list so the
+     Effects tray below the drawer cannot register as a row.
+  3. Read each row's track colour from its waveform lane. Self-correcting: if
+     the list scrolls and a different song occupies a row, the colour follows.
   4. For each occluded row, take the nearest unoccluded row as donor, retarget
      its hue to the occluded row's colour, and composite its INK — not its
      rectangle — but only inside the island mask, so no real pixel is ever
-     overwritten.
+     overwritten. A donor has to be a complete, unclipped slider; when the
+     frame has none, one is borrowed from the nearest frame that does.
 
 Grey pixels (the speaker glyph, the track groove) have near-zero saturation and
 are left alone by the hue retarget, which is why this is done in HSV rather
@@ -77,6 +78,10 @@ FLAT_TOL = 46                  # max channel spread within a donor strip
 LIST_Y0, LIST_Y1 = 134, 586
 THUMB_X0, THUMB_X1 = 1700, 1790  # where slider ink lives, for presence tests
 
+# The island itself, as a fixed pill — see _pill().
+PILL_CX, PILL_R, PILL_PAD = 1732.5, 38.0, 3.0
+PILL_Y0, PILL_Y1 = 324, 505    # cap centres
+
 
 # ----------------------------------------------------------------- io --------
 
@@ -118,18 +123,35 @@ def write_frames(frames, path, fps=FPS):
 
 # ------------------------------------------------------------ detection ------
 
+def _pill():
+    """The island as a constant shape.
+
+    Thresholding it per frame looked more careful but was the opposite: the
+    detected edge moved by a pixel or two with the compression noise, so a thin
+    ring around the cutout was repainted in some frames and left alone in
+    others — 2400 pixels changing hands frame to frame, which is a shimmering
+    outline. The island is hardware. It cannot move. One mask for the whole
+    clip is both more accurate and perfectly steady.
+
+    Geometry is measured, not assumed: the always-black core across every frame
+    of both clips is x 1695..1770, y 286..543, i.e. a pill of radius 38 with
+    its cap centres 181px apart. PILL_PAD covers the anti-aliased rim, which
+    the profiles show is 1-2px on every side.
+    """
+    y, x = np.mgrid[0:H, 0:W]
+    cy = np.clip(y, PILL_Y0, PILL_Y1)
+    return np.sqrt((x - PILL_CX) ** 2 + (y - cy) ** 2) <= PILL_R + PILL_PAD
+
+
 def island_mask(fr):
-    """Opaque-black blob on the right. Returned dilated by 2px so the
-    anti-aliased rim is repainted too — leaving it produces a dark outline
-    exactly where the eye is looking for a seam."""
+    """The constant mask, plus the per-frame detection it is checked against."""
     m = fr.max(axis=2) <= 14
     box = np.zeros_like(m)
     box[ISL["y0"]:ISL["y1"] + 1, ISL["x0"]:ISL["x1"] + 1] = True
-    m &= box
-    out = m.copy()
-    for d in (1, 2):
-        out |= np.roll(m, d, 0) | np.roll(m, -d, 0) | np.roll(m, d, 1) | np.roll(m, -d, 1)
-    return out, m
+    return ISLAND, m & box
+
+
+ISLAND = _pill()
 
 
 def island_ok(m):
@@ -140,13 +162,35 @@ def island_ok(m):
             and abs(ys.min() - 285) < ISL_TOL and abs(ys.max() - 543) < ISL_TOL)
 
 
+def controls_visible(fr):
+    """Is the editor on screen, rather than the system Files sheet over it?
+
+    Needed because row detection reads the track lanes, and the album grid in
+    the picker has rows of its own — without this gate a slider gets painted
+    onto the sheet. The test is the Mixr wordmark in the top-left corner: it is
+    in every editor frame and covered in every sheet frame, it is nowhere near
+    the island, and its contrast is decisive (std ~83 against ~1, and ~62 with
+    the sheet halfway out, which is correctly read as still covered)."""
+    return fr[25:78, 28:175].astype(np.float64).std() > 70
+
+
 def row_centres(fr):
-    """Row centres from the S/M button band."""
-    band = fr[:, SM_X0:SM_X1].astype(int)
+    """Row centres from the S/M button band, inside the list only. Without the
+    bound the Effects tray below the drawer registers as a sixth row, and being
+    the one 'unoccluded row' in a single-track frame it then gets used as the
+    donor."""
+    band = np.zeros((H, SM_X1 - SM_X0, 3), np.int64)
+    band[LIST_Y0:LIST_Y1] = fr[LIST_Y0:LIST_Y1, SM_X0:SM_X1]
     prof = (band.sum(axis=2) / 3).mean(axis=1)
     if prof.max() < 20:
         return []
-    hot = np.where(prof > prof.max() * 0.55)[0]
+    # Threshold above the gaps between rows, not as a fraction of the brightest
+    # row. Waveforms render in one row at a time as a project loads, so for a
+    # few frames one lane is far brighter than the rest; a relative threshold
+    # narrows the dimmer row's band until it is discarded, and the slider
+    # reconstructed behind the island blinks out for those frames.
+    base = np.percentile(prof[LIST_Y0:LIST_Y1], 20)
+    hot = np.where(prof > base + 0.30 * (prof.max() - base))[0]
     if not len(hot):
         return []
     groups, start, prev = [], hot[0], hot[0]
@@ -246,37 +290,57 @@ def retarget(patch, src_rgb, dst_rgb):
 
 # --------------------------------------------------------------- fill --------
 
-def fill_frame(fr, stats):
+def find_donor(fr):
+    """The row this frame can lend: an unoccluded, unclipped, complete slider,
+    plus the track colour to retarget away from. None if the frame has none."""
+    iy0, iy1 = ISL["y0"], ISL["y1"]
+    for y in row_centres(fr):
+        if iy0 - ROW_HALF < y < iy1 + ROW_HALF or not whole_row(fr, y):
+            continue
+        c = lane_colour(fr, y)
+        if c is not None:
+            return fr[y - ROW_HALF:y + ROW_HALF, SLICE_X0:SLICE_X1].astype(
+                np.float64), c
+    return None
+
+
+def fill_frame(fr, stats, lend=None):
     grown, raw = island_mask(fr)
     if not island_ok(raw):
         stats["island_miss"] += 1
         return fr, False
 
     out = fr.astype(np.float64).copy()
+    editor = controls_visible(fr)
 
     # Pass A — background and row dividers.
     # Runs on EVERY frame, including the ones with no Controls column (the
     # Files sheet in the middle of the hero clip). The island is on screen the
     # whole time; skipping those frames left the pill visible for a beat and
     # then made it vanish, which reads worse than leaving it throughout.
-    # Between the rows the Controls column has no vertical structure: flat
-    # background, plus the occasional horizontal hairline divider. Both are
-    # constant along x, so a strip either side of the island reconstructs them.
     # Medians rather than means keep compression speckle out of the fill.
     left = fr[:, DON_L0:DON_L1].astype(np.float64)
     right = fr[:, DON_R0:DON_R1].astype(np.float64)
     med_l, med_r = np.median(left, axis=1), np.median(right, axis=1)   # (H, 3)
     # A strip is usable only where it is flat. Structure inside it means it is
-    # sitting on content — an album thumbnail, a filename — and extending that
-    # sideways invents detail rather than restoring it.
+    # sitting on content, and extending that sideways invents detail.
     flat_l = (left.max(axis=1).max(axis=1) - left.min(axis=1).min(axis=1)) < FLAT_TOL
     flat_r = (right.max(axis=1).max(axis=1) - right.min(axis=1).min(axis=1)) < FLAT_TOL
+    if not editor:
+        # Under the Files sheet the left strip lands inside an album thumbnail,
+        # where plenty of 7px windows read as locally flat while their colour
+        # changes every scanline — extending those laid bands of smeared cover
+        # art across the cutout. The right strip is clear of the grid and is
+        # plain sheet background at every row, so it is the only donor here.
+        # The thumbnail's own right edge falls at x 1695, three pixels into the
+        # island, so this loses nothing of the artwork worth keeping.
+        flat_l = np.zeros_like(flat_l)
 
     ys, xs = np.where(grown)
     # Ramp between the two strips where both are usable, so a horizontal
     # gradient across the cutout survives; fall back to whichever single strip
-    # is flat. Where the two agree — every ordinary frame — the ramp is a
-    # constant and this is identical to a plain fill.
+    # is flat. In the editor the two sides agree closely, so the ramp is very
+    # nearly a constant and the row dividers come through unbroken.
     t = ((xs - DON_L1) / float(DON_R0 - DON_L1))[:, None]
     both = flat_l[ys] & flat_r[ys]
     only_l = flat_l[ys] & ~flat_r[ys]
@@ -285,15 +349,17 @@ def fill_frame(fr, stats):
                                + t[both] * med_r[ys[both]])
     out[ys[only_l], xs[only_l]] = med_l[ys[only_l]]
     out[ys[only_r], xs[only_r]] = med_r[ys[only_r]]
-    bg = np.where(flat_l[:, None], med_l, med_r)   # per-row ground for Pass B
     stats["rows_no_donor"] += int((~flat_l & ~flat_r)[ISL["y0"]:ISL["y1"]].sum())
 
     # Pass B — the sliders themselves, painted over the background above.
+    if not editor:
+        stats["sheet_up"] += 1
+        return np.clip(out, 0, 255).astype(np.uint8), True
     centres = row_centres(fr)
     iy0, iy1 = ISL["y0"], ISL["y1"]
     occluded = [y for y in centres if iy0 - ROW_HALF < y < iy1 + ROW_HALF]
     clear    = [y for y in centres if y not in occluded]
-    if len(centres) < 2:
+    if not centres:
         stats["no_rows"] += 1
         return np.clip(out, 0, 255).astype(np.uint8), True
     if not occluded:
@@ -302,22 +368,34 @@ def fill_frame(fr, stats):
     clear = [c for c in clear if whole_row(fr, c)]
     stats["donors_clipped"] += len([c for c in centres
                                     if c not in occluded]) - len(clear)
-    if not clear:
+    if not clear and lend is None:
         stats["no_donor"] += 1
         return np.clip(out, 0, 255).astype(np.uint8), True
+    if not clear:
+        stats["borrowed"] += 1
 
     did = 0
     for y in occluded:
-        donor = min(clear, key=lambda c: abs(c - y))
-        src_c = lane_colour(fr, donor)
         dst_c = lane_colour(fr, y)
-        if src_c is None or dst_c is None:
+        if dst_c is None:
             continue
-        dy0, dy1 = donor - ROW_HALF, donor + ROW_HALF
+        if clear:
+            donor = min(clear, key=lambda c: abs(c - y))
+            patch = fr[donor - ROW_HALF:donor + ROW_HALF,
+                       SLICE_X0:SLICE_X1].astype(np.float64)
+            src_c = lane_colour(fr, donor)
+            if src_c is None:
+                continue
+        else:
+            # Nothing in THIS frame shows a slider — the single imported track
+            # sits dead centre behind the island. Borrow the nearest frame that
+            # does. Legitimate for the same reason the whole method is: the
+            # volumes are never touched, so the slider is identical in every
+            # frame of the clip; only the hue has to follow this row's track.
+            patch, src_c = lend
         ty0, ty1 = y - ROW_HALF, y + ROW_HALF
-        if dy0 < 0 or dy1 > H or ty0 < 0 or ty1 > H:
+        if ty0 < 0 or ty1 > H:
             continue
-        patch = fr[dy0:dy1, SLICE_X0:SLICE_X1].astype(np.float64)
         shifted = retarget(patch, src_c, dst_c)
 
         # Paint the slider's INK, not the donor's whole rectangle. Transplanting
@@ -326,7 +404,11 @@ def fill_frame(fr, stats):
         # leaves a visible dark box around every reconstructed slider.
         # Alpha comes from how far each donor pixel departs from the donor row's
         # own background, so anti-aliased edges feather instead of stepping.
-        donor_bg = np.median(bg[dy0:dy1], axis=0)
+        # That background is read off the patch's own outer scanlines rather
+        # than the frame — the borrowed donor comes from a different frame and
+        # has to carry its own reference with it.
+        donor_bg = np.median(
+            np.concatenate([patch[:4], patch[-4:]]).reshape(-1, 3), axis=0)
         ink = np.abs(patch - donor_bg).max(axis=2)
         alpha = np.clip((ink - 4.0) / 26.0, 0.0, 1.0)[..., None]
 
@@ -365,10 +447,28 @@ def main():
     print(f"{os.path.basename(src)}: {len(frames)} frames")
     check_layout(frames)
     stats = dict(filled=0, rows_filled=0, island_miss=0, no_rows=0,
-                 nothing_to_do=0, no_donor=0, rows_no_donor=0, donors_clipped=0)
+                 nothing_to_do=0, no_donor=0, rows_no_donor=0, donors_clipped=0,
+                 borrowed=0, sheet_up=0)
+
+    # Which frame each frame can borrow a slider from. Nearest in time either
+    # direction, so the stretch where a single track sits behind the island is
+    # covered from whichever side is closer.
+    lends = [find_donor(f) if controls_visible(f) else None for f in frames]
+    nearest, last = [None] * len(frames), None
+    for i in range(len(frames)):
+        if lends[i] is not None:
+            last = lends[i]
+        nearest[i] = last
+    last = None
+    for i in range(len(frames) - 1, -1, -1):
+        if lends[i] is not None:
+            last = lends[i]
+        elif last is not None and nearest[i] is None:
+            nearest[i] = last
+
     out = []
     for i, f in enumerate(frames):
-        g, _ = fill_frame(f, stats)
+        g, _ = fill_frame(f, stats, nearest[i])
         out.append(g)
         if probe is not None and i == probe:
             from PIL import Image
