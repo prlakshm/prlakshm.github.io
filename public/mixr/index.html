@@ -1044,7 +1044,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 /* Equal-height figure grids give both devices one shared visual row and both
    captions one shared baseline. The shorter device centers inside that row. */
 .devices figure{margin:0;display:grid;grid-template-rows:minmax(0,1fr) auto;align-items:center}
-.devices .device{border-radius:clamp(10px,1.6vw,18px);padding:calc(5px + .5%)}
+.devices .device{border-radius:clamp(10px,1.6vw,18px);padding:calc(5px + .5%);margin-bottom:15px}
 /* The nubs belong to the phone. The Mac keeps its pseudo-elements — it uses
    them for the base, so it is excluded here. */
 .devices .device:not(.device--mac)::before,
@@ -1059,7 +1059,6 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
   border-radius:10px;
   padding:calc(5px + .5%);
   padding-bottom:calc(13px + 1.1%);      /* the chin */
-  margin-bottom:15px;                     /* room for the base */
   overflow:visible}
 /* base: a shallow deck, wider than the lid, catching light along its top edge.
    top/width are reset explicitly — .device::before is the phone's volume nub
