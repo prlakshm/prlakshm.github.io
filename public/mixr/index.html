@@ -1040,11 +1040,45 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
    by this point the reader has seen this interface several times, and the
    claim being made is "it holds at another size", not "look at the UI". */
 .devices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:clamp(14px,2.4vw,28px);align-items:start;margin-top:20px}
-.devices figure{margin:0}
+  gap:clamp(14px,2.4vw,28px);align-items:stretch;margin-top:20px}
+/* Equal-height figure grids give both devices one shared visual row and both
+   captions one shared baseline. The shorter device centers inside that row. */
+.devices figure{margin:0;display:grid;grid-template-rows:minmax(0,1fr) auto;align-items:center}
 .devices .device{border-radius:clamp(10px,1.6vw,18px);padding:calc(5px + .5%)}
-/* The nubs belong to the phone. */
-.devices .device::before,.devices .device::after{content:none}
+/* The nubs belong to the phone. The Mac keeps its pseudo-elements — it uses
+   them for the base, so it is excluded here. */
+.devices .device:not(.device--mac)::before,
+.devices .device:not(.device--mac)::after{content:none}
+
+/* ---- laptop, not a slab -------------------------------------------------
+   The tablet frame and a laptop frame differ in two places, and both matter:
+   a laptop's lid has a deeper chin than its sides, and it sits on a base that
+   is WIDER than the lid. Without the second one it just reads as a tablet
+   with a thick bottom border. */
+.devices .device--mac{
+  border-radius:10px;
+  padding:calc(5px + .5%);
+  padding-bottom:calc(13px + 1.1%);      /* the chin */
+  margin-bottom:15px;                     /* room for the base */
+  overflow:visible}
+/* base: a shallow deck, wider than the lid, catching light along its top edge.
+   top/width are reset explicitly — .device::before is the phone's volume nub
+   (top:-2px, width:9%) and those would otherwise survive and park this bar at
+   the top of the frame. */
+.devices .device--mac::before{content:"";position:absolute;z-index:2;
+  top:auto;width:auto;
+  left:-7.5%;right:-7.5%;bottom:-11px;height:11px;
+  border-radius:1px 1px 7px 7px;
+  background:linear-gradient(180deg,#43434e,#22222b 42%,#111117);
+  box-shadow:0 1px 0 rgba(255,255,255,.14) inset,
+             0 7px 16px rgba(0,0,0,.45)}
+/* the shallow notch cut into the front lip, where a thumb opens it */
+.devices .device--mac::after{content:"";position:absolute;z-index:3;
+  top:auto;right:auto;
+  left:50%;transform:translateX(-50%);
+  bottom:-11px;width:16%;height:5px;
+  border-radius:0 0 6px 6px;
+  background:#15151b}
 .devices .device > img{border-radius:clamp(5px,1vw,11px)}
 .devices figcaption{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.13em;
   text-transform:uppercase;color:#7f8694;margin-top:10px;text-align:center}
@@ -1312,7 +1346,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
     </div>
     <div>
       <h4>Premiere Pro</h4>
-      <span class="gave">Defined the inituition</span>
+      <span class="gave">Shaped the inituition</span>
       <p>With a background in video editing, this was the editor I knew best. Drag-and-drop and the SFX (sound effects) library were all inspired by Premiere Pro.</p>
     </div>
     <div>
@@ -1350,7 +1384,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 <!-- 03 -->
 <section id="behavior">
   <div class="sechead rv"><p class="lab">03 &mdash; Behavior</p>
-    <h2>Trying not to get sued.</h2></div>
+    <h2>Three pivotal points in defining behavior. Trying not to get sued.</h2></div>
 
   <div class="stack rv d1">
     <p>I considered copyright before designed anything. Mixr can&rsquo;t stream from a library and it can&rsquo;t host anyone&rsquo;s masters, so the whole thing is built around import and export: you bring your own files in, you take your remix out, and nothing lives on a server in between.</p>
@@ -1970,7 +2004,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 <section id="changed">
   <div class="sechead rv"><p class="lab">05 &mdash; Coding Agents</p>
     <h2>Claude vs. Codex vs. Cursor</h2>
-    <p>The last two passes were adding responsive layout for iPad and Mac and accessibility testing. I performed a visual audit with no code changes until I read it. Auditing first is what stopped responsive work from becoming a redesign. Claude Code tended to change components I finalized without asking.</p>
+    <p>The last two passes were adding responsive layout for iPad and Mac and accessibility testing. I performed a visual audit with no code changes until I read it. Auditing first is what stopped responsive work from becoming a redesign. Claude tended to change components I finalized without asking.</p>
 
     <div class="devices rv d2">
       <figure>
@@ -1980,145 +2014,12 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
         <figcaption>iPad</figcaption>
       </figure>
       <figure>
-        <div class="device">
+        <div class="device device--mac">
           <img src="art/responsive-mac.webp" alt="Mixr on Mac: the same six lanes in a narrower window, with the track list, controls column and Effects drawer all still in place." loading="lazy">
         </div>
-        <figcaption>Mac</figcaption>
+        <figcaption>Mac laptop</figcaption>
       </figure>
     </div>
-  </div>
-
-  <div class="stack rv d1">
-    <p>At one point the lift came out and the clip went back to sliding along the lane. Still functional, still &ldquo;correct,&rdquo; and immediately worse &mdash; nothing was ever picked up, it just slid. Getting the lift back was a whole task of its own.</p>
-  </div>
-
-  <div class="ba rv d2">
-    <div>
-      <h4>Before &mdash; slide</h4>
-      <p>The clip tracked the finger along the lane at rest height. Nothing wrong with it. It just never felt held.</p>
-    </div>
-    <div class="pick">
-      <h4>After &mdash; lift</h4>
-      <p>6&nbsp;pt up, scaled 1.05, a shadow at radius 18. The clip leaves the surface, and the lane it came from goes to 0.28.</p>
-    </div>
-  </div>
-
-  <div class="dec rv d2">
-    <h3 style="margin-top:36px">The play button was centred. It didn't look centred.</h3>
-    <p>For weeks the transport cluster felt slightly off. My instinct was to nudge the play button, which was wrong &mdash; it was already dead centre. The time, BPM and key sat to its right and dragged the perceived centre left.</p>
-    <p>The fix moved everything except the button: the cluster shifts 20&ndash;30&nbsp;px right, time, BPM and key tighten into one metadata block, their labels shrink, and the play glow pulls back 10&ndash;15% because the bloom made it read larger than it is.</p>
-
-    <div class="demo" style="margin-top:20px">
-      <div class="rowlab">
-        <span class="demo-title">Optical centre</span>
-        <span class="hint">SWITCH BETWEEN THE TWO BUILDS</span>
-      </div>
-      <div class="tog" id="nb-tog" role="group" aria-label="Navbar build">
-        <button type="button" aria-pressed="true"  data-state="before">Before</button>
-        <button type="button" aria-pressed="false" data-state="after">After</button>
-      </div>
-      <div class="nb" id="nb">
-        <span class="nb-tick geo" id="nb-geo"></span>
-        <span class="nb-tick opt" id="nb-opt"></span>
-        <!-- The real bar is five groups: brand, history, playback, metadata,
-             export. All five have to be here or the balance being demonstrated
-             is not the balance the app actually has. -->
-        <div class="nb-row">
-          <span class="nb-brand">Mixr</span>
-          <span class="nb-skip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 7H14a5 5 0 0 1 0 10h-3a1 1 0 0 1 0-2h3a3 3 0 0 0 0-6H8.5l1.8 1.8a1 1 0 1 1-1.4 1.4l-3.5-3.5a1 1 0 0 1 0-1.4l3.5-3.5a1 1 0 1 1 1.4 1.4z"/></svg></span>
-          <span class="nb-skip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 7H10a5 5 0 0 0 0 10h3a1 1 0 0 0 0-2h-3a3 3 0 0 1 0-6h5.5l-1.8 1.8a1 1 0 1 0 1.4 1.4l3.5-3.5a1 1 0 0 0 0-1.4l-3.5-3.5a1 1 0 1 0-1.4 1.4z"/></svg></span>
-          <span class="nb-spacer"></span>
-          <div class="nb-cluster" id="nb-cluster">
-            <span class="nb-skip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 6a1 1 0 0 1 2 0v4.3l7.5-4.9A1 1 0 0 1 18 6.3v11.4a1 1 0 0 1-1.5.9L9 13.7V18a1 1 0 0 1-2 0z"/></svg></span>
-            <button type="button" class="nb-play" aria-label="Play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2a1 1 0 0 1 1.53-.85l9 6.8a1 1 0 0 1 0 1.7l-9 6.8A1 1 0 0 1 8 18.8z"/></svg></button>
-            <span class="nb-skip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 6a1 1 0 0 0-2 0v4.3L7.5 5.4A1 1 0 0 0 6 6.3v11.4a1 1 0 0 0 1.5.9l7.5-4.9V18a1 1 0 0 0 2 0z"/></svg></span>
-            <div class="nb-meta" id="nb-meta">
-              <div><b>01:24</b><span>/ 03:45</span></div>
-              <div><b>124</b><span>BPM</span></div>
-              <div><b>Gm</b><span>KEY</span></div>
-            </div>
-          </div>
-          <span class="nb-spacer"></span>
-          <button type="button" class="mx-btn mx-btn--glass" style="padding:7px 12px">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h5V4a1 1 0 0 1 2 0v6a1 1 0 0 1-2 0V8H4a1 1 0 0 1 0-2zm9 0h7a1 1 0 0 1 0 2h-7a1 1 0 0 1 0-2zm-9 10h7a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm11-2a1 1 0 0 1 2 0v2h3a1 1 0 0 1 0 2h-3v2a1 1 0 0 1-2 0z"/></svg>
-            Mixer
-          </button>
-          <button type="button" class="mx-btn mx-btn--primary" style="padding:7px 12px">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a1 1 0 0 1 1 1v8.6l2.3-2.3a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4l2.3 2.3V4a1 1 0 0 1 1-1z"/></svg>
-            Export
-          </button>
-        </div>
-      </div>
-      <p class="nb-key">
-        <span class="k1"><i></i>Geometric centre of the bar</span>
-        <span class="k2"><i></i>Centre of the cluster's mass</span>
-      </p>
-      <p class="tl-nums" id="nb-nums" role="status" aria-live="polite"></p>
-      <p class="foot">The pink mark is measured off the live DOM on every switch, not hard-coded &mdash; it is the centre of the transport cluster's bounding box, which is roughly where the eye puts the group. All five groups are here, because the balance being shown is a balance between them: with brand and history on the left and Mixer and Export on the right, the cluster's mass does not sit where the maths says the middle is. The after state closes the gap by moving everything except the button, then this readout checks that it actually landed. The correction is recomputed at whatever width you are reading this &mdash; so the number above is this recreation's, not the app's 20&ndash;30&nbsp;px.</p>
-    </div>
-
-    <div class="flag">
-      <p>Chosen: optical balance over equal gaps. The navbar is spaced as five groups &mdash; brand, history, playback, metadata, export &mdash; with intentional distances between them rather than one evenly spaced row. Related things sit close; unrelated things get air.</p>
-    </div>
-  </div>
-
-  <div class="ba rv d2">
-    <div>
-      <h4>Before &mdash; six effects</h4>
-      <p>Auto, Reverb, Echo, Bass Boost, Pitch Up, Flanger. Two of those are not creative choices.</p>
-    </div>
-    <div class="pick">
-      <h4>After &mdash; six effects</h4>
-      <p>Auto, Reverb, Echo, Pitch, Flanger, Blur. Same count, and every card now changes the character of a clip rather than correcting it.</p>
-    </div>
-  </div>
-
-  <div class="demo rv d2">
-    <p class="sub">Before</p>
-    <figure><img src="art/effects-then.png" alt="An earlier build's effects drawer: Auto, Reverb, Echo, Bass Boost, Pitch Up and the edge of a red card." loading="lazy"></figure>
-    <p class="sub" style="margin-top:26px">After</p>
-    <figure><img src="art/effects-now.png" alt="Today's effects drawer: Auto, Reverb, Echo, Pitch, Flanger and the edge of Blur." loading="lazy"></figure>
-    <p class="foot">Bass Boost is gone &mdash; it is a mix correction, not a creative choice, and it made every remix louder rather than more interesting. &ldquo;Pitch Up&rdquo; became &ldquo;Pitch&rdquo; once the control could go both ways.</p>
-  </div>
-
-  <div class="stack rv d2">
-    <p>Auto&rsquo;s first version applied effect presets across a whole track. That is decorating, not arranging, and it produced remixes that sounded processed rather than edited. It was rebuilt to do what a person would do: split, trim, duplicate, move and overlap real clips on the real timeline.</p>
-  </div>
-
-  <div class="demo rv d2">
-    <div class="rowlab">
-      <span class="demo-title">What Auto writes</span>
-      <span class="hint">SAME LANE, TWO GENERATIONS</span>
-    </div>
-    <p class="sub">Before &mdash; presets over a whole track</p>
-    <div class="tl" style="pointer-events:none">
-      <div class="tl-lane" style="height:84px">
-        <span class="tl-clip" style="--c:var(--mx-pitch);left:2%;width:94%;top:18px"><span class="wave"></span><span class="tag">REVERB 40% &middot; ECHO 25% &middot; WHOLE TRACK</span></span>
-      </div>
-    </div>
-    <p class="foot">One clip, untouched, with a wash over the top of it. Nothing was arranged, so there is nothing on the timeline to grab, trim or undo separately.</p>
-
-    <p class="sub" style="margin-top:30px">After &mdash; real clips on the real timeline</p>
-    <div class="tl" style="pointer-events:none">
-      <div class="tl-lane" style="height:84px">
-        <span class="tl-clip" style="--c:var(--mx-pitch);left:2%;width:20%;top:18px"><span class="wave"></span></span>
-        <span class="tl-clip" style="--c:var(--mx-echo);left:23.5%;width:17%;top:18px"><span class="wave"></span></span>
-        <span class="tl-clip" style="--c:var(--mx-pitch);left:42%;width:12%;top:18px"><span class="wave"></span></span>
-        <span class="tl-clip" style="--c:var(--mx-blur);left:55.5%;width:21%;top:18px"><span class="wave"></span></span>
-        <span class="tl-clip" style="--c:var(--mx-echo);left:78%;width:18%;top:18px"><span class="wave"></span></span>
-      </div>
-    </div>
-    <p class="foot">Split, trimmed, duplicated, reordered, overlapped. Every one of these is an ordinary clip &mdash; you can drag it with the demo above, and the whole run collapses into a single undo.</p>
-  </div>
-
-  <div class="flag rv d2">
-    <h3>The line that fixed Auto</h3>
-    <p>Preservation is a constraint, not the objective. An Auto remix that only makes one safe change is a failure even though it broke nothing &mdash; and sound effects alone do not count as a transformation. It has to feel intentionally edited in several places, or it hasn't done the job.</p>
-  </div>
-
-  <div class="flag rv d2">
-    <h3>The rule Auto is built against</h3>
-    <p>Everything Auto creates has to be something you can see, edit and undo. It writes ordinary clips and ordinary transitions onto the same timeline you edit by hand &mdash; nothing it makes is a special object you are locked out of, and the whole run collapses into a single undo.</p>
   </div>
 </section>
 
