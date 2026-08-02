@@ -70,6 +70,13 @@ DON_L0, DON_L1 = 1679, 1686
 DON_R0, DON_R1 = 1788, 1796
 FLAT_TOL = 46                  # max channel spread within a donor strip
 
+# The Controls list, between the bottom of the ruler and the top of the Effects
+# drawer. Both are fixed chrome in these two recordings; check_layout() asserts
+# that per clip rather than trusting it. A row straddling either edge is not a
+# usable donor — see whole_row().
+LIST_Y0, LIST_Y1 = 134, 586
+THUMB_X0, THUMB_X1 = 1700, 1790  # where slider ink lives, for presence tests
+
 
 # ----------------------------------------------------------------- io --------
 
@@ -152,26 +159,26 @@ def row_centres(fr):
     return [(a + b) // 2 for a, b in groups if b - a > 10]
 
 
-def whole_row(fr, y, bg):
-    """Is this row's slider fully inside its own band, with clearance?
+def whole_row(fr, y):
+    """Is this row usable as a donor — a complete, unclipped slider?
 
-    A row can be detected from its S/M buttons while its slider is half cut off
-    — by the Effects drawer at the bottom of the Controls column, or by the
-    ruler at the top. That happens on every scroll, and transplanting such a
-    row paints a squashed slider sitting on a slab of drawer chrome onto the
-    rows below the island.
+    A row keeps being detected from its S/M buttons after its slider has been
+    cut in half by the Effects drawer below the list or the ruler above it.
+    That happens on every scroll, and transplanting one of those paints a
+    squashed slider sitting on a slab of drawer chrome onto the rows behind the
+    island — which is exactly the glitch on the yellow and red rows.
 
-    The slider is 14pt in a 32pt band, so a whole one leaves the outer few
-    scanlines empty. Ink running to the band edge means the band is holding
-    something that is not just this slider.
+    Two conditions: the row's whole band has to lie inside the list, and the
+    band has to actually contain slider ink. The second catches the row that is
+    scrolled far enough under the drawer to be invisible while its buttons are
+    still detectable.
     """
     y0, y1 = y - ROW_HALF, y + ROW_HALF
-    if y0 < 0 or y1 > H:
+    if y0 < LIST_Y0 or y1 > LIST_Y1:
         return False
-    patch = fr[y0:y1, SLICE_X0:SLICE_X1].astype(np.float64)
-    ink = np.abs(patch - np.median(bg[y0:y1], axis=0)).max(axis=2) > 12
-    edge = np.concatenate([ink[:4], ink[-4:]])
-    return edge.mean() < 0.05
+    s = fr[y0:y1, THUMB_X0:THUMB_X1].astype(int)
+    mx, mn = s.max(axis=2), s.min(axis=2)
+    return ((((mx - mn) > 60) & (mx > 90)).mean(axis=1)).max() > 0.30
 
 
 def lane_colour(fr, y):
@@ -292,7 +299,7 @@ def fill_frame(fr, stats):
     if not occluded:
         stats["nothing_to_do"] += 1
         return np.clip(out, 0, 255).astype(np.uint8), True
-    clear = [c for c in clear if whole_row(fr, c, bg)]
+    clear = [c for c in clear if whole_row(fr, c)]
     stats["donors_clipped"] += len([c for c in centres
                                     if c not in occluded]) - len(clear)
     if not clear:
@@ -333,6 +340,21 @@ def fill_frame(fr, stats):
     return np.clip(out, 0, 255).astype(np.uint8), True
 
 
+def check_layout(frames):
+    """LIST_Y1 is a constant, so prove it against the clip before relying on it.
+    The Effects drawer is draggable; if a future recording opens it further, the
+    donor bound is wrong and rows get rejected (or worse, accepted) silently."""
+    tops = []
+    for f in frames[::5]:
+        lum = f[:, 250:1450].astype(np.float64).mean(axis=(1, 2))
+        tops.append(int(np.argmax(np.diff(lum)[500:720])) + 501)
+    mode = int(np.bincount(tops).argmax())
+    if abs(mode - (LIST_Y1 + 1)) > 3:
+        raise SystemExit(
+            f"drawer top is {mode}, expected {LIST_Y1 + 1} — re-measure LIST_Y1")
+    print(f"  layout ok: drawer top {mode}")
+
+
 def main():
     src, dst = sys.argv[1], sys.argv[2]
     probe = None
@@ -341,6 +363,7 @@ def main():
 
     frames = read_frames(src)
     print(f"{os.path.basename(src)}: {len(frames)} frames")
+    check_layout(frames)
     stats = dict(filled=0, rows_filled=0, island_miss=0, no_rows=0,
                  nothing_to_do=0, no_donor=0, rows_no_donor=0, donors_clipped=0)
     out = []

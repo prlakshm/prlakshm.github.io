@@ -23,6 +23,10 @@ test("centers the iPad and Mac laptop while sharing a caption baseline", async (
     html,
     /\.devices \.device--mac\{[^}]*margin-bottom:/,
   );
+  assert.match(
+    html,
+    /\.devices \.device--mac\{[^}]*transform:translateY\(-5px\)/,
+  );
   assert.match(html, /<figcaption>iPad<\/figcaption>/);
   assert.match(html, /<figcaption>Mac laptop<\/figcaption>/);
   assert.doesNotMatch(html, /<figcaption>Mac<\/figcaption>/);
