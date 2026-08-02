@@ -1,19 +1,23 @@
 #!/usr/bin/env python3
 """
-Seven audio clips for the Mixr case study: one dry loop, then the same loop with
-each of the six effect cards applied at full strength.
+Six audio clips for the Mixr case study: one dry loop, then the same loop with
+each of the five audio effects applied at full strength.
+
+Auto is deliberately absent. It is an arrangement engine, not a filter — there
+is no "Auto at 100%" to render onto a loop, and putting it in the row implied
+there was.
 
 Why the source is synthesised rather than a real song: the effects have to be
 demonstrated on a public portfolio page, and the tracks Mixr was built against
-are commercial masters. This writes its own loop instead — 124 BPM in G minor,
-matching the tempo and key shown in the app's own transport bar — so the page
-can ship the audio outright.
+are commercial masters. This writes its own loop instead — 103 BPM in B minor,
+disco-pop in the neighbourhood of what Mixr gets used on — so the page can ship
+the audio outright.
 
 Everything is numpy; the recursive filters are blocked so the feedback loops
 stay vectorised rather than running a Python loop per sample.
 
 Outputs to public/mixr/audio/:
-    original.mp3  auto.mp3  reverb.mp3  echo.mp3  pitch.mp3  flanger.mp3  blur.mp3
+    original.mp3  reverb.mp3  echo.mp3  pitch.mp3  flanger.mp3  blur.mp3
     peaks.json    — waveform envelopes on one shared scale, so the rows can be
                     read against each other: echo's repeats and reverb's tail
                     are visible in the shape, not just audible
@@ -25,7 +29,11 @@ import subprocess
 import numpy as np
 
 SR    = 44100
-BPM   = 124.0
+# Disco-pop tempo and key — the brief was "something in the neighbourhood of
+# Levitating". 103 BPM in B minor, four-on-the-floor with an octave-jumping
+# bassline and claps on the backbeat. It has to be a real groove: the first
+# loop here was a generic 124 BPM pad and the effects had nothing to bite on.
+BPM   = 103.0
 BEAT  = 60.0 / BPM
 BEATS = 8
 TAIL  = 1.30                       # room for reverb / echo to ring out
@@ -92,41 +100,67 @@ def kick(start, amp=0.95):
     return sweep * e * amp
 
 
-def hat(start, amp=0.16):
-    rng = np.random.default_rng(int(start * 1000) + 7)
-    n = min(N - int(start * SR), int(0.055 * SR))
+def noise_hit(start, dur, amp, hp=2, seed=0):
+    rng = np.random.default_rng(int(start * 1000) + seed)
+    a0 = int(start * SR)
+    n = min(N - a0, int(dur * SR))
     if n <= 0:
         return np.zeros(N)
+    v = rng.standard_normal(n)
+    for _ in range(hp):                      # crude high-pass by differencing
+        v = np.diff(v, prepend=0)
     out = np.zeros(N)
-    a0 = int(start * SR)
-    noise = rng.standard_normal(n)
-    # crude high-pass: difference twice
-    noise = np.diff(np.diff(noise, prepend=0), prepend=0)
-    out[a0:a0 + n] = noise
-    return out * env(start, 0.055, attack=0.001, curve=1.6) * amp
+    out[a0:a0 + n] = v
+    return out * env(start, dur, attack=0.001, curve=1.6) * amp
 
 
-# G minor, i - VI - III - VII, two beats each.
+def hat(start, amp=0.13):
+    return noise_hit(start, 0.045, amp, hp=2, seed=7)
+
+
+def clap(start, amp=0.34):
+    """Three quick bursts a few ms apart, then a short tail — the backbeat is
+    what makes this read as disco rather than as a click track."""
+    out = np.zeros(N)
+    for k, d in enumerate((0.0, 0.011, 0.020)):
+        out += noise_hit(start + d, 0.030, amp * (1.0 - 0.22 * k), hp=1, seed=31 + k)
+    out += noise_hit(start + 0.028, 0.15, amp * 0.42, hp=1, seed=41)
+    return out
+
+
+# B minor, i - III - v - IV, two beats each. Roots are the bassline's anchor;
+# the triads sit two octaves up as the stab.
 CHORDS = [
-    (98.00,  [392.00, 466.16, 587.33]),   # Gm
-    (77.78,  [311.13, 392.00, 466.16]),   # Eb
-    (116.54, [233.08, 293.66, 349.23]),   # Bb
-    (87.31,  [349.23, 440.00, 523.25]),   # F
+    (123.47, [493.88, 587.33, 739.99]),   # Bm   B  D  F#
+    (146.83, [293.66, 369.99, 440.00]),   # D    D  F# A
+    (185.00, [369.99, 440.00, 554.37]),   # F#m  F# A  C#
+    (164.81, [329.63, 415.30, 493.88]),   # E    E  G# B
 ]
 
 
 def build_source():
     x = np.zeros(N)
     for b in range(BEATS):
-        x += kick(b * BEAT)
-        x += hat(b * BEAT + BEAT * 0.5)
+        x += kick(b * BEAT)                             # four on the floor
+        x += hat(b * BEAT + BEAT * 0.5, 0.13)           # offbeat hat
+        x += hat(b * BEAT + BEAT * 0.25, 0.055)         # 16th ghost
+        x += hat(b * BEAT + BEAT * 0.75, 0.055)
+        if b % 2 == 1:
+            x += clap(b * BEAT)                         # backbeat, 2 and 4
+
     for i, (root, triad) in enumerate(CHORDS):
         s = i * 2 * BEAT
-        x += tone(root, s, 2 * BEAT * 0.96, 0.42, "saw", curve=1.4)
-        for f in triad:                      # stab on the downbeat
-            x += tone(f, s, 0.55, 0.13, "saw", detune=0.004, curve=2.4)
-        for f in triad:                      # answer on the offbeat
-            x += tone(f, s + BEAT * 1.5, 0.30, 0.085, "tri", curve=2.6)
+        # Octave-jumping eighths — root on the beat, octave up on the "and".
+        # This figure is the whole character of the groove.
+        for e in range(4):
+            at = s + e * (BEAT / 2)
+            f  = root * (2.0 if e % 2 else 1.0)
+            x += tone(f, at, BEAT * 0.42, 0.34, "saw", curve=1.8)
+        # Chord stab on the downbeat, answered short on the second beat's "and".
+        for f in triad:
+            x += tone(f, s, 0.42, 0.105, "saw", detune=0.005, curve=2.6)
+        for f in triad:
+            x += tone(f, s + BEAT * 1.5, 0.24, 0.07, "tri", curve=2.8)
     return x / np.max(np.abs(x)) * 0.82
 
 
@@ -222,32 +256,6 @@ def fx_blur(x, cutoff=420.0):
     return y                                  # left at its natural level
 
 
-def fx_auto(x):
-    """Not a filter. Auto rearranges — it writes real clips onto the timeline,
-    so this splits the loop into beats and reorders, trims and duplicates them
-    with short crossfades, exactly like the arrangement it would commit."""
-    beat = int(BEAT * SR)
-    seg = [x[i * beat:(i + 1) * beat] for i in range(BEATS)]
-    order = [0, 1, 0, 2, 4, 4, 5, 3]          # duplicated, reordered, trimmed
-    xf = int(0.012 * SR)
-    out = np.zeros(N)
-    pos = 0
-    for k, s in enumerate(order):
-        g = seg[s].copy()
-        if k in (2, 5):                        # trimmed entries
-            g = g[: int(len(g) * 0.62)]
-        if pos + len(g) > N:
-            g = g[: N - pos]
-        if len(g) == 0:
-            break
-        if pos > 0 and xf < len(g):            # equal-power crossfade at the seam
-            f = np.linspace(0, 1, xf)
-            out[pos:pos + xf] *= np.cos(f * np.pi / 2)
-            g[:xf] *= np.sin(f * np.pi / 2)
-        out[pos:pos + len(g)] += g
-        pos += len(g) - (xf if xf < len(g) else 0)
-    return out / max(np.max(np.abs(out)), 1e-9) * 0.82
-
 
 # -------------------------------------------------------------------- write --
 
@@ -279,11 +287,10 @@ def write(name, x, table):
 def main():
     os.makedirs(OUT, exist_ok=True)
     src = build_source()
-    print(f"source: {N/SR:.2f}s @ {BPM:g} BPM, G minor")
+    print(f"source: {N/SR:.2f}s @ {BPM:g} BPM, B minor")
 
     clips = [
         ("original", src),
-        ("auto",     fx_auto(src)),
         ("reverb",   fx_reverb(src)),
         ("echo",     fx_echo(src)),
         ("pitch",    fx_pitch(src)),
@@ -295,7 +302,7 @@ def main():
     for name, y in clips:
         write(name, y, table)
 
-    # Normalise every envelope against the loudest single peak across all seven,
+    # Normalise every envelope against the loudest single peak across all six,
     # so the rows can be read against each other — blur should LOOK quieter.
     top = max(max(v) for v in table.values()) or 1.0
     table = {k: [round(min(1.0, p / top), 4) for p in v] for k, v in table.items()}

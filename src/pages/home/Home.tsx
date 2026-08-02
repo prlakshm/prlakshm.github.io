@@ -355,6 +355,50 @@ function Home() {
     const cleanups: Array<() => void> = [];
     const reduced = prefersReducedMotion();
 
+    /* Which scrap is pinned open by a click, if any. Hover alone is not enough
+       on a touch screen — there is no hover to give — and on a mouse a click
+       that behaved exactly like a hover would not be worth having. So a click
+       pins the label until it is dismissed, and a pinned label ignores the
+       pointer leaving. Shared across every scrap so pinning one releases the
+       last, and only one label is ever up. */
+    let pinned: HTMLElement | null = null;
+    let pinTimer = 0;
+    let pinX = 0;
+    let pinY = 0;
+    /* Whether the pin came from a finger. Touch pins are ended by the timer
+       ALONE: after a tap, browsers emit a compatibility mouse move, which
+       arrives as a pointermove with pointerType "mouse" — guarding on the
+       event's type instead of the pin's would dismiss the label on a phone
+       before it had been read. */
+    let pinByTouch = false;
+
+    /** A pin is a peek, not a mode — it lets go on its own. */
+    const PIN_MS = 2600;
+    /** A click can carry a pixel or two of drift; only real travel counts. */
+    const PIN_SLOP = 6;
+
+    const unpin = () => {
+      if (pinTimer) {
+        window.clearTimeout(pinTimer);
+        pinTimer = 0;
+      }
+      if (!pinned) return;
+      pinned.dispatchEvent(new CustomEvent("scrap:hide"));
+      pinned = null;
+    };
+
+    /* Moving the cursor at all releases the pin. Touch is excluded — there is
+       no cursor to move, so on a phone the timer is what ends it. */
+    const onDrift = (e: PointerEvent) => {
+      if (!pinned || pinByTouch || e.pointerType === "touch") return;
+      const dx = e.clientX - pinX;
+      const dy = e.clientY - pinY;
+      if (dx * dx + dy * dy < PIN_SLOP * PIN_SLOP) return;
+      unpin();
+    };
+    document.addEventListener("pointermove", onDrift, { passive: true });
+    cleanups.push(() => document.removeEventListener("pointermove", onDrift));
+
     stage.querySelectorAll<HTMLElement>(".scrap").forEach((scrap) => {
       const tip = scrap.querySelector<HTMLElement>(".scrap-tooltip");
       if (!tip) return;
@@ -363,35 +407,120 @@ function Home() {
          which makes `position: fixed` resolve to that box — not the viewport.
          Park the tip on `document.body` while visible so +14 / +18 matches
          the hero-title chip distance. */
-      const place = (clientX: number, clientY: number) => {
-        tip.style.left = `${clientX + 14}px`;
-        tip.style.top = `${clientY + 18}px`;
+      /* Measured when the label is raised, not on every move — place() runs on
+         each pointermove, and reading offsetWidth there is a layout per frame. */
+      let tipW = 0;
+      let tipH = 0;
+      const measureTip = () => {
+        tipW = tip.offsetWidth;
+        tipH = tip.offsetHeight;
       };
-      const show = (on: boolean) =>
-        animate(
+
+      /* Set from the pointer that actually raised the label, not from a media
+         query. A touchscreen laptop answers `(hover: hover)` yes and would then
+         place a tapped label under the finger. */
+      let byTouch = false;
+
+      const place = (clientX: number, clientY: number) => {
+        /* Below-right of the cursor on a mouse. Above it on touch, because
+           +18px puts the label directly under the finger that just tapped it. */
+        const coarse = byTouch || !window.matchMedia("(hover: hover)").matches;
+        const pad = 8;
+        let x = clientX + 14;
+        let y = coarse ? clientY - tipH - 16 : clientY + 18;
+        // A strip at either end of the row would otherwise push its label off
+        // the side, which is most of them on a phone.
+        x = Math.min(Math.max(pad, x), window.innerWidth - tipW - pad);
+        y = Math.min(Math.max(pad, y), window.innerHeight - tipH - pad);
+        tip.style.left = `${x}px`;
+        tip.style.top = `${y}px`;
+      };
+      const show = (on: boolean) => {
+        /* State on the strip as well as the animation. The opacity lives on a
+           tip that has been reparented to <body>, which leaves nothing on the
+           scrap itself to hang a style off — and a pinned strip wants to look
+           pinned. */
+        scrap.classList.toggle("is-tip", on);
+        return animate(
           tip,
           { opacity: on ? 1 : 0 },
           reduced ? { duration: 0 } : { type: "spring", stiffness: 460, damping: 24 }
         );
+      };
 
       const enter = (e: PointerEvent) => {
+        byTouch = e.pointerType === "touch";
         if (tip.parentElement !== document.body) document.body.appendChild(tip);
+        measureTip();
         place(e.clientX, e.clientY);
         show(true);
       };
-      const move = (e: PointerEvent) => place(e.clientX, e.clientY);
-      const leave = () => show(false);
+      const move = (e: PointerEvent) => {
+        if (pinned === scrap) return; // a pinned label stays where it was put
+        byTouch = e.pointerType === "touch";
+        place(e.clientX, e.clientY);
+        /* Hover takes back over after a pin is released. Without this, drifting
+           the cursor while still on the strip would kill the label and leave a
+           dead patch until you moved off and came back. */
+        if (!scrap.classList.contains("is-tip")) show(true);
+      };
+      const leave = () => {
+        if (pinned === scrap) return;
+        show(false);
+      };
 
+      // Lets `unpin` close a scrap it does not hold a closure over.
+      const hide = () => show(false);
+
+      const click = (e: MouseEvent) => {
+        if (pinned === scrap) {
+          unpin();
+          return;
+        }
+        unpin(); // release whichever one was up
+        if (tip.parentElement !== document.body) document.body.appendChild(tip);
+        measureTip();
+        place(e.clientX, e.clientY);
+        show(true);
+        pinned = scrap;
+        pinX = e.clientX;
+        pinY = e.clientY;
+        pinByTouch = byTouch;
+        pinTimer = window.setTimeout(unpin, PIN_MS);
+      };
+
+      const down = (e: PointerEvent) => {
+        byTouch = e.pointerType === "touch";
+      };
+
+      scrap.addEventListener("pointerdown", down);
       scrap.addEventListener("pointerenter", enter);
       scrap.addEventListener("pointermove", move);
       scrap.addEventListener("pointerleave", leave);
+      scrap.addEventListener("click", click);
+      scrap.addEventListener("scrap:hide", hide);
       cleanups.push(() => {
+        scrap.removeEventListener("pointerdown", down);
         scrap.removeEventListener("pointerenter", enter);
         scrap.removeEventListener("pointermove", move);
         scrap.removeEventListener("pointerleave", leave);
+        scrap.removeEventListener("click", click);
+        scrap.removeEventListener("scrap:hide", hide);
         if (tip.parentElement !== scrap) scrap.appendChild(tip);
       });
     });
+
+    /* A click anywhere else puts the pinned label away. Capture, so it lands
+       before whatever was clicked gets to handle it. */
+    const onOutside = (e: PointerEvent) => {
+      if (!pinned) return;
+      if (pinned.contains(e.target as Node)) return; // the scrap's own click owns that
+      unpin();
+    };
+    document.addEventListener("pointerdown", onOutside, true);
+    cleanups.push(() =>
+      document.removeEventListener("pointerdown", onOutside, true)
+    );
 
     return () => cleanups.forEach((fn) => fn());
   }, []);

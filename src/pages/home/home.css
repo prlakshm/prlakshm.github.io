@@ -1289,6 +1289,10 @@
    in the pocket mouth so five scraps read as a stuffed handful, not one. */
 .scrap {
   position: relative;
+  /* Clicking pins the label open, so the strip has to look like something you
+     can click. Hover alone used to be the only way in, which gave touch no
+     route to the labels at all. */
+  cursor: pointer;
   /* Each textile takes a fixed share (--wf) of the row after gaps, and its
      height falls out of its own aspect (--ar). Because the shares are derived
      from aspect x reference-height, the rendered heights hold the reference
@@ -1305,6 +1309,12 @@
     )
     rotate(calc((var(--si) - 2) * 5deg)) scale(0.84);
 }
+
+/* .scrap.is-tip is still set by Home.tsx while a label is up, but deliberately
+   carries no styling — the label itself is the feedback, and brightening the
+   textile on top of it read as the strip lighting up rather than as a caption
+   appearing. Kept as a hook: it is the only state the tooltip exposes, since
+   the tip is reparented onto <body> and its opacity lives on Motion. */
 
 /* No negative margin any more: the textiles are sized as shares of the row,
    so they fit side by side with a real gap instead of overlapping. */
@@ -1662,10 +1672,13 @@
      open at this width; this is the belt to that brace, and it also covers a
      desktop window dragged narrow mid-spill. */
   .jr-spill:not([data-inert]),
-  .scrap-tooltip,
   .jr-img--open {
     display: none;
   }
+  /* .scrap-tooltip is NOT hidden here any more. It was grouped with the spill
+     suppression back when hover was the only way to raise it, which on a phone
+     meant never — so the five labels were simply unreachable on touch. Tapping
+     a strip now pins its label, so it has to be able to show. */
 
   /* The open image is display:none here, so the cross-fade must not run —
      otherwise tapping a journal fades the cover to nothing with no

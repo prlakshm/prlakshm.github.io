@@ -20,9 +20,6 @@ for (const [name, pagePath] of pages) {
       /\.side \.who::before\{[^}]*background:var\(--ground\)[^}]*mask-image:radial-gradient/,
     );
     assert.match(html, /\.side \.who>span\{display:block;color:inherit\}/);
-    assert.match(
-      html,
-      /\.side \.who>span\+span\{[^}]*font-weight:600/,
-    );
+    assert.doesNotMatch(html, /\.side \.who>span\+span\{[^}]*font-weight:/);
   });
 }
