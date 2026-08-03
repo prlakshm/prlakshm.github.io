@@ -11,8 +11,6 @@ import Footer from './components/Footer.js';
 import Home from './pages/home/Home.js';
 import CaseStudyHBOMax1 from './pages/case-study-hbo-max1/CaseStudyHBOMax1.js';
 import CaseStudyHBOMax2 from './pages/case-study-hbo-max2/CaseStudyHBOMax2.js';
-import CaseStudyBinary from './pages/case-study-binary/CaseStudyBinary.js';
-import CaseStudyDreamer from './pages/case-study-dreamer/CaseStudyDreamer.js';
 import SurpriseRailV1 from './pages/surprise-rail-v1/SurpriseRailV1.js';
 import './app.css';
 import Fun from './pages/fun/Fun.js';
@@ -63,8 +61,6 @@ function Shell() {
             Kept routed, not linked, so the exhibition-room treatment is not lost. */}
         <Route path="/surprise-rail-v1" element={<SurpriseRailV1 />} />
         <Route path="/hbo-max-rtw" element={<CaseStudyHBOMax2 />} />
-        <Route path="/binary-escape" element={<CaseStudyBinary />} />
-        <Route path="/richdreamer" element={<CaseStudyDreamer />} />
         {/* /about deep-links to the manifesto section on the homepage. */}
         <Route path="/about" element={<Home />} />
       </Routes>
