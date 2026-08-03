@@ -1333,17 +1333,20 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
        through the middle, coming back softer at bottom-trailing. Values fitted
        against the "Linear" pill sampled out of the transition recording at native
        resolution — nine points across its body, mean error 1.6/255. */
-    linear-gradient(135deg,color-mix(in srgb,var(--c) 24%,transparent),
-      color-mix(in srgb,var(--c) 12%,transparent) 20%,
-      transparent 42%,transparent 60%,
-      color-mix(in srgb,var(--c) 5%,transparent) 82%,
-      color-mix(in srgb,var(--c) 10%,transparent)),
+    linear-gradient(135deg,color-mix(in srgb,var(--c) 26%,transparent),
+      color-mix(in srgb,var(--c) 11.7%,transparent) 17.6%,
+      transparent 32%,transparent 68%,
+      color-mix(in srgb,var(--c) 6.4%,transparent) 82.4%,
+      color-mix(in srgb,var(--c) 14.3%,transparent)),
     /* and a little more weight out of the middle: the hue holds further along
        each end of the diagonal, and the centre is sunk under a soft ellipse.
-       Both are small on purpose — nothing here moves a channel by more than
-       4/255, which reads as the tint gathering at the edges rather than as a
-       different button. */
-    radial-gradient(ellipse closest-side at 50% 50%,rgba(0,0,0,.13),transparent 62%),
+       Strength and placement are separate knobs, and they pull in opposite
+       directions here: the hue is back to roughly the strength the app's own
+       pill carries (corner R-G 24 against its 22), but it only survives the
+       outer 32% of the diagonal instead of the outer 46%, and the middle is
+       sunk under a wider, deeper ellipse. Softer colour, further out, darker
+       through the centre. */
+    radial-gradient(ellipse closest-side at 50% 50%,rgba(0,0,0,.30),transparent 74%),
     /* the white sheen, which is what washes the hue out of the top-middle */
     linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,.127) 25%,
       rgba(255,255,255,.05) 50%,rgba(255,255,255,.075) 75%,rgba(0,0,0,.12)),
