@@ -1487,121 +1487,22 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     <p>For building and testing it I pulled tracks off Spotify as files through <a href="https://spotdown.org" target="_blank" rel="noreferrer">spotdown.org<span class="nav-rule" aria-hidden="true"></span></a>, which is also the honest answer to how a beginner gets audio into an app like this at all.</p>
   </div>
 
-  <div class="stack rv d2">
-    <p>Split, duplicate, delete, speed and drag are the whole editing language. Naming them was easy. Deciding how they <em>behave</em> took two days and was the hardest design work in the project.</p>
-  </div>
-
-  <figure class="device rv d2">
-    <video preload="none" data-src="art/clip-menu.mp4" poster="art/clip-menu-poster.jpg" autoplay muted loop playsinline
-           aria-label="A clip on the Mixr timeline: selected, showing the Split, Speed, Duplicate and Delete actions, then split into pieces, then one piece lifted and dragged to a new position on the lane."></video>
-    <figcaption>Split, Speed, Duplicate, Delete &mdash; the whole editing language, on the clip itself. Then the split, and the drag that follows it.</figcaption>
-  </figure>
-
-
-  <div class="demo rv d2">
-    <p class="sub">Drop into a clip body</p>
-    <ol class="sb">
-      <li>
-        <div class="sb-stage">
-          <span class="sb-clip" style="--c:var(--mx-pitch);left:6%;width:40%"><i></i></span>
-          <span class="sb-clip" style="--c:var(--mx-echo);left:58%;width:32%"><i></i></span>
-        </div>
-        <b>01 &middot; Resting</b><i class="cap">Two clips, one lane.</i>
-      </li>
-      <li>
-        <div class="sb-stage">
-          <span class="sb-clip" style="--c:var(--mx-pitch);left:6%;width:40%"><i></i></span>
-          <span class="sb-clip lift" style="--c:var(--mx-echo);left:22%;width:32%"><i></i></span>
-        </div>
-        <b>02 &middot; Lifted</b><i class="cap">Detaches, scales 1.04, follows the cursor.</i>
-      </li>
-      <li>
-        <div class="sb-stage">
-          <span class="sb-clip" style="--c:var(--mx-pitch);left:6%;width:40%"><i></i></span>
-          <span class="sb-cut" style="left:26%"></span>
-          <span class="sb-clip lift" style="--c:var(--mx-echo);left:22%;width:32%"><i></i></span>
-        </div>
-        <b>03 &middot; Split previewed</b><i class="cap">The destination shows where it will cut.</i>
-      </li>
-      <li>
-        <div class="sb-stage">
-          <span class="sb-clip" style="--c:var(--mx-pitch);left:6%;width:18%"><i></i></span>
-          <span class="sb-clip" style="--c:var(--mx-echo);left:25%;width:32%"><i></i></span>
-          <span class="sb-clip" style="--c:var(--mx-pitch);left:58%;width:22%"><i></i></span>
-        </div>
-        <b>04 &middot; Sandwiched</b><i class="cap">Destination splits; the clip lands between both halves.</i>
-      </li>
-    </ol>
-    <p class="foot">Drop a clip into the body of another and Mixr splits the destination and inserts between the halves, rather than shoving it aside. Video editors have done this for years &mdash; but they make you choose it first, with a modifier for insert and a plain drag for overwrite. Here there is no mode to pick.</p>
-  </div>
-
   <div class="dec rv d2">
-    <h3 style="margin-top:36px">Hold a modifier, or infer it from where you let go?</h3>
-    <p>Premiere and Final Cut both do the insert edit, and both make you ask for it &mdash; a modifier held during the drag switches between overwrite and insert. It is precise, it is teachable, and it is a mode.</p>
-    <p>Rejected: the modifier. A beginner does not know the mode exists, so they never find the behavior; and on a touch screen there is no key to hold in the first place.</p>
-    <div class="flag">
-      <p>Chosen: the drop position <em>is</em> the choice. Let go over a clip&rsquo;s edge and it snaps flush; let go over its middle and it cuts in. Nothing to hold, nothing to learn &mdash; the two intentions already live in two different places on screen.</p>
-    </div>
+    <h3>Drag-and-drop was not as simple as a drag and drop.</h3>
+    <p>Split, duplicate, delete, speed and drag are the whole editing language. Naming them was easy. Deciding how they <em>behave</em> took two days and was the hardest design work in the project. Drop a clip onto another and there are two things you could mean &mdash; push it aside, or cut in &mdash; and video editors make you say which with a modifier held down during the drag. A beginner does not know the mode exists, and on a touch screen there is no key to hold. So the drop position is the choice: let go over a clip&rsquo;s edge and it snaps flush, let go over its middle and it cuts in.</p>
   </div>
-
-  <div class="stack rv d2">
-    <p>That only works if the reading of &ldquo;where you let go&rdquo; is never surprising. Predictability comes from resolving the drop in a fixed order rather than from one clever rule. The pointer is tested against five cases in priority, and the first that matches wins.</p>
-  </div>
-
-  <ol class="ladder rv d2">
-    <li><b>Ghost restore</b><span>Released within the snap zone of where it started &mdash; put it back, ripple nothing.</span></li>
-    <li><b>Edge snap</b><span>Inside a neighbor&rsquo;s 10&nbsp;pt edge zone &mdash; snap flush before or after it.</span></li>
-    <li><b>Literal gap</b><span>Leading edge landed in empty space &mdash; leave it exactly where it was let go.</span></li>
-    <li class="pick"><b>Insert into body</b><span>Pointer inside a clip, past its edge zones &mdash; split there and sandwich.</span></li>
-    <li><b>Free placement</b><span>Anything else &mdash; place it and let the lane reflow.</span></li>
-  </ol>
 
   <div class="demo rv d2">
     <div class="rowlab">
-      <span class="demo-title">Try the five rules</span>
-      <span class="hint">DRAG A CLIP &middot; OR TAB AND USE ARROW KEYS</span>
+      <span class="demo-title">Clip Actions</span>
+      <span class="hint">SPLIT &middot; SPEED &middot; DUPLICATE &middot; DELETE</span>
     </div>
-    <div class="tl" id="tl">
-      <div class="tl-lane" id="tl-lane">
-        <span class="tl-cut" id="tl-cut"></span>
-      </div>
-    </div>
-    <div class="tl-readout">
-      <span class="tl-rule" data-rule="ghost">Ghost restore</span>
-      <span class="tl-rule" data-rule="snap">Edge snap</span>
-      <span class="tl-rule" data-rule="gap">Literal gap</span>
-      <span class="tl-rule" data-rule="insert">Insert into body</span>
-      <span class="tl-rule" data-rule="free">Free placement</span>
-      <button type="button" class="tl-reset" id="tl-reset">Reset lane</button>
-    </div>
-    <p class="tl-nums" id="tl-nums" role="status" aria-live="polite">Pick up a clip to see which rule resolves.</p>
-    <p class="foot">This is not an animation of the behavior &mdash; it is the behavior. <code>resolveClipDrop</code> is ported line for line out of <code>MixrTimeline.swift</code>, including the priority order, the hysteresis that stops the result flickering between two rules mid-drag, and the <code>minClipLengthUnits</code> clamp that stops a split leaving a two-unit sliver. Constants are the shipped ones: a 10&nbsp;pt snap zone, 8&nbsp;pt of hysteresis, 20&nbsp;pt of neighbor shift, 0.28 ghost opacity, a 1.05 lift. The hatched bands are the edge zones, drawn only while you are dragging.</p>
-    <p class="foot" style="margin-top:12px">The one thing to try: pick up the blue clip and let go over the <em>middle</em> of the purple one. Then do it again, but let go near the purple clip&rsquo;s left edge. Same gesture, two different intentions, and you never told the app which one you meant.</p>
+    <figure class="device">
+      <video preload="none" data-src="art/clip-menu.mp4" poster="art/clip-menu-poster.jpg" autoplay muted loop playsinline
+             aria-label="A clip on the Mixr timeline: selected, showing the Split, Speed, Duplicate and Delete actions, then split into pieces, then one piece lifted and dragged to a new position on the lane."></video>
+    </figure>
+    <p class="foot">Split, Speed, Duplicate, Delete &mdash; the whole editing language, on the clip itself. Then the split, and the drag that follows it.</p>
   </div>
-
-  <div class="stack rv d2">
-    <p>The preview is the contract: whatever the neighbors animate to while you are dragging is exactly what happens when you let go.</p>
-    <p>The timeline is only honest if the sound follows it. Splitting a clip splits its audio; undo restores both. Otherwise the two drift apart and the app starts lying to you.</p>
-  </div>
-
-  <figure class="rv d2">
-    <svg class="dg dgflow" viewBox="0 0 760 132" role="img"
-         aria-label="Audio path: a timeline clip carries clip settings into a player node, through an effect chain, into the mixer, and out.">
-      <text class="mi" x="24" y="24">ONE CLIP, END TO END</text>
-      <g class="fx" style="--d:0"><rect class="bx" x="24" y="52" width="118" height="48"/><text class="lb" x="83" y="81" text-anchor="middle">Timeline clip</text></g>
-      <path class="ln fx-line" style="--d:.3" d="M142 76H166"/>
-      <g class="fx" style="--d:.5"><rect class="bx" x="174" y="52" width="112" height="48"/><text class="lb" x="230" y="81" text-anchor="middle">Clip settings</text></g>
-      <path class="ln fx-line" style="--d:.75" d="M286 76H310"/>
-      <g class="fx" style="--d:.95"><rect class="bx" x="318" y="52" width="106" height="48"/><text class="lb" x="371" y="81" text-anchor="middle">Player node</text></g>
-      <path class="ln fx-line" style="--d:1.2" d="M424 76H448"/>
-      <g class="fx" style="--d:1.4"><rect class="bx pick" x="456" y="52" width="112" height="48"/><text class="lb ac" x="512" y="81" text-anchor="middle">Effect chain</text></g>
-      <path class="ln fx-line" style="--d:1.65" d="M568 76H592"/>
-      <g class="fx" style="--d:1.85"><rect class="bx" x="600" y="52" width="74" height="48"/><text class="lb" x="637" y="81" text-anchor="middle">Mixer</text></g>
-      <path class="ln fx-line" style="--d:2.1" d="M674 76H700"/>
-      <g class="fx" style="--d:2.3"><path class="tick" d="M708 76 700 72 700 80Z"/><text class="lb ac" x="716" y="81">Out</text></g>
-    </svg>
-    <figcaption>Track volume lives at the mixer; per-clip effects live before it. Keeping them on separate stages is what lets you turn a track down without undoing the echo you put on one clip of it.</figcaption>
-  </figure>
 </section>
 
 <!-- 04 -->
@@ -1708,15 +1609,12 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   </div>
 
   <div class="demo rv d2">
-    <div class="rowlab">
-      <span class="demo-title">Effects Tray</span>
-      <span class="hint">THE SAME CARDS RUNNING IN THE APP</span>
-    </div>
+    <p class="sub">Each effect gets its own slider and/or preset option</p>
     <figure class="device">
       <video preload="none" data-src="art/effect-tray.mp4" poster="art/effect-tray-poster.jpg" autoplay muted loop playsinline
              aria-label="Effect cards opening in Mixr, one after another: Reverb with Small Room, Hall and Ambient presets, Echo with Classic, Ping Pong and Reverse, Pitch with Pitch Up and Down, then Flanger and Blur which are slider-only. Each card lights and a tray grows beside it."></video>
     </figure>
-    <p class="foot">Recorded on simulator device. Each effect gets its own slider and/or preset option.</p>
+    <p class="foot">Recorded on simulator device.</p>
   </div>
 
   <div class="demo rv d2">
@@ -1799,55 +1697,6 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     </div>
   </div>
 
-
-  <div class="dec rv d2">
-    <h3 style="margin-top:36px">Matching the brand.</h3>
-    <p>The sound-effects menu started as a ChatGPT recreation, and it was a good starting point &mdash; the grid, the durations under the names, the icon-over-label stack all survived. What did not survive was the finish. Every tile glowed the same hard white, and white is not a color this app owns.</p>
-    <p>Rejected: the white version. It looks premium in isolation and it belongs to nothing. Drop it back into the app and it is the only surface not speaking the same language as the effect cards, the waveforms and the transport.</p>
-
-    <div class="demo" style="margin-top:20px">
-      <p class="sub">Where it started &mdash; the ChatGPT recreation</p>
-      <figure><img src="art/sfx-og.webp" alt="The first sound-effects menu: six cards in a three-by-two grid, each with a hard white glowing border and a white icon, over a dark blurred timeline." loading="lazy"></figure>
-      <p class="foot">Uniform white glow on all six, at full strength, on every edge.</p>
-
-      <p class="sub" style="margin-top:30px">Where it landed &mdash; rebuilt here from <code>SFXComponents.swift</code></p>
-      <div class="sfx" role="img" aria-label="The shipped sound-effects menu: Riser, Downlifter, Impact, Crash, Snare Build and Clap Fill, each on charcoal-indigo glass with a pearl icon tile and a lavender duration.">
-        <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
-          <defs><linearGradient id="pearl" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#F8F5FF"/><stop offset="1" stop-color="#E6DCFF"/>
-          </linearGradient></defs>
-        </svg>
-        <div class="sfx-card">
-          <span class="sfx-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20a1 1 0 0 1-1-1V4a1 1 0 0 1 2 0v13.2l4.6-5.5a1 1 0 0 1 1.42-.12l3.2 2.67 5.1-6.12-2.1-.05a1 1 0 0 1 .05-2l4.7.12a1 1 0 0 1 .97 1.02l-.12 4.7a1 1 0 1 1-2-.05l.05-2.1-5.72 6.86a1 1 0 0 1-1.41.13l-3.2-2.67L4.8 19H21a1 1 0 0 1 0 2z"/></svg></span>
-          <span class="sfx-label"><b>Riser</b><span>4s</span></span>
-        </div>
-        <div class="sfx-card">
-          <span class="sfx-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20a1 1 0 0 1-1-1V4a1 1 0 0 1 2 0v13.2l4.6-5.5a1 1 0 0 1 1.42-.12l3.2 2.67L18.4 8l-.9 1.9a1 1 0 0 1-1.85-.72l1.9-4.3a1 1 0 0 1 1.31-.5l4.3 1.9a1 1 0 1 1-.81 1.83l-1.9-.84-4.9 7.36a1 1 0 0 1-1.44.24l-3.2-2.67L4.8 19H21a1 1 0 0 1 0 2z"/></svg></span>
-          <span class="sfx-label"><b>Downlifter</b><span>2s</span></span>
-        </div>
-        <div class="sfx-card">
-          <span class="sfx-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.8l2.1 4.6 4.6-1.6-1.6 4.6 4.6 2.1-4.6 2.1 1.6 4.6-4.6-1.6L12 21.2l-2.1-4.6-4.6 1.6 1.6-4.6L2.3 11.5l4.6-2.1-1.6-4.6 4.6 1.6z"/></svg></span>
-          <span class="sfx-label"><b>Impact</b><span>1s</span></span>
-        </div>
-        <div class="sfx-card">
-          <span class="sfx-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.6 2.2a.5.5 0 0 1 .87.46l-1.9 6.14h4.6a.5.5 0 0 1 .38.83l-8.2 12.2a.5.5 0 0 1-.87-.46l1.9-6.14H5.8a.5.5 0 0 1-.39-.83z"/></svg></span>
-          <span class="sfx-label"><b>Crash</b><span>1s</span></span>
-        </div>
-        <div class="sfx-card">
-          <span class="sfx-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.9 5.2a1 1 0 0 0-1.8 0L5 17.4H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2h-2zM7.24 17.4 12 7.9l4.76 9.5z"/></svg></span>
-          <span class="sfx-label"><b>Snare Build</b><span>4s</span></span>
-        </div>
-        <div class="sfx-card">
-          <span class="sfx-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.4 11.2 6.9 7.7a1.4 1.4 0 0 1 2-2l3.5 3.5zM8.2 13.4l-4-1.1a1.4 1.4 0 0 1 .74-2.7l4 1.07zm5.6-5.6-1.1-4a1.4 1.4 0 0 1 2.7-.74l1.07 4zm3 9.9a5.6 5.6 0 0 1-7.92 0l-3.1-3.1a1.4 1.4 0 0 1 2-2l1.5 1.5-4.3-4.3a1.4 1.4 0 0 1 2-2l4.3 4.3-1.2-1.2a1.4 1.4 0 0 1 2-2l4.72 4.72a3.9 3.9 0 0 1 0 3.98z"/></svg></span>
-          <span class="sfx-label"><b>Clap Fill</b><span>2s</span></span>
-        </div>
-      </div>
-      <p class="foot">Not a screenshot &mdash; a rebuild at the shipped pt sizes, so a 200&times;138 card here is a 200&times;138 card on device. Charcoal-indigo glass (<code>#1B1F2E</code> &rarr; <code>#101421</code>), a 0.85px white rim at .16, a pearl icon ramp (<code>#F8F5FF</code> &rarr; <code>#E6DCFF</code>) carrying a tight white core glow at 2.8 and a pearl bloom at 6, and the duration in <code>sfxMenuLavender</code> <code>#C9B9F4</code> at .88. The white is still there &mdash; it just moved into the icon, where it reads as light rather than as a color choice, and everything around it went lavender to match the rest of the app.</p>
-    </div>
-
-    <div class="flag">
-      <p>Chosen: the same charcoal-indigo glass the effect cards use, with the pearl tile as the only bright object. A component can be beautiful and still be wrong, and the test is not how it looks on its own &mdash; it is whether you can tell it belongs to this app with the label covered up.</p>
-    </div>
 
     <div class="demo" style="margin-top:20px">
       <div class="rowlab">
