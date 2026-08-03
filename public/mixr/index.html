@@ -1241,7 +1241,12 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 .fold[aria-expanded="false"] .chev{transform:rotate(180deg)}
 .fold:hover .chev{fill:#fff}
 .fold:focus-visible{outline:2px solid #f2f0ec;outline-offset:4px;border-radius:4px}
-.fold[aria-expanded="false"] + .hint{opacity:.55}
+/* Collapsed, the panel shows its white heading and nothing else — the same
+   thing App Icon Options shows, which carries no hint at all. Dimming the hint
+   still left a line of grey under a closed panel and made the two folds look
+   like different components. display:none rather than visibility, so it does
+   not hold a gap either. */
+.fold[aria-expanded="false"] + .hint{display:none}
 /* Collapsed state hides the body outright rather than animating its height —
    the panel contains lazily-loaded images whose height is not known up front,
    so a height transition would either jump or need measuring on every open. */
