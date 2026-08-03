@@ -27,17 +27,17 @@ OUT = os.path.abspath(OUT)
 TILT = 6.0        # degrees counter-clockwise. Enough to read as deliberate at
                   # 16px; past ~8 the spine stops looking upright and it reads
                   # as a mistake rather than as pizzazz.
-PAD = 0.13        # breathing room around the artwork, as a fraction of the
+PAD = 0.05        # breathing room around the artwork, as a fraction of the
                   # square, so the corners are not flush against the tab edge.
-                  # Also the budget the nudge below spends: at 0.10 the
-                  # downward nudge ate the whole bottom margin and the book sat
-                  # flush on the tab's baseline.
+                  # Also the budget the nudge below spends. Kept tight so the
+                  # book fills the tab: the square is portrait artwork in a
+                  # square frame, so most of the slack is horizontal anyway.
 
 # Nudge off centre, as a fraction of the square. A tab favicon sits left of the
 # title with the close button to its right, so a mathematically centred mark
 # reads as sitting high and left in that context. Positive = right / down.
-OFF_X = 0.050
-OFF_Y = 0.022
+OFF_X = 0.085
+OFF_Y = 0.012
 
 # Named for what they are. The punch-p-* and punch-holes-* files in this
 # directory are different marks and must not be overwritten — punch-holes-
