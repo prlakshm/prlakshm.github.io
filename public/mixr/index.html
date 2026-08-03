@@ -270,6 +270,11 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
    would otherwise run together as one wall. */
 .dec p + p{margin-top:14px}
 .dec h3 + p{margin-top:12px}
+/* Those two margins space a .dec that lays itself out with margins. A .stack is
+   a flex column with its own 16px gap, so on a block that is BOTH they add to
+   it rather than replacing it — 16 + 12 gave the run-in under those headings
+   12px more than every other heading on the page. Let the gap own it. */
+.stack.dec > * + *{margin-top:0}
 .dec .form{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:1px;
   background:var(--rule);border:1px solid var(--rule);margin-top:18px}
 .dec .form div{background:var(--ground);padding:13px 14px;display:flex;flex-direction:column;gap:5px}
@@ -692,6 +697,10 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   font-variant-numeric:tabular-nums;text-align:right}
 .demo .sub{margin:0 0 12px;font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.12em;
   text-transform:uppercase;color:#a6a6b0}
+/* A .sub that introduces something you can actually use, rather than captioning
+   a figure. White, matching .demo-title — the grey is for captions that sit
+   under a still, and reads as secondary next to a live control. */
+.demo .sub--live{color:#fff}
 
 /* ---- recreated: the beats segmented control ---- */
 /* DurationOption.label(isSelected:) returns "1 Beat" / "4 Beats" when chosen and
@@ -1243,6 +1252,102 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   .sfx-card{width:100%}
 }
 
+/* ---- the live drag-and-drop lane ---------------------------------------
+   Geometry and paint are WaveformStyle / TLK. The clip body is the app's four
+   layers, not a flat tint: glassClipNavy, a colour wash top-left to
+   bottom-right, a top-down darkening, then the rim. The old single 22% fill is
+   what made it read dull. */
+.tt{margin-top:16px;border-radius:10px;position:relative;
+  background:linear-gradient(180deg,#080B16,#050816);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+.tt-head{display:flex;align-items:center;justify-content:flex-end;
+  padding:10px 12px 0}
+.tt-scroll{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;
+  -ms-overflow-style:none;border-radius:0 0 10px 10px;padding-bottom:12px;
+  touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.tt-scroll::-webkit-scrollbar{display:none}
+.tt-lane{position:relative;height:88px;width:var(--lane-w)}
+.tt-lane::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(90deg,rgba(42,49,66,.62) 1px,transparent 1px);
+  background-size:calc(100% / 16) 100%}
+.tt-zone{position:absolute;top:0;bottom:0;pointer-events:none;opacity:0;
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.10) 0 3px,transparent 3px 6px);
+  transition:opacity .18s ease}
+.tt.is-drag .tt-zone{opacity:1}
+/* The clip body, layer for layer. */
+.tt-clip{position:absolute;top:20px;height:48px;border-radius:10px;cursor:grab;
+  background:
+    linear-gradient(180deg,rgba(0,0,0,.18),transparent 46%,rgba(0,0,0,.08)),
+    linear-gradient(135deg,color-mix(in srgb,var(--c) 34%,transparent),
+                           color-mix(in srgb,var(--c) 10%,transparent)),
+    linear-gradient(#0B1020,#0B1020);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 48%,transparent);
+  transition:left .38s cubic-bezier(.32,.72,.24,1),width .38s cubic-bezier(.32,.72,.24,1),
+             transform .22s cubic-bezier(.32,.72,.24,1),opacity .22s ease}
+.tt-clip .wave{position:absolute;inset:0;display:block;overflow:hidden;border-radius:inherit}
+.tt-clip .wave svg{display:block;width:100%;height:100%}
+/* Lifted OUT of the lane and following the pointer. left/width stop animating
+   while it is held, or the clip lags a frame behind the cursor. */
+.tt-clip.is-moving{cursor:grabbing;z-index:6;transform:translateY(-14px) scale(1.06) rotate(-.4deg);
+  transition:transform .18s cubic-bezier(.32,.72,.24,1);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 92%,transparent),
+             0 10px 18px rgba(0,0,0,.6),
+             0 0 22px color-mix(in srgb,var(--c) 36%,transparent)}
+.tt-clip:focus-visible{outline:2px solid #f2f0ec;outline-offset:3px}
+.tt-cut{position:absolute;top:16px;bottom:16px;width:2px;opacity:0;
+  background:rgba(255,255,255,.92);pointer-events:none;
+  box-shadow:0 0 10px rgba(255,255,255,.55);transition:opacity .16s ease}
+.tt-cut.on{opacity:1}
+/* Where it will land. The moving clip is off following the cursor, so without
+   this nothing on the lane says what the drop will actually do — which is the
+   contract this interaction is supposed to keep. */
+.tt-ghost{position:absolute;top:20px;height:48px;border-radius:10px;opacity:0;
+  pointer-events:none;z-index:2;
+  border:1px dashed color-mix(in srgb,var(--c) 62%,transparent);
+  background:color-mix(in srgb,var(--c) 9%,transparent);
+  transition:left .16s cubic-bezier(.32,.72,.24,1),width .16s ease,opacity .14s ease}
+.tt.is-drag .tt-ghost{opacity:1}
+/* Transition handles, as on a real clip edge. Inert on purpose — this widget is
+   about the drop resolution, and a live transition control here would promise
+   an editor the page does not contain. */
+.tt-dot{position:absolute;top:50%;width:11px;height:11px;margin-top:-5.5px;
+  border-radius:50%;pointer-events:none;z-index:4;
+  background:radial-gradient(circle at 34% 30%,#fff,color-mix(in srgb,var(--c) 72%,#fff) 62%,
+    color-mix(in srgb,var(--c) 88%,#000) 100%);
+  box-shadow:0 0 0 1px rgba(0,0,0,.34),0 1px 3px rgba(0,0,0,.5),
+             0 0 9px color-mix(in srgb,var(--c) 46%,transparent)}
+.tt-clip.is-moving .tt-dot{opacity:.35}
+/* Reset — TLTransitionSettingsSegmentedControl's selected pill, drawn round and
+   carrying the track's own pink as trackColor: a white glass ramp, the hue at
+   .13 / .07 through it, a rim that turns pink at the third stop, three stacked
+   shadows. */
+.tt-reset{appearance:none;border:0;cursor:pointer;border-radius:999px;
+  padding:6px 18px;font-family:var(--fm);font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:#f2f0ec;position:relative;isolation:isolate;
+  /* The hue runs at .26 / .15 here, not the pill's .13 / .07. The pill sits in
+     a recessed dark track that already reads pink around it; this button sits
+     on bare panel, so the same numbers came out grey. Matched to the pill by
+     eye, not by copying its percentages. */
+  background:
+    linear-gradient(160deg,color-mix(in srgb,var(--c) 26%,transparent),
+                           color-mix(in srgb,var(--c) 8%,transparent) 52%,
+                           color-mix(in srgb,var(--c) 15%,transparent)),
+    linear-gradient(160deg,rgba(255,255,255,.16),rgba(255,255,255,.085) 28%,
+                           rgba(255,255,255,.03) 58%,rgba(255,255,255,.045) 78%,
+                           rgba(0,0,0,.12));
+  box-shadow:0 .5px 1.2px rgba(0,0,0,.24),0 1.5px 2.5px rgba(0,0,0,.32),
+             0 2.5px 4.5px rgba(0,0,0,.15);
+  transition:transform .16s ease,filter .2s ease}
+.tt-reset::before{content:"";position:absolute;inset:0;border-radius:inherit;
+  padding:.5px;pointer-events:none;
+  background:linear-gradient(160deg,rgba(255,255,255,.42),rgba(255,255,255,.24) 34%,
+    color-mix(in srgb,var(--c) 46%,transparent) 66%,color-mix(in srgb,var(--c) 22%,transparent));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude}
+.tt-reset:hover{filter:brightness(1.18)}
+.tt-reset:active{transform:scale(.97)}
+.tt-reset:focus-visible{outline:2px solid #f2f0ec;outline-offset:3px}
+
 /* ---- collapsible demo panel ---------------------------------------------- */
 /* The title itself is the control, so the whole thing reads as one affordance
    rather than a heading with a stray arrow parked next to it. */
@@ -1506,7 +1611,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 <!-- 03 -->
 <section id="behavior">
   <div class="sechead rv"><p class="lab">03 &mdash; Behavior</p>
-    <h2>Three pivotal points in defining behavior.</h2></div>
+    <h2>Making it feel familiar.</h2></div>
 
   <div class="stack rv d1">
     <h3>Trying not to get sued.</h3>
@@ -1515,9 +1620,8 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
   <div class="dec rv d2">
     <h3>Drag-and-drop is not as simple as a drag and drop.</h3>
-    <p>Split, speed, duplicate, and delete are the toolbar actions. That plus drag-and-drop are the editing language.</p>
     <p>Deciding how drag-and-drop behaves took two days and was the hardest design work in the project.</p>
-    <p>I took inspiration from Premiere Pro (thank you, competitive research). When a clip is dropped in the middle of another, it splits the existing clip and gets sandwiched inside. When it&rsquo;s dropped towards the start or end, it snaps to the edge and the timeline shifts accordingly.</p>
+    <p>I took inspiration from Premiere Pro (thank you, competitive research). When a clip is dropped in the middle, it splits the existing clip and gets sandwiched inside. When it&rsquo;s dropped within 10px of the start or end, it snaps to the edge.</p>
   </div>
 
   <div class="demo rv d2">
@@ -1530,7 +1634,22 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
              aria-label="A clip on the Mixr timeline: selected, showing the Split, Speed, Duplicate and Delete actions, then split into pieces, then one piece lifted and dragged to a new position on the lane."></video>
     </figure>
     <p class="foot">Recorded on simulator device.</p>
+
+    <p class="sub sub--live" style="margin-top:24px">Try it yourself &mdash; drag &middot; drop</p>
+    <div class="tt" id="tt" style="--c:var(--mx-pitch)">
+      <div class="tt-head">
+        <button type="button" class="tt-reset" id="tt-reset">Reset</button>
+      </div>
+      <div class="tt-scroll" id="tt-scroll">
+        <div class="tt-lane" id="tt-lane">
+          <i class="tt-ghost" id="tt-ghost" aria-hidden="true"></i>
+          <i class="tt-cut" id="tt-cut" aria-hidden="true"></i>
+        </div>
+      </div>
+    </div>
+    <p class="foot">Rebuilt in CSS from <code>MixrTimeline.swift</code>.</p>
   </div>
+
 </section>
 
 <!-- 04 -->
@@ -1631,7 +1750,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     <p class="foot">Rebuilt in CSS from <code>EffectCard.swift</code>. &ldquo;Auto&rdquo; gets stronger coloring to recommend it as a starting point.</p>
   </div>
 
-  <div class="stack rv d1">
+  <div class="stack dec rv d1">
     <h3>Optical alignment over mathematical, always.</h3>
     <p>Each card gets a different glow strength, because darker colors appear dimmer and I wanted visual cohesion. Icons in the clip-editing toolbar get different sizes and vertical offsets because their shapes carry different visual weight.</p>
   </div>
@@ -1725,36 +1844,14 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     </div>
   </div>
 
+  <div class="stack dec rv d1">
+    <h3>Color has meaning.</h3>
+    <p>Every track gets a color. The same color follows across the waveform, volume slider, transition settings, and segmented control.</p>
+  </div>
 
-  <div class="demo rv d2">
-      <div class="rowlab">
-        <button type="button" class="fold" id="icons-fold" aria-expanded="false" aria-controls="icons-body">
-          <span class="demo-title">App Icon Options</span>
-          <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.3 8.6a1 1 0 0 1 1.4 0L12 13.9l5.3-5.3a1 1 0 1 1 1.4 1.42l-6 6a1 1 0 0 1-1.4 0l-6-6a1 1 0 0 1 0-1.42z"/></svg>
-        </button>
-      </div>
-      <div id="icons-body" data-folded="true">
-      <ul class="icons">
-        <li class="pick">
-          <figure><img src="art/icon-simple.webp" alt="Icon option two: the waveform mark alone, glowing purple on a dark glass tile." loading="lazy"></figure>
-          <b>Simple</b>
-          <i>Purple waveform on glass tile.</i>
-          <span class="v">Chosen</span>
-        </li>
-        <li>
-          <figure><img src="art/icon-disco.webp" alt="Icon option one: the waveform mark inside an iridescent soap-bubble sphere, on near-black." loading="lazy"></figure>
-          <b>Disco</b>
-          <i>Inspired by Spotify&rsquo;s disco takeover.</i>
-          <span class="v">Rejected</span>
-        </li>
-        <li>
-          <figure><img src="art/icon-controller.webp" alt="Icon option three: a DJ controller with a jog wheel, two knobs, a play button and a crossfader, the waveform mark on the platter." loading="lazy"></figure>
-          <b>DJ controller</b>
-          <i>Inspired by <a href="https://recent.design/i/v9qpcdh-frig-app-icon" target="_blank" rel="noreferrer">Frig<span class="nav-rule" aria-hidden="true"></span></a>&rsquo;s utility app icon. </i>
-          <span class="v">Rejected</span>
-        </li>
-      </ul>
-      </div>
+  <div class="stack dec rv d1">
+    <h3>Music uses beats, not seconds.</h3>
+    <p>Video editors measure time in seconds. Music follows tempo, so Mixr measures transitions in beats. A four-beat crossfade transition stays consistent even when the song&rsquo;s BPM changes.</p>
   </div>
 </section>
 
@@ -2667,6 +2764,320 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     } else {
       lazyVids.forEach(attach);          // no observer: just load them
     }
+  }
+
+  /* ======================================================================
+     Try it Yourself — the drag-and-drop lane, live.
+     resolveDrop below is MixrTimeline.resolveClipDrop: the same five-case
+     priority ladder, the same hysteresis, the same min-length clamp. Constants
+     are the shipped ones (TimelineScreen.swift): totalUnits 130, a 10pt snap
+     zone, 8pt of hysteresis, minClipLengthUnits 2, and for the auto-scroll
+     clipDragScrollZone 120px / clipDragScrollSpeed 10px per frame.
+     ==================================================================== */
+  var tt = document.getElementById("tt");
+  if(tt){
+    var TT_UNITS = 130, TT_SNAP_PT = 10, TT_HYST_PT = 8,
+        TT_MIN = 2, TT_EPS = 0.001,
+        TT_SCROLL_ZONE = 120, TT_SCROLL_SPEED = 10,
+        TT_OVER = 1.20;                    // lane = 120% of the visible track
+
+    /* The three segments, measured off clip-menu.mp4: the splits land at
+       0.295 and 0.514 of the visible lane. Clip three runs past the right
+       edge there, and it does here too — that is what you scroll to reach. */
+    var TT_START = [
+      { id:"a", start:0,     len:38.30 },
+      { id:"b", start:38.30, len:28.53 },
+      { id:"c", start:66.83, len:63.17 }
+    ];
+    var ttClips = TT_START.map(function(c){ return Object.assign({}, c); });
+
+    var ttScroll = document.getElementById("tt-scroll"),
+        ttLane   = document.getElementById("tt-lane"),
+        ttCut    = document.getElementById("tt-cut"),
+        ttReset  = document.getElementById("tt-reset"),
+        ttGhost  = document.getElementById("tt-ghost"),
+        ttNodes  = {}, ttZones = [];
+
+    /* The whole track is 120% of the viewport: all three segments are visible
+       as they are in the recording, with the last running 20% past the right
+       edge — which is the only thing there is to scroll to. */
+    function ttSizeLane(){
+      var w = Math.max(320, Math.round(ttScroll.clientWidth * TT_OVER));
+      ttLane.style.setProperty("--lane-w", w + "px");
+      return w;
+    }
+    function ttLaneW(){ return ttLane.getBoundingClientRect().width || ttSizeLane(); }
+    function ttPct(u){ return (u / TT_UNITS) * 100 + "%"; }
+    function ttSnapU(){ return (TT_SNAP_PT / ttLaneW()) * TT_UNITS; }
+    function ttHystU(){ return (TT_HYST_PT / ttLaneW()) * TT_UNITS; }
+
+    /* ---- the port ---------------------------------------------------- */
+    function ttBestSnap(kind, pointerUnit, others, zone){
+      var best = null;
+      others.forEach(function(c){
+        if(c.len <= TT_EPS) return;
+        var edge = kind === "before" ? c.start : c.start + c.len;
+        var d = Math.abs(pointerUnit - edge);
+        if(d > zone + TT_EPS) return;
+        if(!best || d < best.d - TT_EPS) best = { clip:c, d:d };
+      });
+      return best && best.clip;
+    }
+    function ttInsertTarget(pointerUnit, others, zone){
+      for(var i = 0; i < others.length; i++){
+        var c = others[i];
+        if(c.len <= TT_MIN * 2 + TT_EPS) continue;
+        if(pointerUnit > c.start + zone + TT_EPS &&
+           pointerUnit < c.start + c.len - zone - TT_EPS) return c;
+      }
+      return null;
+    }
+    function ttResolve(o){
+      // Hysteresis first, or the result strobes between two rules on a boundary.
+      if(o.prev && o.prevPointer != null &&
+         Math.abs(o.pointerUnit - o.prevPointer) < o.hyst) return o.prev;
+      var moving = ttClips.filter(function(c){ return c.id === o.id; })[0];
+      if(!moving) return { rule:"free", start:Math.max(0, o.rawStart) };
+      var others = ttClips.filter(function(c){ return c.id !== o.id; });
+
+      if(o.originalStart != null &&
+         Math.abs(o.rawStart - o.originalStart) <= o.snap + TT_EPS)
+        return { rule:"ghost", start:o.originalStart };
+
+      var before = ttBestSnap("before", o.pointerUnit, others, o.snap);
+      if(before){
+        var prefixEnd = others.reduce(function(m, c){
+          return (c.id !== before.id && c.start < before.start - TT_EPS)
+            ? Math.max(m, c.start + c.len) : m; }, 0);
+        return { rule:"snap", start:Math.max(0, Math.max(prefixEnd, before.start - moving.len)) };
+      }
+      var after = ttBestSnap("after", o.pointerUnit, others, o.snap);
+      if(after) return { rule:"snap", start:Math.max(0, after.start + after.len) };
+
+      var clamped = Math.max(0, o.rawStart);
+      var inClip = others.some(function(c){
+        return clamped > c.start + TT_EPS && clamped < c.start + c.len - TT_EPS; });
+      if(!inClip) return { rule:"gap", start:clamped };
+
+      var target = ttInsertTarget(o.pointerUnit, others, o.snap);
+      if(target){
+        var lo = target.start + TT_MIN, hi = target.start + target.len - TT_MIN,
+            cut = Math.min(Math.max(o.pointerUnit, lo), hi);
+        return { rule:"insert", start:cut, targetId:target.id, splitUnit:cut };
+      }
+      return { rule:"free", start:clamped };
+    }
+
+    /* ---- render ------------------------------------------------------ */
+    function ttBuild(){
+      [].slice.call(ttLane.querySelectorAll(".tt-clip,.tt-zone")).forEach(function(n){ n.remove(); });
+      ttNodes = {}; ttZones = [];
+      ttClips.forEach(function(c){
+        var el = document.createElement("div");
+        el.className = "tt-clip"; el.tabIndex = 0;
+        el.style.setProperty("--c", "var(--mx-pitch)");
+        el.dataset.id = c.id;
+        el.setAttribute("role", "button");
+        el.setAttribute("aria-label", "Timeline segment. Drag to move it.");
+        /* Transition handles on both edges. Inert: no listener, pointer-events
+           off in CSS — they say "a transition can live here", nothing more. */
+        el.innerHTML = '<span class="wave"></span>' +
+          '<i class="tt-dot" style="left:-5.5px"></i>' +
+          '<i class="tt-dot" style="right:-5.5px"></i>';
+        ttLane.appendChild(el);
+        ttNodes[c.id] = el;
+        ["l","r"].forEach(function(side){
+          var z = document.createElement("i");
+          z.className = "tt-zone"; ttLane.appendChild(z);
+          ttZones.push({ el:z, id:c.id, side:side });
+        });
+      });
+      ttLayout();
+    }
+    function ttLayout(){
+      ttClips.forEach(function(c){
+        var el = ttNodes[c.id]; if(!el) return;
+        el.style.left = ttPct(c.start); el.style.width = ttPct(c.len);
+      });
+      var zu = ttSnapU();
+      ttZones.forEach(function(z){
+        var c = ttClips.filter(function(k){ return k.id === z.id; })[0];
+        if(!c){ z.el.style.width = "0"; return; }
+        z.el.style.left  = ttPct(z.side === "l" ? c.start : c.start + c.len - zu);
+        z.el.style.width = ttPct(zu);
+      });
+      [].slice.call(ttLane.querySelectorAll(".wave")).forEach(ttWave);
+    }
+    /* The waveform is a FILLED MIRRORED SILHOUETTE — WaveformSilhouettePath in
+       WaveformStyle.swift — not a bar pattern. Built at the clip's real pixel
+       width so the 8pt inner padding stays a true pt value. */
+    function ttWave(el){
+      var clip = el.parentElement;
+      var W = Math.round(clip.getBoundingClientRect().width);
+      var H = Math.round(clip.getBoundingClientRect().height);
+      if(W < 6 || H < 6) return;
+      if(el.dataset.w === String(W) && el.dataset.h === String(H)) return;
+      el.dataset.w = W; el.dataset.h = H;
+      var seed = el.dataset.seed || (el.dataset.seed =
+        String(70 + clip.dataset.id.charCodeAt(0)));
+      var n = Math.max(28, Math.round(W / 2.2)), s = (+seed) >>> 0, a = [], i;
+      function rnd(){ s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }
+      for(i = 0; i < n; i++){
+        var t = i / (n - 1);
+        var env = 0.62 + 0.38 * Math.pow(Math.sin(Math.PI * t), 0.5);
+        a.push(Math.min(0.98, Math.max(0.05, env * (0.62 + 0.38 * rnd()))));
+      }
+      a = a.map(function(v, j){
+        return (a[Math.max(0, j - 1)] + v + a[Math.min(n - 1, j + 1)]) / 3; });
+      var cy = H / 2, maxHalf = (H - 8 * 2) / 2 * 0.86,
+          drawable = Math.max(1, W - 16),
+          xAt = function(k){ return 8 + drawable * k / (n - 1); };
+      var d = "M" + xAt(0).toFixed(2) + " " + (cy - maxHalf * a[0]).toFixed(2);
+      for(i = 1; i < n; i++) d += "L" + xAt(i).toFixed(2) + " " + (cy - maxHalf * a[i]).toFixed(2);
+      for(i = n - 1; i >= 0; i--) d += "L" + xAt(i).toFixed(2) + " " + (cy + maxHalf * a[i]).toFixed(2);
+      d += "Z";
+      /* The app's paint, not a flat fill. WaveformStyle fills the silhouette
+         with a TOP-TO-BOTTOM gradient peak(.94) -> base -> peak, then draws it
+         again in peak at .20 behind a 2.5pt glow of base at .38. A single flat
+         colour is exactly what made this read dull. */
+      var gid = "ttg" + (clip.dataset.id || "x");
+      el.innerHTML =
+        '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">' +
+          '<defs>' +
+            '<linearGradient id="' + gid + '" x1="0" y1="0" x2="0" y2="1">' +
+              '<stop offset="0" stop-color="#FF7FB8" stop-opacity=".94"/>' +
+              '<stop offset=".5" stop-color="#FF5FA2"/>' +
+              '<stop offset="1" stop-color="#FF7FB8"/>' +
+            '</linearGradient>' +
+            '<filter id="' + gid + 'f" x="-30%" y="-30%" width="160%" height="160%">' +
+              '<feDropShadow dx="0" dy="0" stdDeviation="2.5" ' +
+                'flood-color="#FF5FA2" flood-opacity=".38"/>' +
+            '</filter>' +
+          '</defs>' +
+          '<path d="' + d + '" fill="url(#' + gid + ')"/>' +
+          '<path d="' + d + '" fill="#FF7FB8" fill-opacity=".20" filter="url(#' + gid + 'f)"/>' +
+        '</svg>';
+    }
+
+    /* ---- drag -------------------------------------------------------- */
+    var ttDrag = null, ttRaf = 0;
+    function ttUnitAt(clientX){
+      var r = ttLane.getBoundingClientRect();
+      return ((clientX - r.left) / r.width) * TT_UNITS;
+    }
+    function ttAutoScroll(clientX){
+      var r = ttScroll.getBoundingClientRect(), dx = 0;
+      if(clientX < r.left + TT_SCROLL_ZONE)
+        dx = -TT_SCROLL_SPEED * (1 - (clientX - r.left) / TT_SCROLL_ZONE);
+      else if(clientX > r.right - TT_SCROLL_ZONE)
+        dx =  TT_SCROLL_SPEED * (1 - (r.right - clientX) / TT_SCROLL_ZONE);
+      if(dx) ttScroll.scrollLeft += dx;
+      return dx;
+    }
+    ttLane.addEventListener("pointerdown", function(e){
+      var el = e.target.closest(".tt-clip"); if(!el) return;
+      e.preventDefault();
+      var c = ttClips.filter(function(k){ return k.id === el.dataset.id; })[0];
+      if(!c) return;
+      ttDrag = { id:c.id, grab:ttUnitAt(e.clientX) - c.start,
+                 originalStart:c.start, prev:null, prevPointer:null, x:e.clientX };
+      tt.classList.add("is-drag"); el.classList.add("is-moving");
+      try { ttLane.setPointerCapture(e.pointerId); } catch(err){}
+      ttTick();
+    });
+    function ttPreview(){
+      if(!ttDrag) return;
+      var pointerUnit = ttUnitAt(ttDrag.x),
+          rawStart = pointerUnit - ttDrag.grab;
+      var res = ttResolve({ id:ttDrag.id, pointerUnit:pointerUnit, rawStart:rawStart,
+        originalStart:ttDrag.originalStart, snap:ttSnapU(), hyst:ttHystU(),
+        prev:ttDrag.prev, prevPointer:ttDrag.prevPointer });
+      ttDrag.prev = res; ttDrag.prevPointer = pointerUnit; ttDrag.res = res;
+      var el = ttNodes[ttDrag.id];
+      var moving = ttClips.filter(function(c){ return c.id === ttDrag.id; })[0];
+      /* The held clip goes where the POINTER is, not where it would land. It
+         detaches and follows anywhere — including over its neighbours — and the
+         ghost below carries the resolution. Pinning it to res.start instead was
+         what made this feel like a slider rather than something picked up. */
+      if(el) el.style.left = ttPct(Math.max(0, rawStart));
+      if(ttGhost && moving){
+        ttGhost.style.left  = ttPct(Math.max(0, res.start));
+        ttGhost.style.width = ttPct(moving.len);
+      }
+      ttCut.classList.toggle("on", res.rule === "insert");
+      if(res.rule === "insert") ttCut.style.left = ttPct(res.splitUnit);
+    }
+    function ttTick(){
+      if(!ttDrag) return;
+      ttAutoScroll(ttDrag.x);
+      ttPreview();
+      ttRaf = requestAnimationFrame(ttTick);
+    }
+    addEventListener("pointermove", function(e){
+      if(!ttDrag) return;
+      ttDrag.x = e.clientX;
+      /* Resolve here rather than waiting for the rAF loop. The loop exists for
+         the auto-scroll, which has to keep running while the pointer is still;
+         the clip itself has to track the pointer on the same frame it moved. */
+      ttPreview();
+    }, {passive:true});
+    function ttEnd(){
+      if(!ttDrag) return;
+      cancelAnimationFrame(ttRaf);
+      var res = ttDrag.res, id = ttDrag.id, el = ttNodes[id];
+      if(el){ el.classList.remove("is-moving"); }
+      tt.classList.remove("is-drag");
+      ttCut.classList.remove("on");
+      if(res && res.rule === "insert"){
+        // split the destination and sandwich the moving clip between the halves
+        var moving = ttClips.filter(function(c){ return c.id === id; })[0];
+        var t = ttClips.filter(function(c){ return c.id === res.targetId; })[0];
+        if(moving && t){
+          var leftLen = res.splitUnit - t.start, rightLen = t.len - leftLen;
+          var rest = ttClips.filter(function(c){ return c.id !== id && c.id !== t.id; });
+          var rebuilt = rest.concat([
+            { id:t.id, start:t.start, len:leftLen },
+            { id:id,  start:t.start + leftLen, len:moving.len },
+            { id:t.id + "-b", start:t.start + leftLen + moving.len, len:rightLen }
+          ]);
+          rebuilt.sort(function(x, y){ return x.start - y.start; });
+          // reflow anything after the insertion point
+          var cursor = null;
+          rebuilt.forEach(function(c){
+            if(cursor != null && c.start < cursor - TT_EPS) c.start = cursor;
+            cursor = c.start + c.len;
+          });
+          ttClips = rebuilt;
+          ttDrag = null; ttBuild(); return;
+        }
+      }
+      if(res){
+        var m = ttClips.filter(function(c){ return c.id === id; })[0];
+        if(m) m.start = Math.max(0, res.start);
+      }
+      ttDrag = null; ttLayout();
+    }
+    addEventListener("pointerup", ttEnd);
+    addEventListener("pointercancel", ttEnd);
+
+    ttReset.addEventListener("click", function(){
+      ttClips = TT_START.map(function(c){ return Object.assign({}, c); });
+      ttBuild();
+      ttScroll.scrollLeft = 0;
+    });
+    addEventListener("resize", function(){ ttSizeLane(); ttLayout(); }, {passive:true});
+    /* The block starts collapsed, so the first build happens inside a
+       display:none panel and the silhouettes cannot be drawn — they need the
+       clip's real pixel size to keep the 8pt inner padding a true pt value.
+       Redraw when the panel is opened. Watching the lane for a resize does NOT
+       work: its width is pinned to --lane-w, so it never actually changes. */
+    ttSizeLane();
+    ttBuild();
+    /* The panel is inside a reveal, so it can be measured at zero width on
+       first paint; re-size once it actually has one. */
+    if(window.ResizeObserver) new ResizeObserver(function(){
+      if(ttScroll.clientWidth > 40){ ttSizeLane(); ttLayout(); }
+    }).observe(ttScroll);
   }
 
   /* Collapsible demo panels. Generic over [class=fold] + aria-controls, so a
