@@ -81,7 +81,9 @@ function CaseStudyHBOMax2() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    document.title = "Personalized Reasons to Watch — Pranavi Ram";
+    // No per-route title: the tab reads "Pranavi's Portfolio" everywhere, and
+    // this was the one page that overrode it. A SPA route change does not reset
+    // the title on its own, so the override also stuck after navigating away.
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const reveals = Array.from(

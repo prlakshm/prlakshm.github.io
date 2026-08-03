@@ -14,7 +14,7 @@ const GEAR_PATH =
 
 const links = [
   {
-    href: "mailto:pranavi_lakshminarayanan@brown.edu",
+    href: "mailto:pranaviram@gmail.com",
     label: "Email Pranavi",
     external: false,
     viewBox: "0 0 197 157.79",
