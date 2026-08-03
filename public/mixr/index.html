@@ -294,7 +294,11 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 /* ============ dark product panels ============ */
 .demo{margin-top:26px;background:var(--max-ink);border:1px solid var(--rule);
   padding:clamp(18px,3vw,34px);overflow:hidden}
-.demo .rowlab{display:flex;align-items:baseline;gap:12px;margin-bottom:19.2px;flex-wrap:wrap}
+/* 14px, not the 12 the other case studies use. The gap is optical, not
+   mathematical: Surprise Rail sets 12px against a 37.5px title, and the same
+   12px next to this page's 30px title reads tighter. The ratio says 15; 14 is
+   what actually looked right. */
+.demo .rowlab{display:flex;align-items:baseline;gap:14px;margin-bottom:19.2px;flex-wrap:wrap}
 .demo-title{font-size:clamp(30px,4vw,44px);font-variation-settings:"wght" 640;letter-spacing:-.022em;
   line-height:1;color:#fff}
 .hint{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.13em;color:#7a7a88}
@@ -1483,13 +1487,15 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
   <div class="stack rv d1">
     <h3>Trying not to get sued.</h3>
-    <p>I considered copyright before designing anything. Mixr can&rsquo;t stream from a library and it can&rsquo;t host anyone&rsquo;s masters, so the whole thing is built around import and export: you bring your own files in, you take your remix out, and nothing lives on a server in between.</p>
-    <p>For building and testing it I pulled tracks off Spotify as files through <a href="https://spotdown.org" target="_blank" rel="noreferrer">spotdown.org<span class="nav-rule" aria-hidden="true"></span></a>, which is also the honest answer to how a beginner gets audio into an app like this at all.</p>
+    <p>I considered copyright before designing anything. Mixr can&rsquo;t stream from a library like Spotfiy, so the whole thing is built around import and export. You bring your own songs in and get your remix out.</p>
+    <p>I pulled downloaded Spotify songs as mp4 files through <a href="https://spotdown.org" target="_blank" rel="noreferrer">spotdown.org<span class="nav-rule" aria-hidden="true"></span></a>, and users can do the same.</p>
   </div>
 
   <div class="dec rv d2">
-    <h3>Drag-and-drop was not as simple as a drag and drop.</h3>
-    <p>Split, duplicate, delete, speed and drag are the whole editing language. Naming them was easy. Deciding how they <em>behave</em> took two days and was the hardest design work in the project. Drop a clip onto another and there are two things you could mean &mdash; push it aside, or cut in &mdash; and video editors make you say which with a modifier held down during the drag. A beginner does not know the mode exists, and on a touch screen there is no key to hold. So the drop position is the choice: let go over a clip&rsquo;s edge and it snaps flush, let go over its middle and it cuts in.</p>
+    <h3>Drag-and-drop is not as simple as a drag and drop.</h3>
+    <p>Split, speed, duplicate, and delete are the toolbar actions. That plus drag-and-drop are the editing language.</p>
+    <p>Deciding how drag-and-drop behaves took two days and was the hardest design work in the project.</p>
+    <p>I took inspiration from Premiere Pro (thank you, competitive research). When a clip is dropped in the middle of another, it splits the existing clip and gets sandwitched inside. When it's dropped towards the start or end, it snaps to the edge and the timeline shifts accordingly.</p>
   </div>
 
   <div class="demo rv d2">
@@ -1501,7 +1507,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       <video preload="none" data-src="art/clip-menu.mp4" poster="art/clip-menu-poster.jpg" autoplay muted loop playsinline
              aria-label="A clip on the Mixr timeline: selected, showing the Split, Speed, Duplicate and Delete actions, then split into pieces, then one piece lifted and dragged to a new position on the lane."></video>
     </figure>
-    <p class="foot">Split, Speed, Duplicate, Delete &mdash; the whole editing language, on the clip itself. Then the split, and the drag that follows it.</p>
+    <p class="foot">Recorded on simulator device.</p>
   </div>
 </section>
 
@@ -1605,7 +1611,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
   <div class="stack rv d1">
     <h3>Optical alignment over mathematical, always.</h3>
-    <p>Each card gets a different glow strength, because darker colors appear dimmer and I wanted visual cohesion.</p>
+    <p>Each card gets a different glow strength, because darker colors appear dimmer and I wanted visual cohesion. Icons in the clip-editing toolbar get different sizes and vertical offsets because their shapes carry different visual weight.</p>
   </div>
 
   <div class="demo rv d2">
@@ -1698,7 +1704,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   </div>
 
 
-    <div class="demo" style="margin-top:20px">
+  <div class="demo rv d2">
       <div class="rowlab">
         <button type="button" class="fold" id="icons-fold" aria-expanded="false" aria-controls="icons-body">
           <span class="demo-title">App Icon Options</span>
@@ -1727,8 +1733,6 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
         </li>
       </ul>
       </div>
-    </div>
-
   </div>
 </section>
 
