@@ -137,9 +137,21 @@ main::before{bottom:0}
    render darker than the second row. */
 .side .who{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.16em;text-transform:uppercase;
   line-height:21px;color:var(--brass);position:relative;isolation:isolate;width:max-content}
-.side .who::before{content:"";position:absolute;z-index:-1;inset:-8px -14px;background:var(--ground);
-  -webkit-mask-image:radial-gradient(ellipse at center,#000 64%,transparent 100%);
-  mask-image:radial-gradient(ellipse at center,#000 64%,transparent 100%);pointer-events:none}
+/* Same wash main, .jump and .prog use — half-strength ground behind a
+   two-axis linear fade — rather than the opaque radial plate this used to
+   carry. Opaque, it was the only non-card element on the page that hid the
+   paper grid outright, so the metadata read as sitting on a different surface
+   from the section list directly under it. At 50% the grid ghosts through and
+   the two match. Insets stay tight to the text: the house rule's are sized for
+   blocks far taller than these two lines. */
+.side .who::before{content:"";position:absolute;z-index:-1;inset:-8px -14px;pointer-events:none;
+  background:color-mix(in srgb,var(--ground) 50%,transparent);
+  -webkit-mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),
+                     linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);
+  -webkit-mask-composite:source-in;
+  mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),
+             linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);
+  mask-composite:intersect}
 .side .who>span{display:block;color:inherit}
 .jump{display:flex;flex-direction:column;gap:1px;border-left:1px solid var(--rule)}
 .jump a{position:relative;font-family:var(--fm);font-size:var(--fs-body);line-height:1.5;

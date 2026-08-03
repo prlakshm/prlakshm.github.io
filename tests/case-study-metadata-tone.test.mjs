@@ -15,9 +15,17 @@ for (const [name, pagePath] of pages) {
       html,
       /\.side \.who\{[^}]*position:relative;[^}]*isolation:isolate;[^}]*width:max-content/,
     );
+    // The plate carries the same wash main/.jump/.prog use — half-strength
+    // ground behind a two-axis linear fade. It used to be an opaque radial,
+    // which made the metadata the only non-card element that hid the paper
+    // grid outright and set it apart from the section list beneath it.
     assert.match(
       html,
-      /\.side \.who::before\{[^}]*background:var\(--ground\)[^}]*mask-image:radial-gradient/,
+      /\.side \.who::before\{[^}]*background:color-mix\(in srgb,var\(--ground\) 50%,transparent\)/,
+    );
+    assert.match(
+      html,
+      /\.side \.who::before\{[^}]*mask-image:linear-gradient\(to right[^}]*mask-composite:intersect/,
     );
     assert.match(html, /\.side \.who>span\{display:block;color:inherit\}/);
     assert.doesNotMatch(html, /\.side \.who>span\+span\{[^}]*font-weight:/);

@@ -109,9 +109,21 @@ main::before{bottom:0}
    render darker than the second row. */
 .side .who{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.16em;text-transform:uppercase;
   line-height:21px;color:var(--brass);position:relative;isolation:isolate;width:max-content}
-.side .who::before{content:"";position:absolute;z-index:-1;inset:-8px -14px;background:var(--ground);
-  -webkit-mask-image:radial-gradient(ellipse at center,#000 64%,transparent 100%);
-  mask-image:radial-gradient(ellipse at center,#000 64%,transparent 100%);pointer-events:none}
+/* Same wash main, .jump and .prog use — half-strength ground behind a
+   two-axis linear fade — rather than the opaque radial plate this used to
+   carry. Opaque, it was the only non-card element on the page that hid the
+   paper grid outright, so the metadata read as sitting on a different surface
+   from the section list directly under it. At 50% the grid ghosts through and
+   the two match. Insets stay tight to the text: the house rule's are sized for
+   blocks far taller than these two lines. */
+.side .who::before{content:"";position:absolute;z-index:-1;inset:-8px -14px;pointer-events:none;
+  background:color-mix(in srgb,var(--ground) 50%,transparent);
+  -webkit-mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),
+                     linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);
+  -webkit-mask-composite:source-in;
+  mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),
+             linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);
+  mask-composite:intersect}
 .side .who>span{display:block;color:inherit}
 .jump{display:flex;flex-direction:column;gap:1px;border-left:1px solid var(--rule)}
 .jump a{position:relative;font-family:var(--fm);font-size:var(--fs-body);line-height:1.5;
@@ -1424,7 +1436,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 <!-- 01 -->
 <section id="problem">
   <div class="sechead rv"><p class="lab">01 &mdash; Problem</p>
-    <h2>DJing shouldn&rsquo;t require you being a DJ.</h2></div>
+    <h2>DJing shouldn&rsquo;t require you to be a DJ.</h2></div>
 
   <div class="stack rv d1">
     <p>I wanted to learn to DJ, but I never learned music theory, played an instrument, or remixed a song. I <em>did</em> know how to code. So instead of buying a controller, I started building an app.</p>
@@ -1442,7 +1454,8 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     <h2>Choosing the right references.</h2></div>
 
   <div class="stack rv d2">
-    <p>I wanted to give beginners a familiar place to start. The reference wasn&rsquo;t DJ software. It was video editors like CapCut, Final Cut Pro, Premiere Pro, DaVinci Resolve, and GarageBand.</p>
+    <h3>More people have used video editors than DJ software.</h3>
+    <p>I wanted to give beginners a familiar place to start. The reference was video editors like CapCut, Final Cut Pro, Premiere Pro, and GarageBand.</p>
     <p>These products share a familiar interaction model: import media, arrange clips on a timeline, edit them directly, preview, and undo.</p>
   </div>
 
@@ -1465,7 +1478,8 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   </figure>
 
 
-  <div class="stack rv d1">
+  <div class="dec rv d1">
+    <h3>Asking AI for a starting point.</h3>
     <p>I started by asking ChatGPT for mocks. I find it has the best image generation capabilities and doesn&rsquo;t return UI that looks AI-generated.</p>
   </div>
 
@@ -1475,7 +1489,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   </figure>
 
   <div class="stack rv d2">
-    <p>I knew what I wanted to change. &ldquo;AI Suggestions&rdquo; was a floating button and belonged in the effects tray. It should also be called &ldquo;Auto&rdquo; like iPhone photo editing. The &ldquo;Mixr&rdquo; button on the top had no indication of what it did. It needed to go.</p>
+    <p>I knew what I wanted to change. &ldquo;AI Suggestions&rdquo; was a floating button and belonged in the effects tray. It should also be called &ldquo;Auto&rdquo; like iPhone photo editing. I had no idea what the &ldquo;Mixr&rdquo; button on the top would do, so it had to go.</p>
     <p>But the layout was right, and I never looked back. Controls on the sides, timeline in the middle, effects along the bottom. It felt intuitive because it resembled video editing software, not a DJ&rsquo;s.</p>
   </div>
 
@@ -1496,9 +1510,8 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
   <div class="stack rv d1">
     <h3>Trying not to get sued.</h3>
-    <p>I considered copyright before designing anything. Mixr can&rsquo;t stream from a library like Spotify, so the whole thing is built around import and export. You bring your own songs in and get your remix out.</p>
-    <p>I downloaded Spotify songs as mp3 files through <a href="https://spotdown.org" target="_blank" rel="noreferrer">spotdown.org<span class="nav-rule" aria-hidden="true"></span></a>, and users can do the same.</p>
-  </div>
+    <p>I considered copyright before designing anything. Mixr can&rsquo;t stream from a library like Spotify, so the whole thing is built around import and export. You bring your own songs in and save your remix out.</p>
+ </div>
 
   <div class="dec rv d2">
     <h3>Drag-and-drop is not as simple as a drag and drop.</h3>
