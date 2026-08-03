@@ -6,7 +6,7 @@ function Footer() {
       </div>
       <div className="right">
             <div className="contact">
-              <a href="mailto:pranaviram@gmail.com" target="_blank">
+              <a href="mailto:pranaviram2@gmail.com" target="_blank">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 197 157.79"
