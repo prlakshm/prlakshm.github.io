@@ -8,6 +8,13 @@ lays its Controls column out edge to edge (a bare .ignoresSafeArea on the
 screen body), which puts two of the volume sliders underneath it. Nothing in
 any frame ever reveals them.
 
+Not every clip has a slider back there. In effect-tray the project holds one
+track, whose row sits well above the cutout, so the island covers nothing but
+the Controls column's own ground — Pass B correctly reports nothing_to_do on
+all 694 frames and Pass A alone clears it. That path is the easy case and the
+honest one: the ground is a single flat colour, and the donor strips either
+side of the cutout agree on it to 0/255.
+
 What makes reconstruction legitimate rather than invention: the volumes are
 left at their import defaults, so every slider in a clip is at the SAME value.
 A visible row is therefore an exact template for a hidden one — same geometry,
@@ -52,7 +59,7 @@ import numpy as np
 W, H = 1800, 828
 FPS = 30
 
-# Island box, measured across both clips and both ends of each (±2px, which is
+# Island box, measured across every clip and both ends of each (±2px, which is
 # compression noise on the rounded edge). Verified per frame against this.
 ISL = dict(x0=1688, x1=1776, y0=280, y1=548)
 ISL_TOL = 14
@@ -72,7 +79,7 @@ DON_R0, DON_R1 = 1788, 1796
 FLAT_TOL = 46                  # max channel spread within a donor strip
 
 # The Controls list, between the bottom of the ruler and the top of the Effects
-# drawer. Both are fixed chrome in these two recordings; check_layout() asserts
+# drawer. Both are fixed chrome in these recordings; check_layout() asserts
 # that per clip rather than trusting it. A row straddling either edge is not a
 # usable donor — see whole_row().
 LIST_Y0, LIST_Y1 = 134, 586
@@ -134,7 +141,7 @@ def _pill():
     clip is both more accurate and perfectly steady.
 
     Geometry is measured, not assumed: the always-black core across every frame
-    of both clips is x 1695..1770, y 286..543, i.e. a pill of radius 38 with
+    of every clip is x 1695..1770, y 286..543, i.e. a pill of radius 38 with
     its cap centres 181px apart. PILL_PAD covers the anti-aliased rim, which
     the profiles show is 1-2px on every side.
     """
