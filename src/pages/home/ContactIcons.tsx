@@ -33,7 +33,7 @@ const links = [
     ],
   },
   {
-    href: "https://www.linkedin.com/in/prlakshm",
+    href: "https://www.linkedin.com/in/pranaviram",
     label: "Pranavi on LinkedIn",
     external: true,
     viewBox: "0 0 240 240",
