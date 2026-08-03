@@ -18,6 +18,8 @@ const API = "https://api.anthropic.com/v1/messages";
 /* Only these may call the Worker. A public portfolio endpoint that answers
    anyone is an invitation to run up a bill on someone else's key. */
 const ALLOWED_ORIGINS = [
+  "https://pranaviram.com",
+  "https://www.pranaviram.com",
   "https://pranaviln.com",
   "https://www.pranaviln.com",
   "https://prlakshm.github.io",

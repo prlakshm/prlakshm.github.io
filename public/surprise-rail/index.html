@@ -372,12 +372,34 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
    these end on a 1.55 question that needs the block to be read as separated. */
 .results-metrics{margin-top:clamp(19.2px,2.4vw,25.6px);
   padding-bottom:clamp(19.2px,2.4vw,25.6px)}
-.results-metrics .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(22px,5vw,64px)}
+/* auto-fit, not a hard repeat(2). The observed-session stats above are a
+   flex-wrap row: when the two no longer fit they drop to their own lines. This
+   grid was locked to two tracks at every width, so instead of wrapping it kept
+   dividing — and "Play After Reveal", whose equation is 343px wide against the
+   first metric's 304px, ran into its neighbour. 344px is that widest equation,
+   so the pair stays side by side while both fit and stacks the moment they
+   do not. */
+.results-metrics .stats{--metric-gap:clamp(22px,5vw,64px);
+  /* a container, so the nudge below can ask how wide THIS grid is rather than
+     how wide the window is — the two stack on their own width, not the
+     viewport's, and a media query cannot see that. */
+  container-type:inline-size;
+  display:grid;gap:var(--metric-gap);
+  grid-template-columns:repeat(auto-fit,minmax(min(344px,100%),1fr))}
 .results-metrics .result-metric{display:flex;flex-direction:column;align-items:stretch;gap:0}
 /* Second column nudged one minor grid cell left onto the next gridline. A
    transform rather than a margin: it shifts the rendered column without
-   changing the track, so the first column keeps its width and nothing reflows. */
-.results-metrics .result-metric:nth-child(2){transform:translateX(calc(-1 * var(--grid-minor)))}
+   changing the track, so the first column keeps its width and nothing reflows.
+   Two guards, because this nudge caused two different bugs. It only applies
+   while the pair is actually side by side: stacked, there is no gridline to
+   land on and the shift just pulls the lower metric 32px out of alignment with
+   the upper. And it is clamped to the gap, because --grid-minor is a flat 32px
+   while the gap clamps down to 22px — so at narrow widths the nudge was bigger
+   than the space it had to move into and walked metric two into metric one. */
+@container (min-width:752px){
+  .results-metrics .result-metric:nth-child(2){
+    transform:translateX(calc(-1 * min(var(--grid-minor), var(--metric-gap))))}
+}
 /* 16px, not the 12px the observed-session stats use between figure and label.
    Same box gap would read tighter here: the fraction's rule is a hard edge with
    no side bearing, so it crowds the word in a way a letter's ink does not. Both
@@ -592,11 +614,10 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   main{padding-top:19px}
 }
 @media (max-width:620px){
-  .two,.results-metrics .stats{grid-template-columns:1fr}
-  /* The second metric is nudged one grid cell left so it lands on a gridline
-     beside the first. Stacked, there is nothing to align to and the transform
-     just walks it off the left edge. */
-  .results-metrics .result-metric:nth-child(2){transform:none}
+  .two{grid-template-columns:1fr}
+  /* .results-metrics .stats is NOT forced to one column here any more: auto-fit
+     already stacks it the moment the pair stops fitting, which is a wider point
+     than this breakpoint and is what was letting the two overlap in between. */
 }
 @media (prefers-reduced-motion:reduce){
   .wt-nav{transition:none}
@@ -657,7 +678,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 <header class="rv">
   <p class="lab">Case study</p>
   <h1>Designing Surprise Rail for HBO Max</h1>
-  <p class="lede" style="margin-top:20px">Curiosity didn't kill the cat. It got more clicks. <br/>
+  <p class="lede" style="margin-top:20px">Curiosity didn&rsquo;t kill the cat. It got more clicks. <br/>
     Surprise Rail is a new themed rail for HBO Max, built on tiles that hide the key art and sell the title in three words. A viewer with nothing in mind now has something to be curious about.</p>
   <div class="meta">
     <div><span>Role</span><span>Product designer</span></div>
@@ -711,7 +732,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
         <li><b>5 of 7</b><span>leave without playback</span></li>
       </ul>
     </figure>
-    <p>HBO Max had plenty to watch, but viewers still struggled to choose. Key art or a synopsis alone wasn't enough.  There needed to be a better reason to get users to stop scrolling.</p>
+    <p>HBO Max had plenty to watch, but viewers still struggled to choose. Key art or a synopsis alone wasn&rsquo;t enough. There needed to be a better reason to get users to stop scrolling.</p>
   </div>
   
 </section>
@@ -721,7 +742,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   <div class="sechead rv"><p class="lab">02 &mdash; Insights</p>
     <h2>Surprise works because there is the potential for something great.</h2></div>
   <div class="stack rv d1">
-    <p>I was walking through the Strand bookstore and saw a new display table: Blind Date with a Book. You don't get the cover, but you get clues that let you say yes or no. I thought, &ldquo;What if I could apply this idea to a rail?&rdquo;</p>
+    <p>I was walking through the Strand bookstore and saw a new display table: Blind Date with a Book. You don&rsquo;t get the cover, but you get clues that let you say yes or no. I thought, &ldquo;What if I could apply this idea to a rail?&rdquo;</p>
   </div>
   <figure class="book-ref rv d2" style="max-width:320px">
     <img src="art/blind-date-book-transparent.png" alt="A hardback wrapped in kraft paper, tied with twine and a red wax seal, hand-lettered Blind Date with a Book with the clues mystery, thriller, suspense and crime" loading="lazy">
@@ -738,7 +759,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
     <figure class="proto-match">
       <img src="art/film-reel.jpg" alt="Home page with film-strip tiles scattered one per row across Recent Releases, Art-House Gems and Global Indie" loading="lazy">
     </figure>
-    <p>Rejected: Testing showed it broke people's mental model. They couldn't tell why titles were hidden. A skip-level review flagged the film-reel motif as overdone and not premium enough for HBO Max.</p>
+    <p>Rejected: Testing showed it broke people&rsquo;s mental model. They couldn&rsquo;t tell why titles were hidden. A skip-level review flagged the film-reel motif as overdone and not premium enough for HBO Max.</p>
     <div class="flag rv d2">
       <p>Chosen: One dedicated rail. One pattern to learn. Rest of browse stays familiar.</p>
     </div>
@@ -751,7 +772,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
     </figure>
     <p>Rejected: Solid black. It was boring and gave no clue that anything was hidden.</p>
     <div class="flag rv d2">
-      <p>Chosen: Frosted glass. Cause ya' gotta tease a little. <br/>
+      <p>Chosen: Frosted glass. Cause ya&rsquo; gotta tease a little. <br/>
         Testers could tell there was a title underneath. It was visually intriguing and borrowed design language of the HBO Max glass. </p>
     </div>
     <section class="tile-breakdown" aria-labelledby="tile-breakdown-title">
@@ -788,7 +809,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   <div class="stack rv d1">
     <p>AI generates clues from three inputs: title metadata, the subpage it appears, and a copy guide with writing rules.</p>
     <p>AI makes the idea scalable. Instead of writing every variation by hand, the system generates context-specific clues across the catalog.</p>
-    <p>The secret sauce is that the subpage indicates what the user wants. If the user is on the Comedy page, they want comedic themes. I adapted clues based on the user's intent at time of browsing.</p>
+    <p>The secret sauce is that the subpage indicates what the user wants. If the user is on the Comedy page, they want comedic themes. I adapted clues based on the user&rsquo;s intent at time of browsing.</p>
 
   </div>
   <div class="flag rv d2">
@@ -860,7 +881,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
     <h2>Testing killed the idea I liked.</h2></div>
   <div class="stack rv d1">
     <p>Only titles within the subpage category can get recommended. I changed the rail heading based on the subpage so users know to expect something different.</p>
-    <p>"Blind Date with a [theme]" was a name I was attched to. It landed with 18&ndash;25s, but was minunderstood by older viewers. They read it literally and expected a movie with dating invloved.</p>
+    <p>&ldquo;Blind Date with a [theme]&rdquo; was a name I was attached to. It landed with 18&ndash;25s, but was misunderstood by older viewers. They read it literally and expected a movie with dating involved.</p>
   </div>
   <div class="two rv d2">
     <figure class="shot">
@@ -885,9 +906,9 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
       </div>
     </figure>
   </div>
-  <p>Rejected: "Blind Date with a [theme]." It didn't land for all ages. It overran the title's fixed width and took up two lines, which was atypical in the app.</p>
+  <p>Rejected: &ldquo;Blind Date with a [theme].&rdquo; It didn&rsquo;t land for all ages. It overran the title&rsquo;s fixed width and took up two lines, which was atypical in the app.</p>
   <div class="flag rv d2">
-    <p>Chosen: "Surprise [theme]." Short and sweet. If you were on the Home page, you would see this as a general "Surprise For Me" rail.</p>
+    <p>Chosen: &ldquo;Surprise [theme].&rdquo; Short and sweet. If you were on the Home page, you would see this as a general &ldquo;Surprise For Me&rdquo; rail.</p>
   </div>
 </section>
 
@@ -896,7 +917,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   <div class="sechead rv"><p class="lab">06 &mdash; Results</p>
     <h2>Not shipped. Still measurable.</h2></div>
   <div class="stack rv d1">
-    <p>Designed across TV, desktop, and mobile. The concept was tested and presented to product, but it wasn't picked up. If it was shipped, here are the metrics I would measure:</p>
+    <p>Designed across TV, desktop, and mobile. The concept was tested and presented to product, but it wasn&rsquo;t picked up. If it was shipped, here are the metrics I would measure:</p>
   </div>
   <figure class="findings results-metrics rv d2">
     <ul class="stats">
@@ -923,7 +944,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
     </ul>
   </figure>
   <div class="stack rv d2">
-    <p>I'd work with engineering to collect data for both events. Then with product to determine if we should keep the rail, modify it, or retire it.</p>
+    <p>I&rsquo;d work with engineering to collect data for both events. Then with product to determine if we should keep the rail, modify it, or retire it.</p>
   </div>
   <div class="flag rv d2">
     <p>The Surprise Rail started as an idea. Research shaped it into a scalable, page-aware system that turned indecision into curiosity and curiosity into clicks.</p>

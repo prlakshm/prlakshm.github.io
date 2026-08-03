@@ -1415,7 +1415,17 @@
 
 @media (max-width: 1439px) {
   .jr {
-    width: min(var(--jw), 25vw);
+    /* Scaled by a factor the whole row shares, never capped per book. A cap
+       like min(--jw, 40vw) is hit by the widest book first, so Mixr shrank on
+       its own while the other two sat at full size and the row lost its
+       proportions. --jscale is set in steps below and multiplies every book by
+       the same amount, so they only ever grow smaller together.
+       The books trim their transparent margins out of the layout (see .jr), so
+       three at natural size occupy about 898px of an 1152px row — they fit far
+       below where the old 25vw clamp began shrinking them, which took Mixr from
+       480px to 320px here and 256px by 1024 for space that was never
+       contested. */
+    width: calc(var(--jw) * var(--jscale, 1));
     --splay: 0.78;
   }
   .jr-stage {
@@ -1470,6 +1480,21 @@
     width: auto;
     height: auto;
     aspect-ratio: var(--ar, 0.5);
+  }
+}
+
+/* One scale for the row. The three-across range runs down to the wrap at
+   1023px; above 1240 there is room for full size, and the two steps below it
+   buy back gap rather than shrinking any single book to fit. */
+@media (max-width: 1240px) {
+  .shelf-row {
+    --jscale: 0.94;
+  }
+}
+
+@media (max-width: 1120px) {
+  .shelf-row {
+    --jscale: 0.88;
   }
 }
 

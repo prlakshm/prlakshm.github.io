@@ -43,8 +43,9 @@ angle per draft is the fix.
 
 ## Guardrails
 
-- **Origin allowlist** — `pranaviln.com`, `prlakshm.github.io`, localhost. A
-  public endpoint that answers anyone is a way to run up a bill on your key.
+- **Origin allowlist** — `pranaviram.com`, the legacy `pranaviln.com` domain,
+  `prlakshm.github.io`, and localhost. A public endpoint that answers anyone is
+  a way to run up a bill on your key.
 - **Rate limit** — 12 requests per IP per minute, in-isolate. A speed bump; the
   real ceilings are the title cap and the `max_tokens` on each call.
 - **Input clamping** — titles are capped at 12 × 80 characters and stripped of
