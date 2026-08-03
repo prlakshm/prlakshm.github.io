@@ -27,8 +27,17 @@ OUT = os.path.abspath(OUT)
 TILT = 6.0        # degrees counter-clockwise. Enough to read as deliberate at
                   # 16px; past ~8 the spine stops looking upright and it reads
                   # as a mistake rather than as pizzazz.
-PAD = 0.06        # breathing room around the artwork, as a fraction of the
+PAD = 0.13        # breathing room around the artwork, as a fraction of the
                   # square, so the corners are not flush against the tab edge.
+                  # Also the budget the nudge below spends: at 0.10 the
+                  # downward nudge ate the whole bottom margin and the book sat
+                  # flush on the tab's baseline.
+
+# Nudge off centre, as a fraction of the square. A tab favicon sits left of the
+# title with the close button to its right, so a mathematically centred mark
+# reads as sitting high and left in that context. Positive = right / down.
+OFF_X = 0.050
+OFF_Y = 0.022
 
 # Named for what they are. The punch-p-* and punch-holes-* files in this
 # directory are different marks and must not be overwritten — punch-holes-
@@ -47,12 +56,15 @@ def main():
 
     side = int(round(max(im.size) * (1 + PAD * 2)))
     square = Image.new("RGBA", (side, side), (0, 0, 0, 0))
-    square.paste(im, ((side - im.width) // 2, (side - im.height) // 2), im)
+    x = (side - im.width) // 2 + int(round(side * OFF_X))
+    y = (side - im.height) // 2 + int(round(side * OFF_Y))
+    square.paste(im, (x, y), im)
 
     os.makedirs(OUT, exist_ok=True)
     master = os.path.join(OUT, "notebook-favicon-master.png")
     square.save(master)
-    print(f"  master {square.size[0]}x{square.size[1]}  tilt {TILT}deg CCW")
+    print(f"  master {square.size[0]}x{square.size[1]}  tilt {TILT}deg CCW"
+          f"  nudge +{OFF_X:.3f}x +{OFF_Y:.3f}y")
 
     for name, px in SIZES.items():
         square.resize((px, px), Image.LANCZOS).save(os.path.join(OUT, name))
