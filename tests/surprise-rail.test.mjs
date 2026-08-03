@@ -14,7 +14,10 @@ test("keeps Home and Next past the content edge without shrinking reading progre
   assert.doesNotMatch(progressMarkup, /NEXT|class="next"/);
   assert.match(progressMarkup, /<span>READ<\/span>[\s\S]*class="track"[\s\S]*id="pct"/);
   assert.match(html, /<a class="case-home" href="\/"[^>]*>\s*HOME[\s\S]*class="next-arrow"/);
-  assert.match(html, /<a class="case-next" href="\/"[^>]*>\s*NEXT/);
+  // NEXT carries the reader on to the next notebook in the landing page's own
+  // order (01 Surprise Rail -> 02 Mixr). It used to point at "/", which just
+  // repeated HOME beside it.
+  assert.match(html, /<a class="case-next" href="\/mixr\/"[^>]*>\s*NEXT/);
   assert.match(html, /main\{position:relative;/);
   assert.match(html, /\.case-actions\{position:absolute;right:calc\(-1 \* var\(--gutter\)\);/);
   assert.match(html, /\.case-actions\{[^}]*flex-direction:column;[^}]*gap:calc\(var\(--grid-minor\) - var\(--case-link-h\)\)/);
