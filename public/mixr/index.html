@@ -152,6 +152,11 @@ section{margin-top:clamp(16px,calc(9vw - 48px),84px);
   scroll-margin-top:calc(var(--nav-height) + 28px)}
 .sechead{display:flex;flex-direction:column;gap:11px;margin-bottom:22px}
 .stack{display:flex;flex-direction:column;gap:16px}
+/* The optical-alignment point sits right under the effects-cards prototype and
+   was flush against it — .dec gets margin-top:30px in that position, .stack got
+   nothing. Scoped to .fx-demo rather than every .demo on purpose: the other
+   place this pattern occurs (section 03) is spaced the way it is deliberately. */
+.fx-demo + .stack{margin-top:30px}
 
 /* reveals */
 .rv{opacity:0;transform:translateY(16px);
@@ -341,42 +346,83 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
    Per-effect multipliers are the Swift's: EffectUnselectedGlow (--un),
    EffectSelectedGlow (--sel), EffectRimGlow (--rim). */
-/* --k is 1: the card's children (tile, title, knob, tray) are all expressed as
-   pt * --k, and 1:1 is the point of this pass. Raise it only to zoom the whole
-   component uniformly — never to fix one element. */
-.fx-rail{--k:1;display:flex;gap:12px;overflow-x:auto;padding:16px 10px 20px;
-  scrollbar-width:none;-ms-overflow-style:none;scroll-behavior:smooth}
+/* --k zooms the whole card uniformly. EVERY dimension inside it is written as
+   pt * --k — the shell, the tile, the type, the three bubbles, the marble, the
+   glow radii and the blur radii — so raising it enlarges the component without
+   changing a single proportion. 1.4 on desktop, back to device scale on a
+   phone. Never raise it to fix one element. */
+.fx-rail{display:flex;gap:calc(12px * var(--k));overflow-x:auto;
+  padding:calc(16px * var(--k)) calc(10px * var(--k)) calc(20px * var(--k));
+  /* The rail needs side padding so a card's spill glow has somewhere to paint
+     instead of being clipped by overflow — but that padding also pushed the
+     first card 14px right of the panel title. Pulling the rail back by exactly
+     its own padding keeps the room and lands Auto's left edge on the title. */
+  margin-left:calc(-10px * var(--k));
+  scrollbar-width:none;-ms-overflow-style:none;scroll-behavior:smooth;
+  /* touch-action:pan-x hands vertical swipes back to the page, so a thumb
+     travelling down the article does not get caught by the rail. */
+  overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;
+  cursor:grab;touch-action:pan-x;
+  /* Tabbing scrolls with scrollIntoView, which moves the MINIMUM distance and
+     so parks the focused card flush against the edge — clipping its 2px focus
+     ring and the glow it throws sideways. This is the gutter scrollIntoView
+     leaves — just past the ring (2px outline + 3px offset = 5px), so the card
+     clears the edge without the rail lurching. Sizing it to clear the FULL 34px
+     spill overshot badly. */
+  scroll-padding-inline:calc(7px * var(--k))}
 .fx-rail::-webkit-scrollbar{display:none}
+/* scroll-behavior goes AUTO while dragging: smooth scrolling animates toward a
+   target, and a drag sets a new target every pointermove, so the rail would lag
+   behind the cursor. */
+.fx-rail.is-dragging{cursor:grabbing;scroll-behavior:auto;user-select:none}
+.fx-rail.is-dragging .ec{cursor:grabbing}
 
-.ec{--g:var(--un);
+/* Idle values. Every one of these is a product of the Swift's own multipliers,
+   which are per-effect on purpose — the yellow and red cards are pulled back at
+   rest because those hues read brightest, and Auto is pushed up because it is
+   the one card standing for all six. Selection swaps the whole set at once, so
+   a press lights the tile, the bubbles, the rim and the spill together. */
+.ec{--g:var(--gt);                  /* GlassIconTile glowScale               */
+    --ig:var(--igm);                /* EffectIconGlow on the symbol bloom     */
   position:relative;flex:0 0 auto;display:flex;align-items:flex-start;
-  width:152px;height:66px;border-radius:11px;
-  padding:9px 0 0 10px;                     /* inset 10, top inset-1 */
+  width:calc(152px * var(--k));height:calc(66px * var(--k));
+  border-radius:calc(11px * var(--k));
+  padding:calc(9px * var(--k)) 0 0 calc(10px * var(--k));   /* inset 10, top inset-1 */
   cursor:pointer;isolation:isolate;border:0;background:none;
   transition:filter .16s ease}
+.ec[aria-pressed="true"]{--g:var(--gts);--ig:1}
+/* The lighting boost has to be resolved on the bubbles themselves: --lb is an
+   inline value on each one (intensity x EffectUnselectedGlow), so a calc on the
+   button has nothing to read. Resting drops to .82 of it, exactly as the Swift
+   does; selection swaps in the effect's own selected boost instead. */
+.ec-blob,.ec-orb{--L:calc(.82 * var(--lb))}
+.ec[aria-pressed="true"] .ec-blob,
+.ec[aria-pressed="true"] .ec-orb{--L:var(--lbs)}
 .ec:focus-visible{outline:2px solid #f2f0ec;outline-offset:3px}
 
 /* EffectCardSpillGlow — the "glow reflects onto neighbouring cards" layer.
    Deliberately OUTSIDE the card's bounds (w+48 x h+18, blur 11) and not
    clipped, which is the whole point: it lands on the cards either side. */
 .ec::before{content:"";position:absolute;z-index:0;pointer-events:none;
-  left:-24px;right:-24px;top:-9px;bottom:-9px;border-radius:19px;
-  background:radial-gradient(circle 92px at 52% 60%,
+  left:calc(-24px * var(--k));right:calc(-24px * var(--k));
+  top:calc(-9px * var(--k));bottom:calc(-9px * var(--k));
+  border-radius:calc(19px * var(--k));
+  background:radial-gradient(circle calc(92px * var(--k)) at 52% 60%,
     color-mix(in srgb,var(--c) calc(15.4% * var(--spill,0)),transparent),
     color-mix(in srgb,var(--c) calc(6.1% * var(--spill,0)),transparent) 55%,
     transparent 78%);
-  filter:blur(11px);transition:background .16s ease}
-.ec[aria-pressed="true"]{--spill:calc(1 * var(--sel))}
+  filter:blur(calc(11px * var(--k)));transition:background .16s ease}
+.ec[aria-pressed="true"]{--spill:var(--sp)}
 
 /* EffectCardGlassBackground + cardBloom, in SwiftUI's overlay order. */
 .ec::after{content:"";position:absolute;inset:0;z-index:0;border-radius:inherit;
   pointer-events:none;
   background:
     /* cardBloom — radial at UnitPoint(.78,.48), endRadius 90 */
-    radial-gradient(circle 90px at 78% 48%,
+    radial-gradient(circle calc(90px * var(--k)) at 78% 48%,
       color-mix(in srgb,var(--c) calc(4.5% * var(--g)),transparent),transparent 74%),
     /* white .045 -> clear at (.18,.04), endRadius 82 */
-    radial-gradient(circle 82px at 18% 4%,rgba(255,255,255,.045),transparent 72%),
+    radial-gradient(circle calc(82px * var(--k)) at 18% 4%,rgba(255,255,255,.045),transparent 72%),
     /* effect colour, bottomLeading -> topTrailing */
     linear-gradient(to top right,
       color-mix(in srgb,var(--c) calc(3.5% * var(--un)),transparent),transparent 62%),
@@ -390,9 +436,9 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
 .ec[aria-pressed="true"]::after{
   background:
-    radial-gradient(circle 90px at 78% 48%,
-      color-mix(in srgb,var(--c) calc(10% * var(--sel)),transparent),transparent 74%),
-    radial-gradient(circle 82px at 18% 4%,rgba(255,255,255,.045),transparent 72%),
+    radial-gradient(circle calc(90px * var(--k)) at 78% 48%,
+      color-mix(in srgb,var(--c) calc(var(--blo) * 1%),transparent),transparent 74%),
+    radial-gradient(circle calc(82px * var(--k)) at 18% 4%,rgba(255,255,255,.045),transparent 72%),
     linear-gradient(to top right,color-mix(in srgb,var(--c) 10%,transparent),transparent 62%),
     linear-gradient(to bottom,rgba(255,255,255,.075),rgba(255,255,255,.016) 48%,rgba(0,0,0,.18)),
     linear-gradient(rgba(5,7,13,.56),rgba(5,7,13,.56));
@@ -405,15 +451,15 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
    post is about, and it is the reason no two corners look the same. */
 .ec.is-auto::after{
   background:
-    radial-gradient(circle 86px at 26% 24%,rgba(167,139,250,calc(.225 * var(--ab,1))),
+    radial-gradient(circle calc(86px * var(--k)) at 26% 24%,rgba(167,139,250,calc(.225 * var(--ab,1))),
       rgba(167,139,250,calc(.062 * var(--ab,1))) 46%,transparent 72%),
-    radial-gradient(circle 76px at 18% 96%,rgba(255,95,162,calc(.225 * var(--ab,1))),
+    radial-gradient(circle calc(76px * var(--k)) at 18% 96%,rgba(255,95,162,calc(.225 * var(--ab,1))),
       rgba(255,95,162,calc(.056 * var(--ab,1))) 46%,transparent 72%),
-    radial-gradient(circle 68px at 92% 92%,rgba(234,179,8,calc(.16 * var(--ab,1))),
+    radial-gradient(circle calc(68px * var(--k)) at 92% 92%,rgba(234,179,8,calc(.16 * var(--ab,1))),
       rgba(234,179,8,calc(.040 * var(--ab,1))) 46%,transparent 72%),
-    radial-gradient(circle 82px at 96% 14%,rgba(56,189,248,calc(.19 * var(--ab,1))),
+    radial-gradient(circle calc(82px * var(--k)) at 96% 14%,rgba(56,189,248,calc(.19 * var(--ab,1))),
       rgba(56,189,248,calc(.050 * var(--ab,1))) 46%,transparent 72%),
-    radial-gradient(circle 72px at 15% 4%,rgba(255,255,255,.045),transparent 70%),
+    radial-gradient(circle calc(72px * var(--k)) at 15% 4%,rgba(255,255,255,.045),transparent 70%),
     linear-gradient(to bottom left,rgba(56,189,248,.045),transparent 50%,rgba(255,95,162,.050)),
     linear-gradient(to bottom right,rgba(255,255,255,.075),rgba(167,139,250,.020) 50%,rgba(0,0,0,.10)),
     linear-gradient(rgba(5,7,13,.34),rgba(5,7,13,.34));
@@ -423,13 +469,12 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
 /* The two card shadows, both on the element itself. */
 .ec{filter:drop-shadow(0 2px 6px rgba(0,0,0,.32))
-           drop-shadow(0 0 calc(5px * var(--g)) color-mix(in srgb,var(--c) calc(7% * var(--g)),transparent))}
+           drop-shadow(0 0 5px color-mix(in srgb,var(--c) calc(7% * var(--un)),transparent))}
+.ec.is-auto{filter:drop-shadow(0 2px 6px rgba(0,0,0,.32))
+           drop-shadow(0 0 5px color-mix(in srgb,var(--c) calc(8% * var(--un)),transparent))}
 .ec[aria-pressed="true"]{
   filter:drop-shadow(0 2px 6px rgba(0,0,0,.32))
-         drop-shadow(0 0 calc(11px * var(--sel)) color-mix(in srgb,var(--c) calc(26.4% * var(--sel)),transparent))}
-.ec.is-auto[aria-pressed="true"]{
-  filter:drop-shadow(0 2px 6px rgba(0,0,0,.32))
-         drop-shadow(0 0 calc(15px * var(--sel)) color-mix(in srgb,var(--c) calc(46% * var(--sel)),transparent))}
+         drop-shadow(0 0 calc(var(--shr) * 1px) color-mix(in srgb,var(--c) calc(var(--sho) * 1%),transparent))}
 
 .ec > *{position:relative;z-index:1}
 /* ---- the card's light: blob, orb, dot ------------------------------------
@@ -441,19 +486,22 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
    not decoration. --lb is intensity x EffectUnselectedGlow. */
 .ec-blob,.ec-orb,.ec-dot{position:absolute;border-radius:50%;pointer-events:none;
   transform:translate(-50%,-50%);z-index:0}
-.ec-blob{width:var(--s);height:var(--s);left:var(--x);top:var(--y);filter:blur(2.4px);
+.ec-blob{width:calc(var(--s) * var(--k));height:calc(var(--s) * var(--k));
+  left:var(--x);top:var(--y);filter:blur(calc(2.4px * var(--k)));
   background:radial-gradient(circle at 50% 50%,
-    rgba(255,255,255,calc(.055 * var(--lb))) 0%,
-    color-mix(in srgb,var(--c) calc(26% * var(--lb)),transparent) 38%,
-    color-mix(in srgb,var(--c) calc(8% * var(--lb)),transparent) 68%,
+    rgba(255,255,255,calc(.055 * var(--L))) 0%,
+    color-mix(in srgb,var(--c) calc(26% * var(--L)),transparent) 38%,
+    color-mix(in srgb,var(--c) calc(8% * var(--L)),transparent) 68%,
     transparent 100%)}
-.ec-orb{width:var(--s);height:var(--s);left:var(--x);top:var(--y);filter:blur(.55px);
+.ec-orb{width:calc(var(--s) * var(--k));height:calc(var(--s) * var(--k));
+  left:var(--x);top:var(--y);filter:blur(calc(.55px * var(--k)));
   background:radial-gradient(circle at 50% 50%,
-    rgba(255,255,255,calc(.18 * var(--lb))) 0%,
-    color-mix(in srgb,var(--c) calc(50% * var(--lb)),transparent) 42%,
-    color-mix(in srgb,var(--c) calc(14% * var(--lb)),transparent) 74%,
+    rgba(255,255,255,calc(.18 * var(--L))) 0%,
+    color-mix(in srgb,var(--c) calc(50% * var(--L)),transparent) 42%,
+    color-mix(in srgb,var(--c) calc(14% * var(--L)),transparent) 74%,
     transparent 100%)}
-.ec-dot{width:var(--s);height:var(--s);left:var(--x);top:var(--y);
+.ec-dot{width:calc(var(--s) * var(--k));height:calc(var(--s) * var(--k));
+  left:var(--x);top:var(--y);
   background:radial-gradient(circle at 42% 38%,rgba(255,255,255,.75),
     color-mix(in srgb,var(--c) 62%,transparent) 70%,transparent);
   box-shadow:0 0 2.5px color-mix(in srgb,var(--c) 55%,transparent)}
@@ -462,7 +510,8 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
    All three cluster bottom-right: bubble and arc share a centre at
    (w-17, h-16), the marble sits at (w-24, h-15). reflectionArcSize 28,
    glassBubbleSize 13. */
-.ec-glass{position:absolute;width:28px;height:28px;right:3px;bottom:2px;border-radius:50%;
+.ec-glass{position:absolute;width:calc(28px * var(--k));height:calc(28px * var(--k));
+  right:calc(3px * var(--k));bottom:calc(2px * var(--k));border-radius:50%;
   pointer-events:none;z-index:1;
   background:rgba(255,255,255,.018);
   box-shadow:0 1px 2px rgba(0,0,0,.30)}
@@ -487,108 +536,125 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
 /* GlassMarble — a lit sphere, not a flat dot: dark rim, radial body off-centre
    at (.45,.40), a 0.6px white stroke, and a sharp 3.1px specular up-left. */
-.ec-marble{position:absolute;width:13px;height:13px;right:17px;bottom:9px;
+.ec-marble{position:absolute;width:calc(13px * var(--k));height:calc(13px * var(--k));
+  right:calc(17px * var(--k));bottom:calc(9px * var(--k));
   border-radius:50%;pointer-events:none;z-index:2;
   background:radial-gradient(circle at 45% 40%,
     rgba(255,255,255,.98) 0%,rgba(255,255,255,.88) 55%,rgba(255,255,255,.78) 100%);
   box-shadow:0 0 0 .6px rgba(255,255,255,.55),
              0 1.5px 3px rgba(0,0,0,.50),
              0 0 .8px 1.5px rgba(0,0,0,.52)}
-.ec-marble::after{content:"";position:absolute;width:3.1px;height:3.1px;border-radius:50%;
-  left:calc(50% - 2.6px - 1.55px);top:calc(50% - 2.6px - 1.55px);
+.ec-marble::after{content:"";position:absolute;border-radius:50%;
+  width:calc(3.1px * var(--k));height:calc(3.1px * var(--k));
+  left:calc(50% - (2.6px + 1.55px) * var(--k));top:calc(50% - (2.6px + 1.55px) * var(--k));
   background:#fff;filter:blur(.3px)}
 /* backdrop-filter samples what is painted behind it. Against flat black there
    is nothing to sample and the glass reads identical to a solid card, so the
    panel carries the app's own ambient wash (MixrColors.glassAmbientPurple). */
-.fx-demo{position:relative;isolation:isolate}
+.fx-demo{--k:1.4;position:relative;isolation:isolate}
+/* The recording sits the same distance below the "Rebuilt in CSS" line as the
+   cards sit above it: the rail's own bottom padding plus the foot's margin.
+   Written as the sum rather than a fixed number so it stays matched when --k
+   changes and the rail's padding grows with it. */
+.fx-demo > figure{margin:calc(20px * var(--k) + 16px) 0 0}
 .fx-demo::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
   background:
     radial-gradient(120% 90% at 12% 0%,rgba(139,92,246,.16),transparent 62%),
     radial-gradient(90% 80% at 88% 108%,rgba(14,165,233,.10),transparent 60%)}
 .fx-demo > *{position:relative;z-index:1}
 
-/* ── control tray ── EffectControlTray.swift.
-   height matches the card, width is 190 slider-only / 236 with presets, and the
-   whole grow runs at expandAnimationDuration 0.682s. */
-.ec-tray{flex:0 0 auto;align-self:center;
-  width:0;height:calc(66px * var(--k));overflow:hidden;
-  border-radius:calc(11px * var(--k));
-  background:rgba(5,8,16,.30);
-  -webkit-backdrop-filter:blur(24px) saturate(180%);
-  backdrop-filter:blur(24px) saturate(180%);
-  border:.5px solid transparent;
-  transition:width .682s cubic-bezier(.42,0,.58,1),
-             margin-left .682s cubic-bezier(.42,0,.58,1),
-             border-color .3s ease;
-  margin-left:0}
-/* The 190/236 in EffectTrayMetrics are, per their own comment, the "fallback
-   width for previews / compact contexts" — the real tray is .frame(maxWidth:
-   .infinity) and fills whatever the panel has left after the focused card. JS
-   sets --tw to that measured leftover; the fallback is only the floor. */
-.ec-tray.open{width:max(calc(var(--tw) * var(--k)),var(--fill,0px));margin-left:12px;
-  /* strokeBorder(effect.color.opacity(0.30), lineWidth: 0.6) — the rim is the
-     effect's own hue, not a neutral white like the cards. */
-  border-color:color-mix(in srgb,var(--c) 30%,transparent);
-  box-shadow:0 2px 6px rgba(0,0,0,.32),
-             0 0 9px color-mix(in srgb,var(--c) 14%,transparent)}
-.ec-tray .inner{width:100%;height:100%;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:7px;padding:0 calc(12px * var(--k));
-  transform:translateY(calc(3.5px * var(--k)))}   /* presetContentDownshift */
-/* sliderRowWidthFraction .75 of the tray content width */
-.ec-row{display:flex;align-items:center;gap:9px;width:75%}
-.ec-zero{font-family:var(--fm);font-size:9.5px;color:#8b8b99}
-.ec-val{font-family:var(--fm);font-size:9.5px;color:#8b8b99;
-  font-variant-numeric:tabular-nums;min-width:3ch;text-align:right}
-.ec-val.on{color:#f2f0ec}
-.ec-tray input[type=range]{-webkit-appearance:none;appearance:none;flex:1;
-  height:2px;border-radius:2px;background:rgba(255,255,255,.16);outline:none}
-.ec-tray input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;
-  width:11px;height:11px;border-radius:50%;background:var(--c);cursor:pointer;
-  box-shadow:0 0 8px color-mix(in srgb,var(--c) 60%,transparent)}
-.ec-tray input[type=range]:focus-visible{outline:2px solid #f2f0ec;outline-offset:4px}
-/* presetSegmentedHeight 28 — same recessed-track pill as the duration control */
-.ec-seg{display:flex;align-items:center;height:calc(28px * var(--k));padding:2px;
-  border-radius:calc(8px * var(--k));background:rgba(0,0,0,.34);
-  border:.5px solid rgba(255,255,255,.06)}
-.ec-seg button{appearance:none;border:0;background:transparent;cursor:pointer;
-  font-family:var(--fm);font-size:10.5px;letter-spacing:.02em;color:#8b8b99;
-  padding:0 10px;height:100%;border-radius:calc(6px * var(--k));white-space:nowrap;
-  transition:background .24s ease,color .24s ease}
-.ec-seg button[aria-pressed="true"]{background:rgba(255,255,255,.09);color:#f2f0ec}
-.ec-seg button:focus-visible{outline:2px solid #f2f0ec;outline-offset:2px}
-/* Icon tile: dark glass with a top-edge and a bottom-edge radial of the hue.
-   Centres are MixrEffect.iconGlow, which differs per effect on purpose. */
-.ec-tile{position:relative;flex:0 0 auto;display:grid;place-items:center;
+/* ---- GlassIconTile -------------------------------------------------------
+   Six layers, in the Swift's own order. The two radials are the tile's light:
+   a medium one falling from the top edge and a much stronger one rising from
+   the bottom, each at its own per-effect centre (MixrEffect.iconGlow). The
+   SwiftUI gradients carry FOUR stops over an explicit endRadius — 0.54 and
+   0.42 of the 46pt tile — so the stops here are placed at 0/33/67/100% of
+   24.8px and 19.3px rather than eyeballed as percentages of the box. */
+.ec-tile,.fxa-ico{position:relative;flex:0 0 auto;display:grid;place-items:center;
   width:calc(46px * var(--k));height:calc(46px * var(--k));border-radius:calc(12px * var(--k));
   background:
-    radial-gradient(120% 96% at var(--bx) var(--by),
-      color-mix(in srgb,var(--c) calc(88% * var(--g)),transparent) 0%,
-      color-mix(in srgb,var(--c) calc(38% * var(--g)),transparent) 34%,
-      transparent 72%),
-    radial-gradient(118% 92% at var(--tx) var(--ty),
-      color-mix(in srgb,var(--c) calc(54% * var(--g)),transparent) 0%,
-      color-mix(in srgb,var(--c) calc(21% * var(--g)),transparent) 36%,
-      transparent 74%),
-    linear-gradient(180deg,rgba(17,21,33,.72),rgba(5,7,13,.94));
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.10),
-             inset 0 1px 0 rgba(255,255,255,.13);
-  transition:background .34s ease}
-.ec-tile svg{width:calc(22px * var(--k));height:calc(22px * var(--k));display:block;
-  fill:#fff;filter:drop-shadow(0 0 calc(4px * var(--g)) var(--c))
-                 drop-shadow(0 0 calc(9px * var(--g)) color-mix(in srgb,var(--c) 55%,transparent))}
+    /* the crisp specular streak across the top — Path (0.18,0.08)→(0.78,0.08) */
+    linear-gradient(rgba(255,255,255,.13),rgba(255,255,255,.13))
+      no-repeat calc(8.28px * var(--k)) calc(3.68px * var(--k)) / calc(27.6px * var(--k)) .8px,
+    /* bottom bloom — .98 / .42 / .11 → clear, endRadius size*0.42 */
+    radial-gradient(circle calc(19.3px * var(--k)) at var(--bx) var(--by),
+      color-mix(in srgb,var(--c) calc(98% * var(--g)),transparent) 0%,
+      color-mix(in srgb,var(--c) calc(42% * var(--g)),transparent) 33%,
+      color-mix(in srgb,var(--c) calc(11% * var(--g)),transparent) 67%,
+      transparent 100%),
+    /* top glow — .60 / .24 / .055 → clear, endRadius size*0.54 */
+    radial-gradient(circle calc(24.8px * var(--k)) at var(--tx) var(--ty),
+      color-mix(in srgb,var(--c) calc(60% * var(--g)),transparent) 0%,
+      color-mix(in srgb,var(--c) calc(24% * var(--g)),transparent) 33%,
+      color-mix(in srgb,var(--c) calc(5.5% * var(--g)),transparent) 67%,
+      transparent 100%),
+    /* clean transparent glass base — dark and glossy, NOT frosted */
+    linear-gradient(135deg,rgba(17,21,33,.96),rgba(5,7,13,.99));
+  transition:background .16s ease}
+/* The coloured rim. This is what the tile was missing: the Swift strokes it
+   white .12 → colour .58 → colour .30, so the tile is ringed in its own hue
+   and not in neutral grey. A flat white ring is why it read dull. */
+.ec-tile::before,.fxa-ico::before{content:"";position:absolute;inset:0;border-radius:inherit;
+  padding:.9px;pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.12),
+    color-mix(in srgb,var(--c) 58%,transparent) 52%,
+    color-mix(in srgb,var(--c) 30%,transparent));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude}
+/* Glass catchlight: a white .16 hairline that is itself masked to fade from
+   the top-left corner, so the reflection dies before it reaches the bottom. */
+.ec-tile::after,.fxa-ico::after{content:"";position:absolute;inset:0;border-radius:inherit;
+  padding:.55px;pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.16),
+    rgba(255,255,255,.024) 44%,transparent 72%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude}
+/* Auto's tile carries three more accents — pink low-right, blue high-left,
+   yellow along the bottom — which is why it never matches any other card. */
+.ec.is-auto .ec-tile{background:
+    linear-gradient(rgba(255,255,255,.13),rgba(255,255,255,.13))
+      no-repeat calc(8.28px * var(--k)) calc(3.68px * var(--k)) / calc(27.6px * var(--k)) .8px,
+    radial-gradient(circle calc(19.3px * var(--k)) at 88% 92%,
+      rgba(255,95,162,calc(.48 * var(--aa,1))),
+      rgba(255,95,162,calc(.14 * var(--aa,1))) 42%,transparent 100%),
+    radial-gradient(circle calc(24.8px * var(--k)) at 8% 12%,
+      rgba(56,189,248,calc(.32 * var(--aa,1))),
+      rgba(56,189,248,calc(.09 * var(--aa,1))) 42%,transparent 100%),
+    radial-gradient(circle calc(19.3px * var(--k)) at 70% 102%,
+      rgba(234,179,8,calc(.25 * var(--aa,1))),
+      rgba(234,179,8,calc(.07 * var(--aa,1))) 42%,transparent 100%),
+    radial-gradient(circle calc(19.3px * var(--k)) at var(--bx) var(--by),
+      color-mix(in srgb,var(--c) calc(98% * var(--g)),transparent) 0%,
+      color-mix(in srgb,var(--c) calc(42% * var(--g)),transparent) 33%,
+      color-mix(in srgb,var(--c) calc(11% * var(--g)),transparent) 67%,
+      transparent 100%),
+    radial-gradient(circle calc(24.8px * var(--k)) at var(--tx) var(--ty),
+      color-mix(in srgb,var(--c) calc(60% * var(--g)),transparent) 0%,
+      color-mix(in srgb,var(--c) calc(24% * var(--g)),transparent) 33%,
+      color-mix(in srgb,var(--c) calc(5.5% * var(--g)),transparent) 67%,
+      transparent 100%),
+    linear-gradient(135deg,rgba(17,21,33,.72),rgba(5,7,13,.90))}
+.ec.is-auto .ec-tile::before{background:linear-gradient(135deg,
+    rgba(255,255,255,calc(.26 * var(--aa,1))),
+    rgba(192,132,252,calc(.72 * var(--aa,1))) 26%,
+    rgba(255,95,162,calc(.60 * var(--aa,1))) 52%,
+    rgba(234,179,8,calc(.41 * var(--aa,1))) 76%,
+    rgba(56,189,248,calc(.55 * var(--aa,1))))}
+.ec.is-auto[aria-pressed="true"] .ec-tile{--aa:calc(1.16 * var(--sel))}
+
+/* The symbol is the EFFECT's colour, not white — only Auto is white, because
+   only Auto stands for all six at once. Two shadows: a tight one at full
+   strength and a wide one at .55, which is what gives the glyph its bloom. */
+.ec-tile svg,.fxa-ico svg{width:calc(22px * var(--k));height:calc(22px * var(--k));display:block;
+  fill:var(--c);position:relative;z-index:1;
+  filter:drop-shadow(0 0 4px color-mix(in srgb,var(--c) calc(100% * var(--ig)),transparent))
+         drop-shadow(0 0 9px color-mix(in srgb,var(--c) calc(55% * var(--ig)),transparent))}
+.ec.is-auto .ec-tile svg{fill:#fff;
+  filter:drop-shadow(0 0 calc(4.6px * var(--ab,1)) rgba(245,208,254,1))
+         drop-shadow(0 0 calc(10px * var(--ab,1)) rgba(192,132,252,calc(.64 * var(--ab,1))))}
 .ec-name{margin-left:calc(9px * var(--k));font-family:var(--fsf);
   font-size:calc(11px * var(--k));font-weight:500;letter-spacing:.005em;
   color:#fff;white-space:nowrap;position:relative;z-index:2}
-/* Bubbles. Positions come from EffectLightingLayout — deliberately not the same
-   coordinates on every card. */
-.ec-bub{position:absolute;border-radius:50%;pointer-events:none;z-index:1;
-  background:radial-gradient(circle at 34% 30%,rgba(255,255,255,.36),rgba(255,255,255,.05) 62%,transparent 74%);
-  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.16)}
-.ec-knob{position:absolute;right:calc(10px * var(--k));bottom:calc(9px * var(--k));
-  width:calc(13px * var(--k));height:calc(13px * var(--k));border-radius:50%;z-index:2;
-  background:radial-gradient(circle at 36% 30%,#fff,#e7e7ef 52%,#b9b9c6 100%);
-  box-shadow:0 1px 3px rgba(0,0,0,.55)}
 /* Auto alone gets the iridescent body — it is the one card that stands for all
    the others at once, so it carries every colour rather than one. */
 .ec.is-auto{background-image:
@@ -831,11 +897,10 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
      "Case study", and that much air reads as a dropped element. */
   .shell{row-gap:11px}
   main{padding-top:19px}
-  /* Left at 1 on a phone too. --k used to bump here because the rail was
-     rendering at 1.34 and the phone needed a different ratio; now that the
-     card is 1:1 with the device, scaling it up would be the one thing this
-     rebuild exists to avoid. */
-  .fx-rail{--k:1}
+  /* Back to device scale on a phone. The rail runs at 1.4 on desktop so the
+     glass is legible at reading distance; at this width a 213px card would
+     just push the row off the side. */
+  .fx-demo{--k:1}
 }
 /* ============================================================================
    Recreated app surfaces — everything below is rebuilt in CSS/JS from the
@@ -1208,11 +1273,11 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   background:rgba(255,255,255,.07);border-radius:12px;overflow:hidden}
 .fxa-row{display:grid;grid-template-columns:44px 44px minmax(0,1.15fr) minmax(0,1.6fr);
   gap:14px;align-items:center;padding:13px 16px;background:var(--max-ink)}
-.fxa-ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
-  background:color-mix(in srgb,var(--c) 16%,transparent);
-  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 34%,transparent),
-             0 0 16px color-mix(in srgb,var(--c) 20%,transparent)}
-.fxa-ico svg{width:21px;height:21px;fill:var(--c)}
+/* The audio rows carry the SAME GlassIconTile as the effect cards, not a flat
+   tinted square — same layers, same per-effect glow centres, same coloured rim.
+   --k .9565 lands the 46pt tile on this row's 44px. Sharing the selectors above
+   rather than restyling here means the two blocks cannot drift apart. */
+.fxa-ico{--k:.9565;--g:var(--gt);--ig:var(--igm)}
 .fxa-txt b{display:block;font-family:var(--fsf);font-size:14px;font-weight:600;color:#fff;
   line-height:1.25}
 .fxa-txt span{display:block;font-family:var(--fm);font-size:var(--fs-micro);line-height:1.6;
@@ -1354,7 +1419,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
   <div class="flag rv d2">
     <h3>Question the Whole Project Answers</h3>
-    <p>Can coding agents help me design and build a software for something I know nothing about?</p>
+    <p>Can coding agents help me design and build software for something I know nothing about?</p>
   </div>
 </section>
 
@@ -1364,7 +1429,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     <h2>Choosing the right references.</h2></div>
 
   <div class="stack rv d2">
-    <p>I wanted to give beginners a familiar place to start. The reference wasn't DJ software. It was video editors like CapCut, Final Cut Pro, Premiere Pro, DaVinci Resolve, and GarageBand.</p>
+    <p>I wanted to give beginners a familiar place to start. The reference wasn&rsquo;t DJ software. It was video editors like CapCut, Final Cut Pro, Premiere Pro, DaVinci Resolve, and GarageBand.</p>
     <p>These products share a familiar interaction model: import media, arrange clips on a timeline, edit them directly, preview, and undo.</p>
   </div>
 
@@ -1372,23 +1437,23 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     <div>
       <h4>CapCut</h4>
       <span class="gave">Set the benchmark</span>
-      <p>&ldquo;As simple as CapCut&rdquo; was in the first prompt. It gave me actions like split, duplicate, and delete that I needed to incorporate in timeline editing.</p>
+      <p>&ldquo;As simple as CapCut&rdquo; was in the first prompt. It gave me actions like split, duplicate, and delete that I needed to incorporate into timeline editing.</p>
     </div>
     <div>
       <h4>Premiere Pro</h4>
-      <span class="gave">Shaped the inituition</span>
+      <span class="gave">Shaped the intuition</span>
       <p>With a background in video editing, this was the editor I knew best. Drag-and-drop and the SFX (sound effects) library were all inspired by Premiere Pro.</p>
     </div>
     <div>
       <h4>GarageBand</h4>
       <span class="gave">Gave the unit</span>
-      <p>Taught me to use the music's unit rather than the clock's. Transitions are measured in beats rather than seconds so timing aligns with tempo.</p>
+      <p>Taught me to use the music&rsquo;s unit rather than the clock&rsquo;s. Transitions are measured in beats rather than seconds so timing aligns with tempo.</p>
     </div>
   </figure>
 
 
   <div class="stack rv d1">
-    <p>I started by asking ChatGPT for mocks. I find it has the best image generation capabilities and doesn't return UI that looks AI-generated.</p>
+    <p>I started by asking ChatGPT for mocks. I find it has the best image generation capabilities and doesn&rsquo;t return UI that looks AI-generated.</p>
   </div>
 
   <figure class="rv d2">
@@ -1398,11 +1463,11 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
   <div class="stack rv d2">
     <p>I knew what I wanted to change. "AI Suggestions" was a floating button and belonged in the effects tray. It should also be called "Auto" like iPhone photo editing. The "Mixr" button on the top had no indication of what it did. It needed to go.</p>
-    <p>But the layout was right, and I never looked back. Controls on the sides, timeline in the middle, effects along the bottom. It felt intuitive because it resembled video editing software, not a DJ's.</p>
+    <p>But the layout was right, and I never looked back. Controls on the sides, timeline in the middle, effects along the bottom. It felt intuitive because it resembled video editing software, not a DJ&rsquo;s.</p>
   </div>
 
   <div class="demo rv d2">
-    <p class="sub">The interface, today's build</p>
+    <p class="sub">The interface, today&rsquo;s build</p>
     <figure class="device">
       <video preload="none" data-src="art/build-now.mp4" poster="art/build-now-poster.jpg" autoplay muted loop playsinline
              aria-label="The Mixr editor in landscape, playing: five coloured waveform lanes with the playhead moving, a Tracks panel listing STAY, Heat Waves, good 4 u and Cut To The Feeling, solo, mute and volume down the right, and the Effects drawer along the bottom."></video>
@@ -1418,7 +1483,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
   <div class="stack rv d1">
     <h3>Trying not to get sued.</h3>
-    <p>I considered copyright before designed anything. Mixr can&rsquo;t stream from a library and it can&rsquo;t host anyone&rsquo;s masters, so the whole thing is built around import and export: you bring your own files in, you take your remix out, and nothing lives on a server in between.</p>
+    <p>I considered copyright before designing anything. Mixr can&rsquo;t stream from a library and it can&rsquo;t host anyone&rsquo;s masters, so the whole thing is built around import and export: you bring your own files in, you take your remix out, and nothing lives on a server in between.</p>
     <p>For building and testing it I pulled tracks off Spotify as files through <a href="https://spotdown.org" target="_blank" rel="noreferrer">spotdown.org<span class="nav-rule" aria-hidden="true"></span></a>, which is also the honest answer to how a beginner gets audio into an app like this at all.</p>
   </div>
 
@@ -1473,7 +1538,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   <div class="dec rv d2">
     <h3 style="margin-top:36px">Hold a modifier, or infer it from where you let go?</h3>
     <p>Premiere and Final Cut both do the insert edit, and both make you ask for it &mdash; a modifier held during the drag switches between overwrite and insert. It is precise, it is teachable, and it is a mode.</p>
-    <p>Rejected: the modifier. A beginner does not know the mode exists, so they never find the behaviour; and on a touch screen there is no key to hold in the first place.</p>
+    <p>Rejected: the modifier. A beginner does not know the mode exists, so they never find the behavior; and on a touch screen there is no key to hold in the first place.</p>
     <div class="flag">
       <p>Chosen: the drop position <em>is</em> the choice. Let go over a clip&rsquo;s edge and it snaps flush; let go over its middle and it cuts in. Nothing to hold, nothing to learn &mdash; the two intentions already live in two different places on screen.</p>
     </div>
@@ -1485,7 +1550,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
   <ol class="ladder rv d2">
     <li><b>Ghost restore</b><span>Released within the snap zone of where it started &mdash; put it back, ripple nothing.</span></li>
-    <li><b>Edge snap</b><span>Inside a neighbour's 10&nbsp;pt edge zone &mdash; snap flush before or after it.</span></li>
+    <li><b>Edge snap</b><span>Inside a neighbor&rsquo;s 10&nbsp;pt edge zone &mdash; snap flush before or after it.</span></li>
     <li><b>Literal gap</b><span>Leading edge landed in empty space &mdash; leave it exactly where it was let go.</span></li>
     <li class="pick"><b>Insert into body</b><span>Pointer inside a clip, past its edge zones &mdash; split there and sandwich.</span></li>
     <li><b>Free placement</b><span>Anything else &mdash; place it and let the lane reflow.</span></li>
@@ -1510,12 +1575,12 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       <button type="button" class="tl-reset" id="tl-reset">Reset lane</button>
     </div>
     <p class="tl-nums" id="tl-nums" role="status" aria-live="polite">Pick up a clip to see which rule resolves.</p>
-    <p class="foot">This is not an animation of the behaviour &mdash; it is the behaviour. <code>resolveClipDrop</code> is ported line for line out of <code>MixrTimeline.swift</code>, including the priority order, the hysteresis that stops the result flickering between two rules mid-drag, and the <code>minClipLengthUnits</code> clamp that stops a split leaving a two-unit sliver. Constants are the shipped ones: a 10&nbsp;pt snap zone, 8&nbsp;pt of hysteresis, 20&nbsp;pt of neighbour shift, 0.28 ghost opacity, a 1.05 lift. The hatched bands are the edge zones, drawn only while you are dragging.</p>
-    <p class="foot" style="margin-top:12px">The one thing to try: pick up the blue clip and let go over the <em>middle</em> of the purple one. Then do it again, but let go near the purple clip's left edge. Same gesture, two different intentions, and you never told the app which one you meant.</p>
+    <p class="foot">This is not an animation of the behavior &mdash; it is the behavior. <code>resolveClipDrop</code> is ported line for line out of <code>MixrTimeline.swift</code>, including the priority order, the hysteresis that stops the result flickering between two rules mid-drag, and the <code>minClipLengthUnits</code> clamp that stops a split leaving a two-unit sliver. Constants are the shipped ones: a 10&nbsp;pt snap zone, 8&nbsp;pt of hysteresis, 20&nbsp;pt of neighbor shift, 0.28 ghost opacity, a 1.05 lift. The hatched bands are the edge zones, drawn only while you are dragging.</p>
+    <p class="foot" style="margin-top:12px">The one thing to try: pick up the blue clip and let go over the <em>middle</em> of the purple one. Then do it again, but let go near the purple clip&rsquo;s left edge. Same gesture, two different intentions, and you never told the app which one you meant.</p>
   </div>
 
   <div class="stack rv d2">
-    <p>The preview is the contract: whatever the neighbours animate to while you are dragging is exactly what happens when you let go.</p>
+    <p>The preview is the contract: whatever the neighbors animate to while you are dragging is exactly what happens when you let go.</p>
     <p>The timeline is only honest if the sound follows it. Splitting a clip splits its audio; undo restores both. Otherwise the two drift apart and the app starts lying to you.</p>
   </div>
 
@@ -1542,21 +1607,22 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 <!-- 04 -->
 <section id="decisions">
   <div class="sechead rv"><p class="lab">04 &mdash; Decisions</p>
-    <h2>What I left out is what made the rest possible.</h2></div>
+    <h2>Subtle nuances elevated the design.</h2></div>
 
   <div class="stack rv d1">
-    <p>No decks, no crossfader, no hot cues, no per-channel EQ. Every one is a real DJ tool, and every one asks the beginner to learn the booth before they can hear a result.</p>
-    <p>I built it in passes, each starting with a freeze list &mdash; what <em>not</em> to touch. The failure mode of moving fast is a fix that quietly redesigns three things you were happy with.</p>
+    <h3>Tiny imperfections make the glass feel alive.</h3>
+    <p>I varied bubble placement in the effects cards and let glow reflections spill onto neighboring cards. These subtle differences let the glass breathe and feel alive.</p>
+   
   </div>
 
   <div class="demo fx-demo rv d2">
     <div class="rowlab">
-      <span class="demo-title">Effects</span>
+      <span class="demo-title">Effects Cards</span>
       <span class="hint">CLICK A CARD &middot; OR TAB AND PRESS ENTER</span>
     </div>
     <div class="fx-rail" id="fxrail">
       <button class="ec is-auto" aria-pressed="false"
-              style="--c:var(--mx-auto);--un:1;--sel:1.20;--rim:1;--tx:18%;--ty:-8%;--bx:66%;--by:102%">
+              style="--c:var(--mx-auto);--un:1;--sel:1.20;--gt:1.13;--gts:1.50;--igm:1;--lbs:.80;--sp:1.68;--sho:55.2;--shr:18;--blo:10;--rim:1;--tx:18%;--ty:-8%;--bx:66%;--by:102%">
         <span class="ec-tile" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="M11.2 2.4a.5.5 0 0 1 .95 0l1.1 3.1a3 3 0 0 0 1.8 1.8l3.1 1.1a.5.5 0 0 1 0 .95l-3.1 1.1a3 3 0 0 0-1.8 1.8l-1.1 3.1a.5.5 0 0 1-.95 0l-1.1-3.1a3 3 0 0 0-1.8-1.8l-3.1-1.1a.5.5 0 0 1 0-.95l3.1-1.1a3 3 0 0 0 1.8-1.8zM18 14.6a.32.32 0 0 1 .6 0l.55 1.6a1.6 1.6 0 0 0 .98.98l1.6.55a.32.32 0 0 1 0 .6l-1.6.55a1.6 1.6 0 0 0-.98.98l-.55 1.6a.32.32 0 0 1-.6 0l-.55-1.6a1.6 1.6 0 0 0-.98-.98l-1.6-.55a.32.32 0 0 1 0-.6l1.6-.55a1.6 1.6 0 0 0 .98-.98zM5.4 15.1a.26.26 0 0 1 .5 0l.42 1.2a1.3 1.3 0 0 0 .8.8l1.2.42a.26.26 0 0 1 0 .5l-1.2.42a1.3 1.3 0 0 0-.8.8l-.42 1.2a.26.26 0 0 1-.5 0l-.42-1.2a1.3 1.3 0 0 0-.8-.8l-1.2-.42a.26.26 0 0 1 0-.5l1.2-.42a1.3 1.3 0 0 0 .8-.8z"/></svg>
         </span>
@@ -1569,7 +1635,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       </button>
 
       <button class="ec" aria-pressed="false"
-              style="--c:var(--mx-reverb);--un:1;--sel:1.08;--rim:1;--tx:22%;--ty:-8%;--bx:38%;--by:102%">
+              style="--c:var(--mx-reverb);--un:1;--sel:1.08;--gt:1;--gts:1.08;--igm:1;--lbs:1.0627;--sp:1.296;--sho:34.56;--shr:13.5;--blo:12.96;--rim:1;--tx:22%;--ty:-8%;--bx:38%;--by:102%">
         <span class="ec-tile" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="M2.6 7.2c1.4 0 1.4-1.6 2.8-1.6s1.4 1.6 2.8 1.6 1.4-1.6 2.8-1.6 1.4 1.6 2.8 1.6 1.4-1.6 2.8-1.6 1.4 1.6 2.8 1.6a1 1 0 0 1 0 2c-1.4 0-1.4-1.6-2.8-1.6s-1.4 1.6-2.8 1.6-1.4-1.6-2.8-1.6-1.4 1.6-2.8 1.6-1.4-1.6-2.8-1.6-1.4 1.6-2.8 1.6a1 1 0 0 1 0-2zm0 5c1.4 0 1.4-1.6 2.8-1.6s1.4 1.6 2.8 1.6 1.4-1.6 2.8-1.6 1.4 1.6 2.8 1.6 1.4-1.6 2.8-1.6 1.4 1.6 2.8 1.6a1 1 0 0 1 0 2c-1.4 0-1.4-1.6-2.8-1.6s-1.4 1.6-2.8 1.6-1.4-1.6-2.8-1.6-1.4 1.6-2.8 1.6-1.4-1.6-2.8-1.6-1.4 1.6-2.8 1.6a1 1 0 0 1 0-2zm0 5c1.4 0 1.4-1.6 2.8-1.6s1.4 1.6 2.8 1.6 1.4-1.6 2.8-1.6 1.4 1.6 2.8 1.6 1.4-1.6 2.8-1.6 1.4 1.6 2.8 1.6a1 1 0 0 1 0 2c-1.4 0-1.4-1.6-2.8-1.6s-1.4 1.6-2.8 1.6-1.4-1.6-2.8-1.6-1.4 1.6-2.8 1.6-1.4-1.6-2.8-1.6-1.4 1.6-2.8 1.6a1 1 0 0 1 0-2z"/></svg>
         </span>
@@ -1582,7 +1648,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       </button>
 
       <button class="ec" aria-pressed="false"
-              style="--c:var(--mx-echo);--un:1;--sel:1.10;--rim:1;--tx:64%;--ty:-7%;--bx:42%;--by:104%">
+              style="--c:var(--mx-echo);--un:1;--sel:1;--gt:1;--gts:1;--igm:1;--lbs:.912;--sp:1.2;--sho:40;--shr:14;--blo:19;--rim:1;--tx:64%;--ty:-7%;--bx:42%;--by:104%">
         <span class="ec-tile" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="M3 8.4a1 1 0 0 1 1-1h9.1a1.9 1.9 0 1 0-1.85-2.32 1 1 0 1 1-1.95-.43A3.9 3.9 0 1 1 13.1 9.4H4a1 1 0 0 1-1-1zm0 4.4a1 1 0 0 1 1-1h13.3a3.9 3.9 0 1 1-3.8 4.75 1 1 0 1 1 1.95-.43 1.9 1.9 0 1 0 1.85-2.32H4a1 1 0 0 1-1-1zm0 4.6a1 1 0 0 1 1-1h5.2a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1z"/></svg>
         </span>
@@ -1595,7 +1661,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       </button>
 
       <button class="ec" aria-pressed="false"
-              style="--c:var(--mx-pitch);--un:.855;--sel:1;--rim:.9025;--tx:36%;--ty:-10%;--bx:62%;--by:100%">
+              style="--c:var(--mx-pitch);--un:.855;--sel:1;--gt:.7695;--gts:1;--igm:.90;--lbs:.78;--sp:1;--sho:26.4;--shr:11;--blo:10;--rim:.9025;--tx:36%;--ty:-10%;--bx:62%;--by:100%">
         <span class="ec-tile" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="M12 2.4l2.66 6.03 6.55.62a.5.5 0 0 1 .29.87l-4.95 4.36 1.45 6.42a.5.5 0 0 1-.74.54L12 18.02l-5.26 3.22a.5.5 0 0 1-.74-.54l1.45-6.42-4.95-4.36a.5.5 0 0 1 .29-.87l6.55-.62z"/></svg>
         </span>
@@ -1608,7 +1674,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       </button>
 
       <button class="ec" aria-pressed="false"
-              style="--c:var(--mx-flanger);--un:.9025;--sel:1;--rim:.9025;--tx:24%;--ty:-6%;--bx:42%;--by:103%">
+              style="--c:var(--mx-flanger);--un:.9025;--sel:1;--gt:.8145;--gts:1;--igm:.9025;--lbs:.74;--sp:1;--sho:26.4;--shr:11;--blo:10;--rim:.9025;--tx:24%;--ty:-6%;--bx:42%;--by:103%">
         <span class="ec-tile" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="M12.9 2.1c.3 2.6-.7 4.1-2 5.4-1.4 1.4-3.1 2.7-3.9 5.2a6.9 6.9 0 0 0 2.2 7.6c-.5-1.7-.3-3.3 1-4.7.7-.8 1.6-1.4 2.2-2.4.4 1.5 1.4 2.3 2.2 3.3.9 1.1 1.1 2.4.6 3.8a6.6 6.6 0 0 0 3.6-6.6c-.3-2.8-2-4.4-3.2-6.2-1-1.5-1.6-3.2-2.7-5.4z"/></svg>
         </span>
@@ -1621,7 +1687,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       </button>
 
       <button class="ec" aria-pressed="false"
-              style="--c:var(--mx-blur);--un:.7695;--sel:1;--rim:.71225;--tx:22%;--ty:-8%;--bx:56%;--by:102%">
+              style="--c:var(--mx-blur);--un:.7695;--sel:1;--gt:.6310;--gts:1;--igm:.82;--lbs:.72;--sp:1;--sho:26.4;--shr:11;--blo:10;--rim:.71225;--tx:22%;--ty:-8%;--bx:56%;--by:102%">
         <span class="ec-tile" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="M12 2.6c3.6 4.3 6.6 8 6.6 11.4A6.6 6.6 0 0 1 12 20.6a6.6 6.6 0 0 1-6.6-6.6C5.4 10.6 8.4 6.9 12 2.6z"/></svg>
         </span>
@@ -1633,79 +1699,36 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
         <span class="ec-marble" aria-hidden="true"></span>
       </button>
     </div>
-    <p class="foot">Rebuilt in CSS from <code>EffectCard.swift</code> &mdash; 152&times;66 at an 11px radius, a 46px icon tile, 13px bubbles, and per-effect glow centres. Scroll for the rest.</p>
-
-    <p class="sub" style="margin-top:30px">Resting glow, per card</p>
-    <ul class="gw">
-      <li><b>Auto</b><span class="bar" style="--c:var(--mx-auto)"><i style="--w:100%"></i></span><em>1.000</em></li>
-      <li><b>Reverb</b><span class="bar" style="--c:var(--mx-reverb)"><i style="--w:100%"></i></span><em>1.000</em></li>
-      <li><b>Echo</b><span class="bar" style="--c:var(--mx-echo)"><i style="--w:100%"></i></span><em>1.000</em></li>
-      <li><b>Flanger</b><span class="bar" style="--c:var(--mx-flanger)"><i style="--w:90.25%"></i></span><em>0.9025</em></li>
-      <li><b>Pitch</b><span class="bar" style="--c:var(--mx-pitch)"><i style="--w:85.5%"></i></span><em>0.855</em></li>
-      <li><b>Blur</b><span class="bar" style="--c:var(--mx-blur)"><i style="--w:76.95%"></i></span><em>0.7695</em></li>
-    </ul>
-    <p class="foot">Not one glow value shared across six cards. Yellow reads brightest at any given number, then red, then pink, so each is pulled back until the row looks evenly lit. Auto gets pushed the other way on selection &mdash; it is the card I want people to press.</p>
-
-    <p class="sub" style="margin-top:30px">The glow does not stop at the card&rsquo;s edge</p>
-    <div class="fx-rail" id="fxspill" aria-hidden="true"></div>
-    <p class="foot">Rebuilt rather than filmed. The capture of this was 1046px wide rendering into 1606 device pixels on a retina screen &mdash; stretched half again past its own resolution, and no bitrate fixes detail that was never recorded. <code>EffectCardSpillGlow</code> draws outside the card&rsquo;s bounds on purpose (w+48 &times; h+18, blurred 11) and is never clipped, so a lit card washes onto the two beside it. Echo is selected here; watch Reverb on its left and Pitch on its right pick up the purple. That spill is the third thing in the X post, and it is the one that only ever looked right in motion.</p>
+    <p class="foot">Rebuilt in CSS from <code>EffectCard.swift</code>. "Auto" gets stronger coloring to recommend it as a starting point.</p>
   </div>
 
-  <figure class="device rv d2" style="margin-top:22px">
-    <video preload="none" data-src="art/effect-tray.mp4" poster="art/effect-tray-poster.jpg" autoplay muted loop playsinline
-           aria-label="Effect cards opening in Mixr, one after another: Reverb with Small Room, Hall and Ambient presets, Echo with Classic, Ping Pong and Reverse, Pitch with Pitch Up and Down, then Flanger and Blur which are slider-only. Each card lights and a tray grows beside it."></video>
-    <figcaption>The same control in the app. The cards above are CSS, rebuilt from <code>EffectCard.swift</code> and <code>GlassCardModifier.swift</code> &mdash; this is what they are rebuilt from.</figcaption>
-  </figure>
-
-
-  <div class="dec rv d2">
-    <h3 style="margin-top:36px">Expose the parameters, or pick the one number that matters?</h3>
-    <p>Every real audio plugin opens onto a wall of controls. Each is honest, and each asks the beginner to already know what a Q curve or a wet/dry ratio does before they can hear anything change.</p>
-    <p>Rejected: the parameter panel. Not because it is wrong &mdash; it is what a professional wants &mdash; but because it moves the moment of feedback behind a lesson. The first thing you touch should make a sound you can judge.</p>
-
-    <div class="demo" style="margin-top:20px">
-      <p class="sub">Rejected &mdash; one effect, five parameters</p>
-      <div class="tray tray--pro">
-        <div class="tray-glass">
-          <div class="pro-row"><label>Room size</label><div class="pro-track" style="--p:62%"><i></i></div><span class="pro-val">0.62</span></div>
-          <div class="pro-row"><label>Damping</label><div class="pro-track" style="--p:38%"><i></i></div><span class="pro-val">0.38</span></div>
-          <div class="pro-row"><label>Pre-delay</label><div class="pro-track" style="--p:24%"><i></i></div><span class="pro-val">18ms</span></div>
-          <div class="pro-row"><label>Wet / dry</label><div class="pro-track" style="--p:45%"><i></i></div><span class="pro-val">45%</span></div>
-          <div class="pro-row"><label>Diffusion</label><div class="pro-track" style="--p:71%"><i></i></div><span class="pro-val">0.71</span></div>
-        </div>
-      </div>
-      <p class="foot">Five numbers, none of which tell you what the room will sound like. This one is a drawing &mdash; it never got built.</p>
-
-      <p class="sub" style="margin-top:30px">Chosen &mdash; one intensity, three rooms</p>
-      <div class="tray" id="tray" data-effect="reverb">
-        <div class="tray-glass" style="--c:var(--mx-reverb)">
-          <div class="tray-row">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 16 0 1 1 0 0 1-2 0 6 6 0 0 0-12 0 1 1 0 0 1-2 0zm3.2 0a4.8 4.8 0 0 1 9.6 0 1 1 0 0 1-2 0 2.8 2.8 0 0 0-5.6 0 1 1 0 0 1-2 0z"/></svg>
-            <label class="visually-hidden" for="tray-int">Reverb intensity</label>
-            <input id="tray-int" type="range" min="0" max="100" value="45" style="--p:45%">
-            <span class="tray-val" id="tray-val">45%</span>
-          </div>
-          <div class="tray-presets" id="tray-presets" role="group" aria-label="Reverb preset">
-            <button type="button" aria-pressed="true"  data-v="28">Small Room</button>
-            <button type="button" aria-pressed="false" data-v="62">Hall</button>
-            <button type="button" aria-pressed="false" data-v="84">Ambient</button>
-          </div>
-        </div>
-      </div>
-      <p class="foot">Live &mdash; drag the slider or pick a room. Rebuilt from <code>EffectControlTray.swift</code>. The presets are not shortcuts to a hidden panel; they <em>are</em> the panel, and each one just moves the single slider to a value that sounds like its name. Flanger and Blur ship with no presets at all &mdash; slider only.</p>
-    </div>
-
-    <div class="flag">
-      <p>Chosen: one intensity per effect, presets where a name is more useful than a number. The set stays small, named and preset-backed &mdash; and every control produces a sound before it asks a question.</p>
-    </div>
+  <div class="stack rv d1">
+    <h3>Optical alignment over mathematical, always.</h3>
+    <p>Each card gets a different glow strength, because darker colors appear dimmer and I wanted visual cohesion.</p>
   </div>
 
   <div class="demo rv d2">
     <div class="rowlab">
-      <span class="demo-title">Hear the effects</span>
-      <span class="hint">EACH ONE AT 100% &middot; SAME LOOP EVERY TIME</span>
+      <span class="demo-title">Effects Tray</span>
+      <span class="hint">THE SAME CARDS RUNNING IN THE APP</span>
+    </div>
+    <figure class="device">
+      <video preload="none" data-src="art/effect-tray.mp4" poster="art/effect-tray-poster.jpg" autoplay muted loop playsinline
+             aria-label="Effect cards opening in Mixr, one after another: Reverb with Small Room, Hall and Ambient presets, Echo with Classic, Ping Pong and Reverse, Pitch with Pitch Up and Down, then Flanger and Blur which are slider-only. Each card lights and a tray grows beside it."></video>
+    </figure>
+    <p class="foot">Recorded on simulator device. Each effect gets its own slider and/or preset option.</p>
+  </div>
+
+  <div class="demo rv d2">
+    <div class="rowlab">
+      <button type="button" class="fold" id="fxa-fold" aria-expanded="false" aria-controls="fxa-body">
+        <span class="demo-title">Hear the Effects</span>
+        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.3 8.6a1 1 0 0 1 1.4 0L12 13.9l5.3-5.3a1 1 0 1 1 1.4 1.42l-6 6a1 1 0 0 1-1.4 0l-6-6a1 1 0 0 1 0-1.42z"/></svg>
+      </button>
+      <span class="hint">EACH AT 100% &middot; SAME AUDIO WITH EFFECT APPLIED</span>
     </div>
 
+    <div id="fxa-body" data-folded="true">
     <div class="fxa">
       <div class="fxa-src" style="--c:#9CA3AF">
         <button type="button" class="fxa-play" data-clip="original" aria-pressed="false" aria-label="Play the original loop">
@@ -1713,227 +1736,73 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
           <svg class="ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h3.4v16H7zm6.6 0H17v16h-3.4z"/></svg>
         </button>
         <div>
-          <div class="fxa-txt"><b>Original</b><span>The dry loop. Nothing applied &mdash; this is what the five below are doing it to.</span></div>
+          <div class="fxa-txt"><b>Original</b><span>Dry loop. Nothing applied.</span></div>
           <div class="fxa-wave" data-wave="original" style="margin-top:9px;height:34px"><span class="pw"></span></div>
         </div>
       </div>
 
       <ul class="fxa-rows">
 
-        <li class="fxa-row" style="--c:var(--mx-reverb)">
+        <li class="fxa-row" style="--c:var(--mx-reverb);--tx:22%;--ty:-8%;--bx:38%;--by:102%;--gt:1;--igm:1;">
           <span class="fxa-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.6 7.2c1.4 0 1.4-1.6 2.8-1.6s1.4 1.6 2.8 1.6 1.4-1.6 2.8-1.6 1.4 1.6 2.8 1.6 1.4-1.6 2.8-1.6 1.4 1.6 2.8 1.6a1 1 0 0 1 0 2c-1.4 0-1.4-1.6-2.8-1.6s-1.4 1.6-2.8 1.6-1.4-1.6-2.8-1.6-1.4 1.6-2.8 1.6-1.4-1.6-2.8-1.6-1.4 1.6-2.8 1.6a1 1 0 0 1 0-2zm0 5c1.4 0 1.4-1.6 2.8-1.6s1.4 1.6 2.8 1.6 1.4-1.6 2.8-1.6 1.4 1.6 2.8 1.6 1.4-1.6 2.8-1.6 1.4 1.6 2.8 1.6a1 1 0 0 1 0 2c-1.4 0-1.4-1.6-2.8-1.6s-1.4 1.6-2.8 1.6-1.4-1.6-2.8-1.6-1.4 1.6-2.8 1.6-1.4-1.6-2.8-1.6-1.4 1.6-2.8 1.6a1 1 0 0 1 0-2z"/></svg></span>
           <button type="button" class="fxa-play" data-clip="reverb" aria-pressed="false" aria-label="Play Reverb">
             <svg class="ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2a1 1 0 0 1 1.53-.85l9 6.8a1 1 0 0 1 0 1.7l-9 6.8A1 1 0 0 1 8 18.8z"/></svg>
             <svg class="ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h3.4v16H7zm6.6 0H17v16h-3.4z"/></svg>
           </button>
-          <span class="fxa-txt"><b>Reverb</b><span>Puts the loop in a room. Watch the tail after the last hit &mdash; that is the room answering back.</span></span>
+          <span class="fxa-txt"><b>Reverb</b><span>Adds space as if in large room or hall.</span></span>
           <span class="fxa-wave" data-wave="reverb"><span class="pw"></span></span>
         </li>
 
-        <li class="fxa-row" style="--c:var(--mx-echo)">
+        <li class="fxa-row" style="--c:var(--mx-echo);--tx:64%;--ty:-7%;--bx:42%;--by:104%;--gt:1;--igm:1;">
           <span class="fxa-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.4a1 1 0 0 1 1-1h9.1a1.9 1.9 0 1 0-1.85-2.32 1 1 0 1 1-1.95-.43A3.9 3.9 0 1 1 13.1 9.4H4a1 1 0 0 1-1-1zm0 4.4a1 1 0 0 1 1-1h13.3a3.9 3.9 0 1 1-3.8 4.75 1 1 0 1 1 1.95-.43 1.9 1.9 0 1 0 1.85-2.32H4a1 1 0 0 1-1-1zm0 4.6a1 1 0 0 1 1-1h5.2a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1z"/></svg></span>
           <button type="button" class="fxa-play" data-clip="echo" aria-pressed="false" aria-label="Play Echo">
             <svg class="ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2a1 1 0 0 1 1.53-.85l9 6.8a1 1 0 0 1 0 1.7l-9 6.8A1 1 0 0 1 8 18.8z"/></svg>
             <svg class="ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h3.4v16H7zm6.6 0H17v16h-3.4z"/></svg>
           </button>
-          <span class="fxa-txt"><b>Echo</b><span>Repeats one <em>beat</em> behind, not one second. The repeats are the extra humps in the shape.</span></span>
+          <span class="fxa-txt"><b>Echo</b><span>Repeats as if shouting into a canyon.</span></span>
           <span class="fxa-wave" data-wave="echo"><span class="pw"></span></span>
         </li>
 
-        <li class="fxa-row" style="--c:var(--mx-pitch)">
+        <li class="fxa-row" style="--c:var(--mx-pitch);--tx:36%;--ty:-10%;--bx:62%;--by:100%;--gt:.7695;--igm:.90;">
           <span class="fxa-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.4l2.66 6.03 6.55.62a.5.5 0 0 1 .29.87l-4.95 4.36 1.45 6.42a.5.5 0 0 1-.74.54L12 18.02l-5.26 3.22a.5.5 0 0 1-.74-.54l1.45-6.42-4.95-4.36a.5.5 0 0 1 .29-.87l6.55-.62z"/></svg></span>
           <button type="button" class="fxa-play" data-clip="pitch" aria-pressed="false" aria-label="Play Pitch">
             <svg class="ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2a1 1 0 0 1 1.53-.85l9 6.8a1 1 0 0 1 0 1.7l-9 6.8A1 1 0 0 1 8 18.8z"/></svg>
             <svg class="ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h3.4v16H7zm6.6 0H17v16h-3.4z"/></svg>
           </button>
-          <span class="fxa-txt"><b>Pitch</b><span>Up a fifth, same length. Shifting pitch without changing tempo is the whole trick.</span></span>
+          <span class="fxa-txt"><b>Pitch</b><span>Sound higher like a chipmunk or lower like a man.</span></span>
           <span class="fxa-wave" data-wave="pitch"><span class="pw"></span></span>
         </li>
 
-        <li class="fxa-row" style="--c:var(--mx-flanger)">
+        <li class="fxa-row" style="--c:var(--mx-flanger);--tx:24%;--ty:-6%;--bx:42%;--by:103%;--gt:.8145;--igm:.9025;">
           <span class="fxa-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.9 2.1c.3 2.6-.7 4.1-2 5.4-1.4 1.4-3.1 2.7-3.9 5.2a6.9 6.9 0 0 0 2.2 7.6c-.5-1.7-.3-3.3 1-4.7.7-.8 1.6-1.4 2.2-2.4.4 1.5 1.4 2.3 2.2 3.3.9 1.1 1.1 2.4.6 3.8a6.6 6.6 0 0 0 3.6-6.6c-.3-2.8-2-4.4-3.2-6.2-1-1.5-1.6-3.2-2.7-5.4z"/></svg></span>
           <button type="button" class="fxa-play" data-clip="flanger" aria-pressed="false" aria-label="Play Flanger">
             <svg class="ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2a1 1 0 0 1 1.53-.85l9 6.8a1 1 0 0 1 0 1.7l-9 6.8A1 1 0 0 1 8 18.8z"/></svg>
             <svg class="ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h3.4v16H7zm6.6 0H17v16h-3.4z"/></svg>
           </button>
-          <span class="fxa-txt"><b>Flanger</b><span>A copy of itself a few milliseconds behind, swept slowly. The whoosh is the two copies cancelling.</span></span>
+          <span class="fxa-txt"><b>Flanger</b><span>Adds a sweeping, whoosing sound.</span></span>
           <span class="fxa-wave" data-wave="flanger"><span class="pw"></span></span>
         </li>
 
-        <li class="fxa-row" style="--c:var(--mx-blur)">
+        <li class="fxa-row" style="--c:var(--mx-blur);--tx:22%;--ty:-8%;--bx:56%;--by:102%;--gt:.6310;--igm:.82;">
           <span class="fxa-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6c3.6 4.3 6.6 8 6.6 11.4A6.6 6.6 0 0 1 12 20.6a6.6 6.6 0 0 1-6.6-6.6C5.4 10.6 8.4 6.9 12 2.6z"/></svg></span>
           <button type="button" class="fxa-play" data-clip="blur" aria-pressed="false" aria-label="Play Blur">
             <svg class="ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2a1 1 0 0 1 1.53-.85l9 6.8a1 1 0 0 1 0 1.7l-9 6.8A1 1 0 0 1 8 18.8z"/></svg>
             <svg class="ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h3.4v16H7zm6.6 0H17v16h-3.4z"/></svg>
           </button>
-          <span class="fxa-txt"><b>Blur</b><span>A low-pass closed most of the way. Everything bright goes, and the hats disappear first.</span></span>
+          <span class="fxa-txt"><b>Blur</b><span>Soft and muffled, as if underwater.</span></span>
           <span class="fxa-wave" data-wave="blur"><span class="pw"></span></span>
         </li>
       </ul>
     </div>
 
-    <p class="foot">The loop is synthesised for this page &mdash; 103&nbsp;BPM in B minor, four-on-the-floor with an octave-jumping bassline and claps on the backbeat, in the neighbourhood of what people actually remix. Mixr was built against commercial masters, and none of those can ship on a public site, so the page writes its own source and runs the five effects over it. Every clip is levelled to the same peak: an A/B where one option is simply louder isn&rsquo;t an A/B. What changes is timbre and time, and that survives levelling. Reverb is a Freeverb topology at .965 feedback, Echo is one beat of delay at .58, Pitch is an overlap-add shift of +7 semitones, Flanger sweeps a 1&ndash;6&nbsp;ms delay, Blur is two cascaded low-pass biquads at 420&nbsp;Hz. See <code>scripts/mixr_effect_clips/generate.py</code>.</p>
-  </div>
-
-  <div class="stack rv d2">
-    <p>The red card took longest to name. Warmth described a quality rather than an action. Haze was at least picturable. It ended up Flanger &mdash; the one place I let a technical term stand, because no everyday word for it isn&rsquo;t a lie.</p>
-  </div>
-
-  <div class="flag rv d2">
-    <h3>Why an audio effect is called Blur</h3>
-    <p>I borrowed the name from visual editing so a beginner can predict what it will feel like before hearing it. Someone who has never heard the phrase &ldquo;low-pass filter&rdquo; has definitely blurred a photo, and the guess they make from the word is the right one.</p>
-  </div>
-
-  <div class="demo rv d2">
-    <p class="sub">Transition duration</p>
-    <div class="sg-wrap">
-      <span class="sg-lab">Duration</span>
-      <div class="sg" id="sg" role="group" aria-label="Transition duration in beats">
-        <span class="sg-pill" id="sgpill" aria-hidden="true"></span>
-        <button type="button" aria-pressed="true"  data-n="1">1 Beat</button>
-        <button type="button" aria-pressed="false" data-n="2">2</button>
-        <button type="button" aria-pressed="false" data-n="4">4</button>
-        <button type="button" aria-pressed="false" data-n="8">8</button>
-      </div>
+    <p class="foot">Other effects I considered were Warmth, Chorus, and Bass Boost. I chose this set because they each had distinct impact on audio and allowed room for experimentation.</p>
     </div>
-    <p class="foot">Beats, not seconds &mdash; suggested by people following the build on X, and obviously right once said out loud. A transition is counted in the music's own unit.</p>
-    <p class="foot" style="margin-top:12px">The pill is tinted with the <em>track's</em> colour, not left neutral. <code>TLTransitionSettingsSegmentedControl</code> takes a <code>trackColor</code> and threads it through the whole stack &mdash; body fill at .13, the rim gradient, an inner highlight at .12, and both shadows at .08. It is set to the purple track here. Plain glass would have been easier and slightly cleaner, and it would have thrown away the one thing the control says before you read it: which lane you are about to change.</p>
-    <figure style="margin-top:22px;max-width:500px">
-      <video preload="none" data-src="art/segmented.mp4" poster="art/segmented-poster.jpg" muted loop playsinline controls
-             aria-label="The Crossfade panel in the app: the Duration pill sliding and resizing across 1 Beat, 2, 4 and 8, then the Curve control switching between Linear, Ease In/Out and Ease Out."></video>
-    </figure>
-    <p class="foot">The same control in the app.</p>
   </div>
 
-  <div class="demo rv d2">
-    <p class="sub">Identity</p>
-    <div class="brand">
-      <img src="art/app-icon.png" alt="The Mixr app icon: a purple gradient tile with the uneven waveform mark." loading="lazy">
-      <ul class="swatches">
-        <li><span style="background:var(--mx-purple)"></span><code>#7C3AED</code></li>
-        <li><span style="background:var(--mx-pitch)"></span><code>#FF5FA2</code></li>
-        <li><span style="background:var(--mx-echo)"></span><code>#8B5CF6</code></li>
-        <li><span style="background:var(--mx-flanger)"></span><code>#EF4444</code></li>
-        <li><span style="background:var(--mx-blur)"></span><code>#EAB308</code></li>
-        <li><span style="background:var(--mx-reverb)"></span><code>#0EA5E9</code></li>
-        <li><span style="background:var(--mx-bg)"></span><code>#050816</code></li>
-      </ul>
-    </div>
-    <p class="foot">Purple is the brand; the other five are the track colors, assigned in order as songs are imported. The near-black ground is what makes six of them legible at once.</p>
-  </div>
-
-  <div class="stack rv d2">
-    <p>The app carries a real design system, and it was the first thing built &mdash; before a single screen. Tokens, then components, then layouts. Doing it in that order is what let a coding agent make changes for weeks without the interface drifting.</p>
-    <p>What follows is that system rebuilt in the browser, in the same order the app&rsquo;s own <code>DesignSystemPreviewView</code> lists it. Every number is read out of the Swift, not measured off a screenshot.</p>
-  </div>
-
-  <div class="demo rv d2">
-    <div class="rowlab">
-      <span class="demo-title">Design system</span>
-      <span class="hint">REBUILT FROM THE SOURCE &middot; NOT A SCREENSHOT</span>
-    </div>
-
-    <p class="sub">Color palette &middot; <code>MixrColors.swift</code></p>
-    <div class="ds">
-      <div class="ds-card">
-        <h5>Surfaces &amp; text</h5>
-        <ul class="ds-sw">
-          <li><i style="background:#050816"></i><b>Background</b><code>#050816</code></li>
-          <li><i style="background:#080B16"></i><b>Background Secondary</b><code>#080B16</code></li>
-          <li><i style="background:#111827"></i><b>Surface</b><code>#111827</code></li>
-          <li><i style="background:#171E2E"></i><b>Elevated Surface</b><code>#171E2E</code></li>
-          <li><i style="background:#2A3142"></i><b>Divider</b><code>#2A3142</code></li>
-          <li><i style="background:#9CA3AF"></i><b>Text Secondary</b><code>#9CA3AF</code></li>
-        </ul>
-      </div>
-      <div class="ds-card">
-        <h5>Accent</h5>
-        <ul class="ds-sw">
-          <li><i style="background:#7C3AED"></i><b>Primary Purple</b><code>#7C3AED</code></li>
-          <li><i style="background:#8B5CF6"></i><b>Secondary Purple</b><code>#8B5CF6</code></li>
-        </ul>
-        <p class="ds-note">Two purples, and the app never invents a third. Primary is the brand and every committing action; secondary is the same hue lifted for gradients and glows.</p>
-      </div>
-      <div class="ds-card">
-        <h5>Waveform base</h5>
-        <ul class="ds-sw">
-          <li><i style="background:#FF5FA2"></i><b>Pink</b><code>#FF5FA2</code></li>
-          <li><i style="background:#8B5CF6"></i><b>Purple</b><code>#8B5CF6</code></li>
-          <li><i style="background:#EF4444"></i><b>Red</b><code>#EF4444</code></li>
-          <li><i style="background:#EAB308"></i><b>Yellow</b><code>#EAB308</code></li>
-          <li><i style="background:#0EA5E9"></i><b>Blue</b><code>#0EA5E9</code></li>
-        </ul>
-        <p class="ds-note">Handed out in this order as songs import. Five, because a sixth lane is where the colours stop being tellable apart at clip size.</p>
-      </div>
-    </div>
-
-    <p class="sub" style="margin-top:32px">Typography &middot; <code>MixrTypography.swift</code></p>
-    <ul class="ds-type">
-      <li><span class="spec" style="font-size:24px;font-weight:600;letter-spacing:-.01em">Mixr</span><span class="meta">DISPLAY LOGO &middot; 24 / SEMIBOLD</span></li>
-      <li><span class="spec" style="font-size:15px;font-weight:600">Effects</span><span class="meta">SECTION TITLE &middot; 15 / SEMIBOLD</span></li>
-      <li><span class="spec" style="font-size:13px;font-weight:600">Blinding Lights</span><span class="meta">SONG TITLE &middot; 13 / SEMIBOLD</span></li>
-      <li><span class="spec" style="font-size:12px;font-weight:400">Adjust reverb and echo levels</span><span class="meta">BODY &middot; 12 / REGULAR</span></li>
-      <li><span class="spec" style="font-size:12px;font-weight:500">Import Songs</span><span class="meta">BUTTON &middot; 12 / MEDIUM</span></li>
-      <li><span class="spec" style="font-size:12px;font-weight:500;font-family:var(--fm)">1:24 / 3:45</span><span class="meta">TIMECODE &middot; 12 / MEDIUM / MONOSPACED</span></li>
-      <li><span class="spec" style="font-size:10px;font-weight:500">The Weeknd &middot; 03:20 &middot; 124 BPM</span><span class="meta">METADATA &middot; 10 / MEDIUM</span></li>
-      <li><span class="spec" style="font-size:9px;font-weight:400">KEY</span><span class="meta">CAPTION &middot; 9 / REGULAR</span></li>
-    </ul>
-    <p class="foot">Eight styles, rendered here at their real sizes and weights &mdash; the row heights are the specimen. Timecode is the only monospaced one, because a clock that changes width as it counts is the fastest way to make a transport bar feel cheap. Nothing in the app sets a font size inline; a view names a style and gets all four properties.</p>
-
-    <p class="sub" style="margin-top:32px">Glass &middot; <code>GlassCardModifier.swift</code></p>
-    <ul class="ds-glass">
-      <li>
-        <span class="sw" style="--tint:#050810;--fill:.28;--hi:.08;--lo:.05;--bd:rgba(255,255,255,.06)"></span>
-        <span class="cap"><b>Default</b>tint .28 &middot; mat .08<br>border white .06</span>
-      </li>
-      <li>
-        <span class="sw" style="--tint:#050810;--fill:.30;--hi:.07;--lo:.06;--bd:rgba(124,58,237,.42)"></span>
-        <span class="cap"><b>Selected</b>tint .30 &middot; mat .07<br>border purple .42</span>
-      </li>
-      <li>
-        <span class="sw" style="--tint:#0A0F1A;--fill:.34;--hi:.10;--lo:.075;--bd:rgba(255,255,255,.08)"></span>
-        <span class="cap"><b>Elevated</b>tint .34 &middot; mat .10<br>border white .08</span>
-      </li>
-      <li>
-        <span class="sw" style="--tint:#0A0F1A;--fill:.42;--hi:.12;--lo:.09;--bd:rgba(255,255,255,.10)"></span>
-        <span class="cap"><b>Strong</b>tint .42 &middot; mat .12<br>border white .10</span>
-      </li>
-    </ul>
-    <p class="foot">Four levels, and the only one that changes hue is Selected &mdash; its border goes purple rather than getting brighter. That is the entire selection language of the app: a card, a preset, a track row and a toggle all say &ldquo;this one&rdquo; the same way. <code>edgeHighlightOpacity</code> also jumps .16&nbsp;&rarr;&nbsp;.24 and <code>lowerReflectionOpacity</code> .08&nbsp;&rarr;&nbsp;.36 on selection, which is what makes the lit card look like it caught the light rather than turned on.</p>
-
-    <p class="sub" style="margin-top:32px">Buttons &middot; <code>MixrButtonStyles.swift</code></p>
-    <div class="ds-btns">
-      <button type="button" class="mx-btn mx-btn--primary">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a1 1 0 0 1 1 1v8.6l2.3-2.3a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4l2.3 2.3V4a1 1 0 0 1 1-1zM5 18a1 1 0 0 1 1-1h12a1 1 0 0 1 0 2H6a1 1 0 0 1-1-1z"/></svg>
-        Export
-      </button>
-      <button type="button" class="mx-btn mx-btn--glass">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h5V4a1 1 0 0 1 2 0v6a1 1 0 0 1-2 0V8H4a1 1 0 0 1 0-2zm9 0h7a1 1 0 0 1 0 2h-7a1 1 0 0 1 0-2zm-9 10h7a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm11-2a1 1 0 0 1 2 0v2h3a1 1 0 0 1 0 2h-3v2a1 1 0 0 1-2 0z"/></svg>
-        Mixer
-      </button>
-      <button type="button" class="mx-btn mx-btn--icon is-play" aria-label="Play">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2a1 1 0 0 1 1.53-.85l9 6.8a1 1 0 0 1 0 1.7l-9 6.8A1 1 0 0 1 8 18.8z"/></svg>
-      </button>
-      <button type="button" class="mx-btn mx-btn--icon" aria-label="Mixer panel">
-        <svg viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px"><path d="M4 6h5V4a1 1 0 0 1 2 0v6a1 1 0 0 1-2 0V8H4a1 1 0 0 1 0-2zm9 0h7a1 1 0 0 1 0 2h-7a1 1 0 0 1 0-2zm-9 10h7a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm11-2a1 1 0 0 1 2 0v2h3a1 1 0 0 1 0 2h-3v2a1 1 0 0 1-2 0z"/></svg>
-      </button>
-      <button type="button" class="mx-btn mx-btn--toggle" aria-pressed="true" data-toggle>S</button>
-      <button type="button" class="mx-btn mx-btn--toggle" aria-pressed="false" data-toggle>M</button>
-    </div>
-    <p class="foot">Live &mdash; press them. Primary is the only gradient fill in the app and it is spent on one thing per screen. Everything else is Glass Default, which is why the bar reads as one material with a single bright object in it. Metrics: <code>MixrRadius.button 12</code>, <code>icon 20</code>, <code>MixrLayout.buttonPaddingH 16 / V 10</code>, <code>iconButtonSize 40</code>, <code>toggleButtonWidth 32</code>. Solo and mute are the toggles &mdash; selected state is the purple border again, not a fill.</p>
-
-    <p class="sub" style="margin-top:32px">Radius &amp; spacing &middot; <code>DesignTokens.swift</code></p>
-    <p class="foot" style="margin-top:0">
-      <code>MixrSpacing</code> &mdash; xxs 2 &middot; xs 4 &middot; sm 8 &middot; md 12 &middot; lg 16 &middot; xl 24.<br>
-      <code>MixrRadius</code> &mdash; glass 16 &middot; button 12 &middot; icon 20 &middot; toggle 16 &middot; waveform 10.<br>
-      <code>WaveformStyle</code> &mdash; lane height 48 &middot; corner 10 &middot; inner padding 8 &middot; clip opacity 0.55 &middot; bar 2 at 1 spacing &middot; fade 15%.<br>
-      Six spacing steps and five radii for the whole app. A component that needs a seventh is usually a component that is wrong.
-    </p>
-  </div>
 
   <div class="dec rv d2">
     <h3 style="margin-top:36px">Matching the brand.</h3>
-    <p>The sound-effects menu started as a ChatGPT recreation, and it was a good starting point &mdash; the grid, the durations under the names, the icon-over-label stack all survived. What did not survive was the finish. Every tile glowed the same hard white, and white is not a colour this app owns.</p>
+    <p>The sound-effects menu started as a ChatGPT recreation, and it was a good starting point &mdash; the grid, the durations under the names, the icon-over-label stack all survived. What did not survive was the finish. Every tile glowed the same hard white, and white is not a color this app owns.</p>
     <p>Rejected: the white version. It looks premium in isolation and it belongs to nothing. Drop it back into the app and it is the only surface not speaking the same language as the effect cards, the waveforms and the transport.</p>
 
     <div class="demo" style="margin-top:20px">
@@ -1973,7 +1842,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
           <span class="sfx-label"><b>Clap Fill</b><span>2s</span></span>
         </div>
       </div>
-      <p class="foot">Not a screenshot &mdash; a rebuild at the shipped pt sizes, so a 200&times;138 card here is a 200&times;138 card on device. Charcoal-indigo glass (<code>#1B1F2E</code> &rarr; <code>#101421</code>), a 0.85px white rim at .16, a pearl icon ramp (<code>#F8F5FF</code> &rarr; <code>#E6DCFF</code>) carrying a tight white core glow at 2.8 and a pearl bloom at 6, and the duration in <code>sfxMenuLavender</code> <code>#C9B9F4</code> at .88. The white is still there &mdash; it just moved into the icon, where it reads as light rather than as a colour choice, and everything around it went lavender to match the rest of the app.</p>
+      <p class="foot">Not a screenshot &mdash; a rebuild at the shipped pt sizes, so a 200&times;138 card here is a 200&times;138 card on device. Charcoal-indigo glass (<code>#1B1F2E</code> &rarr; <code>#101421</code>), a 0.85px white rim at .16, a pearl icon ramp (<code>#F8F5FF</code> &rarr; <code>#E6DCFF</code>) carrying a tight white core glow at 2.8 and a pearl bloom at 6, and the duration in <code>sfxMenuLavender</code> <code>#C9B9F4</code> at .88. The white is still there &mdash; it just moved into the icon, where it reads as light rather than as a color choice, and everything around it went lavender to match the rest of the app.</p>
     </div>
 
     <div class="flag">
@@ -1982,12 +1851,12 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
     <div class="demo" style="margin-top:20px">
       <div class="rowlab">
-        <button type="button" class="fold" id="icons-fold" aria-expanded="true" aria-controls="icons-body">
-          <span class="demo-title">Icon Designs</span>
+        <button type="button" class="fold" id="icons-fold" aria-expanded="false" aria-controls="icons-body">
+          <span class="demo-title">App Icon Options</span>
           <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.3 8.6a1 1 0 0 1 1.4 0L12 13.9l5.3-5.3a1 1 0 1 1 1.4 1.42l-6 6a1 1 0 0 1-1.4 0l-6-6a1 1 0 0 1 0-1.42z"/></svg>
         </button>
       </div>
-      <div id="icons-body">
+      <div id="icons-body" data-folded="true">
       <ul class="icons">
         <li class="pick">
           <figure><img src="art/icon-simple.webp" alt="Icon option two: the waveform mark alone, glowing purple on a dark glass tile." loading="lazy"></figure>
@@ -1998,7 +1867,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
         <li>
           <figure><img src="art/icon-disco.webp" alt="Icon option one: the waveform mark inside an iridescent soap-bubble sphere, on near-black." loading="lazy"></figure>
           <b>Disco</b>
-          <i>Inspired by Spotify's disco takeover.</i>
+          <i>Inspired by Spotify&rsquo;s disco takeover.</i>
           <span class="v">Rejected</span>
         </li>
         <li>
@@ -2046,7 +1915,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
   <div class="dec rv d1">
     <h3>Claude Code vs. Codex vs. Cursor</h3>
-    <p>Each is good at different tasks. Codex is good at planning, research, and visual exploration. Claude Code is good at grunt work coding. Cursor is if I don't want to switch between an agent chat and code editor. My best setup is to talk through plans with ChatGPT's free tier, then pay for Claude Code or Cursor to build.</p>
+    <p>Each is good at different tasks. Codex is good at planning, research, and visual exploration. Claude Code is good at grunt work coding. Cursor is if I don&rsquo;t want to switch between an agent chat and a code editor. My best setup is to talk through plans with ChatGPT&rsquo;s free tier, then pay for Claude Code or Cursor to build.</p>
   </div>
 </section>
 
@@ -2075,7 +1944,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
   <form class="beta rv d2" id="beta" novalidate>
     <h3>Get Mixr Beta</h3>
-    <p>Sign up for the mailing list to get Mixr Beta when it's released.</p>
+    <p>Sign up for the mailing list to get Mixr Beta when it&rsquo;s released.</p>
     <div class="beta-row">
       <label class="visually-hidden" for="beta-email">Email address</label>
       <input id="beta-email" name="email" type="email" inputmode="email" autocomplete="email"
@@ -2119,7 +1988,11 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   var links = [].slice.call(document.querySelectorAll("#jump a"));
   var secs  = links.map(function(a){ return document.querySelector(a.getAttribute("href")); });
   var bar = document.getElementById("bar");
-  var pct = document.getElementById("pct");
+  /* pctEl, not pct: everything on this page shares one function scope, and the
+     live timeline further down declares its own `var pct` unit formatter
+     inside an `if` block — which is not a scope, so it was overwriting this
+     reference and freezing the readout at the 0% it painted on load. */
+  var pctEl = document.getElementById("pct");
   function onScroll(){
     var y = window.scrollY + window.innerHeight*0.28, cur = -1;
     secs.forEach(function(s,i){ if(s && s.offsetTop <= y) cur = i; });
@@ -2127,7 +2000,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     var h = document.documentElement.scrollHeight - window.innerHeight;
     var p = h > 0 ? Math.min(100, Math.max(0, window.scrollY / h * 100)) : 0;
     if(bar) bar.style.inset = "0 " + (100 - p) + "% 0 0";
-    if(pct) pct.textContent = Math.round(p) + "%";
+    if(pctEl) pctEl.textContent = Math.round(p) + "%";
   }
   addEventListener("scroll", onScroll, {passive:true});
 
@@ -2214,116 +2087,83 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
      replaces the previous one rather than stacking. */
   var rail = document.getElementById("fxrail");
   if(rail){
+    /* Selection only. The block used to open EffectControlTray's sliders and
+       preset pickers beside the card; this demo is now just the cards, so the
+       whole tray is gone and a press does exactly what it does in the app —
+       lights the card. Buttons fire click on Enter and Space for free, which
+       is why there is no key handler here. */
     var cards = [].slice.call(rail.querySelectorAll(".ec"));
-
-    /* EffectControlTray.swift. Reverb, Echo and Pitch carry preset segmented
-       controls and get presetWidth 236; Flanger and Blur are intensity-only at
-       sliderOnlyWidth 190. Auto opens no tray — it is the arrangement action,
-       not a per-clip effect with a level. Preset titles are the enum's own
-       (ReverbPreset / EchoPreset / PitchDirection in Models/ClipEffects.swift);
-       Pitch reads "Pitch Up" when selected and "Down" when not, which is what
-       PitchDirection.label does. */
-    var TRAY = {
-      Reverb:  { w:236, presets:["Small Room","Hall","Ambient"], sel:0 },
-      Echo:    { w:236, presets:["Classic","Ping Pong","Reverse"], sel:0 },
-      Pitch:   { w:236, presets:["Pitch Up","Down"], sel:0 },
-      Flanger: { w:190, presets:null },
-      Blur:    { w:190, presets:null }
-    };
-
-    var tray = document.createElement("div");
-    tray.className = "ec-tray";
-    rail.appendChild(tray);
-
-    function buildTray(card, name){
-      var cfg = TRAY[name];
-      tray.style.setProperty("--tw", cfg.w + "px");
-      tray.style.setProperty("--c", getComputedStyle(card).getPropertyValue("--c"));
-      var inner = document.createElement("div");
-      inner.className = "inner";
-
-      var row = document.createElement("div");
-      row.className = "ec-row";
-      var range = document.createElement("input");
-      range.type = "range"; range.min = 0; range.max = 100; range.value = 0;
-      range.setAttribute("aria-label", name + " level");
-      var zero = document.createElement("span");
-      zero.className = "ec-zero"; zero.textContent = "0";
-      var val = document.createElement("span");
-      val.className = "ec-val"; val.textContent = "100";
-      /* Grey 100 until the slider is touched, then the live value in white —
-         showsCurrentValue in the tray. */
-      range.addEventListener("input", function(){
-        val.textContent = range.value;
-        val.classList.add("on");
-      });
-      row.appendChild(zero); row.appendChild(range); row.appendChild(val);
-      inner.appendChild(row);
-
-      if(cfg.presets){
-        var seg = document.createElement("div");
-        seg.className = "ec-seg";
-        cfg.presets.forEach(function(label, i){
-          var b = document.createElement("button");
-          b.type = "button"; b.textContent = label;
-          b.setAttribute("aria-pressed", String(i === cfg.sel));
-          b.addEventListener("click", function(){
-            cfg.sel = i;
-            [].slice.call(seg.children).forEach(function(o, j){
-              o.setAttribute("aria-pressed", String(j === i));
-            });
-          });
-          seg.appendChild(b);
-        });
-        inner.appendChild(seg);
-      }
-      tray.replaceChildren(inner);
-    }
-
-    /* Leftover panel width after the focused card, which is what the tray
-       actually spans. Recomputed on resize so it keeps filling. */
-    function fillTray(card){
-      var pad = parseFloat(getComputedStyle(rail).paddingLeft) || 0;
-      var gap = parseFloat(getComputedStyle(rail).gap) || 12;
-      var room = rail.clientWidth - pad * 2 - card.getBoundingClientRect().width - gap;
-      tray.style.setProperty("--fill", Math.max(0, room) + "px");
-    }
-    addEventListener("resize", function(){
-      if(!tray.classList.contains("open")) return;
-      var open = cards.find(function(c){ return c.getAttribute("aria-pressed") === "true"; });
-      if(open) fillTray(open);
-    }, {passive:true});
-
-    function closeTray(){
-      tray.classList.remove("open");
-      tray.style.setProperty("--tw", "0px");
-    }
+    /* railDrag, not drag: the whole page shares one function scope and the live
+       timeline further down declares its own `var drag`, which would overwrite
+       this one and make every click throw. Same trap as pctEl above. */
+    var railDrag = {on:false, moved:false, x:0, left:0, id:null};
 
     cards.forEach(function(c){
-      c.addEventListener("click", function(){
+      c.addEventListener("click", function(e){
+        // A real drag already scrolled the rail — that gesture was a scroll,
+        // not a press, so it must not change the selection.
+        if(railDrag.moved){
+          e.preventDefault();
+          railDrag.moved = false;
+          return;
+        }
         var was = c.getAttribute("aria-pressed") === "true";
         cards.forEach(function(o){ o.setAttribute("aria-pressed","false"); });
         c.setAttribute("aria-pressed", was ? "false" : "true");
-
-        var name = (c.querySelector(".ec-name") || {}).textContent || "";
-        if(was || !TRAY[name]){ closeTray(); return; }
-
-        // The tray grows out of the card it belongs to, so it has to sit
-        // immediately after it — siblings get pushed along by the flex row.
-        buildTray(c, name);
-        c.insertAdjacentElement("afterend", tray);
-        /* Flush layout so the transition has a start width to run from. A
-           requestAnimationFrame would do it too, but rAF does not fire in a
-           backgrounded tab and is throttled elsewhere — the tray would just
-           never open. Reading offsetWidth is synchronous and always lands. */
-        fillTray(c);
-        void tray.offsetWidth;
-        tray.classList.add("open");
-        // Focused card goes to the head of the row; the rest push off right.
-        rail.scrollTo({ left: c.offsetLeft - rail.offsetLeft,
-                        behavior: reduce ? "auto" : "smooth" });
+      });
+      // Keyboard focus has to bring the card into view, or tabbing walks the
+      // selection off the side of a rail that cannot scroll itself.
+      c.addEventListener("focus", function(){
+        c.scrollIntoView({inline:"nearest", block:"nearest",
+                          behavior: reduce ? "auto" : "smooth"});
       });
     });
+
+    /* Drag to scroll, same gesture as the Surprise Rail prototype. The whole
+       trick is the 8px threshold: below it the pointer is a click and the card
+       selects, above it the rail scrolls and the click is swallowed. Touch is
+       left alone — the browser's own swipe scrolling is better than anything
+       reimplemented here, which is what touch-action:pan-x preserves. */
+    var THRESH = 8;
+    rail.addEventListener("pointerdown", function(e){
+      if(e.pointerType === "touch" || e.button !== 0) return;
+      railDrag.on = true; railDrag.moved = false;
+      railDrag.x = e.clientX; railDrag.left = rail.scrollLeft; railDrag.id = e.pointerId;
+    });
+    rail.addEventListener("pointermove", function(e){
+      if(!railDrag.on || e.pointerId !== railDrag.id) return;
+      var dx = e.clientX - railDrag.x;
+      if(!railDrag.moved && Math.abs(dx) > THRESH){
+        railDrag.moved = true;
+        rail.classList.add("is-dragging");
+        try { rail.setPointerCapture(e.pointerId); } catch (err) {}
+      }
+      if(railDrag.moved) rail.scrollLeft = railDrag.left - dx;
+    });
+    function endDrag(e){
+      if(!railDrag.on || (e && railDrag.id != null && e.pointerId !== railDrag.id)) return;
+      var wasDrag = railDrag.moved;
+      railDrag.on = false; railDrag.id = null;
+      rail.classList.remove("is-dragging");
+      // click fires after pointerup in the same turn, so the flag has to
+      // survive until the handler above has read it — clear on the next task.
+      if(wasDrag) setTimeout(function(){ railDrag.moved = false; }, 0);
+    }
+    rail.addEventListener("pointerup", endDrag);
+    rail.addEventListener("pointercancel", endDrag);
+
+    // Vertical wheel scrolls the rail, but only while it has somewhere to go —
+    // at either end the page takes the scroll back, so the reader is never
+    // trapped in the component.
+    rail.addEventListener("wheel", function(e){
+      if(rail.scrollWidth <= rail.clientWidth) return;
+      if(Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+      var atStart = rail.scrollLeft <= 0;
+      var atEnd = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 1;
+      if((e.deltaY < 0 && atStart) || (e.deltaY > 0 && atEnd)) return;
+      e.preventDefault();
+      rail.scrollLeft += e.deltaY;
+    }, {passive:false});
   }
 
   /* Beta signup → pranaviram2@gmail.com.
@@ -2361,14 +2201,14 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       // Deliberately loose: the server is the real validator, and an overly
       // strict pattern rejects legitimate addresses.
       if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-        say("That doesn't look like an email address. Mind checking it?", "err");
+        say("That doesn&rsquo;t look like an email address. Mind checking it?", "err");
         betaInput.focus();
         return;
       }
       if(!BETA_ENDPOINT){
-        say("The list isn't wired up yet. Message me on "
+        say("The list isn&rsquo;t wired up yet. Message me on "
           + "<a href=\"" + BETA_FALLBACK + "\" target=\"_blank\" rel=\"noreferrer\">X</a>"
-          + " and I'll add you to the beta by hand.");
+          + " and I&rsquo;ll add you to the beta by hand.");
         return;
       }
       betaBtn.disabled = true;
@@ -2393,7 +2233,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
         }, function(){ /* not JSON — the status is all there is */ });
       }).then(function(){
         beta.reset();
-        say("You're on the list! Message me on "
+        say("You&rsquo;re on the list! Message me on "
           + "<a href=\"" + BETA_FALLBACK + "\" target=\"_blank\" rel=\"noreferrer\">X</a>"
           + " if you have any more questions.");
       }).catch(function(err){
@@ -2404,7 +2244,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
         if(window.console && console.warn){
           console.warn("Mixr beta signup failed:", (err && err.message) || err);
         }
-        say("That didn't go through. Try again, or message me on "
+        say("That didn&rsquo;t go through. Try again, or message me on "
           + "<a href=\"" + BETA_FALLBACK + "\" target=\"_blank\" rel=\"noreferrer\">X</a>.", "err");
       }).then(function(){
         betaBtn.disabled = false;
@@ -2954,22 +2794,6 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     }
   }
 
-  /* The spill-glow rail: a clone of the main effects rail with Echo already
-     lit, so the wash onto its neighbours is visible without asking the reader
-     to press anything. Cloned rather than authored twice — one source of truth
-     for the card markup, and it cannot drift from the rail above it. */
-  var spill = document.getElementById("fxspill");
-  var srcRail = document.getElementById("fxrail");
-  if(spill && srcRail){
-    spill.innerHTML = srcRail.innerHTML;
-    [].slice.call(spill.querySelectorAll(".ec")).forEach(function(c, i){
-      c.setAttribute("aria-pressed", i === 2 ? "true" : "false");  // Echo
-      c.tabIndex = -1;                       // decorative: aria-hidden on the rail
-    });
-    // No tray in this one — it is about the glow between cards, not the control.
-    [].slice.call(spill.querySelectorAll(".ec-tray")).forEach(function(t){ t.remove(); });
-  }
-
   /* Collapsible demo panels. Generic over [class=fold] + aria-controls, so a
      second one costs no JS. */
   [].slice.call(document.querySelectorAll(".fold")).forEach(function(btn){
@@ -3178,7 +3002,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       nbNums.textContent = Math.abs(resid) < 0.5
         ? "Cluster centre is on the bar's centre — balanced."
         : "Cluster centre sits " + Math.abs(resid).toFixed(1) + "px " +
-          (resid >= 0 ? "right" : "left") + " of the bar's centre.";
+          (resid >= 0 ? "right" : "left") + " of the bar's center.";
     }
 
     nbBtns.forEach(function(b){

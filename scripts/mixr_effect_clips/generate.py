@@ -44,6 +44,9 @@ OUT = os.path.abspath(OUT)
 
 t = np.arange(N) / SR
 
+# B minor, the key the page claims.
+B2, D3, FS3, A3, B3, D4, FS4 = 61.74, 73.42, 92.50, 220.0, 123.47, 146.83, 185.0
+
 
 # ---------------------------------------------------------------- synthesis --
 
@@ -139,28 +142,48 @@ CHORDS = [
 
 
 def build_source():
-    x = np.zeros(N)
-    for b in range(BEATS):
-        x += kick(b * BEAT)                             # four on the floor
-        x += hat(b * BEAT + BEAT * 0.5, 0.13)           # offbeat hat
-        x += hat(b * BEAT + BEAT * 0.25, 0.055)         # 16th ghost
-        x += hat(b * BEAT + BEAT * 0.75, 0.055)
-        if b % 2 == 1:
-            x += clap(b * BEAT)                         # backbeat, 2 and 4
+    """Candidate B — a melodic hook over a sustained pad.
 
-    for i, (root, triad) in enumerate(CHORDS):
-        s = i * 2 * BEAT
-        # Octave-jumping eighths — root on the beat, octave up on the "and".
-        # This figure is the whole character of the groove.
-        for e in range(4):
-            at = s + e * (BEAT / 2)
-            f  = root * (2.0 if e % 2 else 1.0)
-            x += tone(f, at, BEAT * 0.42, 0.34, "saw", curve=1.8)
-        # Chord stab on the downbeat, answered short on the second beat's "and".
-        for f in triad:
-            x += tone(f, s, 0.42, 0.105, "saw", detune=0.005, curve=2.6)
-        for f in triad:
-            x += tone(f, s + BEAT * 1.5, 0.24, 0.07, "tri", curve=2.8)
+    The first loop here was a dense four-on-the-floor with a hat on every 16th,
+    and it was the wrong material: with no gaps, reverb tails and echo repeats
+    land on top of more loop and simply vanish. Measured against the dry signal
+    the old echo came back at 0.96 correlation — the same waveform, slightly
+    louder. What each effect needs from a source is different, and one loop has
+    to serve all five:
+
+      reverb   transients with SILENCE after them; the tail lives in the gap
+      echo     isolated hits with at least a beat of room
+      pitch    a monophonic line you can hum, so the interval is unmistakable
+      flanger  something sustained and broadband for the notches to sweep
+      blur     bright top end that can audibly disappear
+
+    Hence: a sung-length melody carrying the pitch shift, a quiet pad under it
+    for the flanger, hats for the blur, and only two kicks a bar so the gaps
+    stay open.
+    """
+    x = np.zeros(N)
+
+    # Sustained bed. Low in the mix — it is there for the flanger to comb, not
+    # to be heard as a part.
+    for k, f in enumerate((B2, FS3, D3)):
+        x += tone(f, 0.0, BEATS * BEAT, 0.055, "saw",
+                  detune=0.006 + 0.002 * k, curve=0.35)
+
+    # The hook, in B minor. Beat positions, then duration in beats.
+    for f, at, dur in ((B3, 0.0, .75), (D4, .75, .5), (FS4, 1.25, .75),
+                       (D4, 2.0, .5),  (B3, 2.5, 1.0), (A3, 3.5, .5),
+                       (FS4, 4.0, .75), (D4, 4.75, .5), (B3, 5.25, .75),
+                       (A3, 6.0, 1.0)):
+        x += tone(f, at * BEAT, dur * BEAT * 0.92, 0.34, "saw", curve=2.0)
+
+    for bar in range(BEATS // 4):
+        s = bar * 4 * BEAT
+        x += kick(s, 0.85)
+        x += kick(s + 2.5 * BEAT, 0.62)
+        x += clap(s + 2 * BEAT, 0.34)
+        for e in (0.5, 1.5, 2.5, 3.5):
+            x += hat(s + e * BEAT, 0.17)
+
     return x / np.max(np.abs(x)) * 0.82
 
 
@@ -201,39 +224,106 @@ def fx_reverb(x, wet=0.68, fb=0.965):
     return (1 - wet) * x + wet * r
 
 
-def fx_echo(x, wet=0.55, fb=0.58):
-    d = int(BEAT * SR)                       # one beat — the app counts in beats
+def fx_echo(x, wet=0.80, fb=0.74, beats=0.75):
+    """A DOTTED EIGHTH, not a whole beat. Still counted in beats — which is the
+    point the copy makes — but a one-beat delay on a beat-synced loop is the one
+    time you cannot hear: every repeat lands exactly on the next hit, so it
+    reads as "the loop got louder" rather than as an echo."""
+    d = int(BEAT * beats * SR)
     e = comb(x, d, fb)
     e /= max(np.max(np.abs(e)), 1e-9)
     return (1 - wet) * x + wet * e
 
 
-def fx_pitch(x, semitones=7.0, win=2048, hop=512):
-    """Overlap-add stretch, then resample — same length, higher pitch."""
+def fx_pitch(x, semitones=12.0, win=2048, hop=512, search=512):
+    """Pitch up an octave, tempo untouched — WSOLA, then resample.
+
+    The app runs AVAudioUnitTimePitch with .pitch and .rate set independently
+    (MixrPlaybackEngine.swift), so it shifts pitch and holds tempo. It also does
+    not compensate formants, which is exactly why the real thing sounds like a
+    chipmunk rather than like a lower voice played high. Stretch-then-resample
+    reproduces both of those.
+
+    The stretch is WSOLA rather than plain overlap-add. Plain OLA drops each
+    frame in wherever the hop counter lands, so successive frames disagree on
+    phase and partially cancel — heard as the metallic ring that made the old
+    clip sound robotic. Sliding each frame to the offset that best correlates
+    with what is already written removes it.
+
+    An octave rather than a fifth: a fifth reads as musical, an octave reads as
+    a chipmunk, which is what the row's copy promises.
+    """
     r = 2 ** (semitones / 12.0)
     hop_s = int(round(hop * r))
     w = np.hanning(win)
-    frames = 1 + max(0, (len(x) - win) // hop)
-    out = np.zeros(win + hop_s * frames)
+    frames = 1 + max(0, (len(x) - win - search) // hop)
+    out = np.zeros(win + hop_s * frames + search)
     norm = np.zeros_like(out)
+    prev_tail = None
+
     for i in range(frames):
-        a, s = i * hop, i * hop_s
-        out[s:s + win] += x[a:a + win] * w
+        a = i * hop
+        if prev_tail is None:
+            best = a
+        else:
+            lo, hi = max(0, a - search), min(len(x) - win, a + search)
+            if hi <= lo:
+                best = a
+            else:
+                c = np.correlate(x[lo:hi + win], prev_tail, mode="valid")
+                best = lo + int(np.argmax(c))
+        s = i * hop_s
+        out[s:s + win] += x[best:best + win] * w
         norm[s:s + win] += w
+        ov = win - hop_s
+        prev_tail = (x[best + hop_s: best + hop_s + min(ov, win)]
+                     if ov > 0 else x[best:best + 64])
+
     out /= np.maximum(norm, 1e-6)
     idx = np.arange(0, len(out) - 1, r)
     y = np.interp(idx, np.arange(len(out)), out)
     return np.pad(y[:len(x)], (0, max(0, len(x) - len(y))))
 
 
-def fx_flanger(x, mix=0.5, fb=0.7):
-    lfo = 0.5 * (1 - np.cos(2 * np.pi * 0.25 * t))          # 0..1 at 0.25 Hz
-    dly = (1.0 + 5.0 * lfo) * SR / 1000.0                   # 1-6 ms
-    idx = np.arange(len(x)) - dly
-    d = np.interp(idx, np.arange(len(x)), x, left=0.0)
-    y = x + mix * d
-    y = comb(y, int(3.5 * SR / 1000), fb * 0.5)             # resonant tail
-    return y / max(np.max(np.abs(y)), 1e-9) * 0.9
+def fx_flanger(x, intensity=1.5, rate=2.2, lo_ms=0.4, hi_ms=9.0):
+    """A feedback flanger, swept fast.
+
+    The first version mixed a fixed 1-6 ms tap in at 0.72 and bolted a separate
+    comb on after it, and it barely registered: with dry and wet at unequal
+    amplitude the comb notches only dip, they never null, and the null is the
+    entire sound of a flanger. So: depth >= 1.0 puts dry and wet at equal
+    amplitude, and the feedback lives INSIDE the delay line rather than in a
+    comb after it, which is what gives the resonant metallic sweep.
+
+    Rate matters as much as depth here. At 0.4 Hz the sweep drifts through
+    barely one cycle in six seconds and reads as a slow tonal shift; at 2.2 Hz
+    you hear it move, which is what makes it recognisable as a flanger rather
+    than as "something is a bit different".
+
+    `intensity` is how much of the effect is applied, on the scale the page's
+    A/B talks in: 1.0 is full depth, 2.0 is as far as it goes before the comb
+    starts eating the loop. Depth and feedback both ride it — pushing either
+    one alone changes the character rather than the amount.
+    """
+    depth = 1.00 + 0.15 * (intensity - 1.0)      # 1.00 @ 100%, 1.15 @ 200%
+    fb    = 0.85 + 0.09 * (intensity - 1.0)      # 0.85 @ 100%, 0.94 @ 200%
+
+    n = len(x)
+    lfo = 0.5 * (1 - np.cos(2 * np.pi * rate * (np.arange(n) / SR)))
+    dly = (lo_ms + (hi_ms - lo_ms) * lfo) * SR / 1000.0
+    y = np.zeros(n)
+    buf = np.zeros(n)
+    for i in range(n):
+        j = i - dly[i]
+        if j < 1:
+            s = 0.0
+        else:
+            j0 = int(j)
+            fr = j - j0
+            s = buf[j0] * (1 - fr) + buf[min(j0 + 1, n - 1)] * fr
+        buf[i] = x[i] + fb * s
+        y[i] = x[i] + depth * s
+    return y
 
 
 def fx_blur(x, cutoff=420.0):
