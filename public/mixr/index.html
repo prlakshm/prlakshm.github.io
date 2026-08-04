@@ -1403,13 +1403,13 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
    captions. It does not react to selection — the swatch carries the colour. */
 .dsys-sw b,.dsys-sw em{display:block;max-width:100%;white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis;color:#a6a6b0}
-.dsys-sw b{font-family:var(--fm);font-size:10.5px;font-weight:400;letter-spacing:.01em}
-.dsys-sw em{font-family:var(--fm);font-size:10.5px;font-style:normal;
+.dsys-sw b{font-family:var(--fm);font-size:var(--fs-micro);font-weight:400;letter-spacing:.01em}
+.dsys-sw em{font-family:var(--fm);font-size:var(--fs-micro);font-style:normal;
   letter-spacing:.02em;text-transform:uppercase}
 
 /* the five that are tabs */
 .dsys-sw--tab{cursor:pointer;position:relative;border-radius:11px 11px 0 0;
-  border:1px solid var(--ds-line-dim);border-bottom:0;padding:6px 2px 12px;
+  border:1px solid var(--ds-line-dim);border-bottom:0;margin:0 -.75px;padding:6px 2.75px 12px;
   background:var(--surface-tab);
   transition:border-color .2s ease}
 .dsys-sw--tab:hover{border-color:rgba(255,255,255,.30)}
@@ -1419,22 +1419,47 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
 /* The surface the tabs open onto. One thin outline wraps the folder — the
    components inside it stay unboxed. */
-.dsys-body{position:relative;z-index:0;margin-top:-1px;padding:22px 20px 18px;
+.dsys-body{position:relative;z-index:0;margin-top:-1px;padding:28px 20px 18px;
   border:1px solid var(--ds-line);border-radius:12px;
   background:var(--surface-tab);
-  display:grid;grid-template-columns:minmax(0,64fr) minmax(0,36fr);gap:26px;align-items:start}
-.dsys-cap{display:block;margin-top:9px;font-family:var(--fm);font-size:var(--fs-micro);
-  letter-spacing:.12em;text-transform:uppercase;color:#7a7a88}
-.dsys-wave .wave{display:block;height:74px}
-.dsys-wave .wave svg{display:block;width:100%;height:100%}
-.dsys-side{display:flex;flex-direction:column;gap:18px;min-width:0}
+  display:grid;grid-template-columns:minmax(0,64fr) minmax(0,36fr);
+  column-gap:26px;row-gap:0;align-items:stretch}
+.dsys-legend{grid-column:1/-1;margin:24px 0 0;font-family:var(--fm);font-size:var(--fs-micro);
+  letter-spacing:.12em;text-transform:uppercase;color:#a6a6b0}
+/* WaveformClip + WaveformClipBackground. Layer for layer: #080C14 navy base,
+   a topLeading->bottomTrailing tint of the token at 18% -> 10%, then a
+   top-down depth pass of black .18 / clear / black .08. cornerRadius 10.
+   The border is stroked twice in the app (background AND clip), so two 45%
+   passes composite to ~70% — that is the single value used here. The tight
+   glow is glowColor, the token at 20%, at clipGlowRadius 4. */
+.dsys-wave{display:flex;flex-direction:column;min-height:0}
+.dsys-wave .wave{position:relative;display:block;flex:1 1 auto;min-height:0;
+  border-radius:10px;overflow:hidden;
+  background:
+    linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,0) 50%,rgba(0,0,0,.08)),
+    linear-gradient(135deg,color-mix(in srgb,var(--c) 18%,transparent),
+                           color-mix(in srgb,var(--c) 10%,transparent)),
+    #080C14;
+  box-shadow:inset 0 0 0 .5px color-mix(in srgb,var(--c) 70%,transparent),
+             0 0 4px color-mix(in srgb,var(--c) 20%,transparent)}
+.dsys-wave .wave svg{position:relative;display:block;width:100%;height:100%}
+.dsys-side{display:flex;flex-direction:column;gap:28px;min-width:0}
 
-/* SegmentedControl — ClipEditingUI.swift. The pill slides between options. */
-.seg{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;
-  align-items:stretch;padding:3px;border-radius:10px;isolation:isolate;
-  background:rgba(255,255,255,.045);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
-.seg-pill{position:absolute;top:3px;bottom:3px;border-radius:7px;z-index:0;
+/* TLTransitionSettingsSegmentedControl — ClipEditingUI.swift.
+   The track the pill slides on: controlHeight 28, cornerRadius 9, a top-down
+   black .26/.21/.30 well, a white .08 sheen over the top half, a white .09
+   hairline, a brighter white .124 rim that fades downward, and a black .34
+   inner shade pushed 1px down off the bottom edge. */
+.seg{position:relative;display:flex;align-items:center;height:33px;
+  padding:0 6px;border-radius:11px;isolation:isolate;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,0) 50%),
+    linear-gradient(180deg,rgba(0,0,0,.26),rgba(0,0,0,.21) 50%,rgba(0,0,0,.30));
+  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.09),
+             inset 0 .65px 0 rgba(255,255,255,.124),
+             inset 0 -1px 1.1px rgba(0,0,0,.34)}
+/* pillHeight 24 in a 28 track, cornerRadius 7 — scaled to 28 in 33, radius 9 */
+.seg-pill{position:absolute;top:2.5px;height:28px;border-radius:9px;z-index:0;
   background:
     linear-gradient(150deg,color-mix(in srgb,var(--c) 30%,transparent),
       color-mix(in srgb,var(--c) 12%,transparent) 30%,transparent 55%,transparent 74%,
@@ -1446,7 +1471,10 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   background-blend-mode:screen,normal,normal,normal;
   box-shadow:0 .5px 1.2px rgba(0,0,0,.24),0 1.5px 2.5px rgba(0,0,0,.32),
              0 2.5px 4.5px rgba(0,0,0,.15);
-  transition:left .3s cubic-bezier(.32,.72,.24,1),width .3s cubic-bezier(.32,.72,.24,1)}
+  transition:left .4s cubic-bezier(.32,.72,.24,1),width .4s cubic-bezier(.32,.72,.24,1),
+             transform .18s cubic-bezier(.32,.72,.24,1)}
+/* the pill stretches 1.055 on the x axis for 0.12s as it lands */
+.seg-pill[data-stretch="1"]{transform:scaleX(1.055)}
 .seg-pill::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:.75px;
   background:linear-gradient(150deg,rgba(255,255,255,.42),rgba(255,255,255,.20) 33%,
     color-mix(in srgb,var(--c) 19%,transparent) 76%,rgba(255,255,255,.08));
@@ -1455,13 +1483,16 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
   mask-composite:exclude}
 .seg button{position:relative;z-index:1;appearance:none;background:none;border:0;
-  cursor:pointer;padding:7px 4px;border-radius:7px;
-  font-family:var(--fsf);font-size:13px;color:#9aa0ad;
-  transition:color .22s ease}
-.seg button[aria-selected="true"]{color:#fff;font-weight:500}
+  cursor:pointer;flex:1 1 0;min-width:0;height:28px;padding:0 5px;border-radius:9px;
+  font-family:var(--fsf);font-size:13px;line-height:1;color:#9CA3AF;
+  white-space:nowrap;transition:color .22s ease}
+.seg button[aria-selected="true"]{flex:0 0 auto;min-width:60px;padding:0 18px;
+  color:#fff;font-weight:500}
 .seg button:focus-visible{outline:2px solid #f2f0ec;outline-offset:2px}
-.seg button + button::before{content:"";position:absolute;left:-.5px;top:50%;
-  width:1px;height:15px;margin-top:-7.5px;background:rgba(255,255,255,.13)}
+/* dividerWidth .35, height 20, MixrColors.divider at 55%, hidden wherever the
+   seam touches the selection */
+.seg button + button::before{content:"";position:absolute;left:-.175px;top:50%;
+  width:.35px;height:24px;margin-top:-12px;background:rgba(42,49,66,.55)}
 .seg button[aria-selected="true"]::before,
 .seg button[aria-selected="true"] + button::before{opacity:0}
 
@@ -2004,16 +2035,16 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
     <div class="dsys" id="ds" style="--c:#FF5FA2;--peak:#FF7FB8">
       <div class="dsys-swatches">
-        <div class="dsys-sw" style="--s:#7C3AED">
-          <i></i><b>#7C3AED</b><em>Logo color</em>
+        <div class="dsys-sw" style="--s:#5C23BE">
+          <i></i><b>#5C23BE</b><em>Logo color</em>
         </div>
         <button type="button" role="tab" class="dsys-sw dsys-sw--tab" aria-selected="true"
                 data-c="#FF5FA2" data-peak="#FF7FB8" style="--s:#FF5FA2">
           <i></i><b>#FF5FA2</b><em>Track #1</em>
         </button>
         <button type="button" role="tab" class="dsys-sw dsys-sw--tab" aria-selected="false"
-                data-c="#8B5CF6" data-peak="#C084FC" style="--s:#8B5CF6">
-          <i></i><b>#8B5CF6</b><em>Track #2</em>
+                data-c="#9068E9" data-peak="#C084FC" style="--s:#9068E9">
+          <i></i><b>#9068E9</b><em>Track #2</em>
         </button>
         <button type="button" role="tab" class="dsys-sw dsys-sw--tab" aria-selected="false"
                 data-c="#EF4444" data-peak="#F87171" style="--s:#EF4444">
@@ -2035,42 +2066,27 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       <div class="dsys-body">
         <div class="dsys-wave">
           <span class="wave" id="ds-wave"></span>
-          <span class="dsys-cap">Waveform</span>
         </div>
         <div class="dsys-side">
-          <div class="dsys-ctl">
-            <div class="seg" id="seg" role="tablist" aria-label="Transition duration in beats">
-              <i class="seg-pill" aria-hidden="true"></i>
-              <button type="button" role="tab" aria-selected="false">1</button>
-              <button type="button" role="tab" aria-selected="false">2</button>
-              <button type="button" role="tab" aria-selected="true">4</button>
-              <button type="button" role="tab" aria-selected="false">8 Beats</button>
-            </div>
-            <span class="dsys-cap">Transition control</span>
+          <div class="seg" id="seg" role="tablist" aria-label="Transition duration in beats">
+            <i class="seg-pill" aria-hidden="true"></i>
+            <button type="button" role="tab" aria-selected="false" data-n="1">1</button>
+            <button type="button" role="tab" aria-selected="false" data-n="2">2</button>
+            <button type="button" role="tab" aria-selected="true" data-n="4">4</button>
+            <button type="button" role="tab" aria-selected="false" data-n="8">8</button>
           </div>
-          <div class="dsys-ctl">
-            <div class="vol" id="vol">
-              <div class="vol-track" id="vol-track" role="slider" tabindex="0"
-                   aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="72">
-                <i class="vol-fill"></i><i class="vol-thumb"></i>
-              </div>
+          <div class="vol" id="vol">
+            <div class="vol-track" id="vol-track" role="slider" tabindex="0"
+                 aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="72">
+              <i class="vol-fill"></i><i class="vol-thumb"></i>
             </div>
-            <span class="dsys-cap">Volume slider</span>
           </div>
         </div>
+        <p class="dsys-legend">Waveform, Transition duration control, Volume slider</p>
       </div>
     </div>
 
     <p class="foot"><b>Tip:</b> Create a design system before anything else. Tokenize colors to reference them easily throughout building.</p>
-  </div>
-
-  <div class="demo rv d2">
-    <p class="sub">The same token, everywhere the track appears</p>
-    <figure class="device">
-      <video preload="none" data-src="art/transition-menu.mp4" poster="art/transition-menu-poster.jpg" autoplay muted loop playsinline
-             aria-label="The transition settings menu open on a clip edge in Mixr: Fade Out with a Duration segmented control set to 1 Beat, and a Curve control offering Linear, Ease In/Out and Ease Out. Behind it the three track rows — two songs and the Sound Effects row — each carry their own color through the waveform and the volume slider in the Controls column."></video>
-    </figure>
-    <p class="foot">Recorded on simulator device.</p>
   </div>
 
 </section>
@@ -2652,14 +2668,40 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
           glowO = silver ? ".08" : ".38",
           hi = silver ? "#E4DBFA" : peak,
           hiO = silver ? ".08" : ".20";
+      /* WaveformClipGridLines — three white .04 rules at centre and centre
+         +/- height * 0.28 * 0.5. */
+      var grid = "";
+      [-0.28, 0, 0.28].forEach(function(off){
+        var gy = (cy + H * off * 0.5).toFixed(2);
+        grid += '<line x1="0" y1="' + gy + '" x2="' + W + '" y2="' + gy +
+                '" stroke="#fff" stroke-opacity=".04" stroke-width=".5"/>';
+      });
+      /* WaveformWedgeShape — the tail guides: an upright at maxX - tailWidth
+         and two lines converging on (maxX - 2, midY). Drawn over the fade, in
+         the token at 34%, 0.75 wide. */
+      var tx0 = (W - WF_TAIL).toFixed(2), tip = (W - 2).toFixed(2), my = cy.toFixed(2),
+          wedge = '<path d="M' + tx0 + ' 1L' + tx0 + ' ' + (H - 1).toFixed(2) +
+                  'M' + tx0 + ' 1L' + tip + ' ' + my +
+                  'M' + tx0 + ' ' + (H - 1).toFixed(2) + 'L' + tip + ' ' + my +
+                  '" fill="none" stroke="' + (silver ? "#CDC2F4" : base) +
+                  '" stroke-opacity=".34" stroke-width=".75"/>';
+      /* WaveformFade.mask — the clip content fades out over its last 5%. The
+         wedge and the outline sit outside it, exactly as in WaveformClip. */
       dsWave.innerHTML =
         '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">' +
           '<defs><linearGradient id="dsg" x1="0" y1="0" x2="0" y2="1">' + stops + '</linearGradient>' +
+          '<linearGradient id="dsfade" x1="0" y1="0" x2="1" y2="0">' +
+            '<stop offset="0" stop-color="#fff"/><stop offset=".95" stop-color="#fff"/>' +
+            '<stop offset=".985" stop-color="#fff" stop-opacity=".78"/>' +
+            '<stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
+          '<mask id="dsm"><rect width="' + W + '" height="' + H + '" fill="url(#dsfade)"/></mask>' +
           '<filter id="dsgf" x="-30%" y="-30%" width="160%" height="160%">' +
             '<feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="' + glow +
             '" flood-opacity="' + glowO + '"/></filter></defs>' +
-          '<path d="' + d + '" fill="url(#dsg)"/>' +
-          '<path d="' + d + '" fill="' + hi + '" fill-opacity="' + hiO + '" filter="url(#dsgf)"/>' +
+          '<g mask="url(#dsm)">' + grid +
+            '<path d="' + d + '" fill="url(#dsg)"/>' +
+            '<path d="' + d + '" fill="' + hi + '" fill-opacity="' + hiO + '" filter="url(#dsgf)"/>' +
+          '</g>' + wedge +
         '</svg>';
     }
 
@@ -2696,9 +2738,37 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
         segPill.style.width = btn.offsetWidth + "px";
         if(!animate) requestAnimationFrame(function(){ segPill.style.transition = ""; });
       }
+      /* Re-measure on layout changes, but a frame later — the observer fires
+         while the expanded label is still reflowing, and reading offsets then
+         writes the PREVIOUS layout's width onto the pill. */
+      if(window.ResizeObserver) new ResizeObserver(function(){
+        requestAnimationFrame(function(){
+          var cur = seg.querySelector('[aria-selected="true"]');
+          if(!cur) return;
+          segPill.style.left  = cur.offsetLeft + "px";
+          segPill.style.width = cur.offsetWidth + "px";
+        });
+      }).observe(seg);
+      /* DurationOption.label(isSelected:) — the selected option spells out the
+         unit ("1 Beat", "4 Beats"), every other one stays a bare number, and the
+         pill grows into whatever the selected label needs. */
+      function segLabel(b, sel){
+        var n = b.dataset.n;
+        return sel ? (n === "1" ? "1 Beat" : n + " Beats") : n;
+      }
+      var segStretchT = null;
       function segSelect(btn, animate){
-        segBtns.forEach(function(b){ b.setAttribute("aria-selected", String(b === btn)); });
+        segBtns.forEach(function(b){
+          var sel = b === btn;
+          b.setAttribute("aria-selected", String(sel));
+          b.textContent = segLabel(b, sel);
+        });
         segMove(btn, animate);
+        if(animate && !reduce){
+          segPill.dataset.stretch = "1";
+          clearTimeout(segStretchT);
+          segStretchT = setTimeout(function(){ segPill.dataset.stretch = "0"; }, 120);
+        }
       }
       segBtns.forEach(function(b){
         b.addEventListener("click", function(){ segSelect(b, true); });
