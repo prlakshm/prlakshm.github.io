@@ -1381,6 +1381,101 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 .tt-reset:active{transform:scale(.97)}
 .tt-reset:focus-visible{outline:2px solid #f2f0ec;outline-offset:3px}
 
+/* ---- the palette: the icon, then every hue it licenses ------------------- */
+/* The icon is the shipped artwork, not a CSS rebuild. Its bars carry a neon
+   bloom strong enough to saturate the blue channel down the full height of the
+   tile — measured, every bar reads 99% tall at any threshold that catches the
+   core, because the glow IS the artwork. Rebuilding that in box-shadows would
+   lose exactly the luminosity this block is about. */
+.pal{margin-top:18px;display:grid;grid-template-columns:auto minmax(0,1fr);
+  gap:26px;align-items:center}
+.pal-icon{margin:0;flex:0 0 auto}
+.pal-icon img{display:block;width:132px;height:auto;border:0;border-radius:28px}
+.pal-list{margin:0;padding:0;list-style:none;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:14px 12px}
+.pal-list li{display:flex;flex-direction:column;gap:7px}
+.pal-sw{display:block;height:42px;border-radius:9px;background:var(--s);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.16),
+             0 2px 10px color-mix(in srgb,var(--s) 34%,transparent)}
+.pal-list b{font-family:var(--fm);font-size:11.5px;letter-spacing:.06em;color:#e8e8f0;
+  font-weight:400}
+.pal-list i{font-family:var(--fm);font-size:var(--fs-micro);font-style:normal;
+  letter-spacing:.11em;text-transform:uppercase;color:#8f96a6}
+.pal-list li.is-note i{color:color-mix(in srgb,var(--s) 78%,#fff)}
+
+/* ---- carried across components ------------------------------------------ */
+.cac{margin-top:16px;display:grid;grid-template-columns:minmax(0,65fr) minmax(0,35fr);
+  gap:16px;align-items:stretch}
+.cac-wave{position:relative;border-radius:12px;overflow:hidden;min-height:172px;
+  background:linear-gradient(180deg,#080B16,#050816);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+.cac-wave .wave{position:absolute;inset:14px;display:block}
+.cac-wave .wave svg{display:block;width:100%;height:100%}
+.cac-side{display:grid;grid-template-rows:auto 1fr;gap:16px;min-width:0}
+.cac-cell{display:flex;flex-direction:column;justify-content:center;gap:10px;
+  padding:14px 15px;border-radius:12px;
+  background:linear-gradient(180deg,#080B16,#050816);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+.cac-cell > span{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.13em;
+  text-transform:uppercase;color:#7a7a88}
+
+/* SegmentedControl — the track's own selected pill slides between the options.
+   Geometry and layers are ClipEditingUI.swift's: cornerRadius 7, the white
+   .16/.085/.03/.045 body over the material, the hue screened down the diagonal,
+   and the 0.75pt strokeBorder that picks the hue up two-thirds along. */
+.seg{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;
+  align-items:stretch;padding:3px;border-radius:10px;isolation:isolate;
+  background:rgba(255,255,255,.045);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.seg-pill{position:absolute;top:3px;bottom:3px;border-radius:7px;z-index:0;
+  background:
+    linear-gradient(150deg,color-mix(in srgb,var(--c) 30%,transparent),
+      color-mix(in srgb,var(--c) 12%,transparent) 30%,transparent 55%,transparent 74%,
+      color-mix(in srgb,var(--c) 9%,transparent) 84%,color-mix(in srgb,var(--c) 17%,transparent)),
+    radial-gradient(ellipse closest-side at 50% 50%,rgba(0,0,0,.30),transparent 92%),
+    linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.085) 25%,
+      rgba(255,255,255,.03) 50%,rgba(255,255,255,.045) 75%,rgba(0,0,0,.12)),
+    linear-gradient(#0E0A12,#08060A);
+  background-blend-mode:screen,normal,normal,normal;
+  box-shadow:0 .5px 1.2px rgba(0,0,0,.24),0 1.5px 2.5px rgba(0,0,0,.32),
+             0 2.5px 4.5px rgba(0,0,0,.15);
+  transition:left .3s cubic-bezier(.32,.72,.24,1),width .3s cubic-bezier(.32,.72,.24,1)}
+.seg-pill::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:.75px;
+  background:linear-gradient(150deg,rgba(255,255,255,.42),rgba(255,255,255,.20) 33%,
+    color-mix(in srgb,var(--c) 19%,transparent) 76%,rgba(255,255,255,.08));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  mask-composite:exclude}
+.seg button{position:relative;z-index:1;appearance:none;background:none;border:0;
+  cursor:pointer;padding:7px 4px;border-radius:7px;
+  font-family:var(--fsf);font-size:13px;color:#9aa0ad;
+  transition:color .22s ease,font-weight .22s ease}
+.seg button[aria-selected="true"]{color:#fff;font-weight:500}
+.seg button:focus-visible{outline:2px solid #f2f0ec;outline-offset:2px}
+/* dividers sit behind the pill and vanish where it touches */
+.seg button + button::before{content:"";position:absolute;left:-.5px;top:50%;
+  width:1px;height:15px;margin-top:-7.5px;background:rgba(255,255,255,.13)}
+.seg button[aria-selected="true"]::before,
+.seg button[aria-selected="true"] + button::before{opacity:0}
+
+/* the volume slider: speaker glyph, filled bar to the thumb, unfilled tail */
+.vol{display:grid;grid-template-columns:auto minmax(0,1fr);gap:11px;align-items:center}
+.vol svg{width:19px;height:19px;fill:#c6ccd8;flex:0 0 auto}
+.vol-track{position:relative;height:15px;display:flex;align-items:center}
+.vol-track::before{content:"";position:absolute;left:0;right:0;height:3px;border-radius:2px;
+  background:rgba(255,255,255,.17)}
+.vol-fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--c);
+  box-shadow:0 0 7px color-mix(in srgb,var(--c) 55%,transparent)}
+.vol-thumb{position:absolute;width:5px;height:15px;border-radius:3px;background:var(--c);
+  margin-left:-2.5px;box-shadow:0 0 8px color-mix(in srgb,var(--c) 70%,transparent),
+                                0 1px 2px rgba(0,0,0,.5)}
+@media (max-width:640px){
+  .pal{grid-template-columns:1fr;gap:18px;justify-items:start}
+  .cac{grid-template-columns:1fr}
+  .cac-wave{min-height:132px}
+}
+
 /* ---- collapsible demo panel ---------------------------------------------- */
 /* The title itself is the control, so the whole thing reads as one affordance
    rather than a heading with a stray arrow parked next to it. */
@@ -1907,6 +2002,60 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     <p>One color per track. The same color follows across the waveform, volume slider, transition settings, and segmented control.  This helps users understand the components go together.</p>
   </div>
 
+  <div class="demo rv d2">
+    <div class="rowlab">
+      <span class="demo-title">Color Palette</span>
+      <span class="hint">FIVE TRACK HUES &middot; ONE RESERVED FOR SFX</span>
+    </div>
+
+    <div class="pal">
+      <figure class="pal-icon">
+        <img src="art/icon-simple.webp" alt="The Mixr app icon: a purple waveform of six rounded bars glowing on a dark glass tile." loading="lazy">
+      </figure>
+      <ul class="pal-list">
+        <li style="--s:#FF5FA2"><span class="pal-sw"></span><b>#FF5FA2</b><i>Track</i></li>
+        <li class="is-note" style="--s:#8B5CF6"><span class="pal-sw"></span><b>#8B5CF6</b><i>Logo color</i></li>
+        <li style="--s:#EF4444"><span class="pal-sw"></span><b>#EF4444</b><i>Track</i></li>
+        <li style="--s:#EAB308"><span class="pal-sw"></span><b>#EAB308</b><i>Track</i></li>
+        <li style="--s:#0EA5E9"><span class="pal-sw"></span><b>#0EA5E9</b><i>Track</i></li>
+        <li class="is-note" style="--s:#C9B9F4"><span class="pal-sw"></span><b>#C9B9F4</b><i>SFX color</i></li>
+      </ul>
+    </div>
+
+    <p class="sub" style="margin-top:26px">Carried across components</p>
+    <div class="cac" style="--c:var(--mx-pitch)">
+      <div class="cac-wave"><span class="wave" data-seed="412"></span></div>
+      <div class="cac-side">
+        <div class="cac-cell">
+          <span>Crossfade duration</span>
+          <div class="seg" id="seg" role="tablist" aria-label="Crossfade duration in beats">
+            <i class="seg-pill" aria-hidden="true"></i>
+            <button type="button" role="tab" aria-selected="false">1</button>
+            <button type="button" role="tab" aria-selected="false">2</button>
+            <button type="button" role="tab" aria-selected="true">4</button>
+            <button type="button" role="tab" aria-selected="false">8 Beats</button>
+          </div>
+        </div>
+        <div class="cac-cell">
+          <span>Volume</span>
+          <div class="vol">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4.7v14.6a.8.8 0 0 1-1.35.58L5.6 16H3.4A1.4 1.4 0 0 1 2 14.6V9.4A1.4 1.4 0 0 1 3.4 8h2.2l4.05-3.88A.8.8 0 0 1 11 4.7zm3.1 2.4a1 1 0 0 1 1.4.06 7 7 0 0 1 0 9.68 1 1 0 1 1-1.46-1.37 5 5 0 0 0 0-6.94 1 1 0 0 1 .06-1.43zm3.1-2.9a1 1 0 0 1 1.4.07 11 11 0 0 1 0 15.46 1 1 0 1 1-1.45-1.38 9 9 0 0 0 0-12.7 1 1 0 0 1 .05-1.45z"/></svg>
+            <div class="vol-track">
+              <i class="vol-fill" style="width:72%"></i>
+              <i class="vol-thumb" style="left:72%"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <figure class="device" style="margin-top:22px">
+      <video preload="none" data-src="art/transition-menu.mp4" poster="art/transition-menu-poster.jpg" autoplay muted loop playsinline
+             aria-label="The transition menu open on a clip boundary in Mixr: None, Crossfade, Fade Out, Echo Out and Auto, then the Crossfade panel with its duration in beats and its curve. Three tracks are on the timeline in pink, purple and the SFX lavender."></video>
+    </figure>
+    <p class="foot">Recorded in simulator device.</p>
+  </div>
+
 </section>
 
 <!-- 05 -->
@@ -2353,12 +2502,113 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
   /* ======================================================================
      Try it Yourself — the drag-and-drop lane, live.
-     resolveDrop below is MixrTimeline.resolveClipDrop: the same five-case
-     priority ladder, the same hysteresis, the same min-length clamp. Constants
-     are the shipped ones (TimelineScreen.swift): totalUnits 130, a 10pt snap
-     zone, 8pt of hysteresis, minClipLengthUnits 2, and for the auto-scroll
-     clipDragScrollZone 120px / clipDragScrollSpeed 10px per frame.
+
+     Mixr runs TWO resolvers and so does this:
+
+       ttIndicator  = ClipDragState.updateIndicatorTarget — snaps the raw
+                      leading edge to the nearest clip edge, no hysteresis.
+                      Drives the line and the neighbour shift.
+       ttResolve    = MixrTimeline.resolveClipDrop — the five-case priority
+                      ladder with its min-length clamp. Runs only at the drop,
+                      via ttCommitResult (= indicatorDropResult), so the clip
+                      lands where the line says it will.
+
+     Collapsing the two is what made the line stick: the ladder returns its
+     previous answer inside an 8pt window, so a slow drag never moved it.
+
+     Constants are the shipped ones (TimelineScreen.swift): totalUnits 130, a
+     10pt snap zone, 8pt of hysteresis, minClipLengthUnits 2, and for the
+     auto-scroll clipDragScrollZone 120px / clipDragScrollSpeed 10px per frame.
      ==================================================================== */
+  /* ---- Color Palette: the segmented control and the standalone waveform ----
+     The pill is a real selection that slides, the way SegmentedControl animates
+     its selectedSegmentGlass between options rather than cross-fading. */
+  var seg = document.getElementById("seg");
+  if(seg){
+    var segPill = seg.querySelector(".seg-pill"),
+        segBtns = [].slice.call(seg.querySelectorAll("button"));
+    function segMove(btn, animate){
+      if(!animate) segPill.style.transition = "none";
+      segPill.style.left  = (btn.offsetLeft) + "px";
+      segPill.style.width = (btn.offsetWidth) + "px";
+      if(!animate) requestAnimationFrame(function(){ segPill.style.transition = ""; });
+    }
+    function segSelect(btn, animate){
+      segBtns.forEach(function(b){ b.setAttribute("aria-selected", String(b === btn)); });
+      segMove(btn, animate);
+    }
+    segBtns.forEach(function(b){
+      b.addEventListener("click", function(){ segSelect(b, true); });
+      b.addEventListener("keydown", function(e){
+        var i = segBtns.indexOf(b), n = null;
+        if(e.key === "ArrowRight") n = segBtns[Math.min(i + 1, segBtns.length - 1)];
+        if(e.key === "ArrowLeft")  n = segBtns[Math.max(i - 1, 0)];
+        if(n){ e.preventDefault(); n.focus(); segSelect(n, true); }
+      });
+    });
+    var segInit = function(){
+      segSelect(seg.querySelector('[aria-selected="true"]') || segBtns[0], false);
+    };
+    segInit();
+    addEventListener("resize", function(){
+      segMove(seg.querySelector('[aria-selected="true"]') || segBtns[0], false);
+    }, {passive:true});
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(segInit);
+  }
+
+  /* The standalone waveform. ttWave cannot be reused here — it resolves its
+     envelope out of the drag prototype's clip model, and this waveform has no
+     clip behind it. Same WaveformStyle paint, its own envelope: the silhouette
+     is one filled mirrored polygon, drawn with the top-to-bottom
+     peak(.94)/base/peak gradient and a second pass of peak at .20 behind a
+     2.5pt glow of base at .38. */
+  var cacWave = document.querySelector(".cac-wave .wave");
+  if(cacWave){
+    var cacDraw = function(){
+      var r = cacWave.getBoundingClientRect();
+      var W = Math.round(r.width), H = Math.round(r.height);
+      if(W < 8 || H < 8) return;
+      if(cacWave.dataset.w === String(W) && cacWave.dataset.h === String(H)) return;
+      cacWave.dataset.w = W; cacWave.dataset.h = H;
+      var seed = (+cacWave.dataset.seed || 412) >>> 0;
+      var rnd = function(){ seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+      var n = Math.max(40, Math.round(W / 2.2)), a = [], i;
+      for(i = 0; i < n; i++){
+        var t = i / (n - 1);
+        /* amplitude clamped to .05-.98, smoothingRadius 1 — WaveformMetrics */
+        var env = 0.60 + 0.40 * Math.pow(Math.sin(Math.PI * t), 0.55);
+        a.push(Math.min(.98, Math.max(.05, env * (0.60 + 0.40 * rnd()))));
+      }
+      for(i = 1; i < n - 1; i++) a[i] = (a[i-1] + a[i] + a[i+1]) / 3;
+      var cy = H / 2, maxHalf = (H - 8 * 2) / 2 * 0.86,
+          drawable = Math.max(1, W - 16),
+          xAt = function(k){ return 8 + drawable * k / (n - 1); };
+      var d = "M" + xAt(0).toFixed(2) + " " + (cy - maxHalf * a[0]).toFixed(2);
+      for(i = 1; i < n; i++) d += "L" + xAt(i).toFixed(2) + " " + (cy - maxHalf * a[i]).toFixed(2);
+      for(i = n - 1; i >= 0; i--) d += "L" + xAt(i).toFixed(2) + " " + (cy + maxHalf * a[i]).toFixed(2);
+      d += "Z";
+      cacWave.innerHTML =
+        '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">' +
+          '<defs>' +
+            '<linearGradient id="cacg" x1="0" y1="0" x2="0" y2="1">' +
+              '<stop offset="0" stop-color="#FF7FB8" stop-opacity=".94"/>' +
+              '<stop offset=".5" stop-color="#FF5FA2"/>' +
+              '<stop offset="1" stop-color="#FF7FB8"/>' +
+            '</linearGradient>' +
+            '<filter id="cacgf" x="-30%" y="-30%" width="160%" height="160%">' +
+              '<feDropShadow dx="0" dy="0" stdDeviation="2.5" ' +
+                'flood-color="#FF5FA2" flood-opacity=".38"/>' +
+            '</filter>' +
+          '</defs>' +
+          '<path d="' + d + '" fill="url(#cacg)"/>' +
+          '<path d="' + d + '" fill="#FF7FB8" fill-opacity=".20" filter="url(#cacgf)"/>' +
+        '</svg>';
+    };
+    cacDraw();
+    addEventListener("resize", cacDraw, {passive:true});
+    if(window.ResizeObserver) new ResizeObserver(cacDraw).observe(cacWave);
+  }
+
   var tt = document.getElementById("tt");
   if(tt){
     var TT_UNITS = 130, TT_SNAP_PT = 10, TT_HYST_PT = 8,
@@ -2413,7 +2663,6 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       ttLane.style.setProperty("--lane-w", w + "px");
       return w;
     }
-    function ttLaneW(){ return ttLane.getBoundingClientRect().width || ttSizeLane(); }
     function ttPct(u){ return (u / ttSpan()) * 100 + "%"; }
     /* Position is written as a TRANSFORM, never as `left`. left is a layout
        property: writing it every frame reflows a lane that is 120% of the
@@ -2426,6 +2675,10 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
        visual distance however long the arrangement gets. */
     function ttPxU(px){ return (px / ttBaseW()) * TT_UNITS; }
     function ttSnapU(){ return ttPxU(TT_SNAP_PT); }
+    /* Hysteresis belongs to the LADDER, and the ladder now only runs at the
+       drop — where the app disables it (indicatorDropResult passes 0). It is
+       kept in ttResolve's signature because it is part of the ported algorithm;
+       the line must never see it, which was the whole bug. */
     function ttHystU(){ return ttPxU(TT_HYST_PT); }
 
     /* ---- the port ---------------------------------------------------- */
