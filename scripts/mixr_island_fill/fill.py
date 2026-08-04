@@ -262,6 +262,28 @@ def row_centres(fr):
     return [(a + b) // 2 for a, b in groups if b - a > 10]
 
 
+def donor_clean(fr, y):
+    """Is this row safe to TRANSPLANT, not merely detectable?
+
+    whole_row asks whether a row is complete and carries slider ink. That is not
+    enough mid-scroll. The transplant reads its background off the patch's own
+    outer scanlines (donor_bg) and derives alpha from how far each pixel departs
+    from it. If those scanlines are not uniform — because the row is sliding and
+    the band has caught a divider or the next row's edge — donor_bg is wrong,
+    every pixel reads as ink, alpha saturates, and the donor's whole RECTANGLE
+    gets painted. That is the dark slab over the red and yellow sliders at 4.8s.
+
+    So: the four scanlines at each edge of the patch must actually agree with
+    each other, which is exactly the assumption donor_bg makes."""
+    y0, y1 = y - ROW_HALF, y + ROW_HALF
+    if y0 < 0 or y1 > H:
+        return False
+    edges = np.concatenate([fr[y0:y0 + 4, SLICE_X0:SLICE_X1],
+                            fr[y1 - 4:y1, SLICE_X0:SLICE_X1]]).astype(np.float64)
+    flat = edges.reshape(-1, 3)
+    return float(np.percentile(flat, 92) - np.percentile(flat, 8)) < 26.0
+
+
 def whole_row(fr, y):
     """Is this row usable as a donor — a complete, unclipped slider?
 
@@ -354,7 +376,9 @@ def find_donor(fr):
     plus the track colour to retarget away from. None if the frame has none."""
     iy0, iy1 = ISL["y0"], ISL["y1"]
     for y in row_centres(fr):
-        if iy0 - ROW_HALF < y < iy1 + ROW_HALF or not whole_row(fr, y):
+        if iy0 - ROW_HALF < y < iy1 + ROW_HALF:
+            continue
+        if not whole_row(fr, y) or not donor_clean(fr, y):
             continue
         c = lane_colour(fr, y)
         if c is not None:
@@ -435,7 +459,7 @@ def fill_frame(fr, stats, lend=None):
     if not occluded:
         stats["nothing_to_do"] += 1
         return np.clip(out, 0, 255).astype(np.uint8), True
-    clear = [c for c in clear if whole_row(fr, c)]
+    clear = [c for c in clear if whole_row(fr, c) and donor_clean(fr, c)]
     stats["donors_clipped"] += len([c for c in centres
                                     if c not in occluded]) - len(clear)
     if not clear and lend is None:
