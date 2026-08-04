@@ -1067,57 +1067,16 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   background:linear-gradient(180deg,#080B16,#050816);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);
   touch-action:none;user-select:none;-webkit-user-select:none}
-.tl-lane{position:relative;height:104px}
-.tl-lane::before{content:"";position:absolute;inset:0;pointer-events:none;
-  background-image:linear-gradient(90deg,rgba(42,49,66,.62) 1px,transparent 1px);
-  background-size:calc(100% / 26) 100%}
 /* Edge snap zones, drawn only while dragging so the rule is visible, not just
    described. Width is the real 10pt zone converted to a % of the lane. */
-.tl-zone{position:absolute;top:0;bottom:0;pointer-events:none;opacity:0;
-  background:repeating-linear-gradient(45deg,rgba(255,255,255,.10) 0 3px,transparent 3px 6px);
-  transition:opacity .18s ease}
-.tl.is-drag .tl-zone{opacity:1}
-.tl-clip{position:absolute;top:28px;height:48px;border-radius:10px;cursor:grab;
-  background:color-mix(in srgb,var(--c) 22%,transparent);
-  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 48%,transparent);
-  transition:left .38s cubic-bezier(.32,.72,.24,1),width .38s cubic-bezier(.32,.72,.24,1),
-             top .3s cubic-bezier(.32,.72,.24,1),
-             transform .22s cubic-bezier(.32,.72,.24,1),opacity .22s ease}
 /* The waveform is a FILLED MIRRORED SILHOUETTE, not a bar pattern — see
    WaveformSilhouettePath.build in WaveformStyle.swift. An even stripe reads as
    a loading bar; the whole point of the lane is that you can see the shape of
    the song in it. The <svg> is generated in JS at the clip's real pixel size so
    innerPadding (8) and the tail inset stay true pt values instead of being
    stretched by a viewBox. */
-.tl-clip .wave{position:absolute;inset:0;display:block;overflow:visible}
-.tl-clip .wave svg{display:block;width:100%;height:100%}
 /* The label sits over the waveform, so it carries its own shadow rather than a
    plate — a chip behind it would read as a second object on the clip. */
-.tl-clip .tag{position:absolute;left:9px;top:5px;font-family:var(--fsf);font-size:10px;
-  font-weight:500;color:rgba(255,255,255,.9);letter-spacing:.04em;pointer-events:none;
-  text-shadow:0 1px 3px rgba(0,0,0,.85),0 0 8px rgba(0,0,0,.6)}
-.tl-clip.is-moving{cursor:grabbing;z-index:5;transform:translateY(-6px) scale(1.05);
-  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 92%,transparent),
-             0 10px 18px rgba(0,0,0,.6),
-             0 0 22px color-mix(in srgb,var(--c) 36%,transparent);
-  transition:transform .22s cubic-bezier(.32,.72,.24,1)}
-.tl-clip.is-ghost{opacity:.28;z-index:0;cursor:grab}
-.tl-cut{position:absolute;top:22px;bottom:22px;width:1.5px;background:#fff;z-index:6;
-  opacity:0;pointer-events:none;box-shadow:0 0 8px rgba(255,255,255,.7);
-  transition:opacity .16s ease,left .1s linear}
-.tl-cut.on{opacity:1}
-.tl-readout{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-top:14px}
-.tl-rule{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.05em;
-  padding:6px 11px;border-radius:6px;background:rgba(255,255,255,.05);color:#8f96a6;
-  transition:background .2s ease,color .2s ease}
-.tl-rule.on{background:color-mix(in srgb,var(--mx-purple) 30%,transparent);color:#fff}
-.tl-nums{font-family:var(--fm);font-size:11px;color:#7f8694;letter-spacing:.03em}
-.tl-reset{font-family:var(--fm);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
-  background:none;border:1px solid rgba(255,255,255,.16);color:#9CA3AF;border-radius:6px;
-  padding:6px 12px;cursor:pointer;transition:color .18s ease,border-color .18s ease}
-.tl-reset:hover{color:#fff;border-color:rgba(255,255,255,.36)}
-.tl-reset:focus-visible,.tl-clip:focus-visible{outline:2px solid #f2f0ec;outline-offset:3px}
-
 /* ---- recreated: the navbar, geometric vs optical centre ----------------- */
 .nb{position:relative;border-radius:12px;padding:11px 14px;margin-top:16px;
   background:linear-gradient(180deg,#0B0B16,#050816);
@@ -1275,14 +1234,20 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 .tt-lane::before{content:"";position:absolute;inset:0;pointer-events:none;
   background-image:linear-gradient(90deg,rgba(42,49,66,.62) 1px,transparent 1px);
   background-size:calc(100% / 16) 100%}
-.tt-clip{position:absolute;top:20px;height:48px;border-radius:10px;cursor:grab;
+/* Position rides on `translate`, the lift and the neighbour shift on
+   `transform`. They are separate CSS properties, so the per-frame position
+   write cannot be caught by the lift's transition — which is what a single
+   combined transform would do — and neither one relayouts the lane the way
+   writing `left` every frame did. */
+.tt-clip{position:absolute;top:20px;left:0;height:48px;border-radius:10px;cursor:grab;
+  translate:var(--x,0px) 0;transform:translateX(var(--shift,0px));
   background:
     linear-gradient(180deg,rgba(0,0,0,.18),transparent 46%,rgba(0,0,0,.08)),
     linear-gradient(135deg,color-mix(in srgb,var(--c) 34%,transparent),
                            color-mix(in srgb,var(--c) 10%,transparent)),
     linear-gradient(#0B1020,#0B1020);
   box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 48%,transparent);
-  transition:left .38s cubic-bezier(.32,.72,.24,1),width .38s cubic-bezier(.32,.72,.24,1),
+  transition:translate .38s cubic-bezier(.32,.72,.24,1),width .38s cubic-bezier(.32,.72,.24,1),
              top .3s cubic-bezier(.32,.72,.24,1),
              transform .22s cubic-bezier(.32,.72,.24,1),opacity .22s ease}
 /* The edge discs: a dark centre with a white ring, straddling each end of the
@@ -1296,18 +1261,20 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 .tt-clip .wave{position:absolute;inset:0;display:block;overflow:hidden;border-radius:inherit}
 .tt-clip .wave svg{display:block;width:100%;height:100%}
 /* TLK.clipDragLiftScale 1.05, clipDragLiftY 6, clipDragShadowRadius 18 / Y 10.
-   left and top are written every frame, so only the pop is animated — anything
-   else here would make the clip lag behind the pointer. */
+   The lift replaces the neighbour-shift transform while a clip is held, and the
+   transition list is replaced with it too: position lives on `translate`, so
+   the per-frame write stays instant while only the pop animates. */
 .tt-clip.is-moving{cursor:grabbing;z-index:6;transform:translateY(-6px) scale(1.05);
   transition:transform .22s cubic-bezier(.32,.72,.24,1);
   box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 92%,transparent),
-             0 10px 18px rgba(0,0,0,.62),
-             0 0 26px color-mix(in srgb,var(--c) 34%,transparent)}
+             0 10px 18px rgba(0,0,0,.55),
+             0 0 14px color-mix(in srgb,var(--c) 44%,transparent)}
 /* The clip left behind at its ORIGINAL position, at clipDragGhostOpacity 0.28.
    This is the only ghost the app draws — there is no outline at the destination,
    which is what resolveClipRenderFrames makes plain: one frame, isSourceGhost,
    at movingClip.start. */
-.tt-ghost{position:absolute;top:20px;height:48px;border-radius:10px;opacity:0;
+.tt-ghost{position:absolute;top:20px;left:0;height:48px;border-radius:10px;opacity:0;
+  translate:var(--x,0px) 0;
   pointer-events:none;z-index:0;overflow:hidden;
   transition:opacity .12s ease}
 .tt.is-drag .tt-ghost{opacity:.28}
@@ -1317,11 +1284,14 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
    track colour at .85, the full row's height, with a .60 shadow at radius 6.
    It eases over clipIndicatorEaseDuration so it glides onto a snap target
    instead of jumping — the "magnetic" feel. Above the waveform, not inset. */
-.tt-cut{position:absolute;top:0;bottom:0;width:2px;border-radius:1px;opacity:0;
+.tt-cut{position:absolute;top:0;bottom:0;left:0;width:2px;margin-left:-1px;
+  border-radius:1px;opacity:0;translate:var(--x,0px) 0;
   background:color-mix(in srgb,var(--c) 85%,transparent);
   pointer-events:none;z-index:7;
   box-shadow:0 0 6px color-mix(in srgb,var(--c) 60%,transparent);
-  transition:left .1s ease-out,opacity .12s ease}
+  transition:opacity .12s ease}
+/* Only across a snap transition, never in free space — see ttPreview. */
+.tt-cut.glide{transition:translate .1s ease-out,opacity .12s ease}
 .tt-cut.on{opacity:1}
 /* Reset — the segmented control's selected pill. Dark through the middle; the
    hue only appears at the rim, which is where the pill carries it. */
@@ -1333,11 +1303,21 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
        through the middle, coming back softer at bottom-trailing. Values fitted
        against the "Linear" pill sampled out of the transition recording at native
        resolution — nine points across its body, mean error 1.6/255. */
-    linear-gradient(135deg,color-mix(in srgb,var(--c) 26%,transparent),
-      color-mix(in srgb,var(--c) 11.7%,transparent) 17.6%,
-      transparent 32%,transparent 68%,
-      color-mix(in srgb,var(--c) 6.4%,transparent) 82.4%,
-      color-mix(in srgb,var(--c) 14.3%,transparent)),
+    /* 150deg, not 135. On a box this wide the bottom-left corner lands at t=0.30
+       on a 135deg line — inside the leading arm — so it was carrying hue 28.6
+       against the top-left's 42.7, while the top-right escaped at t=0.70. Ten
+       degrees of rotation walks the bottom-left down the line to 19.3 and leaves
+       the other three corners where they were.
+
+       The mid stop at 30.4% is effectively the top-middle's own control: that
+       point sits at t=0.324, right on it, while the top-left corner is back at
+       t=0.11 and hardly feels it. .178 -> .165 takes the top-middle down 6% and
+       the corner only 1.6%. */
+    linear-gradient(150deg,color-mix(in srgb,var(--c) 39.6%,transparent),
+      color-mix(in srgb,var(--c) 16.5%,transparent) 30.4%,
+      transparent 55.3%,transparent 72.4%,
+      color-mix(in srgb,var(--c) 8.9%,transparent) 82.6%,
+      color-mix(in srgb,var(--c) 18.3%,transparent)),
     /* and a little more weight out of the middle: the hue holds further along
        each end of the diagonal, and the centre is sunk under a soft ellipse.
        Strength and placement are separate knobs, and they pull in opposite
@@ -1345,8 +1325,24 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
        pill carries (corner R-G 24 against its 22), but it only survives the
        outer 32% of the diagonal instead of the outer 46%, and the middle is
        sunk under a wider, deeper ellipse. Softer colour, further out, darker
-       through the centre. */
-    radial-gradient(ellipse closest-side at 50% 50%,rgba(0,0,0,.30),transparent 74%),
+       through the centre. Reach is the stop percentages, strength is the alphas;
+       they are tuned separately. Currently the hue runs 55.3% in from the leading
+       end and 27.6% from the trailing one, at a peak of .396 — a wide reach into
+       the middle, which is what lifts centre luminance from 16 to 22.
+
+       The two ends are deliberately NOT level. The body wash is already weaker
+       at the bottom-trailing end than the top-leading one; what made that end
+       read heavy was the rim, whose hue stop sat two-thirds along and spread
+       colour down the whole bottom edge, plus a glow offset downward that
+       pooled under it. Both are pulled toward the corner instead. */
+    /* The dark core: deeper AND wider. Raising the alpha alone barely moved it —
+       the hue now reaches far enough in to screen back over the middle, so a 10%
+       alpha rise bought only 2% of actual luminance — .42 is what would get a
+       real 10% darker; .33 is the value asked for and lands at -3.7%. The width
+       is free at the corners: closest-side on a wide
+       capsule is limited by the vertical radius, so the diagonal ends sit outside
+       the ellipse and their hue reads identically. */
+    radial-gradient(ellipse closest-side at 50% 50%,rgba(0,0,0,.33),transparent 94%),
     /* the white sheen, which is what washes the hue out of the top-middle */
     linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,.127) 25%,
       rgba(255,255,255,.05) 50%,rgba(255,255,255,.075) 75%,rgba(0,0,0,.12)),
@@ -1355,8 +1351,8 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   background-blend-mode:screen,normal,normal,normal;
   box-shadow:0 .5px 1.2px rgba(0,0,0,.24),0 1.5px 2.5px rgba(0,0,0,.32),
              0 2.5px 4.5px rgba(0,0,0,.15),
-             0 2px 8px color-mix(in srgb,var(--c) 8%,transparent),
-             0 0 2px color-mix(in srgb,var(--c) 8%,transparent);
+             0 1px 5px color-mix(in srgb,var(--c) 6%,transparent),
+             0 0 2px color-mix(in srgb,var(--c) 6%,transparent);
   transition:transform .16s ease,filter .2s ease}
 /* strokeBorder 0.75pt down the same diagonal: white .42, white .20, the hue at
    .19 two-thirds along, closing on white .08. Measured on the real pill the rim
@@ -1365,7 +1361,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 .tt-reset::before{content:"";position:absolute;inset:0;border-radius:inherit;
   padding:.75px;pointer-events:none;z-index:2;
   background:linear-gradient(135deg,rgba(255,255,255,.42),rgba(255,255,255,.20) 33%,
-    color-mix(in srgb,var(--c) 19%,transparent) 66%,rgba(255,255,255,.08));
+    color-mix(in srgb,var(--c) 14%,transparent) 76%,rgba(255,255,255,.08));
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
   -webkit-mask-composite:xor;
   mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
@@ -1377,7 +1373,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   pointer-events:none;z-index:1;
   background:
     linear-gradient(215deg,rgba(255,255,255,.126),
-      color-mix(in srgb,var(--c) 12%,transparent) 18%,transparent 78%),
+      color-mix(in srgb,var(--c) 12%,transparent) 14%,transparent 52%),
     linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.045) 30%,transparent 58%),
     linear-gradient(0deg,rgba(0,0,0,.18),transparent 22%);
   filter:blur(.75px)}
@@ -1496,7 +1492,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   html{scroll-behavior:auto}
   .rv{opacity:1;transform:none;transition:none}
   .sb-clip,.sg-pill{transition:none}
-  .tl-clip,.nb-cluster,.nb-tick,.nb-play,.nb-meta,.nb-meta span{transition:none}
+  .nb-cluster,.nb-tick,.nb-play,.nb-meta,.nb-meta span{transition:none}
 }
 </style>
 
@@ -1699,7 +1695,8 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
   <div class="stack dec rv d1">
     <h3>Music uses beats, not seconds.</h3>
-    <p>Video editors measure time in seconds. Music follows tempo, so Mixr measures transitions in beats. A four-beat crossfade transition stays consistent even when the song&rsquo;s BPM changes.</p>
+    <p>Video editors measure time in seconds. Music follows tempo, so Mixr measures transitions in beats. A crossfade is shorter for faster songs and longer for slower ones.</p>
+    <p>Auto works with beats and bars to align edits with the song’s structure.</p>
   </div>
 
   <div class="demo rv d2">
@@ -1808,7 +1805,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
         <span class="ec-marble" aria-hidden="true"></span>
       </button>
     </div>
-    <p class="foot">Rebuilt in CSS from <code>EffectCard.swift</code>. &ldquo;Auto&rdquo; gets stronger coloring to recommend it as a starting point.</p>
+    <p class="foot">Rebuilt in CSS from <code>EffectCard.swift</code>. Auto has stronger colors to recommend it as a starting point.</p>
   </div>
 
   <div class="stack dec rv d1">
@@ -1906,8 +1903,8 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   </div>
 
   <div class="stack dec rv d1">
-    <h3>Color has meaning.</h3>
-    <p>One color per track. The same color follows across the waveform, volume slider, transition settings, and segmented control.</p>
+    <h3>Colors have meaning.</h3>
+    <p>One color per track. The same color follows across the waveform, volume slider, transition settings, and segmented control.  This helps users understand the components go together.</p>
   </div>
 
 </section>
@@ -2355,477 +2352,6 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   });
 
   /* ======================================================================
-     Waveform silhouette — a port of WaveformSilhouettePath.build.
-     The app does NOT draw bars. It fills one continuous polygon mirrored
-     about the centre line, so the clip shows the shape of the song. Metrics
-     are WaveformMetrics / WaveformSilhouetteStyle: innerPadding 8, maxFill
-     .86, amplitude clamped to .05-.98, smoothingRadius 1, tailWidth 28.
-     ==================================================================== */
-  var WAVE_PEAK = {   // MixrWaveformColor.peakColor, keyed by its base hex
-    "#ff5fa2":"#FF7FB8", "#8b5cf6":"#C084FC", "#ef4444":"#F87171",
-    "#eab308":"#FACC15", "#0ea5e9":"#38BDF8", "#7c3aed":"#C084FC"
-  };
-  var WAVE_PAD = 8, WAVE_MAXFILL = 0.86, WAVE_TAIL = 28;
-
-  function waveAmplitudes(seed, n){
-    var s = seed >>> 0, a = [], i;
-    function rnd(){ s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }
-    for(i = 0; i < n; i++){
-      var t = i / (n - 1);
-      // A song-shaped envelope rather than flat noise — quiet in, body, tail.
-      // The floor is deliberately high: real audio at this zoom is dense and
-      // close to full height, and a low floor reads as a sparse blob.
-      var env = 0.62 + 0.38 * Math.pow(Math.sin(Math.PI * t), 0.5);
-      var v = env * (0.62 + 0.38 * rnd());
-      a.push(Math.min(0.98, Math.max(0.05, v)));   // max / minAmplitude
-    }
-    return a.map(function(v, j){                    // smoothingRadius 1
-      return (a[Math.max(0, j - 1)] + v + a[Math.min(n - 1, j + 1)]) / 3;
-    });
-  }
-
-  var waveUid = 0;
-  function paintWave(el){
-    var clip = el.parentElement;
-    var W = Math.round(clip.getBoundingClientRect().width);
-    var H = Math.round(clip.getBoundingClientRect().height);
-    if(W < 6 || H < 6) return;
-    // Skip the rebuild when nothing about the geometry changed — this runs on
-    // every commit and resize, and the path is ~100 points.
-    if(el.dataset.w === String(W) && el.dataset.h === String(H)) return;
-    el.dataset.w = W; el.dataset.h = H;
-
-    var base = (getComputedStyle(clip).getPropertyValue("--c") || "").trim();
-    var peak = WAVE_PEAK[base.toLowerCase()] || base || "#8B5CF6";
-    var seed = el.dataset.seed || (el.dataset.seed = String(
-      Math.abs((clip.textContent || "x").split("").reduce(function(h, c){
-        return ((h << 5) - h + c.charCodeAt(0)) | 0; }, 7)) + 11));
-
-    var n = Math.max(28, Math.round(W / 2.2));
-    var amp = waveAmplitudes(+seed, n);
-    var cy  = H / 2;
-    var maxHalf = (H - WAVE_PAD * 2) / 2 * WAVE_MAXFILL;
-    var tailInset = WAVE_TAIL * 0.35;
-    var drawable = Math.max(1, W - WAVE_PAD * 2 - tailInset);
-    var xAt = function(i){ return WAVE_PAD + drawable * i / (n - 1); };
-
-    var d = "M" + xAt(0).toFixed(2) + " " + (cy - maxHalf * amp[0]).toFixed(2);
-    for(var i = 1; i < n; i++) d += "L" + xAt(i).toFixed(2) + " " + (cy - maxHalf * amp[i]).toFixed(2);
-    for(var j = n - 1; j >= 0; j--) d += "L" + xAt(j).toFixed(2) + " " + (cy + maxHalf * amp[j]).toFixed(2);
-    d += "Z";
-
-    // The tail guide lines — WaveformWedgeShape, drawn inside the tail region.
-    var tailStart = W - WAVE_TAIL, tipX = W - 2;
-    var wedge = (tailStart > WAVE_PAD)
-      ? '<path d="M' + tailStart + ' 1V' + (H - 1) + 'M' + tailStart + ' 1L' + tipX + ' ' + cy +
-        'M' + tailStart + ' ' + (H - 1) + 'L' + tipX + ' ' + cy +
-        '" fill="none" stroke="' + peak + '" stroke-opacity=".22" stroke-width="1"/>'
-      : "";
-
-    var gid = "wg" + (++waveUid);
-    el.innerHTML =
-      /* preserveAspectRatio="none": the clip's width transitions over .38s
-         while this path is regenerated at the FINAL width the moment the drop
-         commits. With the default "meet" the wave letterboxes for the whole
-         animation; stretching a mirrored noise shape horizontally is
-         invisible, so it fills instead. */
-      '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none"' +
-      ' aria-hidden="true" focusable="false">' +
-        '<defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="0" y2="1">' +
-          '<stop offset="0" stop-color="' + peak + '" stop-opacity=".94"/>' +
-          '<stop offset=".5" stop-color="' + base + '"/>' +
-          '<stop offset="1" stop-color="' + peak + '"/>' +
-        '</linearGradient></defs>' +
-        wedge +
-        '<path d="' + d + '" fill="url(#' + gid + ')"/>' +
-      '</svg>';
-  }
-
-  function paintAllWaves(){
-    [].slice.call(document.querySelectorAll(".tl-clip .wave")).forEach(paintWave);
-  }
-
-  /* ======================================================================
-     Live timeline — a port of MixrTimeline.resolveClipDrop.
-     The priority order, the hysteresis and the min-length clamp are the
-     Swift's; only the rendering is new. Units are the app's own: the lane
-     is MixrTimeline.totalUnits (130) wide regardless of pixel width, so
-     the pt-based constants convert the same way they do on device.
-     ==================================================================== */
-  var tl = document.getElementById("tl");
-  if(tl){
-    var TOTAL_UNITS = 130,      // MixrTimeline.totalUnits
-        MIN_LEN     = 2,        // MixrTimeline.minClipLengthUnits
-        EPS         = 0.001,    // MixrTimeline.clipEdgeEpsilon
-        SNAP_PT     = 10,       // TLK.clipInsertionSnapZone
-        HYST_PT     = 8,        // TLK.clipInsertionSnapHysteresis
-        SHIFT_PT    = 20;       // TLK.clipDragNeighborShift
-
-    var START = [
-      { id:"a", c:"var(--mx-pitch)",   name:"Blinding Lights", start:4,  len:30 },
-      { id:"b", c:"var(--mx-echo)",    name:"Levitating",      start:42, len:36 },
-      { id:"c", c:"var(--mx-reverb)",  name:"Heat Waves",      start:92, len:26 }
-    ];
-    var clips = START.map(function(c){ return Object.assign({}, c); });
-
-    var lane   = document.getElementById("tl-lane"),
-        cut    = document.getElementById("tl-cut"),
-        nums   = document.getElementById("tl-nums"),
-        reset  = document.getElementById("tl-reset"),
-        chips  = [].slice.call(document.querySelectorAll(".tl-rule")),
-        nodes  = {},
-        zones  = [];
-
-    var pct = function(u){ return (u / TOTAL_UNITS) * 100 + "%"; };
-    function laneW(){ return lane.getBoundingClientRect().width || 1; }
-    function snapUnits(){ return (SNAP_PT / laneW()) * TOTAL_UNITS; }
-    function hystUnits(){ return (HYST_PT / laneW()) * TOTAL_UNITS; }
-
-    /* ---- the port ---------------------------------------------------- */
-    function bestSnapTarget(kind, pointerUnit, others, snapZone){
-      var best = null;
-      others.forEach(function(c){
-        if(c.len <= EPS) return;
-        var edge = kind === "before" ? c.start : c.start + c.len;
-        var d = Math.abs(pointerUnit - edge);
-        if(d > snapZone + EPS) return;
-        if(!best || d < best.d - EPS) best = { clip:c, d:d };
-      });
-      return best && best.clip;
-    }
-
-    function insertTarget(pointerUnit, others, snapZone){
-      for(var i = 0; i < others.length; i++){
-        var c = others[i];
-        if(c.len <= MIN_LEN * 2 + EPS) continue;
-        if(pointerUnit > c.start + snapZone + EPS &&
-           pointerUnit < c.start + c.len - snapZone - EPS) return c;
-      }
-      return null;
-    }
-
-    function resolveClipDrop(o){
-      // Hysteresis first — this is what stops the readout strobing between
-      // two rules when the pointer sits on a boundary.
-      if(o.prev && o.prevPointer != null &&
-         Math.abs(o.pointerUnit - o.prevPointer) < o.hyst) return o.prev;
-
-      var moving = o.clips.filter(function(c){ return c.id === o.id; })[0];
-      if(!moving) return { rule:"free", start:Math.max(0, o.rawStart) };
-      var others = o.clips.filter(function(c){ return c.id !== o.id; });
-
-      // 1 — ghost restore
-      if(o.originalStart != null &&
-         Math.abs(o.rawStart - o.originalStart) <= o.snap + EPS)
-        return { rule:"ghost", start:o.originalStart };
-
-      // 2 — clip-edge snap, before then after
-      var before = bestSnapTarget("before", o.pointerUnit, others, o.snap);
-      if(before){
-        var prefixEnd = others.reduce(function(m, c){
-          return (c.id !== before.id && c.start < before.start - EPS)
-            ? Math.max(m, c.start + c.len) : m;
-        }, 0);
-        return { rule:"snap", seam:before.start,
-                 start:Math.max(0, Math.max(prefixEnd, before.start - moving.len)) };
-      }
-      var after = bestSnapTarget("after", o.pointerUnit, others, o.snap);
-      if(after) return { rule:"snap", seam:after.start + after.len,
-                         start:Math.max(0, after.start + after.len) };
-
-      // 3 — literal gap: the LEADING EDGE, not the pointer, decides this one
-      var clamped = Math.max(0, o.rawStart);
-      var startsInClip = others.some(function(c){
-        return clamped > c.start + EPS && clamped < c.start + c.len - EPS;
-      });
-      if(!startsInClip) return { rule:"gap", start:clamped };
-
-      // 4 — insert into body
-      var target = insertTarget(o.pointerUnit, others, o.snap);
-      if(target){
-        var minSplit = target.start + MIN_LEN,
-            maxSplit = target.start + target.len - MIN_LEN,
-            splitUnit = Math.min(Math.max(o.pointerUnit, minSplit), maxSplit);
-        return { rule:"insert", start:splitUnit, targetId:target.id, splitUnit:splitUnit };
-      }
-
-      // 5 — free placement
-      return { rule:"free", start:clamped };
-    }
-
-    /* Commit: reflowedClips, pushing only what the new range overlaps. */
-    function reflowed(id, proposedStart, list){
-      var moving = list.filter(function(c){ return c.id === id; })[0];
-      if(!moving) return list.slice();
-      var anchored = Math.max(0, proposedStart);
-      var movingEnd = anchored + moving.len;
-      var others = list.filter(function(c){ return c.id !== id; })
-                       .sort(function(a, b){ return a.start - b.start; });
-      var out = [], suffix = [], prefixEnd = 0;
-      others.forEach(function(c){
-        if(c.start + c.len <= anchored + EPS){
-          var p = Object.assign({}, c);
-          if(p.start < prefixEnd - EPS) p.start = prefixEnd;
-          prefixEnd = Math.max(prefixEnd, p.start + p.len);
-          out.push(p);
-        } else suffix.push(c);
-      });
-      out.push(Object.assign({}, moving, { start:anchored }));
-      var cursor = movingEnd;
-      suffix.forEach(function(c){
-        var n = Object.assign({}, c);
-        if(n.start < cursor - EPS) n.start = cursor;
-        cursor = Math.max(cursor, n.start + n.len);
-        out.push(n);
-      });
-      return out.sort(function(a, b){ return a.start - b.start; });
-    }
-
-    /* Commit: applyInsertIntoClip — split the destination, sandwich between. */
-    function applyInsert(id, res, list){
-      var moving = list.filter(function(c){ return c.id === id; })[0];
-      var target = list.filter(function(c){ return c.id === res.targetId; })[0];
-      if(!moving || !target) return reflowed(id, res.start, list);
-      var leadLen  = Math.max(MIN_LEN, res.splitUnit - target.start);
-      var tailStart = res.splitUnit + moving.len;
-      var tailLen  = Math.max(MIN_LEN, (target.start + target.len) - res.splitUnit);
-      var rest = list.filter(function(c){ return c.id !== id && c.id !== target.id; });
-      var out = rest.concat([
-        Object.assign({}, target, { id:target.id, start:target.start, len:leadLen }),
-        Object.assign({}, moving, { start:res.splitUnit }),
-        Object.assign({}, target, { id:target.id + "-t", start:tailStart, len:tailLen })
-      ]).sort(function(a, b){ return a.start - b.start; });
-      // Re-run the ripple so anything downstream of the new tail gets pushed.
-      var cursor = 0;
-      out.forEach(function(c){
-        if(c.start < cursor - EPS) c.start = cursor;
-        cursor = Math.max(cursor, c.start + c.len);
-      });
-      return out;
-    }
-
-    /* ---- rendering ---------------------------------------------------- */
-    function build(){
-      lane.querySelectorAll(".tl-clip,.tl-zone").forEach(function(n){ n.remove(); });
-      nodes = {}; zones = [];
-      clips.forEach(function(c){
-        var el = document.createElement("span");
-        el.className = "tl-clip";
-        el.style.setProperty("--c", c.c);
-        el.tabIndex = 0;
-        el.setAttribute("role", "button");
-        el.setAttribute("aria-label", c.name + " clip. Press arrow keys to move.");
-        el.innerHTML = '<span class="wave"></span><span class="tag">' + c.name + '</span>';
-        lane.appendChild(el);
-        nodes[c.id] = el;
-        // Two hatched bands per clip, at its real 10pt edge zones.
-        ["l", "r"].forEach(function(side){
-          var z = document.createElement("span");
-          z.className = "tl-zone";
-          lane.appendChild(z);
-          zones.push({ el:z, id:c.id, side:side });
-        });
-      });
-      paint();
-    }
-
-    function paint(shifts){
-      clips.forEach(function(c){
-        var el = nodes[c.id]; if(!el) return;
-        el.style.left  = pct(c.start);
-        el.style.width = pct(c.len);
-        var s = (shifts && shifts[c.id]) || 0;
-        if(!el.classList.contains("is-moving"))
-          el.style.transform = s ? "translateX(" + s + "px)" : "";
-      });
-      var sz = snapUnits();
-      zones.forEach(function(z){
-        var c = clips.filter(function(x){ return x.id === z.id; })[0];
-        if(!c){ z.el.style.width = "0"; return; }
-        z.el.style.left  = pct(z.side === "l" ? c.start : c.start + c.len - sz);
-        z.el.style.width = pct(sz);
-      });
-      // Widths just changed, so the silhouettes have to be redrawn at the new
-      // pixel size. paintWave no-ops when the geometry is unchanged, which is
-      // what keeps this cheap during a drag (position moves, width does not).
-      paintAllWaves();
-    }
-
-    function light(rule){
-      chips.forEach(function(ch){ ch.classList.toggle("on", ch.dataset.rule === rule); });
-    }
-
-    var RULE_TEXT = {
-      ghost:  "Ghost restore — back where it started, nothing rippled.",
-      snap:   "Edge snap — flush against a neighbour.",
-      gap:    "Literal gap — left exactly where you let go.",
-      insert: "Insert into body — the destination splits and takes it between the halves.",
-      free:   "Free placement — dropped, and the lane reflows around it."
-    };
-    function say(res, pointerUnit){
-      nums.textContent = RULE_TEXT[res.rule] +
-        "   pointer " + pointerUnit.toFixed(1) + "u" +
-        "   → start " + res.start.toFixed(1) + "u";
-    }
-
-    /* ---- drag --------------------------------------------------------- */
-    var drag = null;
-    function onDown(e){
-      var el = e.target.closest(".tl-clip"); if(!el) return;
-      var id = Object.keys(nodes).filter(function(k){ return nodes[k] === el; })[0];
-      var c  = clips.filter(function(x){ return x.id === id; })[0]; if(!c) return;
-      var laneRect = lane.getBoundingClientRect();
-      var unitsPerPx = TOTAL_UNITS / laneRect.width;
-      drag = {
-        id: id,
-        originalStart: c.start,
-        // Where inside the clip it was grabbed — the pointer unit is the
-        // leading edge plus this, exactly as ClipDragState computes it.
-        grabUnits: (e.clientX - laneRect.left) * unitsPerPx - c.start,
-        prev: null, prevPointer: null, res: null
-      };
-      el.classList.add("is-moving");
-      el.setPointerCapture && el.setPointerCapture(e.pointerId);
-      tl.classList.add("is-drag");
-      e.preventDefault();
-    }
-
-    function onMove(e){
-      if(!drag) return;
-      var laneRect = lane.getBoundingClientRect();
-      var unitsPerPx = TOTAL_UNITS / laneRect.width;
-      var pointerAbs = (e.clientX - laneRect.left) * unitsPerPx;
-      var rawStart   = pointerAbs - drag.grabUnits;
-      var pointerUnit = Math.max(0, rawStart + drag.grabUnits);
-
-      var res = resolveClipDrop({
-        id: drag.id, rawStart: rawStart, pointerUnit: pointerUnit, clips: clips,
-        snap: snapUnits(), hyst: hystUnits(),
-        prev: drag.prev, prevPointer: drag.prevPointer,
-        originalStart: drag.originalStart
-      });
-      drag.prev = res; drag.prevPointer = pointerUnit; drag.res = res;
-
-      // Preview only — never mutate the model during a drag.
-      var el = nodes[drag.id];
-      el.style.left = pct(Math.max(0, rawStart));
-      el.classList.add("is-ghost-src");
-
-      // Neighbours shift by the real 20pt, one each way around the landing.
-      var shifts = {}, ins = res.start;
-      var sorted = clips.filter(function(c){ return c.id !== drag.id; })
-                        .sort(function(a, b){ return a.start - b.start; });
-      var prevC = null, nextC = null;
-      sorted.forEach(function(c){
-        if(c.start + c.len <= ins + EPS) prevC = c;
-        else if(!nextC && c.start >= ins - EPS) nextC = c;
-      });
-      if(prevC) shifts[prevC.id] = -SHIFT_PT;
-      if(nextC) shifts[nextC.id] =  SHIFT_PT;
-      paint(shifts);
-      el.style.left = pct(Math.max(0, rawStart));
-
-      cut.classList.toggle("on", res.rule === "insert");
-      if(res.rule === "insert") cut.style.left = pct(res.splitUnit);
-      light(res.rule);
-      say(res, pointerUnit);
-    }
-
-    function onUp(){
-      if(!drag) return;
-      var res = drag.res, id = drag.id;
-      var el = nodes[id];
-      el.classList.remove("is-moving", "is-ghost-src");
-      tl.classList.remove("is-drag");
-      cut.classList.remove("on");
-      if(res){
-        clips = res.rule === "insert" ? applyInsert(id, res, clips)
-                                      : reflowed(id, res.start, clips);
-      }
-      drag = null;
-      build();
-    }
-
-    lane.addEventListener("pointerdown", onDown);
-    addEventListener("pointermove", onMove);
-    addEventListener("pointerup", onUp);
-    addEventListener("pointercancel", onUp);
-
-    /* Keyboard equivalent — the demo is a real control, so it has to be
-       reachable without a pointer. One unit per press, commit on each. */
-    lane.addEventListener("keydown", function(e){
-      if(e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
-      var el = e.target.closest(".tl-clip"); if(!el) return;
-      var id = Object.keys(nodes).filter(function(k){ return nodes[k] === el; })[0];
-      var c  = clips.filter(function(x){ return x.id === id; })[0]; if(!c) return;
-      e.preventDefault();
-      var step = e.key === "ArrowLeft" ? -2 : 2;
-      var rawStart = c.start + step;
-      var res = resolveClipDrop({
-        id:id, rawStart:rawStart, pointerUnit:Math.max(0, rawStart + c.len / 2),
-        clips:clips, snap:snapUnits(), hyst:0,
-        prev:null, prevPointer:null, originalStart:null
-      });
-      clips = res.rule === "insert" ? applyInsert(id, res, clips)
-                                    : reflowed(id, res.start, clips);
-      light(res.rule); say(res, rawStart + c.len / 2);
-      build();
-      var again = nodes[id]; if(again) again.focus();
-    });
-
-    reset.addEventListener("click", function(){
-      clips = START.map(function(c){ return Object.assign({}, c); });
-      light(null);
-      nums.textContent = "Lane reset. Pick up a clip to see which rule resolves.";
-      build();
-    });
-
-    addEventListener("resize", function(){ paint(); });
-    build();
-  }
-
-  /* The static lanes in section 05 carry the same silhouette. They are plain
-     markup, so they need one pass on load and one per resize. */
-  paintAllWaves();
-  addEventListener("resize", paintAllWaves);
-  if(document.fonts && document.fonts.ready) document.fonts.ready.then(paintAllWaves);
-
-  /* ======================================================================
-     Lazy video. Every autoplaying clip on this page used to be fetched in
-     full within ~50ms of load — all four at once, competing with the hero for
-     bandwidth, whether or not the reader ever scrolled to sections 3 and 4.
-     That is 1.2MB spent before anyone has read a sentence.
-
-     Here the src is parked in data-src and only attached when the clip comes
-     within a screen of the viewport. The poster is frame 0 of its own video,
-     so the still and the first played frame are the same picture and swapping
-     one for the other is invisible.
-
-     The hero is deliberately exempt (data-eager): it is the first thing on
-     the page and deferring it would only add a delay.
-     ==================================================================== */
-  var lazyVids = [].slice.call(document.querySelectorAll("video[data-src]"));
-  if(lazyVids.length){
-    var attach = function(v){
-      if(v.dataset.loaded) return;
-      v.dataset.loaded = "1";
-      v.src = v.dataset.src;
-      // autoplay only fires on attach if the markup asked for it
-      if(v.hasAttribute("autoplay")) v.play().catch(function(){});
-    };
-    if("IntersectionObserver" in window){
-      var io = new IntersectionObserver(function(entries){
-        entries.forEach(function(e){
-          if(e.isIntersecting){ attach(e.target); io.unobserve(e.target); }
-        });
-      }, { rootMargin: "100% 0px" });   // one screen of runway
-      lazyVids.forEach(function(v){ io.observe(v); });
-    } else {
-      lazyVids.forEach(attach);          // no observer: just load them
-    }
-  }
-
-  /* ======================================================================
      Try it Yourself — the drag-and-drop lane, live.
      resolveDrop below is MixrTimeline.resolveClipDrop: the same five-case
      priority ladder, the same hysteresis, the same min-length clamp. Constants
@@ -2843,10 +2369,15 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     /* The three segments, measured off clip-menu.mp4: the splits land at
        0.295 and 0.514 of the visible lane. Clip three runs past the right
        edge there, and it does here too — that is what you scroll to reach. */
+    /* src/off/srcLen are the visual stand-in for MixrClip.sourceOffsetSeconds:
+       which source a segment is a window INTO, and where that window begins.
+       Splitting hands the right half the same source at an advanced offset, so
+       its waveform continues the parent's instead of restarting — the same rule
+       that stops the audio restarting mid-clip in the app (spec §5). */
     var TT_START = [
-      { id:"a", start:0,     len:38.30 },
-      { id:"b", start:38.30, len:28.53 },
-      { id:"c", start:66.83, len:63.17 }
+      { id:"a", start:0,     len:38.30, src:"a", off:0,     srcLen:38.30 },
+      { id:"b", start:38.30, len:28.53, src:"b", off:0,     srcLen:28.53 },
+      { id:"c", start:66.83, len:63.17, src:"c", off:0,     srcLen:63.17 }
     ];
     var ttClips = TT_START.map(function(c){ return Object.assign({}, c); });
 
@@ -2855,20 +2386,47 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
         ttCut    = document.getElementById("tt-cut"),
         ttReset  = document.getElementById("tt-reset"),
         ttGhost  = document.getElementById("tt-ghost"),
-        ttNodes  = {};
+        ttNodes  = {}, ttUid = 0;
 
     /* The whole track is 120% of the viewport: all three segments are visible
        as they are in the recording, with the last running 20% past the right
        edge — which is the only thing there is to scroll to. */
+    /* The content span GROWS with the arrangement (spec §6). Without this the
+       lane is a fixed 130 units and anything the ripple pushes past the end is
+       positioned beyond 100% — it silently disappears off the right of the
+       track. The pixels-per-unit scale is held constant and the lane just gets
+       longer, so the scroll container can always reach every clip. */
+    function ttSpan(){
+      var end = TT_UNITS;
+      ttClips.forEach(function(c){ end = Math.max(end, c.start + c.len); });
+      /* The span also has to cover the clip CURRENTLY IN HAND, or the lane stops
+         at the last committed segment and a clip cannot be dragged past the end
+         of the arrangement. The app does the same thing mid-drag, reserving the
+         proposed edge plus the clip plus a third of a viewport beyond it
+         (beginDragScrollLoop, TimelineScreen.swift:2135). */
+      if(ttDrag && ttDrag.reach != null) end = Math.max(end, ttDrag.reach);
+      return end;
+    }
+    function ttBaseW(){ return Math.max(320, Math.round(ttScroll.clientWidth * TT_OVER)); }
     function ttSizeLane(){
-      var w = Math.max(320, Math.round(ttScroll.clientWidth * TT_OVER));
+      var w = Math.round(ttBaseW() * (ttSpan() / TT_UNITS));
       ttLane.style.setProperty("--lane-w", w + "px");
       return w;
     }
     function ttLaneW(){ return ttLane.getBoundingClientRect().width || ttSizeLane(); }
-    function ttPct(u){ return (u / TT_UNITS) * 100 + "%"; }
-    function ttSnapU(){ return (TT_SNAP_PT / ttLaneW()) * TT_UNITS; }
-    function ttHystU(){ return (TT_HYST_PT / ttLaneW()) * TT_UNITS; }
+    function ttPct(u){ return (u / ttSpan()) * 100 + "%"; }
+    /* Position is written as a TRANSFORM, never as `left`. left is a layout
+       property: writing it every frame reflows a lane that is 120% of the
+       viewport and full of SVG, which is the residual judder once the line is
+       unstuck. translate is composited. Note the px-per-unit scale is constant
+       (baseW / 130) however long the lane grows, so this needs no DOM read. */
+    function ttX(u){ return (u / TT_UNITS) * ttBaseW(); }
+    function ttPlace(el, u){ el.style.setProperty("--x", ttX(u).toFixed(2) + "px"); }
+    /* px -> units against the CONSTANT scale, so the snap zone stays a fixed
+       visual distance however long the arrangement gets. */
+    function ttPxU(px){ return (px / ttBaseW()) * TT_UNITS; }
+    function ttSnapU(){ return ttPxU(TT_SNAP_PT); }
+    function ttHystU(){ return ttPxU(TT_HYST_PT); }
 
     /* ---- the port ---------------------------------------------------- */
     function ttBestSnap(kind, pointerUnit, others, zone){
@@ -2891,22 +2449,6 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       }
       return null;
     }
-    /* ClipDragState.indicatorTarget. The line is NOT the drop rule's answer — it
-       is resolved before the ladder runs and asks one question: where does the
-       moving clip's LEFT EDGE land? The nearest clip edge if that is within the
-       snap zone, otherwise wherever the pointer put it. The ladder then runs
-       from there on release. */
-    function ttIndicator(rawStart, others, snap){
-      var best = null, bd = snap + TT_EPS;
-      others.forEach(function(c){
-        [c.start, c.start + c.len].forEach(function(e){
-          var d = Math.abs(rawStart - e);
-          if(d <= bd){ bd = d; best = e; }
-        });
-      });
-      return best != null ? best : Math.max(0, rawStart);
-    }
-
     function ttResolve(o){
       // Hysteresis first, or the result strobes between two rules on a boundary.
       if(o.prev && o.prevPointer != null &&
@@ -2932,18 +2474,15 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
                          start:Math.max(0, after.start + after.len) };
 
       var clamped = Math.max(0, o.rawStart);
-      /* The app asks whether the moving clip's LEFT EDGE landed in empty space.
-         It can afford to: on a full timeline the clip you are dragging is small
-         against the distances involved. Here the whole lane is 130 units and a
-         clip is up to 63 of them, so grabbing one near its middle puts its left
-         edge far behind the pointer — usually clamped to 0 — and rule 3 returns
-         "empty space" every time. Rule 4 was therefore unreachable and clips
-         only ever got pushed aside, never split. The pointer is what the user
-         is aiming with, so that is what decides whether this is empty space. */
-      var overClip = others.some(function(c){
-        return o.pointerUnit > c.start + TT_EPS &&
-               o.pointerUnit < c.start + c.len - TT_EPS; });
-      if(!overClip) return { rule:"gap", start:clamped };
+      /* Rule 4 asks about the LEADING EDGE, not the pointer, and it is
+         deliberately permissive: if the leading edge is in open space the clip
+         drops exactly there even when its tail overlaps a later clip, and the
+         ripple resolves that at commit. I had this reading the pointer, which
+         fired body-insert far more often than the app does and made free
+         placement fight you. */
+      var startsInClip = others.some(function(c){
+        return clamped > c.start + TT_EPS && clamped < c.start + c.len - TT_EPS; });
+      if(!startsInClip) return { rule:"gap", start:clamped };
 
       var target = ttInsertTarget(o.pointerUnit, others, o.snap);
       if(target){
@@ -2954,12 +2493,57 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       return { rule:"free", start:clamped };
     }
 
+    /* The SECOND resolver — ClipDragState.updateIndicatorTarget
+       (TimelineScreen.swift:248). The app runs two, and this is the one the
+       drop line is drawn from: it takes the RAW LEADING EDGE, snaps it to the
+       nearest existing clip edge inside the snap zone, and then HOLDS that snap
+       until the raw start leaves the zone (activeSnap). No hysteresis.
+
+       Driving the line through the ladder instead is what made it sit still:
+       the ladder returns its previous answer whenever the pointer moved less
+       than 8pt since the last frame, and prevPointer is rewritten every frame,
+       so the window slides with the pointer and any drag slower than roughly
+       8pt/frame never clears it. The line only jumped when you flicked. */
+    function ttIndicator(rawStart){
+      var zone = ttSnapU(),
+          others = ttClips.filter(function(c){ return c.id !== ttDrag.id; }),
+          best = null;
+      if(ttDrag.activeSnap != null){
+        if(Math.abs(rawStart - ttDrag.activeSnap) <= zone + TT_EPS)
+          return { at:ttDrag.activeSnap, snapped:true };
+        ttDrag.activeSnap = null;
+      }
+      others.forEach(function(c){
+        [c.start, c.start + c.len].forEach(function(edge){
+          var d = Math.abs(rawStart - edge);
+          if(d > zone + TT_EPS) return;
+          if(!best || d < best.d - TT_EPS) best = { at:Math.max(0, edge), d:d };
+        });
+      });
+      if(best){ ttDrag.activeSnap = best.at; return { at:best.at, snapped:true }; }
+      return { at:Math.max(0, rawStart), snapped:false };
+    }
+
+    /* ClipDragState.indicatorDropResult (TimelineScreen.swift:303) — the drop
+       commits to WHAT THE LINE SHOWS, which is why the app's line never lies.
+       Snapped: place exactly at the indicator. Otherwise run the ladder with
+       rawStart AND pointerUnit both set to the indicator's position, hysteresis
+       off and ghost-restore off, so a body-insert splits at the line rather
+       than at the finger. */
+    function ttCommitResult(){
+      var at = Math.max(0, ttDrag.ind.at);
+      if(ttDrag.ind.snapped) return { rule:"snap", start:at };
+      return ttResolve({ id:ttDrag.id, pointerUnit:at, rawStart:at,
+        originalStart:null, snap:ttSnapU(), hyst:0, prev:null, prevPointer:null });
+    }
+
     /* MixrTimeline.reflowedClips. Without this a drop just writes a new start
        and clips are left sitting on top of each other — which is exactly the
        overlap in the recording. The app anchors the moving clip, then pushes
        only what its new range actually collides with: everything ending at or
        before it is packed forward, everything after it is pushed out to clear
        its tail. */
+    function ttCopy(c){ return Object.assign({}, c); }
     function ttReflow(id, proposedStart, clips){
       var moving = clips.filter(function(c){ return c.id === id; })[0];
       if(!moving) return clips.slice().sort(function(a,b){ return a.start - b.start; });
@@ -2970,16 +2554,16 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       var arranged = [], suffix = [], prefixEnd = 0;
       others.forEach(function(c){
         if(c.start + c.len <= anchored + TT_EPS){
-          var pc = { id:c.id, start:c.start, len:c.len };
+          var pc = ttCopy(c);
           if(pc.start < prefixEnd - TT_EPS) pc.start = prefixEnd;
           prefixEnd = Math.max(prefixEnd, pc.start + pc.len);
           arranged.push(pc);
         } else suffix.push(c);
       });
-      arranged.push({ id:moving.id, start:anchored, len:moving.len });
+      arranged.push(Object.assign(ttCopy(moving), { start:anchored }));
       var cursor = movingEnd;
       suffix.forEach(function(c){
-        var sc = { id:c.id, start:c.start, len:c.len };
+        var sc = ttCopy(c);
         if(sc.start < cursor - TT_EPS) sc.start = cursor;
         cursor = Math.max(cursor, sc.start + sc.len);
         arranged.push(sc);
@@ -3006,12 +2590,32 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       ttLayout();
     }
     function ttLayout(){
+      ttSizeLane();
       ttClips.forEach(function(c){
         var el = ttNodes[c.id]; if(!el) return;
-        el.style.left = ttPct(c.start); el.style.width = ttPct(c.len);
+        ttPlace(el, c.start); el.style.width = ttPct(c.len);
       });
       [].slice.call(ttLane.querySelectorAll(".wave")).forEach(ttWave);
     }
+    /* One envelope per SOURCE, generated once at a resolution set by the
+       source's own length and cached. Clips sample a window of it, so every
+       piece cut from the same source stays part of one continuous waveform. */
+    var ttEnvCache = {};
+    function ttSourceEnvelope(src, srcLen){
+      if(ttEnvCache[src]) return ttEnvCache[src];
+      var N = Math.max(64, Math.round(srcLen * 12)),
+          s = (70 + String(src).charCodeAt(0)) >>> 0, a = [], i;
+      function rnd(){ s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }
+      for(i = 0; i < N; i++){
+        var t = i / (N - 1),
+            env = 0.62 + 0.38 * Math.pow(Math.sin(Math.PI * t), 0.5);
+        a.push(Math.min(0.98, Math.max(0.05, env * (0.62 + 0.38 * rnd()))));
+      }
+      a = a.map(function(v, j){
+        return (a[Math.max(0, j - 1)] + v + a[Math.min(N - 1, j + 1)]) / 3; });
+      return (ttEnvCache[src] = a);
+    }
+
     /* The waveform is a FILLED MIRRORED SILHOUETTE — WaveformSilhouettePath in
        WaveformStyle.swift — not a bar pattern. Built at the clip's real pixel
        width so the 8pt inner padding stays a true pt value. */
@@ -3020,19 +2624,29 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       var W = Math.round(clip.getBoundingClientRect().width);
       var H = Math.round(clip.getBoundingClientRect().height);
       if(W < 6 || H < 6) return;
-      if(el.dataset.w === String(W) && el.dataset.h === String(H)) return;
-      el.dataset.w = W; el.dataset.h = H;
-      var seed = el.dataset.seed || (el.dataset.seed =
-        String(70 + clip.dataset.id.charCodeAt(0)));
-      var n = Math.max(28, Math.round(W / 2.2)), s = (+seed) >>> 0, a = [], i;
-      function rnd(){ s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }
+      var model0 = ttClips.filter(function(k){ return k.id === clip.dataset.id; })[0];
+      if(el.dataset.w === String(W) && el.dataset.h === String(H) &&
+         model0 && el.dataset.off === String(model0.off || 0)) return;
+      var model = ttClips.filter(function(k){ return k.id === clip.dataset.id; })[0];
+      if(!model) return;
+      var srcLen = model.srcLen || model.len, off = model.off || 0;
+      el.dataset.w = W; el.dataset.h = H; el.dataset.off = off;
+      /* Seed from the SOURCE, not the clip id, and sample only the [off, off+len]
+         slice of it. Seeding per clip meant a split redrew the whole envelope
+         squeezed into each half, and every remainder shared one seed so they all
+         looked alike. */
+      var n = Math.max(28, Math.round(W / 2.2)), a = [], i;
+      var env = ttSourceEnvelope(String(model.src || model.id), srcLen);
+      /* Sample the [off, off+len] window of the source, so a split's halves are
+         the left and right of one envelope rather than two whole ones. */
+      var u0 = srcLen > 0 ? off / srcLen : 0,
+          u1 = srcLen > 0 ? Math.min(1, (off + model.len) / srcLen) : 1;
       for(i = 0; i < n; i++){
-        var t = i / (n - 1);
-        var env = 0.62 + 0.38 * Math.pow(Math.sin(Math.PI * t), 0.5);
-        a.push(Math.min(0.98, Math.max(0.05, env * (0.62 + 0.38 * rnd()))));
+        var u = u0 + (u1 - u0) * (i / (n - 1)),
+            f = u * (env.length - 1),
+            k = Math.floor(f), frac = f - k;
+        a.push(env[k] + ((env[Math.min(env.length - 1, k + 1)] - env[k]) * frac));
       }
-      a = a.map(function(v, j){
-        return (a[Math.max(0, j - 1)] + v + a[Math.min(n - 1, j + 1)]) / 3; });
       var cy = H / 2, maxHalf = (H - 8 * 2) / 2 * 0.86,
           drawable = Math.max(1, W - 16),
           xAt = function(k){ return 8 + drawable * k / (n - 1); };
@@ -3067,37 +2681,70 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     var ttDrag = null, ttRaf = 0;
     function ttUnitAt(clientX){
       var r = ttLane.getBoundingClientRect();
-      return ((clientX - r.left) / r.width) * TT_UNITS;
+      return ((clientX - r.left) / r.width) * ttSpan();
     }
-    function ttAutoScroll(clientX){
-      var r = ttScroll.getBoundingClientRect(), dx = 0;
-      if(clientX < r.left + TT_SCROLL_ZONE)
-        dx = -TT_SCROLL_SPEED * (1 - (clientX - r.left) / TT_SCROLL_ZONE);
-      else if(clientX > r.right - TT_SCROLL_ZONE)
-        dx =  TT_SCROLL_SPEED * (1 - (r.right - clientX) / TT_SCROLL_ZONE);
+    /* Auto-scroll triggers off the LIFTED CLIP's edges, not the cursor — the
+       clip is what you are aiming with. The ramp is quadratic, which is what
+       makes the start imperceptible; a linear ramp lurches the moment you touch
+       the boundary. */
+    function ttAutoScroll(){
+      var el = ttNodes[ttDrag.id]; if(!el) return;
+      var r = ttScroll.getBoundingClientRect(), b = el.getBoundingClientRect(), dx = 0, t;
+      /* The trigger is the clip PASSING the viewport edge, not approaching it —
+         the zone is the distance the ramp is measured over AFTER that, not a
+         margin that starts the scroll early. Triggering on approach meant the
+         lane ran away while the clip was still fully visible, and a clip could
+         never be parked near the edge. */
+      if(b.right > r.right){
+        t = Math.min((b.right - r.right) / TT_SCROLL_ZONE, 1);
+        dx = TT_SCROLL_SPEED * t * t;
+      } else if(b.left < r.left){
+        t = Math.min((r.left - b.left) / TT_SCROLL_ZONE, 1);
+        dx = -TT_SCROLL_SPEED * t * t;
+      }
+      /* Reserve lane past the held clip so there is somewhere to scroll TO,
+         exactly as the app extends its content width mid-drag. Without it the
+         scroll hits the end of the committed arrangement and the clip stops. */
+      var reach = Math.max(0, ttUnitAt(ttDrag.x) - ttDrag.grab) +
+                  (ttClips.filter(function(c){ return c.id === ttDrag.id; })[0] || {len:0}).len +
+                  ttPxU(ttScroll.clientWidth * 0.35);
+      if(ttDrag.reach == null || reach > ttDrag.reach){ ttDrag.reach = reach; ttSizeLane(); }
       if(dx) ttScroll.scrollLeft += dx;
-      return dx;
     }
     ttLane.addEventListener("pointerdown", function(e){
+      /* Primary button only — a right- or middle-click otherwise starts a drag
+         that the context menu then interrupts. */
+      if(e.pointerType === "mouse" && e.button !== 0) return;
       var el = e.target.closest(".tt-clip"); if(!el) return;
       e.preventDefault();
       var c = ttClips.filter(function(k){ return k.id === el.dataset.id; })[0];
       if(!c) return;
+      /* NOTE: the drag arms immediately, on every input. The app requires a
+         0.50s long press plus a 0.09s settle (clipDragLongPressDuration /
+         clipDragArmedSettleDuration) — a deliberate divergence here, because a
+         web prototype that ignores the first half-second of a mouse drag reads
+         as broken. Everything below this line is app behaviour. */
       /* Vertical grab offset too — the clip lifts off the track and follows the
          pointer in both axes, clamped to the lane, rather than sliding along a
          rail. ttPreview writes top; the .is-moving transform is the pop. */
       ttDrag = { id:c.id, grab:ttUnitAt(e.clientX) - c.start,
-                 originalStart:c.start, prev:null, prevPointer:null,
+                 originalStart:c.start,
+                 activeSnap:null, wasSnapped:false,
+                 ind:{ at:c.start, snapped:false }, reach:null,
                  x:e.clientX, y:e.clientY,
                  grabY:e.clientY - el.getBoundingClientRect().top };
       tt.classList.add("is-drag"); el.classList.add("is-moving");
       /* The ghost is the clip's own waveform left where it was picked up from. */
       if(ttGhost){
         ttGhost.innerHTML = el.innerHTML;
-        ttGhost.style.left  = ttPct(c.start);
+        ttPlace(ttGhost, c.start);
         ttGhost.style.width = ttPct(c.len);
         ttGhost.style.setProperty("--c", "var(--mx-pitch)");
       }
+      /* Seeded at the clip's current start so it fades in where the clip is
+         rather than flying in from elsewhere. */
+      ttCut.classList.remove("glide");
+      ttPlace(ttCut, c.start);
       try { ttLane.setPointerCapture(e.pointerId); } catch(err){}
       ttTick();
     });
@@ -3105,44 +2752,49 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       if(!ttDrag) return;
       var pointerUnit = ttUnitAt(ttDrag.x),
           rawStart = pointerUnit - ttDrag.grab;
-      var res = ttResolve({ id:ttDrag.id, pointerUnit:pointerUnit, rawStart:rawStart,
-        originalStart:ttDrag.originalStart, snap:ttSnapU(), hyst:ttHystU(),
-        prev:ttDrag.prev, prevPointer:ttDrag.prevPointer });
-      ttDrag.prev = res; ttDrag.prevPointer = pointerUnit; ttDrag.res = res;
+      /* The line, the neighbour shift and the drop all read the INDICATOR
+         resolver. The ladder is not run per-frame at all: in the app its
+         answer is never drawn either (the lane's neighbour preview reads
+         drag.resolvedInsertStart), and the commit re-derives it from the
+         indicator. Running it here only re-introduced its hysteresis. */
+      var ind = ttIndicator(rawStart);
+      ttDrag.ind = ind;
       var el = ttNodes[ttDrag.id];
-      var moving = ttClips.filter(function(c){ return c.id === ttDrag.id; })[0];
       /* The held clip goes where the POINTER is, not where it would land. It
          detaches and follows anywhere — including over its neighbours — and the
-         ghost below carries the resolution. Pinning it to res.start instead was
-         what made this feel like a slider rather than something picked up. */
+         ghost below carries the resolution. Pinning it to the resolved start
+         instead was what made this feel like a slider rather than something
+         picked up. */
       if(el){
-        el.style.left = ttPct(Math.max(0, rawStart));
+        ttPlace(el, Math.max(0, rawStart));
         var lr = ttLane.getBoundingClientRect(), ch = el.offsetHeight || 48;
         el.style.top = Math.max(0, Math.min(lr.height - ch,
                                             ttDrag.y - lr.top - ttDrag.grabY)) + "px";
       }
-      /* One indicator, always up while dragging — the app draws it for every
-         drag state, not only the ones that split something. */
-      var ind = ttIndicator(rawStart, ttClips.filter(function(c){ return c.id !== ttDrag.id; }),
-                            ttSnapU());
+      /* Ease ONLY across a snap transition — either frame being snapped counts.
+         In free space it tracks the finger 1:1 with no animation. Animating it
+         unconditionally makes the whole drag feel laggy; never animating makes
+         snapping read as a glitch. */
+      ttCut.classList.toggle("glide", ttDrag.wasSnapped || ind.snapped);
+      ttDrag.wasSnapped = ind.snapped;
       ttCut.classList.add("on");
-      ttCut.style.left = ttPct(ind);
+      ttPlace(ttCut, ind.at);
 
-      /* clipDragNeighborShift: the clip ending at the insertion point and the one
-         starting at it part by 20px. Only those two — everything else holds
-         still. The reflow happens on release, not during the drag. */
+      /* Neighbour shift previews the slot opening, and only while the line is
+         actually snapped to a seam — a free-floating line opens nothing. The
+         indicator's snap value IS an existing edge, so this matches on epsilon;
+         a looser tolerance parts the wrong clip when two edges sit close. */
       ttClips.forEach(function(c){
         var n = ttNodes[c.id];
         if(!n || c.id === ttDrag.id) return;
-        var isPrev = Math.abs(c.start + c.len - ind) < TT_EPS + 0.4,
-            isNext = Math.abs(c.start - ind) < TT_EPS + 0.4;
-        n.style.transform = isPrev ? "translateX(-20px)"
-                          : isNext ? "translateX(20px)" : "";
+        var isPrev = ind.snapped && Math.abs(c.start + c.len - ind.at) <= TT_EPS,
+            isNext = ind.snapped && Math.abs(c.start - ind.at) <= TT_EPS;
+        n.style.setProperty("--shift", isPrev ? "-20px" : isNext ? "20px" : "0px");
       });
     }
     function ttTick(){
       if(!ttDrag) return;
-      ttAutoScroll(ttDrag.x);
+      ttAutoScroll();
       ttPreview();
       ttRaf = requestAnimationFrame(ttTick);
     }
@@ -3154,28 +2806,66 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
          the clip itself has to track the pointer on the same frame it moved. */
       ttPreview();
     }, {passive:true});
-    function ttEnd(){
-      if(!ttDrag) return;
+    /* Teardown only — no commit. */
+    function ttCancelDrag(){
       cancelAnimationFrame(ttRaf);
-      var res = ttDrag.res, id = ttDrag.id, el = ttNodes[id];
+      var el = ttNodes[ttDrag.id];
       if(el){ el.classList.remove("is-moving"); el.style.top = ""; }
       tt.classList.remove("is-drag");
       ttCut.classList.remove("on");
       if(ttGhost) ttGhost.innerHTML = "";
       ttClips.forEach(function(c){
-        var n = ttNodes[c.id]; if(n) n.style.transform = "";
+        var n = ttNodes[c.id]; if(n) n.style.setProperty("--shift", "0px");
+      });
+      ttDrag = null;
+      ttSizeLane(); ttLayout();
+    }
+    function ttEnd(){
+      if(!ttDrag) return;
+      cancelAnimationFrame(ttRaf);
+      /* Commit through indicatorDropResult: the drop is derived from where the
+         LINE is, which is why the app's line never lies. Snapped -> place there.
+         Otherwise the ladder runs with rawStart and pointerUnit both set to the
+         line's position, hysteresis off and ghost-restore off, so a body insert
+         cuts at the line rather than at the finger. */
+      var id = ttDrag.id, el = ttNodes[id], res = ttCommitResult();
+      ttDrag.reach = null;
+      if(el){ el.classList.remove("is-moving"); el.style.top = ""; }
+      tt.classList.remove("is-drag");
+      ttCut.classList.remove("on");
+      if(ttGhost) ttGhost.innerHTML = "";
+      ttClips.forEach(function(c){
+        var n = ttNodes[c.id]; if(n) n.style.setProperty("--shift", "0px");
       });
       if(res && res.rule === "insert"){
         // split the destination and sandwich the moving clip between the halves
         var moving = ttClips.filter(function(c){ return c.id === id; })[0];
         var t = ttClips.filter(function(c){ return c.id === res.targetId; })[0];
-        if(moving && t){
-          var leftLen = res.splitUnit - t.start, rightLen = t.len - leftLen;
+        var leftLen = t ? res.splitUnit - t.start : 0,
+            rightLen = t ? t.len - leftLen : 0;
+        /* Refuse a split that would leave either half under the minimum. Silent
+           refusal is correct — the alternative is slivers that cannot be
+           selected or trimmed — and the drop falls through to plain placement. */
+        if(moving && t && leftLen >= TT_MIN - TT_EPS && rightLen >= TT_MIN - TT_EPS){
           var rest = ttClips.filter(function(c){ return c.id !== id && c.id !== t.id; });
           var rebuilt = rest.concat([
-            { id:t.id, start:t.start, len:leftLen },
-            { id:id,  start:t.start + leftLen, len:moving.len },
-            { id:t.id + "-b", start:t.start + leftLen + moving.len, len:rightLen }
+            Object.assign(ttCopy(t), { len:leftLen }),
+            Object.assign(ttCopy(moving), { start:t.start + leftLen }),
+            /* A NEW id, never a suffix on the target's. "a-b" collides the second
+               time you split a, and two clips sharing an id means one DOM node
+               between them — ttNodes keeps only the last, so the other stops
+               being laid out and collapses to zero width. That is the segment
+               going missing. */
+            Object.assign(ttCopy(t), {
+              id:"s" + (++ttUid),
+              start:t.start + leftLen + moving.len,
+              len:rightLen,
+              /* The right half is a LATER WINDOW into the same source — the
+                 visual form of sourceOffsetSeconds advancing by the left
+                 half's length. Without it the remainder restarts the waveform
+                 from the top, the way a split clip restarts the song. */
+              off:(t.off || 0) + leftLen
+            })
           ]);
           ttClips = ttReflow(id, t.start + leftLen, rebuilt);
           ttDrag = null; ttBuild(); return;
@@ -3190,11 +2880,20 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     addEventListener("pointercancel", ttEnd);
 
     ttReset.addEventListener("click", function(){
+      /* Cancel anything in flight first, or the lifted clip, the scrim class
+         and the line stay behind on a model that no longer contains them. */
+      if(ttDrag) ttCancelDrag();
+      ttEnvCache = {};
       ttClips = TT_START.map(function(c){ return Object.assign({}, c); });
       ttBuild();
       ttScroll.scrollLeft = 0;
     });
-    addEventListener("resize", function(){ ttSizeLane(); ttLayout(); }, {passive:true});
+    /* Skip while dragging: ttLayout would snap the held clip back to its model
+       position mid-gesture. */
+    addEventListener("resize", function(){
+      if(ttDrag) return;
+      ttSizeLane(); ttLayout();
+    }, {passive:true});
     /* The block starts collapsed, so the first build happens inside a
        display:none panel and the silhouettes cannot be drawn — they need the
        clip's real pixel size to keep the 8pt inner padding a true pt value.
