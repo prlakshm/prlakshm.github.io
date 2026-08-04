@@ -1230,7 +1230,8 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   -ms-overflow-style:none;border-radius:0 0 10px 10px;padding-bottom:12px;
   touch-action:pan-y;user-select:none;-webkit-user-select:none}
 .tt-scroll::-webkit-scrollbar{display:none}
-.tt-lane{position:relative;height:88px;width:var(--lane-w)}
+.tt-lane{position:relative;height:88px;width:var(--lane-w);cursor:grab}
+.tt.is-pan .tt-lane,.tt.is-pan .tt-clip{cursor:grabbing}
 .tt-lane::before{content:"";position:absolute;inset:0;pointer-events:none;
   background-image:linear-gradient(90deg,rgba(42,49,66,.62) 1px,transparent 1px);
   background-size:calc(100% / 16) 100%}
@@ -1303,19 +1304,14 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
        through the middle, coming back softer at bottom-trailing. Values fitted
        against the "Linear" pill sampled out of the transition recording at native
        resolution — nine points across its body, mean error 1.6/255. */
-    /* 150deg, not 135. On a box this wide the bottom-left corner lands at t=0.30
-       on a 135deg line — inside the leading arm — so it was carrying hue 28.6
-       against the top-left's 42.7, while the top-right escaped at t=0.70. Ten
-       degrees of rotation walks the bottom-left down the line to 19.3 and leaves
-       the other three corners where they were.
-
-       The mid stop at 30.4% is effectively the top-middle's own control: that
-       point sits at t=0.324, right on it, while the top-left corner is back at
-       t=0.11 and hardly feels it. .178 -> .165 takes the top-middle down 6% and
-       the corner only 1.6%. */
+    /* 150deg, not 135: on a box this wide the bottom-left corner lands at t=0.30
+       on a 135deg line — inside the leading arm — so it carried hue 28.6 against
+       the top-left's 42.7. Ten degrees walks it down to 19.3 and leaves the other
+       three corners where they were. The mid stop is effectively the top-middle's
+       own control; that point sits at t=0.324, right on it. */
     linear-gradient(150deg,color-mix(in srgb,var(--c) 39.6%,transparent),
       color-mix(in srgb,var(--c) 16.5%,transparent) 30.4%,
-      transparent 55.3%,transparent 72.4%,
+      transparent 56.5%,transparent 72.4%,
       color-mix(in srgb,var(--c) 8.9%,transparent) 82.6%,
       color-mix(in srgb,var(--c) 18.3%,transparent)),
     /* and a little more weight out of the middle: the hue holds further along
@@ -1325,23 +1321,13 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
        pill carries (corner R-G 24 against its 22), but it only survives the
        outer 32% of the diagonal instead of the outer 46%, and the middle is
        sunk under a wider, deeper ellipse. Softer colour, further out, darker
-       through the centre. Reach is the stop percentages, strength is the alphas;
-       they are tuned separately. Currently the hue runs 55.3% in from the leading
-       end and 27.6% from the trailing one, at a peak of .396 — a wide reach into
-       the middle, which is what lifts centre luminance from 16 to 22.
+       through the centre.
 
        The two ends are deliberately NOT level. The body wash is already weaker
        at the bottom-trailing end than the top-leading one; what made that end
        read heavy was the rim, whose hue stop sat two-thirds along and spread
        colour down the whole bottom edge, plus a glow offset downward that
        pooled under it. Both are pulled toward the corner instead. */
-    /* The dark core: deeper AND wider. Raising the alpha alone barely moved it —
-       the hue now reaches far enough in to screen back over the middle, so a 10%
-       alpha rise bought only 2% of actual luminance — .42 is what would get a
-       real 10% darker; .33 is the value asked for and lands at -3.7%. The width
-       is free at the corners: closest-side on a wide
-       capsule is limited by the vertical radius, so the diagonal ends sit outside
-       the ellipse and their hue reads identically. */
     radial-gradient(ellipse closest-side at 50% 50%,rgba(0,0,0,.33),transparent 94%),
     /* the white sheen, which is what washes the hue out of the top-middle */
     linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,.127) 25%,
@@ -1378,7 +1364,9 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     linear-gradient(0deg,rgba(0,0,0,.18),transparent 22%);
   filter:blur(.75px)}
 .tt-reset:hover{filter:brightness(1.25)}
-.tt-reset:active{transform:scale(.97)}
+/* The click's own shine: the hover lift is 0.25 above neutral, so 10% stronger
+   is 0.275. Pressed reads brighter than hovered rather than only smaller. */
+.tt-reset:active{transform:scale(.97);filter:brightness(1.275)}
 .tt-reset:focus-visible{outline:2px solid #f2f0ec;outline-offset:3px}
 
 /* ---- the palette: the icon, then every hue it licenses ------------------- */
@@ -1770,7 +1758,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
         <span class="demo-title">Try it Yourself</span>
         <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.3 8.6a1 1 0 0 1 1.4 0L12 13.9l5.3-5.3a1 1 0 1 1 1.4 1.42l-6 6a1 1 0 0 1-1.4 0l-6-6a1 1 0 0 1 0-1.42z"/></svg>
       </button>
-      <span class="hint">DROP RULES &middot; SNAPS TO EDGE OR INSERTS IN MIDDLE</span>
+      <span class="hint">DRAG-AND-DROP &middot; SNAPS TO EDGE &middot; INSERTS IN MIDDLE</span>
     </div>
     <div id="tt-body" data-folded="true">
       <div class="tt" id="tt" style="--c:var(--mx-pitch)">
@@ -2931,7 +2919,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     }
 
     /* ---- drag -------------------------------------------------------- */
-    var ttDrag = null, ttRaf = 0;
+    var ttDrag = null, ttRaf = 0, ttPan = null;
     function ttUnitAt(clientX){
       var r = ttLane.getBoundingClientRect();
       return ((clientX - r.left) / r.width) * ttSpan();
@@ -2968,7 +2956,20 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       /* Primary button only — a right- or middle-click otherwise starts a drag
          that the context menu then interrupts. */
       if(e.pointerType === "mouse" && e.button !== 0) return;
-      var el = e.target.closest(".tt-clip"); if(!el) return;
+      var el = e.target.closest(".tt-clip");
+      /* Nothing under the pointer but the timeline itself — grab and pan it.
+         The content follows the hand 1:1 (drag right, the lane comes right),
+         which is the direct-manipulation reading of grabbing a strip of time.
+         Deliberately a separate gesture: it never touches ttDrag, so the clip
+         model below is untouched. */
+      if(!el){
+        if(ttDrag) return;
+        e.preventDefault();
+        ttPan = { x:e.clientX, from:ttScroll.scrollLeft, moved:false };
+        tt.classList.add("is-pan");
+        try { ttLane.setPointerCapture(e.pointerId); } catch(err){}
+        return;
+      }
       e.preventDefault();
       var c = ttClips.filter(function(k){ return k.id === el.dataset.id; })[0];
       if(!c) return;
@@ -3052,6 +3053,12 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       ttRaf = requestAnimationFrame(ttTick);
     }
     addEventListener("pointermove", function(e){
+      if(ttPan){
+        var dx = e.clientX - ttPan.x;
+        if(Math.abs(dx) > 2) ttPan.moved = true;
+        ttScroll.scrollLeft = ttPan.from - dx;   // content follows the pointer
+        return;
+      }
       if(!ttDrag) return;
       ttDrag.x = e.clientX; ttDrag.y = e.clientY;
       /* Resolve here rather than waiting for the rAF loop. The loop exists for
@@ -3129,8 +3136,13 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       }
       ttDrag = null; ttLayout();
     }
-    addEventListener("pointerup", ttEnd);
-    addEventListener("pointercancel", ttEnd);
+    function ttPanEnd(){
+      if(!ttPan) return;
+      ttPan = null;
+      tt.classList.remove("is-pan");
+    }
+    addEventListener("pointerup", function(e){ ttPanEnd(); ttEnd(e); });
+    addEventListener("pointercancel", function(e){ ttPanEnd(); ttEnd(e); });
 
     ttReset.addEventListener("click", function(){
       /* Cancel anything in flight first, or the lifted clip, the scrim class
