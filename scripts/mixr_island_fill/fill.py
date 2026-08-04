@@ -56,12 +56,38 @@ import sys
 import os
 import numpy as np
 
-W, H = 1800, 828
+# The recordings have shipped at more than one size (1800x828, then 1900x874).
+# Every constant below was measured at 1800x828, so REF is that baseline and the
+# module rescales itself to whatever the file actually is. The two sizes share an
+# aspect ratio to four decimal places, so a single factor is exact.
+REF_W, REF_H = 1800, 828
+W, H = REF_W, REF_H
 FPS = 30
+
+
+def set_size(w, h):
+    """Rescale every measured constant to the file being processed."""
+    global W, H, ISL, SM_X0, SM_X1, LANE_X0, LANE_X1, SLICE_X0, SLICE_X1
+    global ROW_HALF, DON_L0, DON_L1, DON_R0, DON_R1, LIST_Y0, LIST_Y1
+    global THUMB_X0, THUMB_X1, PILL_CX, PILL_R, PILL_PAD, PILL_Y0, PILL_Y1, ISLAND
+    k = w / float(REF_W)
+    if abs(h / float(REF_H) - k) > 0.002:
+        raise SystemExit(f"{w}x{h} is not the reference aspect ratio")
+    W, H = w, h
+    sx = lambda v: int(round(v * k))
+    ISL = {key: sx(v) for key, v in _ISL_REF.items()}
+    (SM_X0, SM_X1, LANE_X0, LANE_X1, SLICE_X0, SLICE_X1, ROW_HALF,
+     DON_L0, DON_L1, DON_R0, DON_R1, LIST_Y0, LIST_Y1,
+     THUMB_X0, THUMB_X1) = [sx(v) for v in _PX_REF]
+    PILL_CX, PILL_R, PILL_PAD = (_PILL_REF[0] * k, _PILL_REF[1] * k, _PILL_REF[2] * k)
+    PILL_Y0, PILL_Y1 = _PILL_REF[3] * k, _PILL_REF[4] * k
+    ISLAND = _pill()
+    return k
 
 # Island box, measured across every clip and both ends of each (±2px, which is
 # compression noise on the rounded edge). Verified per frame against this.
-ISL = dict(x0=1688, x1=1776, y0=280, y1=548)
+_ISL_REF = dict(x0=1688, x1=1776, y0=280, y1=548)
+ISL = dict(_ISL_REF)
 ISL_TOL = 14
 
 SM_X0, SM_X1 = 1300, 1420      # the S / M buttons — always visible
@@ -77,6 +103,7 @@ ROW_HALF = 16                  # slider is thumbHeight+2 = 16pt tall
 DON_L0, DON_L1 = 1679, 1686
 DON_R0, DON_R1 = 1788, 1796
 FLAT_TOL = 46                  # max channel spread within a donor strip
+SIDE_TOL = 6                   # above this the two strips are on different structure
 
 # The Controls list, between the bottom of the ruler and the top of the Effects
 # drawer. Both are fixed chrome in these recordings; check_layout() asserts
@@ -86,8 +113,11 @@ LIST_Y0, LIST_Y1 = 134, 586
 THUMB_X0, THUMB_X1 = 1700, 1790  # where slider ink lives, for presence tests
 
 # The island itself, as a fixed pill — see _pill().
-PILL_CX, PILL_R, PILL_PAD = 1732.5, 38.0, 3.0
-PILL_Y0, PILL_Y1 = 324, 505    # cap centres
+_PILL_REF = (1732.5, 38.0, 3.0, 324, 505)      # cx, r, pad, cap centres
+PILL_CX, PILL_R, PILL_PAD = _PILL_REF[0], _PILL_REF[1], _PILL_REF[2]
+PILL_Y0, PILL_Y1 = _PILL_REF[3], _PILL_REF[4]
+_PX_REF = (1300, 1420, 1000, 1180, 1640, 1795, 16,
+           1679, 1686, 1788, 1796, 134, 586, 1700, 1790)
 
 
 # ----------------------------------------------------------------- io --------
@@ -97,6 +127,14 @@ def duration_of(path):
         ["ffprobe", "-v", "error", "-show_entries", "format=duration",
          "-of", "csv=p=0", path], capture_output=True, text=True, check=True)
     return float(out.stdout.strip())
+
+
+def probe_size(path):
+    out = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0",
+        "-show_entries", "stream=width,height", "-of", "csv=p=0", path],
+        capture_output=True, text=True, check=True)
+    w, h = [int(v) for v in out.stdout.strip().split(",")[:2]]
+    return w, h
 
 
 def read_frames(path):
@@ -117,9 +155,14 @@ def write_frames(frames, path, fps=FPS):
     p = subprocess.Popen(
         ["ffmpeg", "-v", "error", "-y",
          "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(fps),
+         "-color_range", "tv", "-colorspace", "bt709",
+         "-color_trc", "iec61966-2-1", "-color_primaries", "bt709",
          "-i", "-", "-an",
          "-c:v", "libx264", "-profile:v", "high", "-pix_fmt", "yuv420p",
-         "-crf", "25", "-preset", "slow", "-movflags", "+faststart", path],
+         "-crf", "19", "-preset", "slow",
+         "-color_range", "tv", "-colorspace", "bt709",
+         "-color_trc", "iec61966-2-1", "-color_primaries", "bt709",
+         "-movflags", "+faststart", path],
         stdin=subprocess.PIPE)
     for f in frames:
         p.stdin.write(np.ascontiguousarray(f, dtype=np.uint8).tobytes())
@@ -161,12 +204,21 @@ def island_mask(fr):
 ISLAND = _pill()
 
 
+# The always-black core, measured at the reference size. Scaled like everything
+# else — leaving these as literals is what made every frame fail detection when
+# the exports moved to 1900x874.
+_CORE_REF = (1692, 1772, 285, 543, 8000)
+
+
 def island_ok(m):
-    if m.sum() < 8000:
+    k = W / float(REF_W)
+    x0, x1, y0, y1, area = _CORE_REF
+    if m.sum() < area * k * k:
         return False
     ys, xs = np.where(m)
-    return (abs(xs.min() - 1692) < ISL_TOL and abs(xs.max() - 1772) < ISL_TOL
-            and abs(ys.min() - 285) < ISL_TOL and abs(ys.max() - 543) < ISL_TOL)
+    tol = ISL_TOL * k
+    return (abs(xs.min() - x0 * k) < tol and abs(xs.max() - x1 * k) < tol
+            and abs(ys.min() - y0 * k) < tol and abs(ys.max() - y1 * k) < tol)
 
 
 def controls_visible(fr):
@@ -349,11 +401,22 @@ def fill_frame(fr, stats, lend=None):
     # is flat. In the editor the two sides agree closely, so the ramp is very
     # nearly a constant and the row dividers come through unbroken.
     t = ((xs - DON_L1) / float(DON_R0 - DON_L1))[:, None]
-    both = flat_l[ys] & flat_r[ys]
+    # Ramping assumes the two sides are the same surface at different brightness.
+    # On a ROW DIVIDER they are not: the hairline runs across the Controls panel
+    # and stops before its right edge, so the left strip reads the line (19) and
+    # the right strip reads past its end (9). Ramping those turned every divider
+    # crossing the cutout into a fade instead of a constant line — the broken
+    # dividers. Where the sides disagree by more than compression noise, the left
+    # strip is the one still inside the panel, so it is used alone.
+    disagree = np.abs(med_l - med_r).max(axis=1) > SIDE_TOL
+    both = flat_l[ys] & flat_r[ys] & ~disagree[ys]
+    struct = flat_l[ys] & flat_r[ys] & disagree[ys]
     only_l = flat_l[ys] & ~flat_r[ys]
     only_r = flat_r[ys] & ~flat_l[ys]
     out[ys[both], xs[both]] = ((1 - t[both]) * med_l[ys[both]]
                                + t[both] * med_r[ys[both]])
+    out[ys[struct], xs[struct]] = med_l[ys[struct]]
+    stats["struct_rows"] += int(disagree[ISL["y0"]:ISL["y1"]].sum())
     out[ys[only_l], xs[only_l]] = med_l[ys[only_l]]
     out[ys[only_r], xs[only_r]] = med_r[ys[only_r]]
     stats["rows_no_donor"] += int((~flat_l & ~flat_r)[ISL["y0"]:ISL["y1"]].sum())
@@ -430,18 +493,24 @@ def fill_frame(fr, stats, lend=None):
 
 
 def check_layout(frames):
-    """LIST_Y1 is a constant, so prove it against the clip before relying on it.
-    The Effects drawer is draggable; if a future recording opens it further, the
-    donor bound is wrong and rows get rejected (or worse, accepted) silently."""
+    """The Effects drawer is draggable and the exports have not always cropped
+    the same way, so LIST_Y1 is MEASURED per clip rather than assumed. Asserting
+    a fixed value only told me the number had moved; deriving it means the donor
+    bound is right for whatever was recorded. The assertion that remains is a
+    sanity range — a drawer top outside the middle of the frame means the metric
+    latched onto something else, and silently trusting that would corrupt every
+    row test downstream."""
+    global LIST_Y1
     tops = []
     for f in frames[::5]:
-        lum = f[:, 250:1450].astype(np.float64).mean(axis=(1, 2))
-        tops.append(int(np.argmax(np.diff(lum)[500:720])) + 501)
+        lum = f[:, int(250 * W / REF_W):int(1450 * W / REF_W)].astype(np.float64).mean(axis=(1, 2))
+        lo, hi = int(0.45 * H), int(0.92 * H)
+        tops.append(int(np.argmax(np.diff(lum)[lo:hi])) + lo + 1)
     mode = int(np.bincount(tops).argmax())
-    if abs(mode - (LIST_Y1 + 1)) > 3:
-        raise SystemExit(
-            f"drawer top is {mode}, expected {LIST_Y1 + 1} — re-measure LIST_Y1")
-    print(f"  layout ok: drawer top {mode}")
+    if not (0.45 * H < mode < 0.92 * H):
+        raise SystemExit(f"drawer top measured at {mode} on a {W}x{H} frame — implausible")
+    LIST_Y1 = mode - 1
+    print(f"  layout ok: drawer top {mode}, list bound {LIST_Y1}")
 
 
 def main():
@@ -450,12 +519,14 @@ def main():
     if "--probe" in sys.argv:
         probe = int(sys.argv[sys.argv.index("--probe") + 1])
 
+    w, h = probe_size(src)
+    k = set_size(w, h)
     frames = read_frames(src)
-    print(f"{os.path.basename(src)}: {len(frames)} frames")
+    print(f"{os.path.basename(src)}: {len(frames)} frames at {w}x{h} (scale {k:.4f})")
     check_layout(frames)
     stats = dict(filled=0, rows_filled=0, island_miss=0, no_rows=0,
                  nothing_to_do=0, no_donor=0, rows_no_donor=0, donors_clipped=0,
-                 borrowed=0, sheet_up=0)
+                 borrowed=0, sheet_up=0, struct_rows=0)
 
     # Which frame each frame can borrow a slider from. Nearest in time either
     # direction, so the stretch where a single track sits behind the island is
