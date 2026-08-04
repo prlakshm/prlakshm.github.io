@@ -1225,12 +1225,19 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 .tt{margin-top:14px;border-radius:10px;position:relative;
   background:linear-gradient(180deg,#080B16,#050816);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
-.tt-head{display:flex;align-items:center;justify-content:flex-end;padding:10px 12px 0}
+.tt-head{display:flex;align-items:center;justify-content:flex-end;padding:10px 12px 7px}
 .tt-scroll{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;
   -ms-overflow-style:none;border-radius:0 0 10px 10px;padding-bottom:12px;
   touch-action:pan-y;user-select:none;-webkit-user-select:none}
 .tt-scroll::-webkit-scrollbar{display:none}
-.tt-lane{position:relative;height:88px;width:var(--lane-w);cursor:grab}
+/* --lift-room is headroom at the TOP of the lane. A held clip is raised
+   clipDragLiftY (6px) and scaled 1.05 about its centre, which puts its visual
+   top 7.2px above its own box — without room for that, dragging a clip upward
+   pushed its top edge under the scroll container's overflow and sliced it. The
+   drag clamp reads the same variable, so the two cannot drift. */
+.tt{--lift-room:10px}
+.tt-lane{position:relative;height:calc(88px + var(--lift-room));
+  width:var(--lane-w);cursor:grab}
 .tt.is-pan .tt-lane,.tt.is-pan .tt-clip{cursor:grabbing}
 .tt-lane::before{content:"";position:absolute;inset:0;pointer-events:none;
   background-image:linear-gradient(90deg,rgba(42,49,66,.62) 1px,transparent 1px);
@@ -1240,7 +1247,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
    write cannot be caught by the lift's transition — which is what a single
    combined transform would do — and neither one relayouts the lane the way
    writing `left` every frame did. */
-.tt-clip{position:absolute;top:20px;left:0;height:48px;border-radius:10px;cursor:grab;
+.tt-clip{position:absolute;top:calc(20px + var(--lift-room));left:0;height:48px;border-radius:10px;cursor:grab;
   translate:var(--x,0px) 0;transform:translateX(var(--shift,0px));
   background:
     linear-gradient(180deg,rgba(0,0,0,.18),transparent 46%,rgba(0,0,0,.08)),
@@ -1274,7 +1281,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
    This is the only ghost the app draws — there is no outline at the destination,
    which is what resolveClipRenderFrames makes plain: one frame, isSourceGhost,
    at movingClip.start. */
-.tt-ghost{position:absolute;top:20px;left:0;height:48px;border-radius:10px;opacity:0;
+.tt-ghost{position:absolute;top:calc(20px + var(--lift-room));left:0;height:48px;border-radius:10px;opacity:0;
   translate:var(--x,0px) 0;
   pointer-events:none;z-index:0;overflow:hidden;
   transition:opacity .12s ease}
@@ -1310,7 +1317,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
        three corners where they were. The mid stop is effectively the top-middle's
        own control; that point sits at t=0.324, right on it. */
     linear-gradient(150deg,color-mix(in srgb,var(--c) 39.6%,transparent),
-      color-mix(in srgb,var(--c) 16.5%,transparent) 30.4%,
+      color-mix(in srgb,var(--c) 15%,transparent) 30.4%,
       transparent 56.5%,transparent 72.4%,
       color-mix(in srgb,var(--c) 8.9%,transparent) 82.6%,
       color-mix(in srgb,var(--c) 18.3%,transparent)),
@@ -1360,7 +1367,10 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   background:
     linear-gradient(215deg,rgba(255,255,255,.126),
       color-mix(in srgb,var(--c) 12%,transparent) 14%,transparent 52%),
-    linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.045) 30%,transparent 58%),
+    /* halved: this pass is the top-left's own white wash, and it was the main
+       thing lifting that corner. Taking it down drops white there by ~8/255 and
+       RAISES the hue by ~2, because less white was washing the pink out. */
+    linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.0225) 30%,transparent 58%),
     linear-gradient(0deg,rgba(0,0,0,.18),transparent 22%);
   filter:blur(.75px)}
 .tt-reset:hover{filter:brightness(1.25)}
@@ -2147,6 +2157,36 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   }, {rootMargin:"0px 0px -10% 0px", threshold:.06});
   document.querySelectorAll(".rv").forEach(function(el){ io.observe(el); });
 
+  /* Videos are authored with data-src so they do not all download on load — but
+     nothing was ever swapping that onto src, so every one of them except the
+     eager hero sat on its poster and never played.
+
+     Two paths on purpose. IntersectionObserver loads each one just before it
+     scrolls into view, which is the intent. But a lazy video that never loads is
+     a blank panel, and IO is the kind of thing that quietly does not fire —
+     inside some embedded viewers it delivers no callbacks at all. So a timer
+     sweeps up anything still unloaded a few seconds in. Whichever runs first
+     wins; loadVideo is idempotent. */
+  function loadVideo(v){
+    if(v.dataset.src && !v.getAttribute("src")){
+      v.setAttribute("src", v.dataset.src);
+      v.load();
+    }
+    if(!reduce){ var pr = v.play(); if(pr && pr.catch) pr.catch(function(){}); }
+  }
+  var lazyVids = [].slice.call(document.querySelectorAll("video[data-src]"));
+  var vio = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      loadVideo(e.target);
+      vio.unobserve(e.target);
+    });
+  }, {rootMargin:"300px 0px"});
+  lazyVids.forEach(function(v){ vio.observe(v); });
+  setTimeout(function(){
+    lazyVids.forEach(function(v){ if(!v.getAttribute("src")) loadVideo(v); });
+  }, 2500);
+
   // scroll-spy + read progress
   var links = [].slice.call(document.querySelectorAll("#jump a"));
   var secs  = links.map(function(a){ return document.querySelector(a.getAttribute("href")); });
@@ -2663,6 +2703,12 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
        visual distance however long the arrangement gets. */
     function ttPxU(px){ return (px / ttBaseW()) * TT_UNITS; }
     function ttSnapU(){ return ttPxU(TT_SNAP_PT); }
+    /* Single source of truth with the stylesheet's --lift-room. */
+    function ttLiftRoom(){
+      var v = window.getComputedStyle ?
+        parseFloat(window.getComputedStyle(tt).getPropertyValue("--lift-room")) : NaN;
+      return isNaN(v) ? 10 : v;
+    }
     /* Hysteresis belongs to the LADDER, and the ladder now only runs at the
        drop — where the app disables it (indicatorDropResult passes 0). It is
        kept in ttResolve's signature because it is part of the ported algorithm;
@@ -3022,7 +3068,10 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       if(el){
         ttPlace(el, Math.max(0, rawStart));
         var lr = ttLane.getBoundingClientRect(), ch = el.offsetHeight || 48;
-        el.style.top = Math.max(0, Math.min(lr.height - ch,
+        /* Floor at the headroom, not at 0: the lift raises the clip 7.2px above
+           its own box, so a 0 floor put its top edge outside the lane and the
+           container cut it off. */
+        el.style.top = Math.max(ttLiftRoom(), Math.min(lr.height - ch,
                                             ttDrag.y - lr.top - ttDrag.grabY)) + "px";
       }
       /* Ease ONLY across a snap transition — either frame being snapped counts.
