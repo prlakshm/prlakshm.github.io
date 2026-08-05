@@ -1303,80 +1303,44 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 .tt-cut.on{opacity:1}
 /* Reset — the segmented control's selected pill. Dark through the middle; the
    hue only appears at the rim, which is where the pill carries it. */
+/* Same material as the segmented control's selected pill, layer for layer —
+   including the hue profile fitted to the "1 Beat" pill in the transition
+   recording. Only the capsule shape, the type and the press behaviour are the
+   button's own. Keep this in sync with .seg-pill. */
 .tt-reset{appearance:none;border:0;cursor:pointer;border-radius:999px;
   padding:6px 18px;font-family:var(--fm);font-size:10.5px;letter-spacing:.13em;
   text-transform:uppercase;color:#e8e8f0;position:relative;isolation:isolate;
   background:
-    /* The hue, screen-blended down the diagonal: strongest at top-leading, gone
-       through the middle, coming back softer at bottom-trailing. Values fitted
-       against the "Linear" pill sampled out of the transition recording at native
-       resolution — nine points across its body, mean error 1.6/255. */
-    /* 150deg, not 135: on a box this wide the bottom-left corner lands at t=0.30
-       on a 135deg line — inside the leading arm — so it carried hue 28.6 against
-       the top-left's 42.7. Ten degrees walks it down to 19.3 and leaves the other
-       three corners where they were. The mid stop is effectively the top-middle's
-       own control; that point sits at t=0.324, right on it. */
-    linear-gradient(150deg,color-mix(in srgb,var(--c) 39.6%,transparent),
-      color-mix(in srgb,var(--c) 15%,transparent) 30.4%,
-      transparent 56.5%,transparent 72.4%,
-      color-mix(in srgb,var(--c) 8.9%,transparent) 82.6%,
-      color-mix(in srgb,var(--c) 18.3%,transparent)),
-    /* and a little more weight out of the middle: the hue holds further along
-       each end of the diagonal, and the centre is sunk under a soft ellipse.
-       Strength and placement are separate knobs, and they pull in opposite
-       directions here: the hue is back to roughly the strength the app's own
-       pill carries (corner R-G 24 against its 22), but it only survives the
-       outer 32% of the diagonal instead of the outer 46%, and the middle is
-       sunk under a wider, deeper ellipse. Softer colour, further out, darker
-       through the centre.
-
-       The two ends are deliberately NOT level. The body wash is already weaker
-       at the bottom-trailing end than the top-leading one; what made that end
-       read heavy was the rim, whose hue stop sat two-thirds along and spread
-       colour down the whole bottom edge, plus a glow offset downward that
-       pooled under it. Both are pulled toward the corner instead. */
-    radial-gradient(ellipse closest-side at 50% 50%,rgba(0,0,0,.33),transparent 94%),
-    /* the white sheen, which is what washes the hue out of the top-middle */
-    linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,.127) 25%,
-      rgba(255,255,255,.05) 50%,rgba(255,255,255,.075) 75%,rgba(0,0,0,.12)),
-    /* plum-black, not navy — the pill's own ground reads warm under the tint */
+    linear-gradient(135deg,
+      color-mix(in srgb,var(--c) 7.1%,transparent),
+      color-mix(in srgb,var(--c) 13.6%,transparent) 12%,
+      color-mix(in srgb,var(--c) 12.9%,transparent) 25%,
+      color-mix(in srgb,var(--c) 9.4%,transparent) 38%,
+      color-mix(in srgb,var(--c) 4%,transparent) 50%,
+      color-mix(in srgb,var(--c) 2.2%,transparent) 62%,
+      color-mix(in srgb,var(--c) 7.5%,transparent) 75%,
+      color-mix(in srgb,var(--c) 7.5%,transparent) 88%,
+      color-mix(in srgb,var(--c) 8.2%,transparent)),
+    linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.085) 25%,
+      rgba(255,255,255,.03) 50%,rgba(255,255,255,.045) 75%,rgba(0,0,0,.12)),
     linear-gradient(#0E0A12,#08060A);
-  background-blend-mode:screen,normal,normal,normal;
+  background-blend-mode:screen,normal,normal;
   box-shadow:0 .5px 1.2px rgba(0,0,0,.24),0 1.5px 2.5px rgba(0,0,0,.32),
-             0 2.5px 4.5px rgba(0,0,0,.15),
-             0 1px 5px color-mix(in srgb,var(--c) 6%,transparent),
-             0 0 2px color-mix(in srgb,var(--c) 6%,transparent);
+             0 2.5px 4.5px rgba(0,0,0,.15);
   transition:transform .16s ease,filter .2s ease}
-/* strokeBorder 0.75pt down the same diagonal: white .42, white .20, the hue at
-   .19 two-thirds along, closing on white .08. Measured on the real pill the rim
-   peaks ~120 at the top-left corner, sits ~90 through the middle and dies to
-   ~10 along the bottom, which is what this plus the seam below reproduce. */
-.tt-reset::before{content:"";position:absolute;inset:0;border-radius:inherit;
-  padding:.75px;pointer-events:none;z-index:2;
-  background:linear-gradient(135deg,rgba(255,255,255,.42),rgba(255,255,255,.20) 33%,
-    color-mix(in srgb,var(--c) 14%,transparent) 76%,rgba(255,255,255,.08));
+.tt-reset::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:.75px;
+  pointer-events:none;z-index:2;
+  background:linear-gradient(150deg,rgba(255,255,255,.42),rgba(255,255,255,.20) 33%,
+    color-mix(in srgb,var(--c) 19%,transparent) 76%,rgba(255,255,255,.08));
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
   -webkit-mask-composite:xor;
   mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
   mask-composite:exclude}
-/* Top sheen and the top-trailing specular, both blurred — that blur is what
-   keeps the hue a wash rather than a stripe. Plus the dark seam that sinks the
-   bottom edge of the rim. */
-.tt-reset::after{content:"";position:absolute;inset:0;border-radius:inherit;
-  pointer-events:none;z-index:1;
-  background:
-    linear-gradient(215deg,rgba(255,255,255,.126),
-      color-mix(in srgb,var(--c) 12%,transparent) 14%,transparent 52%),
-    /* halved: this pass is the top-left's own white wash, and it was the main
-       thing lifting that corner. Taking it down drops white there by ~8/255 and
-       RAISES the hue by ~2, because less white was washing the pink out. */
-    linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.0225) 30%,transparent 58%),
-    linear-gradient(0deg,rgba(0,0,0,.18),transparent 22%);
-  filter:blur(.75px)}
-.tt-reset:hover{filter:brightness(1.25)}
-/* The click's own shine: the hover lift is 0.25 above neutral, so 10% stronger
-   is 0.275. Pressed reads brighter than hovered rather than only smaller. */
-.tt-reset:active{transform:scale(.97);filter:brightness(1.275)}
+.tt-reset:hover{filter:brightness(1.45)}
+/* The click's own shine: pressed has to stay brighter than hovered, or the
+   button reads as dimming under the finger. Kept at the same 10% over the
+   hover lift as before — 0.45 above neutral becomes 0.495. */
+.tt-reset:active{transform:scale(.97);filter:brightness(1.495)}
 .tt-reset:focus-visible{outline:2px solid #f2f0ec;outline-offset:3px}
 
 /* ---- design system: token swatches over the controls they colour ---------- */
@@ -1412,7 +1376,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   border:1px solid var(--ds-line-dim);border-bottom:0;margin:0 -.75px;padding:6px 2.75px 12px;
   background:var(--surface-tab);
   transition:border-color .2s ease}
-.dsys-sw--tab:hover{border-color:rgba(255,255,255,.30)}
+.dsys-sw--tab:hover{border-color:var(--ds-line)}
 .dsys-sw--tab[aria-selected="true"]{background:var(--surface-tab);
   border-color:var(--ds-line);z-index:3;padding-bottom:15px}
 .dsys-sw--tab:focus-visible{outline:2px solid #f2f0ec;outline-offset:2px}
@@ -1461,14 +1425,32 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 /* pillHeight 24 in a 28 track, cornerRadius 7 — scaled to 28 in 33, radius 9 */
 .seg-pill{position:absolute;top:2.5px;height:28px;border-radius:9px;z-index:0;
   background:
-    linear-gradient(150deg,color-mix(in srgb,var(--c) 30%,transparent),
-      color-mix(in srgb,var(--c) 12%,transparent) 30%,transparent 55%,transparent 74%,
-      color-mix(in srgb,var(--c) 9%,transparent) 84%,color-mix(in srgb,var(--c) 17%,transparent)),
-    radial-gradient(ellipse closest-side at 50% 50%,rgba(0,0,0,.30),transparent 92%),
+    /* The hue wash, screen-blended down the topLeading->bottomTrailing diagonal.
+       In the app this is one three-stop gradient (trackColor .13 / clear / .07),
+       but SwiftUI projects it across a 96x28 box, so what actually lands on the
+       pill is broader and never reaches zero. These stops are the profile
+       measured off the "1 Beat" pill in the transition recording at native
+       resolution: R-G peaks at 20/255 a fifth of the way along, decays to 5 past
+       the middle, and settles back around 11 across the trailing half. Screen
+       over a dark ground lifts R-G by about 147a, which is where each alpha
+       comes from. No transparent plateau and no dark ellipse — both were mine,
+       and together they were what hollowed out the middle. The three stops
+       through the middle sit a little under the measured curve on purpose —
+       10.2/5.4/3.4 fitted it exactly, these read a touch darker there. */
+    linear-gradient(135deg,
+      color-mix(in srgb,var(--c) 7.1%,transparent),
+      color-mix(in srgb,var(--c) 13.6%,transparent) 12%,
+      color-mix(in srgb,var(--c) 12.9%,transparent) 25%,
+      color-mix(in srgb,var(--c) 9.4%,transparent) 38%,
+      color-mix(in srgb,var(--c) 4%,transparent) 50%,
+      color-mix(in srgb,var(--c) 2.2%,transparent) 62%,
+      color-mix(in srgb,var(--c) 7.5%,transparent) 75%,
+      color-mix(in srgb,var(--c) 7.5%,transparent) 88%,
+      color-mix(in srgb,var(--c) 8.2%,transparent)),
     linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.085) 25%,
       rgba(255,255,255,.03) 50%,rgba(255,255,255,.045) 75%,rgba(0,0,0,.12)),
     linear-gradient(#0E0A12,#08060A);
-  background-blend-mode:screen,normal,normal,normal;
+  background-blend-mode:screen,normal,normal;
   box-shadow:0 .5px 1.2px rgba(0,0,0,.24),0 1.5px 2.5px rgba(0,0,0,.32),
              0 2.5px 4.5px rgba(0,0,0,.15);
   transition:left .4s cubic-bezier(.32,.72,.24,1),width .4s cubic-bezier(.32,.72,.24,1),
@@ -1510,6 +1492,10 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 .vol-track:focus-visible{outline:2px solid #f2f0ec;outline-offset:3px;border-radius:3px}
 @media (max-width:660px){
   .dsys-body{grid-template-columns:1fr;gap:20px}
+  /* Stacked, there is no second column to stretch against, so the waveform —
+     which has no intrinsic height — would collapse to nothing. Give it the
+     height it takes on desktop. */
+  .dsys-wave .wave{min-height:78px}
   /* the seven stay on one row; the type steps down instead of wrapping */
   .dsys-sw b,.dsys-sw em{font-size:8.5px;letter-spacing:0}
   .dsys-sw{padding-left:3px;padding-right:3px}
@@ -1680,7 +1666,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   <p class="lab">Case study</p>
   <h1>Building Mixr, a DJ app</h1>
   <p class="lede" style="margin-top:20px">DJ software can be intimidating. Mixr makes remixing easy by using familiar patterns from video editing apps. <br/>
-    Building the app was an experiment in designing by building: if I could collapse the design and engineering gap by designing as I go.</p>
+    Building the app was an experiment in designing by building: I wanted to see if I could collapse the design and engineering gap by designing as I go.</p>
   <div class="meta">
     <div><span>Role</span><span>Solo designer &amp; engineer</span></div>
     <div><span>Scope</span><span>Product, brand, iOS engineering</span></div>
@@ -1700,7 +1686,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     </div>
     <figure class="device">
       <video data-eager src="art/editor-hero.mp4" poster="art/editor-hero-poster.jpg" autoplay muted loop playsinline
-             aria-label="Mixr running on iPhone: an empty project, then the file picker with five songs, then STAY and Heat Waves landing on the timeline as coloured waveform lanes and playing back, with the transport and BPM in the nav bar and the effects row along the bottom."></video>
+             aria-label="Mixr running on iPhone: an empty project, then the file picker with five songs, then STAY and Heat Waves landing on the timeline as colored waveform lanes and playing back, with the transport and BPM in the nav bar and the effects row along the bottom."></video>
     </figure>
     <p class="foot">Recorded on simulator device.</p>
   </div>
@@ -1770,7 +1756,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     <p class="sub">The interface, today&rsquo;s build</p>
     <figure class="device">
       <video preload="none" data-src="art/build-now.mp4" poster="art/build-now-poster.jpg" autoplay muted loop playsinline
-             aria-label="The Mixr editor in landscape, playing: five coloured waveform lanes with the playhead moving, a Tracks panel listing STAY, Heat Waves, good 4 u and Cut To The Feeling, solo, mute and volume down the right, and the Effects drawer along the bottom."></video>
+             aria-label="The Mixr editor in landscape, playing: five colored waveform lanes with the playhead moving, a Tracks panel listing STAY, Heat Waves, good 4 u and Cut To The Feeling, solo, mute and volume down the right, and the Effects drawer along the bottom."></video>
     </figure>
     <p class="foot">Recorded on simulator device. Each waveform gets its own color from the brand palette.</p>
   </div>
@@ -1787,7 +1773,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
  </div>
 
   <div class="dec rv d2">
-    <h3>Clip editing is the most rule-based. It needs to be predicable.</h3>
+    <h3>Clip editing takes effort to feel effortless.</h3>
     <p>Deciding how drag-and-drop behaves took two days and was the hardest design work in the project.</p>
     <p>I took inspiration from Premiere Pro (thank you, competitive research). When a clip is dropped in the middle, it splits the existing clip and gets sandwiched inside. When it&rsquo;s dropped within 10px of the start or end, it snaps to the edge.</p>
   </div>
@@ -2024,7 +2010,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
   <div class="stack dec rv d1">
     <h3>Colors carry across components.</h3>
-    <p>One color per track. The same color follows across the waveform, volume slider, transition settings, and segmented control.  This helps users understand the components go together.</p>
+    <p>One color per track. The same color follows across the waveform, volume slider, transition settings, and segmented control. This helps users understand the components go together.</p>
   </div>
 
   <div class="demo rv d2">
@@ -2043,8 +2029,8 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
           <i></i><b>#FF5FA2</b><em>Track #1</em>
         </button>
         <button type="button" role="tab" class="dsys-sw dsys-sw--tab" aria-selected="false"
-                data-c="#9068E9" data-peak="#C084FC" style="--s:#9068E9">
-          <i></i><b>#9068E9</b><em>Track #2</em>
+                data-c="#9873EB" data-peak="#C084FC" style="--s:#9873EB">
+          <i></i><b>#9873EB</b><em>Track #2</em>
         </button>
         <button type="button" role="tab" class="dsys-sw dsys-sw--tab" aria-selected="false"
                 data-c="#EF4444" data-peak="#F87171" style="--s:#EF4444">
@@ -2104,7 +2090,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   <div class="devices rv d2">
     <figure>
       <div class="device">
-        <img src="art/responsive-ipad.webp" alt="Mixr on iPad: six coloured waveform lanes across the timeline, the track list down the left with artwork and BPM, solo, mute and volume down the right, and the Effects drawer along the bottom." loading="lazy">
+        <img src="art/responsive-ipad.webp" alt="Mixr on iPad: six colored waveform lanes across the timeline, the track list down the left with artwork and BPM, solo, mute and volume down the right, and the Effects drawer along the bottom." loading="lazy">
       </div>
       <figcaption>iPad</figcaption>
     </figure>
