@@ -861,12 +861,27 @@ function Home() {
     const about = aboutRef.current;
     if (!about) return;
 
-    const grid = about.querySelector<HTMLElement>(".ab-grid");
-    if (!grid) return;
+    /* The manifesto and the portrait arrive as separate parts rather than as
+       one block — .ab-grid animating whole was the odd one out on the page,
+       where the hero's title/lines/tiles and the shelf's notebooks all land in
+       sequence.
+
+       Two beats: the title lands on its own, then the body copy and the
+       portrait arrive together on the second. Slower than the hero (0.95s
+       against 0.7s) because these are large blocks settling rather than six
+       small ones. */
+    const targets = [
+      about.querySelector<HTMLElement>(".mf-line--title"),
+      about.querySelector<HTMLElement>(".mf-line--body"),
+      about.querySelector<HTMLElement>(".ab-portrait"),
+    ].filter((el): el is HTMLElement => el !== null);
+    if (targets.length === 0) return;
 
     const applyVisible = () => {
-      grid.style.opacity = "1";
-      grid.style.transform = "none";
+      targets.forEach((el) => {
+        el.style.opacity = "1";
+        el.style.transform = "none";
+      });
     };
 
     if (aboutEnteredRef.current) {
@@ -881,17 +896,24 @@ function Home() {
       return;
     }
 
-    grid.style.opacity = "0";
-    grid.style.transform = "translateY(8px)";
+    targets.forEach((el) => {
+      el.style.opacity = "0";
+      el.style.transform = "translateY(9px)";
+    });
 
     let controls: ReturnType<typeof animate> | undefined;
     const stopInView = inView(
       about,
       () => {
         controls = animate(
-          grid,
+          targets,
           { opacity: 1, y: 0 },
-          { duration: 0.75, ease: [0.22, 0.61, 0.36, 1] }
+          {
+            duration: 0.95,
+            // title first; body and portrait share the second beat
+            delay: (i: number) => [0, 0.28, 0.28][i] ?? 0,
+            ease: [0.22, 0.61, 0.36, 1],
+          }
         );
         const commit = () => {
           aboutEnteredRef.current = true;
