@@ -92,9 +92,9 @@ export const journals: Journal[] = [
     descriptor: "HBO MAX · CTV",
     client: "HBO MAX",
     annotation: "Designing a themed rail for HBO Max.",
-    closed: "/home/journals/hbomax-closed.png",
+    closed: "/home/journals/hbomax-closed.webp",
     hit: { x0: 0.1379, x1: 0.887, y0: 0.0357, y1: 0.96 },
-    open: "/home/journals/hbomax-open.png",
+    open: "/home/journals/hbomax-open.webp",
     trimClosed: "3.86%",
     trimOpen: "7.57%",
     alt:
@@ -150,9 +150,9 @@ export const journals: Journal[] = [
     descriptor: "NATIVE iOS DJ APP",
     client: "iOS DJ APP",
     annotation: "Building a DJ app for beginners.",
-    closed: "/home/journals/mixr-closed.png",
+    closed: "/home/journals/mixr-closed.webp",
     hit: { x0: 0.0974, x1: 0.79, y0: 0.0457, y1: 0.9329 },
-    open: "/home/journals/mixr-open.png",
+    open: "/home/journals/mixr-open.webp",
     trimClosed: "6.57%",
     trimOpen: "5.71%",
     alt:
@@ -239,7 +239,7 @@ export const journals: Journal[] = [
        balances it optically with Surprise Rail and Mixr. The open export is
        reduced by another 3% in home.css and re-centered within this frame. */
     width: 449,
-    offsetY: -2,
+    offsetY: -3,
     rotate: 1.8,
     /* One note, dead centre. There is no prototype to show yet, and a single
        scrap in the middle of an empty screen says that more plainly than a

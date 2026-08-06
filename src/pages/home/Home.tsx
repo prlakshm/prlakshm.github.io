@@ -14,7 +14,7 @@ import { journals } from "./journals.js";
 const RESUME_URL = "/docs/Pranavi_Ram_Resume_2026.pdf";
 
 // public/about/"Profile picture.png" — space encoded for the URL.
-const PORTRAIT = "/about/Profile%20picture.png";
+const PORTRAIT = "/about/Profile%20picture.webp";
 
 /* Fabric scraps, in the order and relative proportions of the reference
    photograph of the real textiles laid out side by side.
@@ -33,7 +33,7 @@ const scraps = [
   {
     id: "s1",
     label: "my grad dress",
-    src: "/home/scraps/pink%20floral%20fabric/grad-dress.png?v=2",
+    src: "/home/scraps/pink%20floral%20fabric/grad-dress.webp?v=2",
     color: "#D8B98A",
     rotate: -7,
     h: 0.83,
@@ -42,7 +42,7 @@ const scraps = [
   {
     id: "s3",
     label: "my fav kurti from india",
-    src: "/home/scraps/red%20kurta/kurti.png?v=3",
+    src: "/home/scraps/red%20kurta/kurti.webp?v=3",
     mesh: true,
     color: "#B3542E",
     rotate: -3,
@@ -52,7 +52,7 @@ const scraps = [
   {
     id: "s5",
     label: "purple top my mom stitched 4 me",
-    src: "/home/scraps/purple%20top/purple-top.png?v=2",
+    src: "/home/scraps/purple%20top/purple-top.webp?v=2",
     color: "#6E4E8C",
     rotate: -5,
     h: 0.911,
@@ -61,7 +61,7 @@ const scraps = [
   {
     id: "s4",
     label: "my sister's fav dress from high school",
-    src: "/home/scraps/green%20plaid%20fabric/sister-dress.png?v=2",
+    src: "/home/scraps/green%20plaid%20fabric/sister-dress.webp?v=2",
     color: "#31556B",
     rotate: 6,
     h: 0.909,
@@ -70,7 +70,7 @@ const scraps = [
   {
     id: "s2",
     label: "curtains from my childhood bedroom",
-    src: "/home/scraps/golden%20fabric/curtains.png?v=2",
+    src: "/home/scraps/golden%20fabric/curtains.webp?v=2",
     color: "#C9A24B",
     rotate: 4,
     h: 1,
@@ -1018,7 +1018,7 @@ function Home() {
 
               <img
                 className="pocket"
-                src="/home/denim-pocket.png"
+                src="/home/denim-pocket.webp"
                 alt="A denim pocket holding folded fabric scraps."
                 width={716}
                 height={690}
@@ -1046,7 +1046,7 @@ function Home() {
                     height="690"
                   >
                     <image
-                      href="/home/denim-pocket.png"
+                      href="/home/denim-pocket.webp"
                       width="716"
                       height="690"
                       preserveAspectRatio="xMidYMid meet"

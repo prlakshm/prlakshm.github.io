@@ -1,8 +1,8 @@
-import BODY_INK_MASK from "./masks/manifesto-body-ink.png";
-import BODY_LATE_INK_MASK from "./masks/manifesto-body-late-ink.png";
-import BODY_MARK_MASK from "./masks/manifesto-body-marks.png";
-import TITLE_INK_MASK from "./masks/manifesto-title-ink.png";
-import TITLE_MARK_MASK from "./masks/manifesto-title-marks.png";
+import BODY_INK_MASK from "./masks/manifesto-body-ink.webp";
+import BODY_LATE_INK_MASK from "./masks/manifesto-body-late-ink.webp";
+import BODY_MARK_MASK from "./masks/manifesto-body-marks.webp";
+import TITLE_INK_MASK from "./masks/manifesto-title-ink.webp";
+import TITLE_MARK_MASK from "./masks/manifesto-title-marks.webp";
 import {
   MANIFESTO_SOURCES,
   MANIFESTO_WORDS,
