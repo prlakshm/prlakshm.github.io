@@ -866,11 +866,12 @@ function Home() {
        Two beats: the title lands on its own, then the body copy and the
        portrait together 0.3s later, each moving for 0.7s like the hero.
 
-       The handwriting also gets a sweep. It is a tall block, so fading it at
-       one opacity made the last rows appear at the same instant as the first;
-       --rv drags a soft mask edge down the line (see .mf-line in about.css) so
-       the bottom fades in behind the top. It runs longer than the fade, and
-       only on the two ink lines — the portrait just fades. */
+       The body is the exception. It is a tall block of handwriting, and fading
+       it at one opacity made the last rows arrive with the first, so its words
+       are split into three chunks in reading order and faded top to bottom.
+       Opacity only — .mf-line--body .mf-word-wrap carries a translateY and a
+       skewX that position each word, and animating transform here would
+       replace both. */
     const targets = [
       about.querySelector<HTMLElement>(".mf-line--title"),
       about.querySelector<HTMLElement>(".mf-line--body"),
@@ -878,15 +879,23 @@ function Home() {
     ].filter((el): el is HTMLElement => el !== null);
     if (targets.length === 0) return;
 
-    // Only the handwriting sweeps; the portrait just fades.
-    const inkLines = targets.filter((el) => el.classList.contains("mf-line"));
+    /* Three chunks of body words, in reading order, so the split runs down the
+       block rather than across it. */
+    const bodyWords = Array.from(
+      about.querySelectorAll<HTMLElement>(".mf-line--body .mf-word-wrap")
+    );
+    const CHUNKS = 3;
+    const per = Math.ceil(bodyWords.length / CHUNKS) || 1;
+    const chunks = Array.from({ length: CHUNKS }, (_, i) =>
+      bodyWords.slice(i * per, (i + 1) * per)
+    ).filter((c) => c.length > 0);
 
     const applyVisible = () => {
       targets.forEach((el) => {
         el.style.opacity = "1";
         el.style.transform = "none";
       });
-      inkLines.forEach((el) => el.style.setProperty("--rv", "1"));
+      bodyWords.forEach((el) => (el.style.opacity = "1"));
     };
 
     if (aboutEnteredRef.current) {
@@ -905,7 +914,7 @@ function Home() {
       el.style.opacity = "0";
       el.style.transform = "translateY(9px)";
     });
-    inkLines.forEach((el) => el.style.setProperty("--rv", "0"));
+    bodyWords.forEach((el) => (el.style.opacity = "0"));
 
     let controls: ReturnType<typeof animate> | undefined;
     const stopInView = inView(
@@ -921,15 +930,14 @@ function Home() {
             ease: [0.22, 0.61, 0.36, 1],
           }
         );
-        /* Runs longer than the 0.7s fade, so the edge is still travelling
-           once the block has settled — that lag is what keeps the bottom from
-           arriving with the top. Each line's delay matches its own beat above
-           rather than adding a second stagger. */
-        inkLines.forEach((el, i) =>
+        /* Chunks ride the body's own 0.3s beat and then step down it. Their
+           parent line still lifts as one; this only controls when each third
+           becomes visible. */
+        chunks.forEach((chunk, i) =>
           animate(
-            el,
-            { "--rv": 1 } as never,
-            { duration: 1.15, delay: i * 0.3, ease: [0.33, 0, 0.2, 1] }
+            chunk,
+            { opacity: 1 },
+            { duration: 0.55, delay: 0.3 + i * 0.22, ease: [0.22, 0.61, 0.36, 1] }
           )
         );
         const commit = () => {
