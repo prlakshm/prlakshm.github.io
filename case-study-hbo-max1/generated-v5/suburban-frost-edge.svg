@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="414" height="254" viewBox="-24 -25 414 254" role="img" aria-labelledby="title desc">
+  <title id="title">Frost-edge reconstruction from the decoded Suburban Secrets node</title>
+  <desc id="desc">A 365.99 by 206 pixel white rectangle at 75 percent opacity, offset 0.62 pixels upward, with the source node's literal 8 pixel foreground-blur value represented as an SVG Gaussian blur.</desc>
+  <defs>
+    <filter id="figma-foreground-blur-8" x="-15%" y="-25%" width="130%" height="150%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+  </defs>
+  <rect x="0" y="-0.6201171875" width="365.9898376464844" height="206" fill="#fff" fill-opacity=".75" filter="url(#figma-foreground-blur-8)"/>
+</svg>

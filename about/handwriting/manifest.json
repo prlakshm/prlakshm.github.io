@@ -1,0 +1,7 @@
+{
+  "svg": "manifesto-words.svg",
+  "preview": "manifesto-preview.png",
+  "word_count": 135,
+  "lines": 12,
+  "how_to_edit": "Open manifesto-words.svg in Figma, Illustrator, or Inkscape. Each <g id='wNNN' class='word'> is one whole word \u2014 move or resize that group. To put a word on the next line, drag it down; sibling words can be nudged horizontally."
+}

@@ -1,0 +1,204 @@
+<svg viewBox="0 0 380 496" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A hardback book wrapped in kraft paper, tied with jute twine and a red wax seal, hand-lettered Blind Date with a Book">
+  <defs>
+    <linearGradient id="kraft" x1="0.05" y1="0" x2="0.95" y2="1">
+      <stop offset="0" stop-color="#e2caa2"/>
+      <stop offset="0.35" stop-color="#d0b083"/>
+      <stop offset="0.7" stop-color="#bf9d6d"/>
+      <stop offset="1" stop-color="#a9885b"/>
+    </linearGradient>
+    <linearGradient id="pages" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#efe6d3"/>
+      <stop offset="0.7" stop-color="#d9ccb0"/>
+      <stop offset="1" stop-color="#b39a72"/>
+    </linearGradient>
+    <linearGradient id="foldShade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5a442c" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#5a442c" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="paperLight" cx="0.3" cy="0.22" r="0.9">
+      <stop offset="0" stop-color="#fff6e4" stop-opacity="0.55"/>
+      <stop offset="0.5" stop-color="#fff6e4" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#fff6e4" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="paperVignette" cx="0.5" cy="0.5" r="0.75">
+      <stop offset="0.6" stop-color="#3d2c19" stop-opacity="0"/>
+      <stop offset="1" stop-color="#3d2c19" stop-opacity="0.28"/>
+    </radialGradient>
+
+    <linearGradient id="ropeShadeH" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a6f49"/>
+      <stop offset="0.15" stop-color="#a98a5f"/>
+      <stop offset="0.5" stop-color="#dcc794"/>
+      <stop offset="0.85" stop-color="#a98a5f"/>
+      <stop offset="1" stop-color="#7f663f"/>
+    </linearGradient>
+    <linearGradient id="ropeShadeV" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7f663f"/>
+      <stop offset="0.15" stop-color="#a98a5f"/>
+      <stop offset="0.5" stop-color="#dcc794"/>
+      <stop offset="0.85" stop-color="#a98a5f"/>
+      <stop offset="1" stop-color="#7f663f"/>
+    </linearGradient>
+    <pattern id="ropeChevH" width="11" height="16" patternUnits="userSpaceOnUse">
+      <path d="M0,-2 L6,8 L0,18" fill="none" stroke="#6f5735" stroke-width="1.4" opacity="0.4"/>
+      <path d="M5.5,-2 L11.5,8 L5.5,18" fill="none" stroke="#6f5735" stroke-width="1.4" opacity="0.4"/>
+      <path d="M2.5,-2 L8.5,8 L2.5,18" fill="none" stroke="#f2e4c2" stroke-width="0.9" opacity="0.5"/>
+    </pattern>
+    <pattern id="ropeChevV" width="16" height="11" patternUnits="userSpaceOnUse">
+      <path d="M-2,0 L8,6 L18,0" fill="none" stroke="#6f5735" stroke-width="1.4" opacity="0.4"/>
+      <path d="M-2,5.5 L8,11.5 L18,5.5" fill="none" stroke="#6f5735" stroke-width="1.4" opacity="0.4"/>
+      <path d="M-2,2.5 L8,8.5 L18,2.5" fill="none" stroke="#f2e4c2" stroke-width="0.9" opacity="0.5"/>
+    </pattern>
+
+    <radialGradient id="wax" cx="0.38" cy="0.32" r="0.85">
+      <stop offset="0" stop-color="#e8697c"/>
+      <stop offset="0.35" stop-color="#c92742"/>
+      <stop offset="0.75" stop-color="#a01430"/>
+      <stop offset="1" stop-color="#75091f"/>
+    </radialGradient>
+    <radialGradient id="waxSpec" cx="0.35" cy="0.28" r="0.4">
+      <stop offset="0" stop-color="#ffd3da" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#ffd3da" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="grain" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" seed="8" stitchTiles="stitch" result="n"/>
+      <feColorMatrix in="n" type="matrix"
+        values="0 0 0 0 0.30
+                0 0 0 0 0.22
+                0 0 0 0 0.13
+                0 0 0 0.32 0"/>
+    </filter>
+    <filter id="rough">
+      <feTurbulence type="fractalNoise" baseFrequency="0.018 0.035" numOctaves="2" seed="4" result="w"/>
+      <feDisplacementMap in="SourceGraphic" in2="w" scale="2.1" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="softDark" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <filter id="lift" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#4a3925" flood-opacity="0.30"/>
+    </filter>
+
+    <clipPath id="bookClip"><rect x="44" y="26" width="292" height="444" rx="9"/></clipPath>
+  </defs>
+
+  <g filter="url(#lift)">
+    <!-- book body -->
+    <rect x="44" y="26" width="292" height="444" rx="9" fill="url(#kraft)"/>
+
+    <g clip-path="url(#bookClip)">
+      <!-- page block on the bound edge -->
+      <rect x="44" y="26" width="16" height="444" fill="url(#pages)"/>
+      <g stroke="#b7a582" stroke-width="0.6" opacity="0.5">
+        <path d="M47 40 H58"/><path d="M47 60 H58"/><path d="M47 80 H58"/><path d="M47 120 H58"/>
+        <path d="M47 200 H58"/><path d="M47 300 H58"/><path d="M47 380 H58"/><path d="M47 440 H58"/>
+      </g>
+      <rect x="59" y="26" width="5" height="444" fill="#5a442c" opacity="0.22"/>
+
+      <!-- light from top-left + soft vignette -->
+      <rect x="44" y="26" width="292" height="444" fill="url(#paperLight)"/>
+      <rect x="44" y="26" width="292" height="444" fill="url(#paperVignette)"/>
+
+      <!-- paper grain -->
+      <rect x="44" y="26" width="292" height="444" filter="url(#grain)" opacity="0.6" style="mix-blend-mode:multiply"/>
+
+      <!-- wrap folds top & bottom -->
+      <rect x="60" y="26" width="276" height="30" fill="url(#foldShade)"/>
+      <g transform="translate(0,414) scale(1,-1)"><rect x="60" y="0" width="276" height="30" fill="url(#foldShade)"/></g>
+      <path d="M60 58 Q 200 50 336 60" fill="none" stroke="#ffffff" stroke-width="1.4" opacity="0.22"/>
+      <path d="M60 56 Q 200 48 336 58" fill="none" stroke="#6b5230" stroke-width="1" opacity="0.18"/>
+      <path d="M60 438 Q 200 446 336 436" fill="none" stroke="#6b5230" stroke-width="1.2" opacity="0.2"/>
+
+      <!-- soft diagonal creases -->
+      <path d="M120 26 L96 470" stroke="#6b5230" stroke-width="1" opacity="0.06"/>
+      <path d="M250 26 L286 470" stroke="#ffffff" stroke-width="1" opacity="0.10"/>
+    </g>
+
+    <!-- hand-lettered title -->
+    <g filter="url(#rough)" fill="#4a3d2e" font-family="'Trebuchet MS','Century Gothic',sans-serif" font-weight="700" letter-spacing="0.5">
+      <text x="78" y="86" font-size="30">Blind</text>
+      <text x="78" y="122" font-size="30">Date</text>
+      <text x="78" y="158" font-size="30">with a</text>
+      <text x="78" y="194" font-size="30">Book!</text>
+    </g>
+    <text x="308" y="70" fill="#6a5946" font-family="'Segoe UI',sans-serif" font-size="12.5" letter-spacing="1" transform="rotate(90 308 70)">Hardback</text>
+    <line x1="308" y1="74" x2="308" y2="140" stroke="#6a5946" stroke-width="1" opacity="0.55" transform="rotate(90 308 70)"/>
+
+    <!-- hand-written clue list -->
+    <g filter="url(#rough)" fill="#57493a" font-family="'Bradley Hand','Comic Sans MS',cursive" font-size="16.5">
+      <text x="76" y="356">- Humor</text>
+      <text x="76" y="384">- Cozy mystery</text>
+      <text x="76" y="412">- Crime</text>
+      <text x="76" y="440">- Detective</text>
+      <text x="76" y="464">- fiction</text>
+    </g>
+
+    <!-- tree stamp -->
+    <g filter="url(#rough)" transform="translate(238 356)" opacity="0.62">
+      <path d="M22 96 L22 46" stroke="#4c4238" stroke-width="2.6" fill="none"/>
+      <path d="M22 60 L10 74 M22 66 L34 80 M22 52 L12 60 M22 56 L33 64" stroke="#4c4238" stroke-width="1.6" fill="none"/>
+      <g fill="#4c4238">
+        <circle cx="22" cy="34" r="19" opacity="0.14"/>
+        <circle cx="8" cy="44" r="12" opacity="0.14"/>
+        <circle cx="37" cy="44" r="12" opacity="0.14"/>
+      </g>
+      <g stroke="#4c4238" stroke-width="1.1" fill="none" opacity="0.8">
+        <path d="M4 40 Q 22 12 40 40"/>
+        <path d="M9 52 Q 22 26 35 52"/>
+      </g>
+    </g>
+
+    <!-- twine: soft shadow beneath -->
+    <g filter="url(#softDark)" opacity="0.5">
+      <rect x="184" y="26" width="20" height="444" fill="#3d2c19"/>
+      <rect x="44" y="248" width="292" height="20" fill="#3d2c19"/>
+    </g>
+
+    <!-- vertical twine -->
+    <rect x="182" y="26" width="16" height="444" fill="url(#ropeShadeV)"/>
+    <rect x="182" y="26" width="16" height="444" fill="url(#ropeChevV)"/>
+    <!-- horizontal twine -->
+    <rect x="44" y="250" width="292" height="16" fill="url(#ropeShadeH)"/>
+    <rect x="44" y="250" width="292" height="16" fill="url(#ropeChevH)"/>
+
+    <!-- bow loops + tails -->
+    <g filter="url(#softDark)" opacity="0.4">
+      <path d="M190 262 C 156 236 128 250 140 272 C 150 290 178 282 190 262 Z" fill="#3d2c19"/>
+      <path d="M190 262 C 224 236 252 250 240 272 C 230 290 202 282 190 262 Z" fill="#3d2c19"/>
+    </g>
+    <g fill="none" stroke-linecap="round">
+      <path d="M190 260 C 158 236 130 248 141 269 C 150 286 176 279 190 260 Z" fill="url(#ropeShadeH)" stroke="#7f663f" stroke-width="1"/>
+      <path d="M190 260 C 222 236 250 248 239 269 C 230 286 204 279 190 260 Z" fill="url(#ropeShadeH)" stroke="#7f663f" stroke-width="1"/>
+      <path d="M188 268 C 178 320 168 356 158 392" stroke="url(#ropeShadeV)" stroke-width="9"/>
+      <path d="M192 268 C 202 320 214 356 226 392" stroke="url(#ropeShadeV)" stroke-width="9"/>
+      <path d="M188 268 C 178 320 168 356 158 392" stroke="#f2e4c2" stroke-width="1.4" opacity="0.4"/>
+      <path d="M192 268 C 202 320 214 356 226 392" stroke="#f2e4c2" stroke-width="1.4" opacity="0.4"/>
+    </g>
+
+    <!-- wax seal -->
+    <ellipse cx="192" cy="264" rx="28" ry="26" fill="#3d1018" opacity="0.4" filter="url(#softDark)"/>
+    <path d="M190 236
+             C 205 235 219 246 220 260
+             C 221 272 214 283 205 288
+             C 208 296 206 304 199 306
+             C 195 300 193 296 191 292
+             C 178 293 165 284 162 271
+             C 159 256 170 239 190 236 Z"
+          fill="url(#wax)" stroke="#6d0a1c" stroke-width="1" stroke-opacity="0.5"/>
+    <!-- embossed open book emblem (shadow + highlight offsets) -->
+    <g stroke-linecap="round" fill="none">
+      <g transform="translate(1.2,1.4)" stroke="#7a0d1f" stroke-opacity="0.7">
+        <path d="M191 256 C 184 250 176 250 172 253 L172 274 C 176 271 184 271 191 276" stroke-width="2.2"/>
+        <path d="M191 256 C 198 250 206 250 210 253 L210 274 C 206 271 198 271 191 276" stroke-width="2.2"/>
+        <path d="M191 256 L191 276" stroke-width="2"/>
+      </g>
+      <g transform="translate(-0.8,-1)" stroke="#f2a7b2" stroke-opacity="0.55">
+        <path d="M191 256 C 184 250 176 250 172 253 L172 274 C 176 271 184 271 191 276" stroke-width="1.6"/>
+        <path d="M191 256 C 198 250 206 250 210 253 L210 274 C 206 271 198 271 191 276" stroke-width="1.6"/>
+        <path d="M191 256 L191 276" stroke-width="1.5"/>
+      </g>
+    </g>
+    <ellipse cx="180" cy="252" rx="12" ry="9" fill="url(#waxSpec)" transform="rotate(-20 180 252)"/>
+  </g>
+</svg>
