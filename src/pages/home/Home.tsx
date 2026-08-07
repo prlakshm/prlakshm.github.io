@@ -862,14 +862,15 @@ function Home() {
     if (!about) return;
 
     /* The manifesto and the portrait arrive as separate parts rather than as
-       one block — .ab-grid animating whole was the odd one out on the page,
-       where the hero's title/lines/tiles and the shelf's notebooks all land in
-       sequence.
-
+       one block — .ab-grid animating whole was the odd one out on the page.
        Two beats: the title lands on its own, then the body copy and the
-       portrait arrive together on the second, 0.3s later. Each part moves for 0.7s, the
-       same as the hero — what differs is the gap, not the speed: the hero
-       ripples six items 0.06s apart, this holds a real beat between its two. */
+       portrait together 0.3s later, each moving for 0.7s like the hero.
+
+       The handwriting also gets a sweep. It is a tall block, so fading it at
+       one opacity made the last rows appear at the same instant as the first;
+       --rv drags a soft mask edge down the line (see .mf-line in about.css) so
+       the bottom fades in behind the top. It runs longer than the fade, and
+       only on the two ink lines — the portrait just fades. */
     const targets = [
       about.querySelector<HTMLElement>(".mf-line--title"),
       about.querySelector<HTMLElement>(".mf-line--body"),
@@ -877,11 +878,15 @@ function Home() {
     ].filter((el): el is HTMLElement => el !== null);
     if (targets.length === 0) return;
 
+    // Only the handwriting sweeps; the portrait just fades.
+    const inkLines = targets.filter((el) => el.classList.contains("mf-line"));
+
     const applyVisible = () => {
       targets.forEach((el) => {
         el.style.opacity = "1";
         el.style.transform = "none";
       });
+      inkLines.forEach((el) => el.style.setProperty("--rv", "1"));
     };
 
     if (aboutEnteredRef.current) {
@@ -900,6 +905,7 @@ function Home() {
       el.style.opacity = "0";
       el.style.transform = "translateY(9px)";
     });
+    inkLines.forEach((el) => el.style.setProperty("--rv", "0"));
 
     let controls: ReturnType<typeof animate> | undefined;
     const stopInView = inView(
@@ -914,6 +920,17 @@ function Home() {
             delay: (i: number) => [0, 0.3, 0.3][i] ?? 0,
             ease: [0.22, 0.61, 0.36, 1],
           }
+        );
+        /* Runs longer than the 0.7s fade, so the edge is still travelling
+           once the block has settled — that lag is what keeps the bottom from
+           arriving with the top. Each line's delay matches its own beat above
+           rather than adding a second stagger. */
+        inkLines.forEach((el, i) =>
+          animate(
+            el,
+            { "--rv": 1 } as never,
+            { duration: 1.15, delay: i * 0.3, ease: [0.33, 0, 0.2, 1] }
+          )
         );
         const commit = () => {
           aboutEnteredRef.current = true;

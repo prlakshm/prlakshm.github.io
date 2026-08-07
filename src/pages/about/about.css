@@ -82,7 +82,32 @@
   -webkit-mask-composite: source-in;
 }
 
+/* Registered so the value is a real number rather than an unparsed string —
+   Motion drives it on its own tick, but typing it keeps the calc() below
+   predictable and lets the browser interpolate it if anything else ever does. */
+@property --rv {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+/* Reveal sweep. --rv runs 0 -> 1 and drags a soft edge down the block, so the
+   bottom of the handwriting arrives after the top instead of the whole line
+   fading as one piece. Masks nest, so every word keeps its own ink mask
+   underneath this. Defaults to 1 — if the script never runs the text is simply
+   there. */
 .mf-line {
+  --rv: 1;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 calc(var(--rv) * 132% - 32%),
+    transparent calc(var(--rv) * 132%)
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 calc(var(--rv) * 132% - 32%),
+    transparent calc(var(--rv) * 132%)
+  );
   position: relative;
   z-index: 1;
   display: flex;
