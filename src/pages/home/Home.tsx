@@ -867,9 +867,9 @@ function Home() {
        sequence.
 
        Two beats: the title lands on its own, then the body copy and the
-       portrait arrive together on the second, half a second later. Slower than
-       the hero (0.95s against 0.7s, and a 0.5s beat against its 0.06s stagger)
-       because these are large blocks settling rather than six small ones. */
+       portrait arrive together on the second, 0.4s later. Slower than the hero
+       (0.95s against 0.7s, and a 0.4s beat against its 0.06s stagger) because
+       these are large blocks settling rather than six small ones. */
     const targets = [
       about.querySelector<HTMLElement>(".mf-line--title"),
       about.querySelector<HTMLElement>(".mf-line--body"),
@@ -911,7 +911,7 @@ function Home() {
           {
             duration: 0.95,
             // title first; body and portrait share the second beat
-            delay: (i: number) => [0, 0.5, 0.5][i] ?? 0,
+            delay: (i: number) => [0, 0.4, 0.4][i] ?? 0,
             ease: [0.22, 0.61, 0.36, 1],
           }
         );
