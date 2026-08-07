@@ -867,9 +867,9 @@ function Home() {
        sequence.
 
        Two beats: the title lands on its own, then the body copy and the
-       portrait arrive together on the second, 0.4s later. Slower than the hero
-       (0.95s against 0.7s, and a 0.4s beat against its 0.06s stagger) because
-       these are large blocks settling rather than six small ones. */
+       portrait arrive together on the second, 0.3s later. Each part moves for 0.7s, the
+       same as the hero — what differs is the gap, not the speed: the hero
+       ripples six items 0.06s apart, this holds a real beat between its two. */
     const targets = [
       about.querySelector<HTMLElement>(".mf-line--title"),
       about.querySelector<HTMLElement>(".mf-line--body"),
@@ -909,9 +909,9 @@ function Home() {
           targets,
           { opacity: 1, y: 0 },
           {
-            duration: 0.95,
+            duration: 0.7,
             // title first; body and portrait share the second beat
-            delay: (i: number) => [0, 0.4, 0.4][i] ?? 0,
+            delay: (i: number) => [0, 0.3, 0.3][i] ?? 0,
             ease: [0.22, 0.61, 0.36, 1],
           }
         );
