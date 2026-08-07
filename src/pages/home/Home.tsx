@@ -930,14 +930,15 @@ function Home() {
             ease: [0.22, 0.61, 0.36, 1],
           }
         );
-        /* Chunks ride the body's own 0.3s beat and then step down it. Their
-           parent line still lifts as one; this only controls when each third
-           becomes visible. */
+        /* Chunks ride the body's own 0.3s beat and then step down it at 0.15s.
+           The step compounds, so the last chunk gains twice whatever the step
+           loses. Their parent line still lifts as one; this only controls when
+           each third appears. */
         chunks.forEach((chunk, i) =>
           animate(
             chunk,
             { opacity: 1 },
-            { duration: 0.55, delay: 0.3 + i * 0.22, ease: [0.22, 0.61, 0.36, 1] }
+            { duration: 0.55, delay: 0.3 + i * 0.15, ease: [0.22, 0.61, 0.36, 1] }
           )
         );
         const commit = () => {
