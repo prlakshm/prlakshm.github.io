@@ -33,6 +33,29 @@ function Shell() {
      descendants, and the homepage's fixed cutting-mat grid is one of those.
      Leaving a stray opacity behind would anchor the grid to this wrapper
      instead of the viewport. */
+  /* Paint <body> in the incoming page's own ground.
+     App cross-fades the view wrapper below, so for those 180ms the body IS what
+     you see — a single pink default meant every navigation flashed the old
+     palette. Written inline rather than as a CSS rule because several page
+     stylesheets also style body, and this has to win outright.
+     /fun and /hbo-max-rtw paint no ground of their own and genuinely need the
+     gradient; /hbo-max-surprise sets its own via .surprise-page-active. */
+  useEffect(() => {
+    const PINK = 'linear-gradient(to bottom right, #fff7ed, #ffe4e6, #fff7ed)';
+    /* Routes that are still on the old palette. /fun and /hbo-max-rtw paint no
+       ground of their own, so without this they would come up parchment;
+       /hbo-max-surprise sets the same gradient via .surprise-page-active, but
+       an inline style outranks that class, so it has to be named here too —
+       with the fixed attachment that rule also carries. */
+    const GROUND: Record<string, string> = {
+      '/fun': PINK,
+      '/hbo-max-rtw': PINK,
+      '/hbo-max-surprise': `${PINK} fixed`,
+    };
+    document.body.dataset.route = pathname;
+    document.body.style.background = GROUND[pathname] ?? '#f5eee4';
+  }, [pathname]);
+
   useEffect(() => {
     const el = viewRef.current;
     if (!el) return;

@@ -6,8 +6,13 @@ html {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  background: linear-gradient(to bottom right, #fff7ed, #ffe4e6, #fff7ed);
+  /* Parchment by default, because the worktable pages are what this ground is
+     seen through. It IS seen: App.tsx cross-fades the view wrapper on every
+     navigation, so for those 180ms the body is what you are looking at. A pink
+     default meant every route change flashed the old palette. */
+  background: #f5eee4;
 }
+
 
 .header {
   position: fixed;
