@@ -871,6 +871,9 @@
 .jr[data-journal="pinnables"] .jr-img--open {
   left: 1.5463%;
   width: 97%;
+  /* 2% of the image's own rendered height (0.97 x 1432/948 = 1.465W), asked
+     for by eye on top of the hand-tuned values above. */
+  bottom: -2.93cqw;
 }
 
 
