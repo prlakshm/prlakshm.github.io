@@ -92,9 +92,13 @@ export const journals: Journal[] = [
     descriptor: "HBO MAX · CTV",
     client: "HBO MAX",
     annotation: "Designing a themed rail for HBO Max.",
-    closed: "/home/journals/hbomax-closed.webp",
+    /* ?v bumped with the artwork. These filenames never change and the assets
+       ship with cache-control: max-age=600, so without a version anyone who saw
+       the previous cover keeps being served it. Same convention the fabric
+       scraps already use in Home.tsx. */
+    closed: "/home/journals/hbomax-closed.webp?v=2",
     hit: { x0: 0.1379, x1: 0.887, y0: 0.0357, y1: 0.96 },
-    open: "/home/journals/hbomax-open.webp",
+    open: "/home/journals/hbomax-open.webp?v=2",
     trimClosed: "3.86%",
     trimOpen: "7.57%",
     alt:
