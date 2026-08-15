@@ -853,8 +853,9 @@
    only their contents differ.
 
    surprise-rail: its open artwork holds a shorter book than its closed one, so
-   unscaled it shrank and dropped on hover; this sizes the open book back to the
-   closed one's height and bottom edge.
+   unscaled it shrank -4.02% and dropped on hover. These values instead grow it
+   +2.60%, the same growth mixr's pair has natively, so the two read alike on
+   hover. Confirmed by eye in the browser — do NOT replace with a bounds fit.
 
    pinnables: hand-tuned. Fitting it analytically was tried twice (body bounds,
    then a sticker-mask fit) and neither read right in place — its two shots are
@@ -863,17 +864,13 @@
 
    mixr: no rule — its pair is natively aligned. */
 .jr[data-journal="surprise-rail"] .jr-img--open {
-  left: -1.535%;
-  width: 103.069%;
-  bottom: -1.699cqw;
+  left: -3.45%;
+  width: 106.9%;
 }
 
 .jr[data-journal="pinnables"] .jr-img--open {
   left: 1.5463%;
   width: 97%;
-  /* 1% of the image's own rendered height (0.97 x 1432/948 = 1.465W), asked
-     for by eye on top of the hand-tuned values above. */
-  bottom: -1.465cqw;
 }
 
 
