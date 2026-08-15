@@ -848,13 +848,40 @@
   opacity: 0;
 }
 
+/* Aligning the open cover to the closed one.
+   .jr-img is width:100%; bottom:0, so both states render into the same box and
+   only their contents differ — and the three pairs were shot at different
+   framings and, for pinnables, different canvases (948x1432 against 1122x1402).
+   Left alone, swapping states jumped the book: pinnables leapt ~49px.
+
+   These put each open cover's BOOK at the same height and the same bottom edge
+   as its closed one, measured from the cover body with the drop shadow excluded.
+   The movement you see on open is then only what Journal.tsx animates — y:-7 and
+   -1.5deg on a heavy spring — which is the whole point: the lift is authored,
+   not an artefact of the artwork. Recompute all three whenever a cover is
+   re-exported. */
+.jr[data-journal="surprise-rail"] .jr-img--open {
+  left: -1.535%;
+  width: 103.069%;
+  bottom: -1.699cqw;
+}
+
+.jr[data-journal="mixr"] .jr-img--open {
+  left: 1.185%;
+  width: 97.63%;
+  bottom: 1.065cqw;
+}
+
+.jr[data-journal="pinnables"] .jr-img--open {
+  left: 4.028%;
+  width: 91.945%;
+  bottom: -9.698cqw;
+}
+
+
 /* The open export is intentionally only 3% smaller than its earlier treatment.
    The left offset keeps its visible alpha centre aligned with the closed cover
    even though the two source files carry slightly different transparent crop. */
-.jr[data-journal="pinnables"] .jr-img--open {
-  left: 1.5463%;
-  width: 97%;
-}
 
 .jr-shadow {
   position: absolute;
