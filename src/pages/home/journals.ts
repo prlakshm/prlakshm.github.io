@@ -100,8 +100,10 @@ export const journals: Journal[] = [
     alt:
       "A sandy tan leather journal with HBO Max, eyes and Surprise stickers, tied with twine.",
     href: "/surprise-rail/",
-    width: 422,
-    offsetY: 0,
+    width: 434,
+    /* Net ~1% of its own rendered height (466px) below the shelf baseline —
+       down 2%, then back up 1%. */
+    offsetY: 4,
     rotate: -1.5,
     /* Stills lifted straight out of /surprise-rail/ — the prototype as it was
        tested, not a re-render. Two shots, not three: the full home-screen grab
@@ -162,7 +164,9 @@ export const journals: Journal[] = [
        so the tooltip is the plain default. That the app itself is still being
        built is the torn note's job to say, not the cursor's. */
     href: "/mixr/",
-    width: 480, // flagship — reads ~10% larger than the others
+    /* Larger than the other two only because this cover fills less of its
+       frame — measured as a rendered book it is not the biggest. */
+    width: 480,
     offsetY: 0,
     rotate: 1.2,
     /* The timeline shot is cropped free of the iOS home indicator, which rides

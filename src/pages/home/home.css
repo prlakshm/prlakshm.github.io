@@ -754,8 +754,13 @@
   top: 27px;
   bottom: calc(-1 * var(--lead-h));
   width: 1.3px;
+  /* Anchored at the BOTTOM, not the top. The rule's height is
+     annotationHeight - 27 + --lead-h, which lands on no particular multiple of
+     the 9px dash period, so whichever end the pattern starts from the other is
+     clipped mid-dash. Starting from the bottom puts a full dash where it is
+     seen and leaves the partial one at the top, tucked under the kicker. */
   background-image: repeating-linear-gradient(
-    to bottom,
+    to top,
     currentColor 0 4px,
     transparent 4px 9px
   );
@@ -786,7 +791,13 @@
 
 .jr[data-journal="surprise-rail"] .jr-annotation {
   --cover-lift: 1.076;
-  --lead-h: 36px;
+  /* Shorter than the 36 this journal started with, because the label is
+     anchored and the cover is not. The label's offset is
+     100cqw * --cover-lift + --lead-h, and 100cqw IS the journal's width — so
+     every px added to --jw lifts the label by --cover-lift, and --joffset
+     carries it down bodily. This is what is left after holding the label still
+     through both. Retune it whenever this cover's width or offsetY moves. */
+  --lead-h: 23.87px;
 }
 
 .jr[data-journal="mixr"] .jr-annotation {
