@@ -281,8 +281,10 @@ export const journals: Journal[] = [
        carries its own lean from cutout.py's OPEN_ROTATE on top of that, so the
        cover reads as tilting rather than snapping upright. */
     openTilt: -2,
-    /* Rises further than the -7 default, asked for by eye. */
-    openLift: -10,
+    /* Rises further than the -7 default, asked for by eye. The covers are
+       seated flush, so this is the whole movement — no seat offset eating
+       into it the way Surprise Rail's used to. */
+    openLift: -9.5,
     /* One note, dead centre. There is no prototype to show yet, and a single
        scrap in the middle of an empty screen says that more plainly than a
        spread of placeholders would. */
