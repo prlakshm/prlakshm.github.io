@@ -25,10 +25,19 @@ FRAMES = [
     # The closed source is an export that already carries its own alpha, and it
     # beats anything keyed here: the bottom lip of the leather is a deep
     # shadowed red, and no threshold separates that from a black backdrop as
-    # cleanly as the tool that rendered it. Swap the open one for a transparent
-    # export too and this will pick that up automatically.
+    # cleanly as the tool that rendered it.
     ("Red notebook stickers.png", "pinnables-closed.webp"),
-    ("Generated image 1.png", "pinnables-open.webp"),
+    # The open frame is the transparent sibling export saved alongside the
+    # closed one (absolute path — it lives with the other notebook sources,
+    # not in Downloads). It replaced "Generated image 1.png", whose book was
+    # rotated ~2.1 deg counter-clockwise IN PLANE (spine and bottom edge
+    # agreed), which read as the notebook leaning left every time it opened.
+    # This export's bottom edge is level (-0.05 deg) and its spine matches the
+    # closed frame's natural 3/4 perspective, so the pair reads straight.
+    (
+        os.path.expanduser("~/Documents/Portfolio/Notebooks/Red open.png"),
+        "pinnables-open.webp",
+    ),
 ]
 
 # Anything at or below this luminance counts as backdrop, but only if the flood
@@ -114,7 +123,7 @@ def has_alpha(im):
     return im.mode == "RGBA" and im.getchannel("A").getextrema()[0] < 255
 
 
-def build(src_name, out_name, target_lift=None, target_centre=None):
+def build(src_name, out_name, target_lift=None, target_centre=None, rotate=0.0):
     src = Image.open(os.path.join(SRC, src_name))
 
     if has_alpha(src):
@@ -136,6 +145,11 @@ def build(src_name, out_name, target_lift=None, target_centre=None):
         im = im.convert("RGBA")
         im.putalpha(a)
         keyed = True
+    if rotate:
+        # One bicubic pass, before the reframe so the canvas is sized around the
+        # rotated book. These frames are 2x what they render at, so a single
+        # resample here is well under a screen pixel.
+        im = im.rotate(rotate, resample=Image.BICUBIC, expand=True)
     if target_lift is not None:
         im = reframe(im, target_lift, target_centre)
 
@@ -157,14 +171,31 @@ def build(src_name, out_name, target_lift=None, target_centre=None):
 
 
 # How much larger the open book reads than the closed one.
-# The other two notebooks were photographed swinging toward the camera, so their
-# covers get markedly WIDER as they open — +11% for Surprise Rail, +26% for
-# Mixr, growing the cover's area 1.12x and 1.29x. This one was rendered more
-# head-on, so its open cover is actually 2% narrower than its closed one and the
-# whole notebook reads as shrinking on hover. A pose cannot be recovered by
-# scaling, but the size impression can: this factor is set so the open cover's
-# AREA grows 1.12x, matching Surprise Rail.
-OPEN_GROWTH = 1.085
+# 1.0 renders the open cover at exactly the closed one's size. 1.085 (open
+# cover area 1.12x, matching Surprise Rail's photographed growth) and 1.0425
+# both read as the book swelling next to its neighbours; this is the tiny lift
+# in scale that survived, small enough to feel like the cover coming toward you
+# rather than a resize.
+OPEN_GROWTH = 1.01
+
+# Counter-clockwise degrees applied to the OPEN frame only, to square its pose
+# with the closed frame's.
+#
+# The two renders were shot at slightly different camera angles. Fitting a line
+# to each edge, the open book sits -0.98 deg off the closed one measured at the
+# spine but +1.57 off measured at the bottom. Those disagree, and the gap is
+# what the eye reads as perspective: through the cross-fade the baseline and
+# the spine swing by DIFFERENT amounts, so the cover looks sheared rather than
+# tilted.
+#
+# No rotation can remove that gap — it is a perspective difference, and a rigid
+# rotation shifts both readings together, so the 0.59 deg between them survives
+# whatever R is. What R chooses is how the error is SPLIT. 1.58 pinned the
+# baseline exactly and dumped all 0.59 onto the spine, which is what read as
+# the cover twisting. 1.275 is the midpoint of -0.98 and +1.57, so each edge is
+# off by 0.295 and neither one visibly leads. Fixing it properly means
+# re-rendering the open frame at the closed frame's camera angle.
+OPEN_ROTATE = 1.275
 
 if __name__ == "__main__":
     (cs, co), (os_, oo) = FRAMES
@@ -174,4 +205,5 @@ if __name__ == "__main__":
         oo,
         target_lift=closed_lift * OPEN_GROWTH,
         target_centre=closed_centre,
+        rotate=OPEN_ROTATE,
     )

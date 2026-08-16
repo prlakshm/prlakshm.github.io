@@ -796,8 +796,10 @@
      100cqw * --cover-lift + --lead-h, and 100cqw IS the journal's width — so
      every px added to --jw lifts the label by --cover-lift, and --joffset
      carries it down bodily. This is what is left after holding the label still
-     through both. Retune it whenever this cover's width or offsetY moves. */
-  --lead-h: 23.87px;
+     through both. Retune it whenever this cover's width or offsetY moves.
+     Last retune: --jw 434 -> 430, which would have dropped the label 4.304px
+     (4 x --cover-lift), so that came back onto --lead-h. */
+  --lead-h: 28.174px;
 }
 
 .jr[data-journal="mixr"] .jr-annotation {
@@ -810,7 +812,9 @@
    Re-run that and update this if the cover is ever replaced. */
 .jr[data-journal="pinnables"] .jr-annotation {
   --cover-lift: 1.018;
-  --lead-h: 11px;
+  /* Was 11px at --jw 445; the cover came down to 436, which would have dropped
+     the label 9.162px (9 x --cover-lift), so that is added back here. */
+  --lead-h: 20.162px;
   /* Its copy runs to three lines against Surprise Rail's two, so an equal
      footing floated the block's top well above its neighbour's. Dropped until
      the two heading lines sit on one line across the shelf — the tops, since
@@ -853,24 +857,21 @@
    only their contents differ.
 
    surprise-rail: its open artwork holds a shorter book than its closed one, so
-   unscaled it shrank -4.02% and dropped on hover. These values instead grow it
-   +2.60%, the same growth mixr's pair has natively, so the two read alike on
-   hover. Confirmed by eye in the browser — do NOT replace with a bounds fit.
+   unscaled it shrank -3.74% and dropped on hover. This scale is exactly the
+   inverse of that (1 / 0.9626), so the open book renders at the closed one's
+   size - no growth on hover, only the lift and tilt. left is
+   -(width - 100%) / 2, which re-centres the scale.
+   Do NOT replace with a bounds fit; the transparent margins differ.
 
-   pinnables: hand-tuned. Fitting it analytically was tried twice (body bounds,
-   then a sticker-mask fit) and neither read right in place — its two shots are
-   on different canvases with different perspective, so pick values by eye
-   against the live hover and leave them.
+   pinnables: no rule since the straight open export — cutout.py frames the
+   open cover at the closed one's scale and centre, so the pair aligns at
+   width:100% like mixr's does. (The old rule compensated for a render whose
+   book was rotated ~2.1 deg; that frame is gone.)
 
    mixr: no rule — its pair is natively aligned. */
 .jr[data-journal="surprise-rail"] .jr-img--open {
-  left: -3.45%;
-  width: 106.9%;
-}
-
-.jr[data-journal="pinnables"] .jr-img--open {
-  left: 1.5463%;
-  width: 97%;
+  left: -1.9417%;
+  width: 103.883%;
 }
 
 

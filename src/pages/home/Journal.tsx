@@ -69,6 +69,8 @@ function Journal({ journal, index }: Props) {
     width,
     offsetY,
     rotate,
+    openTilt,
+    openLift,
     spill,
   } = journal;
 
@@ -248,8 +250,11 @@ function Journal({ journal, index }: Props) {
           openImg,
           {
             opacity: visible ? 1 : 0,
-            y: visible ? -7 : 0,
-            rotate: visible ? -1.5 : 0,
+            y: visible ? openLift ?? -7 : 0,
+            /* Composes with the journal's resting rotation — the net lean is
+               their sum, which is why a journal resting clockwise needs a
+               stronger negative here to read as tilting left at all. */
+            rotate: visible ? openTilt ?? -1.5 : 0,
           },
           reduced ? { duration: 0 } : SPRING_HEAVY
         );
