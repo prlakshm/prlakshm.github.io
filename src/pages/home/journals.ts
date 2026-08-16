@@ -258,7 +258,7 @@ export const journals: Journal[] = [
        replaced. */
     closed: "/home/journals/pinnables-closed.webp",
     hit: { x0: 0.1212, x1: 0.9002, y0: 0.0813, y1: 0.8959 },
-    open: "/home/journals/pinnables-open.webp?v=2",
+    open: "/home/journals/pinnables-open.webp?v=3",
     trimClosed: "10.41%",
     /* Tracks the open frame's canvas, which cutout.py resizes whenever
        OPEN_GROWTH or OPEN_ROTATE changes — re-run it and copy the printed
@@ -277,12 +277,10 @@ export const journals: Journal[] = [
     /* The ANIMATED swing. Resting pose is +1.8 clockwise, so anything weaker
        than -1.8 leaves the open cover sitting right of vertical no matter how
        much it moves getting there — -1.6 netted +0.2 and read as no tilt at
-       all. -1.8 cancels the +1.8 resting pose exactly, so the ELEMENT ends up
-       at 0 — but the open artwork now carries its own lean from cutout.py's
-       OPEN_ROTATE, so the cover still reads as tilting rather than snapping
-       upright. That is why this can sit at the cancellation point and still
-       look right; it would not have before the frames were squared. */
-    openTilt: -1.8,
+       all. This nets -0.2 against the +1.8 resting pose, and the open artwork
+       carries its own lean from cutout.py's OPEN_ROTATE on top of that, so the
+       cover reads as tilting rather than snapping upright. */
+    openTilt: -2,
     /* Rises further than the -7 default, asked for by eye. */
     openLift: -10,
     /* One note, dead centre. There is no prototype to show yet, and a single

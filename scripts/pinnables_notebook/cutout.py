@@ -176,7 +176,7 @@ def build(src_name, out_name, target_lift=None, target_centre=None, rotate=0.0):
 # both read as the book swelling next to its neighbours; this is the tiny lift
 # in scale that survived, small enough to feel like the cover coming toward you
 # rather than a resize.
-OPEN_GROWTH = 1.01
+OPEN_GROWTH = 1.05
 
 # Counter-clockwise degrees applied to the OPEN frame only, to square its pose
 # with the closed frame's.
