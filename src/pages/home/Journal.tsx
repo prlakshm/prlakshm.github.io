@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { animate } from "motion";
 import { SPRING_HEAVY, joinShelf } from "./interactions.js";
@@ -87,6 +87,47 @@ function Journal({ journal, index }: Props) {
   /** Serialises open/close across the whole shelf, so two notebooks are never
    *  animating at once. See joinShelf in interactions.ts. */
   const shelfRef = useRef(joinShelf(id));
+
+  /* The open covers are half the shelf's image weight and none of it is needed
+     until someone hovers, so they stay out of the document until the browser
+     is idle. Holding them back is what lets the CLOSED covers — the ones that
+     are actually on screen — have the connection to themselves and finish
+     sooner. `loading="lazy"` cannot do this: these sit in the viewport, so it
+     fetches them immediately.
+
+     Hover also flips it, for the case where someone reaches the shelf before
+     idle fires. That path is a fallback, not the norm: idle lands within a
+     frame or two of first paint, long before a pointer arrives. */
+  const [openReady, setOpenReady] = useState(false);
+  useEffect(() => {
+    if (openReady) return;
+    type WithIdle = { requestIdleCallback?: (cb: () => void) => number };
+    const idle = (window as unknown as WithIdle).requestIdleCallback;
+    const arm = () => {
+      /* The torn sheets are background-images, and the spill layer is
+         display:none until a hover — so nothing in a display:none subtree is
+         ever fetched, and adding .is-ready alone would leave them to start
+         downloading at the exact moment they need to be on screen. Warm them
+         here instead, so idle pays for them and the first hover finds them in
+         cache. Only the sheets this journal actually uses. */
+      new Set(
+        spill.filter((s) => !s.src).map((s) => s.sheet ?? 1),
+      ).forEach((n) => {
+        new Image().src = `/home/journals/notes/torn-${n}.webp`;
+      });
+      setOpenReady(true);
+    };
+    if (idle) {
+      const handle = idle.call(window, arm);
+      return () => (window as unknown as {
+        cancelIdleCallback?: (h: number) => void;
+      }).cancelIdleCallback?.(handle);
+    }
+    /* Safari has no requestIdleCallback. A timeout after first paint is the
+       same bargain: the closed covers are already in flight by then. */
+    const t = window.setTimeout(arm, 1200);
+    return () => window.clearTimeout(t);
+  }, [openReady, spill]);
 
   useLayoutEffect(() => {
     const root = rootRef.current;
@@ -456,6 +497,9 @@ function Journal({ journal, index }: Props) {
       // Touch fires pointerenter on tap too. That path is handled by onTap
       // below, which toggles rather than tracking a cursor that is not there.
       if (!canHover()) return;
+      // Fallback for a pointer that beats the idle callback. Cheap after the
+      // first call — React bails out of a set to the value already held.
+      setOpenReady(true);
       if (!tracking) {
         tracking = true;
         window.addEventListener("pointermove", track, { passive: true });
@@ -481,6 +525,7 @@ function Journal({ journal, index }: Props) {
     const onTap = (e: Event) => {
       if (canHover() || !inert) return;
       e.preventDefault();
+      setOpenReady(true);
       const next = !isOpenRef.current;
       if (next) {
         const rect = target.getBoundingClientRect();
@@ -498,6 +543,7 @@ function Journal({ journal, index }: Props) {
       shelf.want(false, () => false, setOpen);
     };
     const onFocus = () => {
+      setOpenReady(true);
       // No cursor on keyboard focus — anchor near the top centre of the link.
       const rect = target.getBoundingClientRect();
       placeTooltip(rect.left + rect.width * 0.5, rect.top + 24);
@@ -581,14 +627,16 @@ function Journal({ journal, index }: Props) {
           alt={alt}
           width={width}
           decoding="async"
+          fetchPriority="high"
           style={{ translate: `0 ${trimClosed}` }}
         />
         <img
           className="jr-img jr-img--open"
-          src={open}
+          src={openReady ? open : undefined}
           alt=""
           aria-hidden="true"
           decoding="async"
+          fetchPriority="low"
           style={{ translate: `0 ${trimOpen}` }}
         />
       </span>
@@ -615,7 +663,7 @@ function Journal({ journal, index }: Props) {
      pull quotes that appear and vanish on a pointer it does not have. */
   const spillLayer = (
     <div
-      className="jr-spill"
+      className={`jr-spill${openReady ? " is-ready" : ""}`}
       data-journal={id}
       /* Marks the layer that survives on a touch device: with no case study to
          navigate to, a tap can open it without stealing anything. */
@@ -636,17 +684,15 @@ function Journal({ journal, index }: Props) {
             /* NOT lazy. These cards have no size or position until the first
                hover runs measure(), so a lazy image sits at 0x0 off the top of
                the document and the loader never fires — the first hover would
-               spill empty frames. Low priority instead: they queue behind the
-               covers and the hero, and are decoded long before anyone reaches
-               the shelf. */
+               spill empty frames. Held back to idle instead, on the same gate
+               as the open covers, then fetched at low priority. Nothing here
+               is on screen until a hover, and a hover cannot arrive before the
+               idle callback in any realistic session. */
             <img
-              src={item.src}
+              src={openReady ? item.src : undefined}
               alt=""
               decoding="async"
-              /* Lowercase, spread as a raw attribute: React 18.3 does not know
-                 the camelCase `fetchPriority` prop and warns on every render
-                 while still emitting nothing useful. */
-              {...{ fetchpriority: "low" }}
+              fetchPriority="low"
             />
           ) : (
             <span className="jr-spill-note">{item.note}</span>

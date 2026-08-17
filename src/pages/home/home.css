@@ -1009,13 +1009,18 @@
   filter: drop-shadow(0 14px 26px color-mix(in srgb, #000 52%, transparent));
 }
 
-.jr-spill-item--note[data-sheet="1"] {
+/* Gated behind .is-ready, which Journal.tsx adds once the browser goes idle.
+   A background-image is fetched as soon as the element it is on renders, and
+   this layer renders on mount, so ungated these three sheets came down the
+   wire ahead of the covers that are actually on screen. Nothing here is
+   visible before a hover. */
+.jr-spill.is-ready .jr-spill-item--note[data-sheet="1"] {
   background-image: url("/home/journals/notes/torn-1.webp");
 }
-.jr-spill-item--note[data-sheet="2"] {
+.jr-spill.is-ready .jr-spill-item--note[data-sheet="2"] {
   background-image: url("/home/journals/notes/torn-2.webp");
 }
-.jr-spill-item--note[data-sheet="3"] {
+.jr-spill.is-ready .jr-spill-item--note[data-sheet="3"] {
   background-image: url("/home/journals/notes/torn-3.webp");
 }
 

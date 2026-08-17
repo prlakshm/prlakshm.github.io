@@ -1,3 +1,5 @@
-# Pristine, sticker-free covers, kept out of git — restore with:
-#   git show HEAD:public/home/journals/red-closed.png > base/red-closed.png
+# Pristine, sticker-free covers, kept out of git. They used to live at
+# public/home/journals/red-closed.png but were deleted once the shelf moved to
+# WebP, so HEAD no longer has them — restore from the last commit that did:
+#   git show b4469de:public/home/journals/red-closed.png > base/red-closed.png
 *.png

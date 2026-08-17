@@ -153,6 +153,10 @@ def build(src_name, out_name, target_lift=None, target_centre=None, rotate=0.0):
     if target_lift is not None:
         im = reframe(im, target_lift, target_centre)
 
+    if MAX_WIDTH and im.size[0] > MAX_WIDTH:
+        h = round(im.size[1] * MAX_WIDTH / im.size[0])
+        im = im.resize((MAX_WIDTH, h), Image.LANCZOS)
+
     path = os.path.join(OUT, out_name)
     # WebP: these frames arrive at twice the resolution of the other covers and
     # this keeps all of it for a third of the weight.
@@ -177,6 +181,19 @@ def build(src_name, out_name, target_lift=None, target_centre=None, rotate=0.0):
 # in scale that survived, small enough to feel like the cover coming toward you
 # rather than a resize.
 OPEN_GROWTH = 1.05
+
+# Cap on the exported frame width, in px.
+#
+# These renders arrive around 1120px for a cover that lays out at 436px — 2.57x,
+# where 2x is as fine as any display resolves. The surplus is ~200KB of detail
+# nobody's screen can show. 880px keeps a true 2x on desktop and more than 3x on
+# a phone, where the shelf lays out far narrower.
+#
+# Note this is the ONLY resample of the artwork besides OPEN_ROTATE — everything
+# else here changes the canvas, not the pixels. Raise it rather than lower it if
+# the covers ever lay out bigger; below 2x the stitching is the first thing to
+# go soft. Set to None to export at source resolution.
+MAX_WIDTH = 880
 
 # Counter-clockwise degrees applied to the OPEN frame only, to square its pose
 # with the closed frame's.

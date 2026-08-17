@@ -256,14 +256,14 @@ export const journals: Journal[] = [
        so the pair cross-fades at matched scale and centre. Every number below
        is measured from that script's output — re-run it if either frame is
        replaced. */
-    closed: "/home/journals/pinnables-closed.webp",
-    hit: { x0: 0.1212, x1: 0.9002, y0: 0.0813, y1: 0.8959 },
-    open: "/home/journals/pinnables-open.webp?v=3",
-    trimClosed: "10.41%",
+    closed: "/home/journals/pinnables-closed.webp?v=2",
+    hit: { x0: 0.1216, x1: 0.9, y0: 0.0818, y1: 0.8964 },
+    open: "/home/journals/pinnables-open.webp?v=4",
+    trimClosed: "10.36%",
     /* Tracks the open frame's canvas, which cutout.py resizes whenever
        OPEN_GROWTH or OPEN_ROTATE changes — re-run it and copy the printed
        trim rather than editing this by hand. */
-    trimOpen: "9.52%",
+    trimOpen: "9.50%",
     alt:
       "A dark red leather journal with pinnables, pushpin and MCP stickers, stuffed with loose pages.",
     /* The notebooks share a baseline, so height is what the eye compares.
@@ -284,7 +284,7 @@ export const journals: Journal[] = [
     /* Rises further than the -7 default, asked for by eye. The covers are
        seated flush, so this is the whole movement — no seat offset eating
        into it the way Surprise Rail's used to. */
-    openLift: -9.5,
+    openLift: -7.125,
     /* One note, dead centre. There is no prototype to show yet, and a single
        scrap in the middle of an empty screen says that more plainly than a
        spread of placeholders would. */
