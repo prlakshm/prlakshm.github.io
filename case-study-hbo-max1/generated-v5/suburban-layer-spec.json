@@ -1,0 +1,166 @@
+{
+  "source": {
+    "file": "/Users/pranavi/Downloads/Surprise Tiles Component Idea.fig",
+    "canvas": {
+      "id": "6006:97068",
+      "name": "🙀 Final Surprise Rail + Tiles"
+    },
+    "railTile": {
+      "screen": "6050:156215",
+      "container": "6089:50502",
+      "frostEdgeNode": "6089:50503",
+      "artAndConcealmentNode": "6089:50504",
+      "descriptorNode": "6089:50505"
+    },
+    "animationVariant": {
+      "frame": "6084:46035",
+      "front": "6084:46049",
+      "container": "6084:46051",
+      "frostEdgeNode": "6084:46052",
+      "artAndConcealmentNode": "6084:46053",
+      "focusBoxNode": "6084:46059",
+      "descriptorNode": "6084:46060"
+    }
+  },
+  "exports": {
+    "suburban-key-art.png": "Byte-identical image fill extracted from archive hash 0751378bbf5db4f9bc6ca118c0f941989d6da0de.",
+    "suburban-black-75.png": "Uniform black source at 75% alpha.",
+    "suburban-angular-60-derived.png": "Angular overlay rasterized from the decoded six stops, transform matrix and 60% fill opacity. Keep the JSON transform as the authoritative implementation source.",
+    "suburban-soft-light-source.png": "White source fill; must use SOFT_LIGHT rather than normal compositing.",
+    "suburban-frost-edge.svg": "White 75% backplate at the decoded dimensions and offset, with the literal 8px foreground-blur value represented in SVG.",
+    "suburban-descriptor.svg": "Descriptor-only layer using decoded type and line metrics; exact output requires Roboto Bold, so the assembled PNG remains the pixel-authoritative reference.",
+    "suburban-assembled-exact.png": "Unmodified crop of the exact Suburban Secrets tile in CTV-Themed-Rail.png; 305×171 is the exported rail scale."
+  },
+  "geometry": {
+    "tile": {
+      "width": 365,
+      "height": 205.31251525878906,
+      "cornerRadius": 0,
+      "clipsContent": true,
+      "rawFrameMaskDisabled": false,
+      "visibleStroke": false
+    },
+    "artAndConcealment": {
+      "x": 0,
+      "y": 0,
+      "width": 365,
+      "height": 205
+    },
+    "frostEdge": {
+      "x": 0,
+      "y": -0.6201171875,
+      "width": 365.9898376464844,
+      "height": 206
+    }
+  },
+  "zOrderBackToFront": [
+    "frostEdge",
+    "artAndConcealment",
+    "descriptor"
+  ],
+  "frostEdge": {
+    "fill": {
+      "type": "SOLID",
+      "color": "#ffffff",
+      "opacity": 0.75,
+      "blendMode": "NORMAL"
+    },
+    "effect": {
+      "type": "FOREGROUND_BLUR",
+      "radius": 8
+    },
+    "note": "This slightly oversized white blurred node sits behind the art node. It is not a translucent glass card above the poster."
+  },
+  "artAndConcealment": {
+    "fillsBackToFront": [
+      {
+        "type": "IMAGE",
+        "hash": "0751378bbf5db4f9bc6ca118c0f941989d6da0de",
+        "originalWidth": 500,
+        "originalHeight": 281,
+        "scaleMode": "FILL",
+        "opacity": 1,
+        "blendMode": "NORMAL"
+      },
+      {
+        "type": "SOLID",
+        "color": "#000000",
+        "opacity": 0.75,
+        "blendMode": "NORMAL"
+      },
+      {
+        "type": "GRADIENT_ANGULAR",
+        "opacity": 0.6000000238418579,
+        "blendMode": "NORMAL",
+        "transform": {
+          "m00": 0.7553748488426208,
+          "m01": 0.19577336311340332,
+          "m02": 0.03142009675502777,
+          "m10": -0.3904295265674591,
+          "m11": 0.2126239836215973,
+          "m12": 0.5852876901626587
+        },
+        "stops": [
+          { "position": 0, "rgba": [0, 0, 0, 1] },
+          { "position": 0.025669943541288376, "rgba": [0.00540396710857749, 0.0024886582978069782, 0.0024886582978069782, 0.9803448915481567] },
+          { "position": 0.2612040936946869, "rgba": [0.05498798191547394, 0.025323303416371346, 0.025323303416371346, 0.800000011920929] },
+          { "position": 0.4774506688117981, "rgba": [0.021823270246386528, 0.016634218394756317, 0.04058368504047394, 0.699999988079071] },
+          { "position": 0.7672561407089233, "rgba": [0.04309253394603729, 0.059795673936605453, 0.02847728505730629, 0.4000000059604645] },
+          { "position": 1, "rgba": [0, 0, 0, 1] }
+        ]
+      },
+      {
+        "type": "SOLID",
+        "color": "#ffffff",
+        "opacity": 0.05,
+        "blendMode": "NORMAL",
+        "visible": false
+      },
+      {
+        "type": "SOLID",
+        "color": "#ffffff",
+        "opacity": 1,
+        "blendMode": "SOFT_LIGHT"
+      }
+    ],
+    "effect": {
+      "type": "FOREGROUND_BLUR",
+      "radius": 15
+    }
+  },
+  "descriptor": {
+    "characters": "Suburban Secrets",
+    "fontFamily": "Roboto",
+    "fontPostScriptName": "Roboto-Bold",
+    "fontWeight": 700,
+    "fontSize": 34,
+    "lineHeight": 51,
+    "letterSpacing": 0,
+    "color": "#ffffff",
+    "textAlign": "CENTER",
+    "frame": {
+      "x": 62,
+      "y": 51.3798828125,
+      "width": 242,
+      "height": 102
+    },
+    "lines": ["Suburban", "Secrets"]
+  },
+  "focusStateOnly": {
+    "visibleInDefaultRailTile": false,
+    "bounds": { "x": -8, "y": -8.1201171875, "width": 381, "height": 223 },
+    "stroke": { "color": "#ffffff", "weight": 3, "align": "OUTSIDE" },
+    "cornerRadius": 2
+  },
+  "verification": {
+    "ctvSuburbanSecretsInstancesChecked": 14,
+    "uniqueArtFillAndEffectStacks": 1,
+    "decodedFillStackSha1": "e1d0dbcf88adb30710f872a1e57531f460cdcbf0",
+    "pixelAuthoritativeReference": "suburban-assembled-exact.png",
+    "caveats": [
+      "The angular PNG is a deterministic rasterization of the decoded transform and stops; the JSON values are authoritative because Figma's native angular-gradient rasterizer is undocumented.",
+      "The frost-edge SVG uses the literal decoded blur value, but native Figma and SVG Gaussian blur can differ at subpixel edges.",
+      "The descriptor SVG requires Roboto Bold. Use the assembled PNG whenever exact glyph rendering is required."
+    ]
+  }
+}
