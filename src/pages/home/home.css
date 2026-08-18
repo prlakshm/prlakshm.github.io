@@ -1009,6 +1009,32 @@
   filter: drop-shadow(0 14px 26px color-mix(in srgb, #000 52%, transparent));
 }
 
+/* The one exception to the pointer-transparent layer above: a scrap carrying a
+   link has to be clickable. Gated on .is-open, or an invisible card would sit
+   in the middle of the page swallowing clicks while the spill is shut. The
+   overlay survives the trip out here because Journal.tsx holds it open for a
+   beat once a linked scrap is on screen (LINK_GRACE). */
+.jr-spill.is-open .jr-spill-item--linked {
+  pointer-events: auto;
+}
+
+/* Reads as pen on paper, not as chrome: the scrap is torn brown paper and a
+   blue web link on it would look pasted in. Underline offset so the rule sits
+   clear of the mono's descenders. */
+.jr-spill-link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: opacity 0.18s ease;
+}
+
+.jr-spill-link:hover,
+.jr-spill-link:focus-visible {
+  opacity: 0.62;
+}
+
 /* Gated behind .is-ready, which Journal.tsx adds once the browser goes idle.
    A background-image is fetched as soon as the element it is on renders, and
    this layer renders on mount, so ungated these three sheets came down the

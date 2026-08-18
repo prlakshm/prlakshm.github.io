@@ -10,7 +10,11 @@
 export type SpillItem = {
   /** Still from the case-study prototype, or omit for a torn paper note. */
   src?: string;
-  /** Note copy. A short selling point in the case study's own voice. */
+  /** Note copy. A short selling point in the case study's own voice.
+   *  One `[label](href)` may appear anywhere in the string — Journal.tsx turns
+   *  it into a real link and makes that scrap the only click target in the
+   *  spill, which is otherwise pointer-transparent. A linked scrap also holds
+   *  the spill open while the cursor travels to it (see LINK_GRACE). */
   note?: string;
   /** Landing centre, as a fraction of the viewport measured from its middle:
    *  -0.5 is the left/top edge, +0.5 the right/bottom. Keep |cx| under ~0.38
@@ -243,11 +247,15 @@ export const journals: Journal[] = [
     id: "pinnables",
     number: "03",
     title: "PINNABLES",
-    client: "MCP",
-    /* No `href` yet, which is what makes the notebook inert and the tooltip
-       read IN PROGRESS. Fill it in when there is something to point at. */
-    descriptor: "MCP · AI CODING AGENTS",
-    annotation: "Pinning components to annotate for coding agents.",
+    client: "DEVTOOL",
+    /* The case study is unwritten, but the tool itself is public — so the
+       notebook points at the repo rather than being inert. Off-site, so it
+       opens in a new tab and the tooltip carries the arrow. Swap this for the
+       case study when there is one, and the CTA below with it. */
+    href: "https://github.com/prlakshm/pinnables",
+    cta: "VIEW REPO",
+    descriptor: "DEVTOOL · AI CODING AGENTS",
+    annotation: "Sending annotations in browser to coding agents.",
     /* WebP rather than PNG like its neighbours: these frames arrive at twice
        their resolution, and WebP keeps all of it for a third of the weight
        (239KB against the ~590KB the smaller PNGs cost).
@@ -291,7 +299,7 @@ export const journals: Journal[] = [
     spill: [
       {
         note:
-          "This notebook is still being written! Read my other case studies in the meantime.",
+          "This notebook is still being written! Check out the tool [here](https://github.com/prlakshm/pinnables).",
         cx: 0,
         cy: 0,
         cw: 0.29,

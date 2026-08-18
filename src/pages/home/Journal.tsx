@@ -30,6 +30,37 @@ function spillBase(vw: number, vh: number) {
   return Math.min(vw * 0.96, vh * 1.6);
 }
 
+/** One `[label](href)` inside a note. Deliberately the whole of the "markdown"
+ *  supported here — a note is a handwritten scrap, not a document. */
+const NOTE_LINK = /\[([^\]]+)\]\(([^)]+)\)/;
+
+/** Note copy with its one optional link turned into a real anchor.
+ *  tabIndex -1 on purpose: the spill layer is aria-hidden (it is decoration
+ *  that appears and vanishes on a pointer), and a focusable node inside an
+ *  aria-hidden subtree is a trap for a screen reader — reachable by Tab,
+ *  unannounced when it lands. The link is a pointer affordance only. */
+function renderNote(note: string) {
+  const m = note.match(NOTE_LINK);
+  if (!m) return note;
+  const [full, label, href] = m;
+  const at = m.index ?? 0;
+  return (
+    <>
+      {note.slice(0, at)}
+      <a
+        className="jr-spill-link"
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        tabIndex={-1}
+      >
+        {label}
+      </a>
+      {note.slice(at + full.length)}
+    </>
+  );
+}
+
 function ExternalArrow() {
   // Berkeley Mono has no ↗, so the affordance is drawn rather than typed.
   return (
@@ -145,6 +176,13 @@ function Journal({ journal, index }: Props) {
     const tooltip = layer.querySelector<HTMLElement>(".jr-tooltip");
     const cards = Array.from(
       layer.querySelectorAll<HTMLElement>(".jr-spill-item")
+    );
+    /* Scraps carrying a link. The spill normally lives and dies with the
+       pointer being on the BOOK, which would make a link in a note that lands
+       at the middle of the screen unreachable — the overlay closes on the way
+       there. These cards therefore also hold it open (see releaseSoon). */
+    const linkedCards = cards.filter((c) =>
+      c.classList.contains("jr-spill-item--linked")
     );
 
     /* A notebook with no case study to open. It is the only one that may spill
@@ -486,12 +524,53 @@ function Journal({ journal, index }: Props) {
        is not a global mousemove tax. It both opens and closes: entering the
        column is not enough, and leaving the book has to release even though
        pointerleave will not fire for another half a notebook's width. */
+    /* Is the pointer on a scrap that carries a link? Only meaningful while the
+       spill is open — the cards keep their landing spots when closed. */
+    const overLink = (x: number, y: number) =>
+      isOpenRef.current &&
+      linkedCards.some((card) => {
+        const r = card.getBoundingClientRect();
+        return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+      });
+
+    /* How long the spill survives the pointer being on neither the book nor a
+       linked scrap. Nothing but a corridor: the cursor has to cross dead desk
+       to get from the notebook out to a scrap at the middle of the screen, and
+       without this the overlay closes somewhere in that gap and the link can
+       never be clicked. Journals with no linked scrap release instantly, as
+       before. */
+    const LINK_GRACE = 500;
+    let graceTimer = 0;
+    const clearGrace = () => {
+      if (!graceTimer) return;
+      window.clearTimeout(graceTimer);
+      graceTimer = 0;
+    };
+    const closeNow = () => {
+      clearGrace();
+      wantsRef.current = false;
+      shelf.want(false, () => false, setOpen);
+    };
+    const releaseSoon = () => {
+      if (!linkedCards.length || !isOpenRef.current) return closeNow();
+      if (graceTimer) return; // already counting down
+      graceTimer = window.setTimeout(() => {
+        graceTimer = 0;
+        closeNow();
+      }, LINK_GRACE);
+    };
+
     let tracking = false;
     const track = (e: PointerEvent) => {
       const on = overBook(e.clientX, e.clientY);
       if (on) placeTooltip(e.clientX, e.clientY);
-      wantsRef.current = on;
-      shelf.want(on, () => wantsRef.current, setOpen);
+      if (on || overLink(e.clientX, e.clientY)) {
+        clearGrace();
+        wantsRef.current = true;
+        shelf.want(true, () => wantsRef.current, setOpen);
+        return;
+      }
+      releaseSoon();
     };
     const enter = (e: PointerEvent) => {
       // Touch fires pointerenter on tap too. That path is handled by onTap
@@ -508,12 +587,25 @@ function Journal({ journal, index }: Props) {
     };
     const leave = () => {
       if (!canHover()) return;
+      /* With a linked scrap on screen the column is no longer the boundary:
+         the pointer is allowed to carry on out to the scrap, so tracking stays
+         armed and `track` above is what eventually releases. */
+      if (linkedCards.length && isOpenRef.current) {
+        releaseSoon();
+        return;
+      }
       if (tracking) {
         tracking = false;
         window.removeEventListener("pointermove", track);
       }
-      wantsRef.current = false;
-      shelf.want(false, () => false, setOpen);
+      closeNow();
+    };
+    /* The pointer left the window altogether — no more pointermove will arrive
+       to end the grace above, so end it here. Hover only: on touch this fires
+       the instant a finger lifts, which would shut the tapped spill. */
+    const leaveWindow = () => {
+      if (!canHover()) return;
+      closeNow();
     };
 
     /* Touch, inert notebook only: tap toggles the spill, and a tap anywhere
@@ -565,27 +657,33 @@ function Journal({ journal, index }: Props) {
     };
 
     /* pointerenter/leave still bound to the column, not the book: they are what
-       start and stop the tracking above. Leaving the column is a hard release —
-       it also covers the pointer leaving the window entirely, which never
-       produces a pointermove. */
+       start and stop the tracking above. Leaving the column is a hard release
+       on a journal with no linked scrap — and the document-level pointerleave
+       covers the pointer leaving the window, which never produces a
+       pointermove. */
     target.addEventListener("pointerenter", enter);
     target.addEventListener("pointerleave", leave);
     target.addEventListener("focusin", onFocus);
-    target.addEventListener("focusout", leave);
+    // Keyboard focus has no cursor to travel to a scrap, so this one is a hard
+    // release even where the pointer would get a corridor.
+    target.addEventListener("focusout", closeNow);
     target.addEventListener("click", onTap);
     // Capture, so a tap on anything else closes before that thing handles it.
     document.addEventListener("pointerdown", onTapOutside, true);
+    document.addEventListener("pointerleave", leaveWindow);
     window.addEventListener("resize", onResize);
 
     return () => {
       target.removeEventListener("pointerenter", enter);
       target.removeEventListener("pointerleave", leave);
       target.removeEventListener("focusin", onFocus);
-      target.removeEventListener("focusout", leave);
+      target.removeEventListener("focusout", closeNow);
       target.removeEventListener("click", onTap);
       document.removeEventListener("pointerdown", onTapOutside, true);
+      document.removeEventListener("pointerleave", leaveWindow);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("pointermove", track);
+      clearGrace();
       shelf.release();
     };
   }, [spill, hit, href, id]);
@@ -677,6 +775,12 @@ function Journal({ journal, index }: Props) {
           key={i}
           className={`jr-spill-item ${
             item.src ? "jr-spill-item--shot" : "jr-spill-item--note"
+          }${
+            // The one card in the layer that takes the pointer, so the CSS can
+            // hand it back its clicks while everything else stays transparent.
+            !item.src && item.note && NOTE_LINK.test(item.note)
+              ? " jr-spill-item--linked"
+              : ""
           }`}
           data-sheet={item.sheet ?? 1}
         >
@@ -695,7 +799,9 @@ function Journal({ journal, index }: Props) {
               fetchPriority="low"
             />
           ) : (
-            <span className="jr-spill-note">{item.note}</span>
+            <span className="jr-spill-note">
+              {renderNote(item.note ?? "")}
+            </span>
           )}
         </div>
       ))}
