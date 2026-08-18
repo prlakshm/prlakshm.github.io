@@ -8,7 +8,7 @@
 
 Create a movie-poster image for each portfolio case-study card. The posters should feel like three different film genres united by one tactile, hand-drawn editorial system. The visual reference is a simple Japanese newspaper advertisement: broad areas of flat color, one cinematic landscape, one central hero object, imperfect print texture, and confident typography.
 
-The generated assets contain illustration only. Titles and metadata remain live HTML so they are crisp, correctly spelled, editable, responsive, and accessible.
+Mixr and Pinnables remain illustration-only assets with titles and metadata in live HTML. The revised Surprise Rail poster is the approved exception: its three cinematic display lines are embedded in the raster artwork, while the card's functional metadata remains live HTML.
 
 ## Shared Visual System
 
@@ -19,7 +19,7 @@ The generated assets contain illustration only. Titles and metadata remain live 
 - Hand-drawn gouache and colored-pencil character translated through vintage screenprint or risograph texture.
 - Flat, slightly uneven ink coverage, subtle newsprint grain, simplified perspective, and minor registration imperfections.
 - Cinematic and authored, not photorealistic, glossy, 3D-rendered, anime, vector-clean, or generically retro.
-- No generated words, letters, numbers, logos, captions, credits, watermarks, borders, QR codes, or fake interface text.
+- No generated words, letters, numbers, logos, captions, credits, watermarks, borders, QR codes, or fake interface text, except for the approved embedded poster typography documented for Surprise Rail below.
 - Each poster uses only its project-specific palette. Notebook leather, tan paper, sepia, brown, and brass are excluded.
 
 ## Live Typography
@@ -69,6 +69,16 @@ Mystery road movie. The viewer feels curiosity before learning what is being wit
   - `#9AA6BD` at 100%
 
 Black should occupy about 70% of the illustration. The spectral gradient has one visible source and direction; it is not an ambient rainbow wash.
+
+### Embedded Poster Typography
+
+The revised Surprise Rail artwork includes three exact lines of cinematic poster copy as part of the raster image:
+
+- Small, widely tracked top kicker: `A CASE STUDY IN AI-ENHANCED DISCOVERY`
+- Oversized condensed title beneath the kicker: `SURPRISE RAIL`
+- Widely tracked closing line near the bottom: `FOLLOW THE UNEXPECTED.`
+
+Set all three lines in uppercase pearl type with subtle tactile print wear. The title carries the primary typographic weight; the kicker and closing line remain quiet. Do not add fake credits, studio names, dates, ratings, logos, or any other copy. Preserve the illustration's gateway, road, horizon rail, palette, texture, and central perspective. The closing line must remain above the opaque live-typography footer's coverage area.
 
 ## Poster 02 — Mixr
 
@@ -133,7 +143,7 @@ Each final prompt must be self-contained and specify:
 4. The exact palette and relative color dominance.
 5. The hand-drawn gouache, colored-pencil, newsprint, and screenprint material qualities.
 6. The simplicity constraint and explicit exclusions.
-7. The instruction to generate illustration only with no typography.
+7. The typography rule: illustration only for Mixr and Pinnables; the three exact approved embedded lines for Surprise Rail.
 
 The prompts may reference the supplied newspaper-poster image for composition, restraint, paper grain, and print character. They must not reproduce its vehicle, Toyota branding, Japanese copy, exact landscape, or layout details.
 
@@ -147,5 +157,5 @@ The prompts may reference the supplied newspaper-poster image for composition, r
 - Mixr reads as a beginner’s path into remixing and uses the exact approved eight-color set.
 - Pinnables reads as a pin-to-browser-to-agent handoff rather than a generic annotation tool.
 - No notebook-derived colors appear.
-- No generated text appears anywhere in the illustration.
+- No generated text appears anywhere in Mixr or Pinnables. Surprise Rail contains only its three approved embedded poster lines, spelled exactly as documented.
 - The live footer remains legible against all three poster images.
