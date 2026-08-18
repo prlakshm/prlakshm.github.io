@@ -50,10 +50,11 @@ Mystery road movie. The viewer feels curiosity before learning what is being wit
 ### Composition
 
 - A near-black road begins wide at the bottom and converges toward the center.
-- A single anonymous pearl cinema screen or concealed poster stands at the vanishing point.
+- A single oversized pearl-and-black film-strip gateway stands at the vanishing point. Its frosted center reads as concealed key art, while sparse sprocket perforations make the Surprise Rail mechanic recognizable without becoming a literal interface.
 - A sparse spectral mountain range crosses the middle distance.
-- One narrow slit of iridescent gate light glows from the concealed screen.
-- No people, vehicles, film reels, popcorn, literal streaming UI, or additional props.
+- Two or three tiny concealed-tile silhouettes form a restrained horizon rail; they remain clearly subordinate to the gateway and contain no legible words.
+- One narrow slit of iridescent reveal light escapes from the gateway and travels down the road.
+- Preserve the original poster's simplicity: one road, one gateway, one minimal horizon rail. No people, vehicles, loose film reels, popcorn, literal streaming UI, readable clue labels, recognizable actors, or extra props.
 
 ### Palette
 
@@ -142,6 +143,7 @@ The prompts may reference the supplied newspaper-poster image for composition, r
 - Each poster remains recognizable at case-study-card size.
 - Each image has one focal object and no competing cluster of symbols.
 - Surprise Rail reads as concealment and curiosity.
+- Surprise Rail is identifiable through its frosted film-strip gateway, concealed horizon tiles, and directional reveal light without resembling an interface screenshot.
 - Mixr reads as a beginner’s path into remixing and uses the exact approved eight-color set.
 - Pinnables reads as a pin-to-browser-to-agent handoff rather than a generic annotation tool.
 - No notebook-derived colors appear.
