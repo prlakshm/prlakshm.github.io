@@ -28,3 +28,6 @@ vite.config.ts
 
 #private
 /private
+
+# local visual brainstorming companion
+/.superpowers/
