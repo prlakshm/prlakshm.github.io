@@ -255,7 +255,7 @@ export const journals: Journal[] = [
     href: "https://github.com/prlakshm/pinnables",
     cta: "VIEW REPO",
     descriptor: "DEVTOOL · AI CODING AGENTS",
-    annotation: "Sending annotations in browser to coding agents.",
+    annotation: "Sending browser annotations to coding agents.",
     /* WebP rather than PNG like its neighbours: these frames arrive at twice
        their resolution, and WebP keeps all of it for a third of the weight
        (239KB against the ~590KB the smaller PNGs cost).
