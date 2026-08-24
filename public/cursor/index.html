@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cursor Loves Indie</title>
+    <style>
+      @font-face {
+        font-family: "Cursor Gothic";
+        src: url("./assets/fonts/CursorGothic-Regular.woff2") format("woff2");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      :root {
+        color-scheme: dark;
+        --ground: #000;
+        --ink: #fff;
+        --muted: #737373;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        background: var(--ground);
+        scroll-behavior: smooth;
+        scroll-snap-type: y mandatory;
+      }
+
+      body {
+        background: var(--ground);
+        color: var(--ink);
+        font-family: "Cursor Gothic", "Helvetica Neue", Arial, sans-serif;
+        margin: 0;
+      }
+
+      .slide {
+        align-items: center;
+        background: var(--ground);
+        display: flex;
+        justify-content: center;
+        min-height: 100svh;
+        overflow: hidden;
+        padding: clamp(24px, 4vw, 64px);
+        position: relative;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+      }
+
+      .animation-slide,
+      .image-slide {
+        padding: 0;
+      }
+
+      .animation-frame {
+        border: 0;
+        height: 100%;
+        inset: 0;
+        position: absolute;
+        width: 100%;
+      }
+
+      .brand-image {
+        display: block;
+        filter: grayscale(1);
+        height: 100svh;
+        object-fit: cover;
+        width: 100%;
+      }
+
+      .image-slide[data-slide="02"] .brand-image {
+        object-position: 50% 50%;
+      }
+
+      .image-slide[data-slide="05"] .brand-image {
+        object-position: 50% 48%;
+      }
+
+      .image-slide[data-slide="08"] .brand-image {
+        object-position: 50% 46%;
+      }
+
+      .center-copy {
+        font-size: clamp(24px, 2.6vw, 42px);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+        margin: 0;
+        max-width: 32em;
+        text-align: center;
+        text-wrap: balance;
+        width: min(86vw, 32em);
+      }
+
+      .folio {
+        bottom: clamp(14px, 2vw, 28px);
+        color: var(--muted);
+        font-size: 12px;
+        left: clamp(18px, 3vw, 48px);
+        letter-spacing: 0.01em;
+        position: absolute;
+      }
+
+      .concept-credit {
+        bottom: clamp(14px, 2vw, 28px);
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        pointer-events: none;
+        position: absolute;
+        right: clamp(18px, 3vw, 48px);
+        text-transform: uppercase;
+        z-index: 1;
+      }
+
+      .contact-credit {
+        pointer-events: auto;
+      }
+
+      .contact-credit a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .contact-credit a:focus-visible {
+        outline: 1.5px solid var(--ink);
+        outline-offset: 3px;
+      }
+
+      .animation-frame:focus-visible {
+        outline: 2px solid var(--muted);
+        outline-offset: -2px;
+      }
+
+      .image-slide .folio {
+        background: rgba(0, 0, 0, 0.58);
+        color: rgba(255, 255, 255, 0.66);
+        padding: 4px 6px;
+      }
+
+      @media (max-width: 720px) {
+        .center-copy {
+          letter-spacing: -0.0125em;
+          line-height: 1.25;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section
+        class="slide animation-slide"
+        data-slide="01"
+        aria-label="Cursor loves indie hero"
+      >
+        <iframe
+          class="animation-frame"
+          src="./wordmark.html"
+          title="Interactive cursor loves indie wordmark"
+          loading="eager"
+        ></iframe>
+        <span class="concept-credit">Independent concept by Pranavi Ram</span>
+      </section>
+
+      <section
+        class="slide image-slide"
+        data-slide="02"
+        aria-label="An independent creative technology studio"
+      >
+        <img
+          class="brand-image"
+          src="./assets/brand/slide-02-office-final-v2.png"
+          alt="A motion-softened black-and-white creative studio filled with desks, plants, keyboards, laptops, and anonymous creators."
+          loading="eager"
+        />
+        <span class="folio" aria-hidden="true">02 / 09</span>
+      </section>
+
+      <section class="slide" data-slide="03" aria-label="Campaign thesis">
+        <p class="center-copy">
+          The next generation of artists will make their own creative tools.
+        </p>
+        <span class="folio" aria-hidden="true">03 / 09</span>
+      </section>
+
+      <section
+        class="slide"
+        data-slide="04"
+        aria-label="The opportunity for creative builders"
+      >
+        <p class="center-copy">
+          Artists already learn complex software. Cursor is a new creative
+          environment where artists can build tools around their practice while
+          staying in control. They see underlying files and review every change
+          before it becomes part of the work. Cursor Loves Indie expands who
+          sees themselves as capable of building software.
+        </p>
+        <span class="folio" aria-hidden="true">04 / 09</span>
+      </section>
+
+      <section
+        class="slide image-slide"
+        data-slide="05"
+        aria-label="Independent creators making together"
+      >
+        <img
+          class="brand-image"
+          src="./assets/brand/slide-05-community-final-v2.png"
+          alt="An anonymous group of creators working together around a table with a laptop, papers, textiles, and electronic materials."
+          loading="lazy"
+        />
+        <span class="folio" aria-hidden="true">05 / 09</span>
+      </section>
+
+      <section
+        class="slide"
+        data-slide="06"
+        aria-label="Why the campaign belongs to Cursor"
+      >
+        <p class="center-copy">
+          Cursor comes from indie origins. They carry the instinct to learn
+          quickly, make their own tools, and stay close to the work.
+        </p>
+        <span class="folio" aria-hidden="true">06 / 09</span>
+      </section>
+
+      <section
+        class="slide"
+        data-slide="07"
+        aria-label="Campaign partnerships and community system"
+      >
+        <p class="center-copy">
+          That same instinct becomes a campaign. Cursor partners with artists
+          across visual art, film, fashion, and music to build tools around
+          their practice. Cursor Cafés give artists a place to meet and find
+          collaborators. Reels and short-form content follow the process.
+          Artists begin with: “I wish I had a tool that…”  They show what
+          they made with Cursor and nominate the next discipline to respond.
+          Cursor Loves Indie becomes Indie Loves Cursor when the community
+          answers back.
+        </p>
+        <span class="folio" aria-hidden="true">07 / 09</span>
+      </section>
+
+      <section
+        class="slide image-slide"
+        data-slide="08"
+        aria-label="Creators sharing a spontaneous moment"
+      >
+        <img
+          class="brand-image"
+              src="./assets/brand/slide-08-closing-final-v6.png"
+          alt="Three anonymous creators sharing a candid, softly blurred laugh in neutral black and white."
+          loading="lazy"
+        />
+        <span class="folio" aria-hidden="true">08 / 09</span>
+      </section>
+
+      <section
+        class="slide animation-slide"
+        data-slide="09"
+        aria-label="Indie loves Cursor closing wordmark"
+      >
+        <iframe
+          class="animation-frame"
+          src="./orbit.html"
+          title="Interactive indie loves Cursor wordmark"
+          loading="lazy"
+        ></iframe>
+        <span class="concept-credit contact-credit">
+          <a href="mailto:pranaviram2@gmail.com">pranaviram2@gmail.com</a>
+        </span>
+      </section>
+    </main>
+
+    <script>
+      const slides = [...document.querySelectorAll(".slide")];
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      );
+
+      const currentIndex = () => {
+        const viewportCenter = window.scrollY + window.innerHeight / 2;
+        return slides.reduce((best, slide, index) => {
+          const currentDistance = Math.abs(
+            slide.offsetTop + slide.offsetHeight / 2 - viewportCenter,
+          );
+          const bestSlide = slides[best];
+          const bestDistance = Math.abs(
+            bestSlide.offsetTop + bestSlide.offsetHeight / 2 - viewportCenter,
+          );
+          return currentDistance < bestDistance ? index : best;
+        }, 0);
+      };
+
+      const goTo = (index) => {
+        slides[index].scrollIntoView({
+          behavior: reducedMotion.matches ? "auto" : "smooth",
+          block: "start",
+        });
+      };
+
+      const handleKeydown = (event) => {
+        if (
+          event.defaultPrevented ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.altKey
+        )
+          return;
+
+        // Leave keys alone while a link or control has focus (Space and Enter
+        // must activate it, not change slides). `closest` is duck-typed
+        // because events also arrive from the wordmark iframes' realms.
+        const target = event.target;
+        if (
+          target &&
+          typeof target.closest === "function" &&
+          target.closest("a, button, input, textarea, select, [contenteditable]")
+        )
+          return;
+
+        const index = currentIndex();
+        const { key } = event;
+        if (
+          ["ArrowDown", "ArrowRight", "PageDown"].includes(key) ||
+          (key === " " && !event.shiftKey)
+        ) {
+          event.preventDefault();
+          goTo(Math.min(index + 1, slides.length - 1));
+        } else if (
+          ["ArrowUp", "ArrowLeft", "PageUp"].includes(key) ||
+          (key === " " && event.shiftKey)
+        ) {
+          event.preventDefault();
+          goTo(Math.max(index - 1, 0));
+        } else if (key === "Home") {
+          event.preventDefault();
+          goTo(0);
+        } else if (key === "End") {
+          event.preventDefault();
+          goTo(slides.length - 1);
+        } else if (/^[1-9]$/.test(key)) {
+          event.preventDefault();
+          goTo(Math.min(Number(key) - 1, slides.length - 1));
+        }
+      };
+
+      window.addEventListener("keydown", handleKeydown);
+
+      // The wordmark iframes are same-origin; wire the same shortcuts inside
+      // them so navigation keeps working when a wordmark holds focus.
+      for (const frame of document.querySelectorAll("iframe.animation-frame")) {
+        const wire = () => {
+          try {
+            frame.contentWindow.addEventListener("keydown", handleKeydown);
+          } catch {
+            /* not ready yet — the load listener will retry */
+          }
+        };
+        frame.addEventListener("load", wire);
+        wire();
+      }
+    </script>
+  </body>
+</html>
