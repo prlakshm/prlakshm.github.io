@@ -83,13 +83,14 @@ test("uses the approved Cursor Loves Indie campaign copy", async () => {
   );
   assert.match(
     copy,
-    /That same instinct becomes a campaign\. Cursor partners with artists across visual art, film, fashion, and music\. Cursor Cafés and workshops give them a place to meet and find collaborators\. Reels and short-form content follow the process\. Artists begin with: ‘I wish I had a tool that…’ They show what they made with Cursor and nominate the next discipline to respond\. Cursor Loves Indie becomes Indie Loves Cursor when the community answers back\./,
+    /That same instinct becomes a campaign\. Cursor partners with artists across visual art, film, fashion, and music\. Cursor Cafés give them a place to meet and find collaborators\. Reels and short-form content follow the process\. Artists begin with: ‘I wish I had a tool that…’ They show what they made with Cursor and nominate the next discipline to respond\. Cursor Loves Indie becomes Indie Loves Cursor when the community answers back\./,
   );
 
   assert.doesNotMatch(copy, /part of the work/);
   assert.doesNotMatch(copy, /They carry the instinct/);
   assert.doesNotMatch(copy, /Cursor comes from indie origins, carrying/);
   assert.doesNotMatch(copy, /hands-on workshops/);
+  assert.doesNotMatch(copy, /Cursor Cafés and workshops/);
   assert.doesNotMatch(copy, /music to build tools around their practice/);
 });
 
