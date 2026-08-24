@@ -69,6 +69,28 @@ test("keeps the Cursor deck and PDF unlisted from the portfolio shell", async ()
   }
 });
 
+test("uses the approved Cursor Loves Indie campaign copy", async () => {
+  const html = await readFile(resolve(deckDir, "index.html"), "utf8");
+  const copy = html.replace(/\s+/g, " ");
+
+  assert.match(
+    copy,
+    /They see underlying files and review every change before it becomes part of their work\./,
+  );
+  assert.match(
+    copy,
+    /Cursor comes from indie origins, carrying the instinct to learn quickly, make its own tools, and stay close to the work\./,
+  );
+  assert.match(
+    copy,
+    /That same instinct becomes a campaign\. Cursor partners with artists across visual art, film, fashion, and music\. Reels and short-form content follow the process\. Artists begin with: ‘I wish I had a tool that…’ They show what they made with Cursor and nominate the next discipline to respond\. Cursor Cafés and hands-on workshops give them a place to meet and find collaborators\. Cursor Loves Indie becomes Indie Loves Cursor when the community answers back\./,
+  );
+
+  assert.doesNotMatch(copy, /part of the work/);
+  assert.doesNotMatch(copy, /They carry the instinct/);
+  assert.doesNotMatch(copy, /music to build tools around their practice/);
+});
+
 test("publishes the deck PDF as nine consistent 16:9 landscape pages", async () => {
   const pdf = await readFile(resolve(repoRoot, "public/cursor-loves-indie.pdf"));
   const source = pdf.toString("latin1");
