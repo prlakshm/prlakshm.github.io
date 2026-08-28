@@ -401,7 +401,7 @@
       <div class="nav-item selected selected-gray"><span class="name">Sound</span></div>
       <div class="sec-label" style="margin-top:8px"><span class="name">Groups</span></div>
       <div class="nav-item selected"><span class="name">All</span></div>
-      <div class="nav-item indent"><span class="name">Feedback</span></div>
+      <div class="nav-item indent"><span class="name">Interactions</span></div>
     </aside>
 
     <section class="main">
@@ -440,10 +440,10 @@ const PLAY_SVG = '<svg class="i-play" width="16" height="16" viewBox="0 0 16 16"
 const SLIDER = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 5h10M3 8h10M3 11h10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="6.2" cy="5" r="1.35" fill="#2c2c2c" stroke="currentColor" stroke-width="1.15"/><circle cx="10.2" cy="8" r="1.35" fill="#2c2c2c" stroke="currentColor" stroke-width="1.15"/><circle cx="7.5" cy="11" r="1.35" fill="#2c2c2c" stroke="currentColor" stroke-width="1.15"/></svg>';
 
 const VARS = [
-  { name: 'tap.primary', file: 'tap-primary.wav', tap: true },
-  { name: 'feedback.success', file: 'success-soft.wav' },
-  { name: 'feedback.error', file: 'error-hollow.wav' },
-  { name: 'notification.high', file: 'notify-high.wav' }
+  { name: 'tap.primary', file: 'tap.wav', tap: true },
+  { name: 'feedback.success', file: 'success.wav' },
+  { name: 'navigation.scroll', file: 'scroll.wav' },
+  { name: 'notification.high', file: 'notify.wav' }
 ];
 
 document.getElementById('rows').innerHTML = VARS.map((v, i) =>
@@ -526,9 +526,9 @@ function createSoundEngine() {
     voices.splice(0).forEach((n) => { try { n.stop(t); } catch (e) {} });
   }
 
-  function tick(t0) {
+  function tick(t0, pitch) {
     noise(t0, 0.001, 0.02, 0.3, [2800, 7200], 1.6);
-    sine(3400 + Math.random() * 500, t0, 0.001, 0.016, 0.035, 'sine');
+    sine(pitch || 3400 + Math.random() * 500, t0, 0.001, 0.016, 0.035, 'sine');
   }
 
   function thock(t0) {
@@ -552,16 +552,19 @@ function createSoundEngine() {
       ensure();
       const t = ctx.currentTime;
       thock(t);
-      for (let i = 0; i < 4; i++) tick(t + 0.04 + i * 0.016);
+      // fixed rising spread — the exact rendition used by the deck's sound-on chime
+      for (let i = 0; i < 4; i++) tick(t + 0.04 + i * 0.016, 3400 + i * 137);
       typewriterBell(t + 0.09);
     },
-    error() {
+    scroll() {
+      // scroll.wav's construction: two soft sine taps, 505Hz then 758Hz at
+      // +44ms, each with a whisper of grain at the onset
       ensure();
       const t = ctx.currentTime;
-      sine(118, t, 0.003, 0.22, 0.22, 'sine');
-      sine(118 * 2.15, t, 0.003, 0.08, 0.04, 'sine');
-      noise(t, 0.004, 0.12, 0.14, [180, 700], 0.7);
-      sine(86, t + 0.11, 0.004, 0.18, 0.1, 'triangle');
+      sine(505, t, 0.002, 0.1, 0.3, 'sine');
+      noise(t, 0.001, 0.02, 0.07, [400, 1200], 1);
+      sine(758, t + 0.044, 0.002, 0.08, 0.17, 'sine');
+      noise(t + 0.044, 0.001, 0.015, 0.04, [500, 1500], 1);
     },
     notify() {
       ensure();
@@ -575,11 +578,11 @@ function createSoundEngine() {
   const map = {
     'tap.primary': 'tap',
     'feedback.success': 'success',
-    'feedback.error': 'error',
+    'navigation.scroll': 'scroll',
     'notification.high': 'notify'
   };
 
-  const durs = { tap: 0.06, success: 0.72, error: 0.32, notify: 0.55 };
+  const durs = { tap: 0.06, success: 0.72, scroll: 0.16, notify: 0.55 };
 
   return {
     play(id) {
@@ -640,8 +643,13 @@ document.addEventListener('click', (e) => {
       (innerWidth - pad) / app.offsetWidth,
       (innerHeight - pad) / app.offsetHeight,
     );
-    scale = Math.min(scale, 1.02);
-    app.style.transform = `scale(${scale})`;
+    scale = Math.min(scale, 1.0);
+    // centered absolutely: grid centering leaves an oversized app parked in
+    // its own overflowing track on narrow (mobile) viewports
+    app.style.position = "absolute";
+    app.style.left = "50%";
+    app.style.top = "50%";
+    app.style.transform = `translate(-50%, -50%) scale(${scale})`;
     app.style.transformOrigin = "50% 50%";
   };
   addEventListener("resize", fit, { passive: true });
@@ -663,6 +671,24 @@ document.addEventListener('click', (e) => {
     cursor.style.left = x + "px";
     cursor.style.top = y + "px";
   };
+
+  /* ?still — print/PDF pose: cursor on navigation.scroll's play button with
+     the token playing. No animation, no messages. */
+  if (new URLSearchParams(location.search).has("still")) {
+    const btn = document.querySelector('.play[data-id="navigation.scroll"]');
+    if (btn) {
+      const pose = () => {
+        const rr = btn.getBoundingClientRect();
+        const aa = app.getBoundingClientRect();
+        setCursor((rr.left + rr.width / 2 - aa.left) / scale, (rr.top + rr.height / 2 - aa.top) / scale);
+      };
+      pose();
+      addEventListener("resize", pose, { passive: true });
+      cursor.style.opacity = "1";
+      setPlaying("navigation.scroll");
+    }
+    return;
+  }
   const wait = (ms, myEpoch) => new Promise((resolve) => {
     const t0 = performance.now();
     const step = () => {

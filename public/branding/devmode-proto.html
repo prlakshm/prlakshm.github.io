@@ -76,9 +76,21 @@
     font-size: 13px; font-weight: 600; line-height: 20px;
   }
   .file-name .label {
-    flex: 1; min-width: 0;
+    flex: 0 1 auto; min-width: 0; max-width: 104px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
+  .dev-badge {
+    flex: none;
+    background: var(--green);
+    color: #fff;
+    font-size: 13px; font-weight: 600;
+    line-height: 1;
+    letter-spacing: .01em;
+    padding: 4px 7px;
+    border-radius: 5px;
+    margin-left: 2px;
+  }
+  .file-name .icon-btn:first-of-type { margin-left: auto; }
   .icon-btn {
     width: 24px; height: 24px; flex: none;
     display: grid; place-items: center;
@@ -444,7 +456,8 @@
     <aside class="files">
       <div class="file-head">
         <div class="file-name">
-          <span class="label">Material 3 Design Kit (…</span>
+          <span class="label">Material 3 Design Kit (Community)</span>
+          <span class="dev-badge">Dev Mode</span>
           <span class="icon-btn"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 4l3 3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           <span class="icon-btn"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.5" y="3.5" width="11" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M6.5 3.5v9" stroke="currentColor" stroke-width="1.2"/></svg></span>
         </div>
@@ -809,7 +822,9 @@
 
     const load = async () => {
       if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
-      if (ctx.state === "suspended") await ctx.resume();
+      // never await resume: without user activation it can hang forever, and
+      // the deck's gate resumes the context as soon as sound is unlocked
+      if (ctx.state === "suspended") ctx.resume().catch(() => {});
       if (!clip) clip = await ctx.decodeAudioData(await (await fetch(audio.src)).arrayBuffer());
       return clip;
     };
@@ -825,11 +840,11 @@
 
     playBtn.addEventListener("click", async (event) => {
       event.stopPropagation();
-      if (voice) {
-        stop();
-        return;
-      }
+      // a click always restarts; the pause state exists only while the sound
+      // is actually running, then the button returns to play
+      if (voice) stop();
       try {
+        if (window.__kickAudio) window.__kickAudio();
         const buffer = await load();
         voice = ctx.createBufferSource();
         voice.buffer = buffer;
@@ -840,8 +855,15 @@
         voice.onended = () => { voice = null; setPlaying(false); };
         voice.start();
         setPlaying(true);
+        if (ctx.state !== "running") {
+          // muted context: the clock is frozen and onended never fires, so
+          // clear the state after the clip's own duration instead
+          const v = voice;
+          setTimeout(() => { if (voice === v) { try { v.stop(); } catch {} voice = null; setPlaying(false); } }, buffer.duration * 1000 + 80);
+        }
       } catch {
-        stop();
+        voice = null;
+        setPlaying(false);
       }
     });
   </script>
@@ -870,8 +892,13 @@
   let fitScale = 1;
   const fit = () => {
     const pad = 40;
-    fitScale = Math.min((innerWidth - pad) / W, (innerHeight - pad) / H, 0.92);
-    clip.style.transform = `scale(${fitScale})`;
+    fitScale = Math.min((innerWidth - pad) / W, (innerHeight - pad) / H, 0.82);
+    // centered absolutely: grid centering leaves an oversized clip parked in
+    // its own overflowing track on narrow (mobile) viewports
+    clip.style.position = "absolute";
+    clip.style.left = "50%";
+    clip.style.top = "50%";
+    clip.style.transform = `translate(-50%, -50%) scale(${fitScale})`;
     clip.style.transformOrigin = "50% 50%";
   };
   addEventListener("resize", fit, { passive: true });
@@ -890,7 +917,8 @@
   const clipPoint = (el, fx = 0.5, fy = 0.5) => {
     const r = el.getBoundingClientRect();
     const c = clip.getBoundingClientRect();
-    return { x: (r.left + r.width * fx - c.left) / fitScale, y: (r.top + r.height * fy - c.top) / fitScale };
+    const cs = c.width / W;
+    return { x: (r.left + r.width * fx - c.left) / cs, y: (r.top + r.height * fy - c.top) / cs };
   };
 
   const setCursor = (x, y) => { cursor.style.left = x + "px"; cursor.style.top = y + "px"; };
@@ -922,7 +950,7 @@
       const k = easeInOut(t);
       const p = down ? k : 1 - k;
       scroller.scrollTop = max * p;
-      zoom = 1 + (ZMAX - 1) * p;
+      zoom = Math.pow(ZMAX, p);
       applyZoom();
       if (t < 1) requestAnimationFrame(step); else res(true);
     };
@@ -934,6 +962,28 @@
     for (const pane of document.querySelectorAll(".sound-view")) pane.hidden = pane.dataset.view !== view;
   };
 
+  /* ?still — print/PDF pose: zoomed onto the Sound section in List view,
+     cursor on the play control. No animation, no messages. */
+  if (new URLSearchParams(location.search).has("still")) {
+    setView("list");
+    const max = scroller.scrollHeight - scroller.clientHeight;
+    scroller.scrollTop = max;
+    const sr = soundSection.getBoundingClientRect();
+    const ar = app.getBoundingClientRect();
+    originY = (sr.top - ar.top) / fitScale + sr.height / fitScale * 1.1;
+    originX = W;
+    zoom = ZMAX;
+    applyZoom();
+    const pose = () => {
+      const p = clipPoint(document.getElementById("playBtn"));
+      setCursor(p.x, p.y);
+    };
+    pose();
+    addEventListener("resize", pose, { passive: true });
+    cursor.style.opacity = "1";
+    return;
+  }
+
   const run = async () => {
     const myEpoch = ++epoch;
     while (epoch === myEpoch && running) {
@@ -941,6 +991,7 @@
       scroller.scrollTop = 0;
       setView("code");
       zoom = 1; applyZoom();
+      clip.style.transform = `scale(${fitScale})`;
       cursor.style.opacity = "0";
 
       // fix the zoom origin on where the Sound section will sit at full scroll
@@ -999,7 +1050,7 @@
       running = data.run;
       epoch += 1;
       if (running) run();
-      else { cursor.style.opacity = "0"; zoom = 1; applyZoom(); }
+      else { cursor.style.opacity = "0"; zoom = 1; applyZoom(); clip.style.transform = `scale(${fitScale})`; }
     }
   });
 })();
