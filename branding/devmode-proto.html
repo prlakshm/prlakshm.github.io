@@ -991,7 +991,7 @@
       scroller.scrollTop = 0;
       setView("code");
       zoom = 1; applyZoom();
-      clip.style.transform = `scale(${fitScale})`;
+      clip.style.transform = `translate(-50%, -50%) scale(${fitScale})`;
       cursor.style.opacity = "0";
 
       // fix the zoom origin on where the Sound section will sit at full scroll
@@ -1050,7 +1050,7 @@
       running = data.run;
       epoch += 1;
       if (running) run();
-      else { cursor.style.opacity = "0"; zoom = 1; applyZoom(); clip.style.transform = `scale(${fitScale})`; }
+      else { cursor.style.opacity = "0"; zoom = 1; applyZoom(); clip.style.transform = `translate(-50%, -50%) scale(${fitScale})`; }
     }
   });
 })();
