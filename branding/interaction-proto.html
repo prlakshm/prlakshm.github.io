@@ -1,0 +1,1039 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Prototype — Interaction sound</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+<style>
+  /* A zoomed-in crop of the Figma canvas, matching the reference recording:
+     Cover's bottom edge across the top, the Body frame peeking in below,
+     no side panels. Brand blue #0d99ff, menu surface #1e1e1e. */
+  :root { --brand: #0d99ff; }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: #052427;
+    color: #1c1c1c;
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 12px;
+    line-height: 17px;
+    letter-spacing: -0.005em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    cursor: default;
+    user-select: none;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: default; }
+  svg { display: block; flex: none; }
+
+  /* the crop itself */
+  .app {
+    position: relative;
+    width: 1200px;
+    height: 824px;
+    overflow: hidden;
+    background: #efefef;
+    border-radius: 10px;
+    will-change: transform;
+  }
+  #zoomClip {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.3), 0 24px 64px rgba(0,0,0,.55);
+    flex: none;
+  }
+  #protoCursor {
+    position: absolute;
+    z-index: 90;
+    width: 26px;
+    pointer-events: none;
+    opacity: 0;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,.45));
+    transition: opacity 450ms ease;
+  }
+
+  /* — Cover frame: only its bottom band is in view — */
+  .cover {
+    position: absolute;
+    left: -300px; top: -380px;
+    width: 1322px; height: 768px;
+    background: linear-gradient(90deg, #d793f7 0 64.5%, #a06af5 64.5% 100%);
+    overflow: hidden;
+  }
+  .cover-title {
+    position: absolute;
+    left: 288px; top: 372px;
+    font-size: 106px; line-height: 1.06;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    color: #221034;
+  }
+  .cover svg.deco { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* pale neighbour area + canvas scrollbar on the right, as in the recording */
+  .neighbour {
+    position: absolute;
+    left: 1060px; top: 0;
+    width: 140px; height: 824px;
+    background: #d8cbee;
+  }
+  .cnv-scrollbar {
+    position: absolute;
+    left: 1188px; top: 16px;
+    width: 6px; height: 452px;
+    border-radius: 3px;
+    background: #a9a9b4;
+    opacity: .8;
+  }
+
+  /* — Body frame: the ENTIRE bottom frame, edge to edge. Its fill matches the
+     canvas (as in the recording) — the frame reads only through its contents,
+     until the drag highlights its full outline. — */
+  .bodyframe {
+    position: absolute;
+    left: -300px; top: 452px;
+    width: 1353px; height: 900px;
+    background: transparent;
+    overflow: hidden;
+  }
+  .sitecard {
+    position: absolute;
+    left: 735px; top: 42px;
+    width: 575px; height: 420px;
+    background: #dcd5e4;
+    border-radius: 12px;
+    padding: 24px 20px 0;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(40, 20, 60, .18);
+  }
+  .site {
+    background: #fdfbfe;
+    border-radius: 8px 8px 0 0;
+    height: 100%;
+    display: flex;
+    overflow: hidden;
+  }
+  .site-rail {
+    width: 46px; flex: none;
+    padding: 12px 0 0;
+    display: flex; flex-direction: column; align-items: center; gap: 13px;
+    background: #f7f2fa;
+  }
+  .site-rail i {
+    width: 17px; height: 17px; border-radius: 6px;
+    background: #cfc3da;
+  }
+  .site-rail i:first-child { background: #e8def8; border-radius: 50%; }
+  .site-main { flex: 1; min-width: 0; padding: 16px 18px 0; }
+  .hero { display: flex; gap: 16px; }
+  .hero-copy { flex: 1; min-width: 0; padding-top: 10px; }
+  .hero-copy h2 {
+    margin: 0 0 7px;
+    font-size: 26px; line-height: 30px;
+    font-weight: 600; letter-spacing: -0.015em;
+    color: #1d1b20;
+  }
+  .hero-copy p {
+    margin: 0 0 12px;
+    font-size: 9.5px; line-height: 13px;
+    color: #79747e;
+  }
+  .pill {
+    display: inline-block;
+    background: #4a49b6; color: #fff;
+    font-size: 10px; font-weight: 600; line-height: 1;
+    padding: 8px 15px; border-radius: 999px;
+  }
+  .hero-art { width: 240px; height: 142px; flex: none; border-radius: 5px; overflow: hidden; }
+  .hero-art svg { width: 100%; height: 100%; }
+  .news-head { font-size: 15px; font-weight: 600; color: #1d1b20; margin: 20px 0 10px; }
+  .cards { display: flex; gap: 12px; }
+  .card { width: 118px; height: 70px; border-radius: 5px; overflow: hidden; flex: none; }
+  .card svg { width: 100%; height: 100%; }
+
+  .canvas-note {
+    position: absolute;
+    left: 238px; top: 76px;
+    width: 372px;
+    font-size: 12.5px; line-height: 19px;
+    color: #3c3c3c;
+  }
+  .canvas-note p { margin: 0 0 14px; }
+
+  /* — selection, noodle, badge — */
+  .sel-ring {
+    position: absolute;
+    left: -301px; top: -381px;
+    width: 1323px; height: 769px;
+    border: 1.5px solid var(--brand);
+    pointer-events: none;
+  }
+  .sel-ring.dashed { border-style: dashed; border-width: 1px; }
+  .sel-ring i {
+    position: absolute;
+    width: 8px; height: 8px;
+    background: #fff;
+    border: 1.5px solid var(--brand);
+  }
+  .sel-ring i.tl { left: -5px; top: -5px; }
+  .sel-ring i.tr { right: -5px; top: -5px; }
+  .sel-ring i.bl { left: -5px; bottom: -5px; }
+  .sel-ring i.br { right: -5px; bottom: -5px; }
+  .sel-ring.dashed i { display: none; }
+  /* drop-target highlight: the full Body frame outline, its top-right handle
+     and the </> mark floating above the corner */
+  .hi-ring {
+    position: absolute;
+    left: -302px; top: 450px;
+    width: 1357px; height: 380px;
+    border: 1.5px solid var(--brand);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 120ms ease;
+  }
+  .hi-ring i.h {
+    position: absolute;
+    right: -5px; top: -5px;
+    width: 8px; height: 8px;
+    background: #fff;
+    border: 1.5px solid var(--brand);
+  }
+  .hi-ring .code-mark {
+    position: absolute;
+    right: 6px; top: -26px;
+    color: var(--brand);
+  }
+  #linkLayer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+  /* the connection dot stays hidden until the cursor comes close,
+     like the real prototype-mode edge node */
+  #protoNode {
+    position: absolute;
+    left: 460px; top: 388px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2.5px solid var(--brand);
+    transform: translate(-50%, -50%);
+    z-index: 6;
+    opacity: 0;
+    transition: opacity 130ms ease;
+  }
+
+  /* ————————————————— dark Interaction panel (UI3, dark only) ————————————————— */
+  .ipanel {
+    position: absolute;
+    width: 365px;
+    background: #2c2c2c;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 14px;
+    box-shadow: 0 0 .5px rgba(0,0,0,.2), 0 12px 22px rgba(0,0,0,.3), 0 2px 6px rgba(0,0,0,.3);
+    z-index: 10;
+    font-size: 13.2px;
+    line-height: 19px;
+    opacity: 0;
+    transform: scale(.96);
+    transform-origin: 25% 0%;
+    visibility: hidden;
+    transition: opacity 140ms ease, transform 140ms ease;
+  }
+  .ipanel.show { opacity: 1; transform: none; visibility: visible; }
+  .ipanel .hd {
+    display: flex; align-items: center;
+    height: 59px; padding: 0 15px 0 24px;
+  }
+  .ipanel .hd .t { font-weight: 600; letter-spacing: .005em; flex: 1; }
+  .ipanel .hd .ib {
+    width: 29px; height: 29px;
+    display: grid; place-items: center;
+    color: #fff; border-radius: 6px;
+  }
+  .isec { border-top: 1px solid #444; padding: 11px 15px 11px 24px; }
+  .irow { display: flex; align-items: center; height: 40px; }
+  .irow .lb { flex: 1; color: #ffffffb2; }
+  .isel {
+    width: 216px; height: 31px;
+    display: flex; align-items: center; gap: 4px;
+    padding: 0 0 0 7px;
+    border: 1px solid #444;
+    border-radius: 7px;
+    color: #fff;
+    text-align: left;
+  }
+  .isel .lead { display: grid; place-items: center; width: 19px; height: 19px; flex: none; }
+  .isel .value {
+    flex: 1;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    padding-left: 5px;
+  }
+  .isel .lead + .value { padding-left: 0; }
+  .isel .chev { display: grid; place-items: center; width: 29px; height: 31px; color: #ffffffb2; flex: none; }
+  .ipanel .ft {
+    border-top: 1px solid #444;
+    display: flex; align-items: center; gap: 6px;
+    height: 59px; padding: 0 24px 0 17px;
+    color: #ffffffb2; font-weight: 600;
+  }
+
+  /* play buttons — same treatment as the variables mock */
+  .play {
+    width: 24px; height: 29px; flex: none;
+    display: grid; place-items: center;
+    color: #ffffffb2;
+    border-radius: 4px;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  .play:hover { color: #fff; }
+  .play.is-playing { color: var(--brand); }
+  .play .i-pause { display: none; }
+  .play.is-playing .i-play { display: none; }
+  .play.is-playing .i-pause { display: block; }
+  .isel .play { display: none; }
+  .isel.has-sound .play { display: grid; }
+
+  /* — sound dropdown: dark surface only — */
+  .menu {
+    position: absolute;
+    z-index: 20;
+    width: 238px;
+    background: #1e1e1e;
+    border: 1px solid #383838;
+    border-radius: 14px;
+    padding: 9px 0;
+    box-shadow: 0 0 .5px rgba(0,0,0,.2), 0 10px 16px rgba(0,0,0,.3), 0 2px 5px rgba(0,0,0,.3);
+    color: #fff;
+    font-size: 12.5px;
+    line-height: 18px;
+    display: none;
+  }
+  .menu.open { display: block; }
+  .menu-item {
+    display: flex; align-items: center;
+    height: 29px;
+    margin: 0 7px;
+    padding: 0 7px 0 9px;
+    border-radius: 6px;
+  }
+  .menu-item .check {
+    width: 19px;
+    display: grid; place-items: center;
+    flex: none;
+    visibility: hidden;
+    margin-right: 7px;
+  }
+  .menu-item.selected .check { visibility: visible; }
+  .menu-item .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .menu-item.hover { background: var(--brand); }
+  .menu-item.hover .play { color: #fff; }
+  .menu-sep { height: 1px; background: #383838; margin: 9px 0; }
+  .menu-import {
+    display: flex; align-items: center; gap: 9px;
+    height: 29px;
+    margin: 0 7px;
+    padding: 0 9px;
+    border-radius: 6px;
+    color: #ffffffb2;
+  }
+  .menu-import.hover { background: var(--brand); color: #fff; }
+</style>
+<script>
+/* Gate all WebAudio output behind the deck's sound toggle, delivered by
+   postMessage; wake suspended contexts eagerly and on any real gesture. */
+(function () {
+  const Real = window.AudioContext || window.webkitAudioContext;
+  if (!Real) return;
+  const desc = Object.getOwnPropertyDescriptor(BaseAudioContext.prototype, "destination");
+  window.__protoSoundOn = false;
+  window.__gates = [];
+  window.__ctxs = [];
+  class Gated extends Real {
+    constructor(...a) { super(...a); window.__ctxs.push(this); if (window.__protoSoundOn) queueMicrotask(() => window.__kickAudio()); }
+    get destination() {
+      if (!this.__gate) {
+        this.__gate = this.createGain();
+        this.__gate.gain.value = window.__protoSoundOn ? 1 : 0;
+        this.__gate.connect(desc.get.call(this));
+        window.__gates.push(this.__gate);
+      }
+      return this.__gate;
+    }
+  }
+  window.AudioContext = Gated;
+  window.webkitAudioContext = Gated;
+  window.__kickAudio = () => { for (const c of window.__ctxs) { if (c.state === "suspended") c.resume().catch(() => {}); } };
+  window.__setProtoSound = (on) => {
+    window.__protoSoundOn = on;
+    for (const g of window.__gates) g.gain.value = on ? 1 : 0;
+    if (on) window.__kickAudio();
+  };
+  addEventListener("pointerdown", () => window.__kickAudio(), true);
+})();
+</script>
+</head>
+<body>
+  <div class="app" id="cnv">
+
+    <!-- Cover frame — bottom band in view, as in the recording -->
+    <div class="cover" role="img" aria-label="Bottom of the Material 3 Design Kit cover frame">
+      <div class="cover-title">Material 3<br />Design Kit</div>
+      <svg class="deco" viewBox="0 0 1322 768" preserveAspectRatio="none" aria-hidden="true">
+        <!-- pointed dark tents along the bottom of the light half -->
+        <path fill="#2f1240" d="M215 768C315 750 355 700 385 603C415 700 455 750 555 768Z"/>
+        <path fill="#2f1240" d="M545 768C645 750 685 700 715 603C745 700 785 750 853 766L853 768Z"/>
+        <path fill="#2f1240" d="M110 768C180 757 235 715 280 618C293 675 300 720 300 768Z"/>
+        <!-- deep-purple crescent just right of the split -->
+        <path fill="#6d21c9" d="M853 570C920 601 990 608 1007 596C980 632 900 630 853 610Z"/>
+      </svg>
+    </div>
+    <div class="sel-ring" id="coverRing"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
+
+    <div class="neighbour" aria-hidden="true"></div>
+    <div class="cnv-scrollbar" aria-hidden="true"></div>
+
+    <!-- Body frame — the entire bottom frame, its top edge peeking in -->
+    <div class="bodyframe" role="img" aria-label="Top of the Body frame with the Material Design site">
+      <div class="canvas-note" aria-hidden="true">
+        <p>Google supports this design kit with documentation and guidance on how to use the components and styles.</p>
+        <p>All foundations have been updated for Material 3 to include additional guidance for modern styling, adaptive layouts and dynamic color.</p>
+      </div>
+      <div class="sitecard">
+      <div class="site">
+        <div class="site-rail"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="site-main">
+          <div class="hero">
+            <div class="hero-copy">
+              <h2>Material Design</h2>
+              <p>Material 3 is the latest version of Google’s open-source design system. Design and build beautiful, usable products with Material 3.</p>
+              <span class="pill">Get started</span>
+            </div>
+            <div class="hero-art">
+              <svg viewBox="0 0 240 142" aria-hidden="true">
+                <rect width="240" height="142" fill="#f0530a"/>
+                <path fill="#5f56f2" d="M50 18c16-12 38-6 41 9s-9 24-22 27-31 3-38-9 7-18 19-27z"/>
+                <path fill="#3c3212" d="M152 9c32-9 70 3 76 24s-19 39-51 39-57-12-60-30 13-27 35-33z"/>
+                <path fill="#7a1fd0" d="M188 86h52v56h-52z"/>
+                <path fill="#8ff0f6" d="M98 142a42 33 0 0184 0z"/>
+                <path fill="#5c2c0a" d="M44 78c22-6 48 0 54 18s-13 36-38 36-42-12-42-30 10-19 26-24z"/>
+              </svg>
+            </div>
+          </div>
+          <div class="news-head">News &amp; launches</div>
+          <div class="cards">
+            <div class="card"><svg viewBox="0 0 118 70" aria-hidden="true"><rect width="118" height="70" fill="#cdea3e"/><path fill="#3f8f1f" d="M12 70c0-27 18-45 39-45s37 15 37 45z"/></svg></div>
+            <div class="card"><svg viewBox="0 0 118 70" aria-hidden="true"><rect width="118" height="70" fill="#2c9c2c"/><path d="M21 48c12-21 30-30 45-21s18 24 6 30" stroke="#b8f04a" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M60 21c9 12 24 15 36 9" stroke="#5f56f2" stroke-width="6" fill="none" stroke-linecap="round"/></svg></div>
+            <div class="card"><svg viewBox="0 0 118 70" aria-hidden="true"><rect width="60" height="70" fill="#4a44e0"/><rect x="60" width="58" height="70" fill="#8a2be2"/><rect x="72" y="9" width="33" height="24" fill="#f0530a"/></svg></div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+    <div class="hi-ring" id="bodyHi">
+      <i class="h"></i>
+      <span class="code-mark"><svg width="19" height="19" viewBox="0 0 16 16" fill="none"><path d="M5.6 4.6L2.4 8l3.2 3.4M10.4 4.6L13.6 8l-3.2 3.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </div>
+
+    <svg id="linkLayer" aria-hidden="true">
+      <path id="noodle" d="" stroke="#0d99ff" stroke-width="2" fill="none" stroke-linecap="round" style="display:none"/>
+      <path id="noodleHead" d="" stroke="#0d99ff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:none"/>
+    </svg>
+    <div id="protoNode"></div>
+
+    <!-- dark Interaction panel, pops up where the noodle lands -->
+    <div class="ipanel" id="ipanel" role="dialog" aria-label="Interaction">
+      <div class="hd">
+        <span class="t">Interaction</span>
+        <span class="ib"><svg width="19" height="19" viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>
+        <span class="ib"><svg width="19" height="19" viewBox="0 0 16 16" fill="none"><path d="M4.2 4.2l7.6 7.6M11.8 4.2l-7.6 7.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>
+      </div>
+      <div class="isec">
+        <div class="irow">
+          <span class="lb">Trigger</span>
+          <span class="isel">
+            <span class="lead"><svg width="19" height="19" viewBox="0 0 16 16" fill="none"><path d="M5.9 5.2l7.9 2.9c.38.14.38.66 0 .8l-3.2 1.2a.45.45 0 00-.27.27l-1.2 3.2c-.14.38-.66.38-.8 0L5.2 5.9a.5.5 0 01.7-.7z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M6.6 3.4V1.6M3.9 3.9L2.6 2.6M3.4 6.6H1.6" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></span>
+            <span class="value">On click</span>
+            <span class="chev"><svg width="19" height="19" viewBox="0 0 16 16" fill="none"><path d="M4.5 6.5L8 10l3.5-3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </span>
+        </div>
+      </div>
+      <div class="isec">
+        <div class="irow">
+          <span class="lb">Action</span>
+          <span class="isel">
+            <span class="lead"><svg width="19" height="19" viewBox="0 0 16 16" fill="none"><path d="M2.5 8h10.2M9.4 4.6L13.1 8l-3.7 3.4" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="value">Navigate to</span>
+            <span class="chev"><svg width="19" height="19" viewBox="0 0 16 16" fill="none"><path d="M4.5 6.5L8 10l3.5-3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </span>
+        </div>
+        <div class="irow">
+          <span class="lb">Destination</span>
+          <span class="isel">
+            <span class="value">Body</span>
+            <span class="chev"><svg width="19" height="19" viewBox="0 0 16 16" fill="none"><path d="M4.5 6.5L8 10l3.5-3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </span>
+        </div>
+      </div>
+      <div class="isec">
+        <div class="irow">
+          <span class="lb">Animation</span>
+          <span class="isel">
+            <span class="value">Instant</span>
+            <span class="chev"><svg width="19" height="19" viewBox="0 0 16 16" fill="none"><path d="M4.5 6.5L8 10l3.5-3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </span>
+        </div>
+      </div>
+      <div class="isec">
+        <div class="irow">
+          <span class="lb">Sound</span>
+          <button type="button" class="isel" id="soundSelect" aria-haspopup="menu" aria-expanded="false">
+            <span class="value" id="soundValue">None</span>
+            <span class="play" id="selPlay" data-id="navigation.scroll" role="button" aria-label="Play navigation.scroll"></span>
+            <span class="chev"><svg width="19" height="19" viewBox="0 0 16 16" fill="none"><path d="M4.5 6.5L8 10l3.5-3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </button>
+        </div>
+      </div>
+      <div class="ft">
+        <svg width="19" height="19" viewBox="0 0 16 16" fill="none"><path d="M6 4.5L9.5 8 6 11.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>State</span>
+      </div>
+    </div>
+
+    <div class="menu" id="soundMenu" role="menu"></div>
+  </div>
+
+<script>
+/* ————————————————— sound engine: same voices as the variables mock ————————————————— */
+function createSoundEngine() {
+  let ctx, master;
+  const noiseBuf = {};
+  const voices = [];
+
+  function ensure() {
+    if (ctx) {
+      if (ctx.state === 'suspended') ctx.resume();
+      return;
+    }
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    master = ctx.createGain();
+    master.gain.value = 0.5;
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 9800;
+    lp.Q.value = 0.5;
+    const d1 = ctx.createDelay(0.2);
+    d1.delayTime.value = 0.038;
+    const d2 = ctx.createDelay(0.2);
+    d2.delayTime.value = 0.071;
+    const g1 = ctx.createGain(); g1.gain.value = 0.12;
+    const g2 = ctx.createGain(); g2.gain.value = 0.07;
+    const hip = ctx.createBiquadFilter();
+    hip.type = 'highpass';
+    hip.frequency.value = 220;
+    master.connect(lp);
+    lp.connect(ctx.destination);
+    lp.connect(hip); hip.connect(d1); d1.connect(g1); g1.connect(ctx.destination);
+    hip.connect(d2); d2.connect(g2); g2.connect(ctx.destination);
+    const n = ctx.createBuffer(1, ctx.sampleRate * 1.2, ctx.sampleRate);
+    const ch = n.getChannelData(0);
+    for (let i = 0; i < ch.length; i++) ch[i] = Math.random() * 2 - 1;
+    noiseBuf.white = n;
+  }
+
+  function env(g, t0, a, d, peak) {
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(peak, t0 + a);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + a + d);
+  }
+
+  function sine(freq, t0, a, d, peak, type) {
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(freq, t0);
+    env(g, t0, a, d, peak);
+    o.connect(g).connect(master);
+    o.start(t0); o.stop(t0 + a + d + 0.05);
+    voices.push(o);
+    return o;
+  }
+
+  function noise(t0, a, d, peak, hp, lpQ) {
+    const src = ctx.createBufferSource();
+    src.buffer = noiseBuf.white;
+    const hpF = ctx.createBiquadFilter(); hpF.type = 'highpass'; hpF.frequency.value = hp[0];
+    const lpF = ctx.createBiquadFilter(); lpF.type = 'bandpass'; lpF.frequency.value = hp[1]; lpF.Q.value = lpQ || 1.2;
+    const g = ctx.createGain();
+    env(g, t0, a, d, peak);
+    src.connect(hpF).connect(lpF).connect(g).connect(master);
+    src.start(t0); src.stop(t0 + a + d + 0.05);
+    voices.push(src);
+  }
+
+  function stopAll() {
+    if (!ctx) return;
+    const t = ctx.currentTime;
+    voices.splice(0).forEach((n) => { try { n.stop(t); } catch (e) {} });
+  }
+
+  function tick(t0, pitch) {
+    noise(t0, 0.001, 0.02, 0.3, [2800, 7200], 1.6);
+    sine(pitch || 3400 + Math.random() * 500, t0, 0.001, 0.016, 0.035, 'sine');
+  }
+
+  function thock(t0) {
+    sine(72, t0, 0.002, 0.1, 0.32, 'sine');
+    sine(148, t0, 0.002, 0.055, 0.09, 'triangle');
+    noise(t0, 0.002, 0.048, 0.2, [350, 1600], 0.95);
+  }
+
+  function typewriterBell(t0) {
+    sine(2093, t0, 0.003, 0.62, 0.15, 'sine');
+    sine(2093 * 2.73, t0, 0.004, 0.2, 0.045, 'sine');
+    sine(1568, t0, 0.005, 0.32, 0.05, 'sine');
+  }
+
+  const pack = {
+    tap() {
+      ensure();
+      tick(ctx.currentTime);
+    },
+    success() {
+      ensure();
+      const t = ctx.currentTime;
+      thock(t);
+      for (let i = 0; i < 4; i++) tick(t + 0.04 + i * 0.016, 3400 + i * 137);
+      typewriterBell(t + 0.09);
+    },
+    scroll() {
+      // scroll.wav's construction: two soft sine taps, 505Hz then 758Hz at
+      // +44ms, each with a whisper of grain at the onset
+      ensure();
+      const t = ctx.currentTime;
+      sine(505, t, 0.002, 0.1, 0.3, 'sine');
+      noise(t, 0.001, 0.02, 0.07, [400, 1200], 1);
+      sine(758, t + 0.044, 0.002, 0.08, 0.17, 'sine');
+      noise(t + 0.044, 0.001, 0.015, 0.04, [500, 1500], 1);
+    },
+    notify() {
+      ensure();
+      const t = ctx.currentTime;
+      sine(2637, t, 0.02, 0.7, 0.11, 'sine');
+      sine(2637 * 2.76, t, 0.024, 0.22, 0.022, 'sine');
+      sine(4186, t, 0.026, 0.28, 0.018, 'sine');
+    }
+  };
+
+  const map = {
+    'tap.primary': 'tap',
+    'feedback.success': 'success',
+    'navigation.scroll': 'scroll',
+    'notification.high': 'notify'
+  };
+
+  const durs = { tap: 0.06, success: 0.72, scroll: 0.16, notify: 0.55 };
+
+  return {
+    play(id) {
+      const k = map[id] || id;
+      stopAll();
+      if (pack[k]) pack[k]();
+      return durs[k] || 0.3;
+    },
+    stop() { stopAll(); }
+  };
+}
+
+const engine = createSoundEngine();
+let endTimer = 0;
+
+const PLAY_SVG = '<svg class="i-play" width="19" height="19" viewBox="0 0 16 16" fill="none"><path d="M5.2 3.7v8.6L13 8 5.2 3.7z" fill="currentColor"/></svg><svg class="i-pause" width="19" height="19" viewBox="0 0 16 16" fill="none"><rect x="4.6" y="3.8" width="2.2" height="8.4" rx=".5" fill="currentColor"/><rect x="9.2" y="3.8" width="2.2" height="8.4" rx=".5" fill="currentColor"/></svg>';
+const CHECK_ICON = '<svg width="19" height="19" viewBox="0 0 16 16" fill="none"><path d="M3.6 8.4l2.9 2.9 5.9-6.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const IMPORT_ICON = '<svg width="19" height="19" viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>';
+
+const TOKENS = ['tap.primary', 'feedback.success', 'navigation.scroll', 'notification.high'];
+
+function setPlaying(id) {
+  document.querySelectorAll('.play').forEach((btn) => {
+    btn.classList.toggle('is-playing', Boolean(id) && btn.dataset.id === id);
+  });
+}
+
+function playToken(id) {
+  // any click restarts from the top, silencing whatever was playing
+  clearTimeout(endTimer);
+  engine.stop();
+  if (window.__kickAudio) window.__kickAudio();
+  const dur = engine.play(id);
+  setPlaying(id);
+  endTimer = setTimeout(() => setPlaying(null), Math.max(dur * 1000, 220) + 120);
+}
+
+/* ————————————————— Sound select + dark dropdown ————————————————— */
+const cnv = document.getElementById('cnv');
+const soundSelect = document.getElementById('soundSelect');
+const soundValue = document.getElementById('soundValue');
+const selPlay = document.getElementById('selPlay');
+const menu = document.getElementById('soundMenu');
+selPlay.innerHTML = PLAY_SVG;
+
+let selectedToken = null;
+let menuOpen = false;
+
+function renderMenu() {
+  menu.innerHTML =
+    `<div class="menu-item${selectedToken ? '' : ' selected hover'}" role="menuitem" data-id="">` +
+      `<span class="check">${CHECK_ICON}</span><span class="name">None</span></div>` +
+    '<div class="menu-sep"></div>' +
+    TOKENS.map((t) =>
+      `<div class="menu-item${t === selectedToken ? ' selected hover' : ''}" role="menuitem" data-id="${t}">` +
+        `<span class="check">${CHECK_ICON}</span>` +
+        `<span class="name">${t}</span>` +
+        `<span class="play" data-id="${t}" role="button" aria-label="Play ${t}">${PLAY_SVG}</span></div>`
+    ).join('') +
+    '<div class="menu-sep"></div>' +
+    `<div class="menu-import" role="menuitem" data-import="1">${IMPORT_ICON}<span>Import Audio</span></div>`;
+}
+
+const ipanel = document.getElementById('ipanel');
+
+function openMenu() {
+  renderMenu();
+  menu.classList.add('open');
+  menuOpen = true;
+  soundSelect.setAttribute('aria-expanded', 'true');
+  // anchor: the selected row opens sitting over the closed control,
+  // clamped inside the crop — same rule as Figma's Animation menu
+  let top = ipanel.offsetTop, left = ipanel.offsetLeft;
+  let el = soundSelect;
+  while (el && el !== ipanel) { top += el.offsetTop; left += el.offsetLeft; el = el.offsetParent === cnv ? null : el.offsetParent; }
+  const selectedEl = menu.querySelector('.selected') || menu.querySelector('.menu-item');
+  const offsetInMenu = selectedEl ? selectedEl.offsetTop : 0;
+  let mTop = top - offsetInMenu;
+  mTop = Math.max(8, Math.min(mTop, cnv.clientHeight - menu.offsetHeight - 8));
+  menu.style.left = Math.min(left, cnv.clientWidth - menu.offsetWidth - 8) + 'px';
+  menu.style.top = mTop + 'px';
+}
+
+function closeMenu() {
+  menu.classList.remove('open');
+  menuOpen = false;
+  soundSelect.setAttribute('aria-expanded', 'false');
+}
+
+function applySelection(id) {
+  selectedToken = id || null;
+  soundValue.textContent = selectedToken || 'None';
+  soundSelect.classList.toggle('has-sound', Boolean(selectedToken));
+  if (selectedToken) {
+    selPlay.dataset.id = selectedToken;
+    selPlay.setAttribute('aria-label', 'Play ' + selectedToken);
+  }
+}
+
+menu.addEventListener('pointerover', (e) => {
+  const item = e.target.closest('.menu-item, .menu-import');
+  if (!item || item.classList.contains('hover')) return;
+  menu.querySelectorAll('.hover').forEach((el) => el.classList.remove('hover'));
+  item.classList.add('hover');
+});
+
+menu.addEventListener('click', (e) => {
+  const play = e.target.closest('.play');
+  if (play) { e.stopPropagation(); playToken(play.dataset.id); return; }
+  if (e.target.closest('.menu-import')) { closeMenu(); return; }
+  const item = e.target.closest('.menu-item');
+  if (!item) return;
+  applySelection(item.dataset.id);
+  closeMenu();
+  if (selectedToken) playToken(selectedToken);
+});
+
+soundSelect.addEventListener('click', (e) => {
+  if (e.target.closest('.play')) { e.stopPropagation(); playToken(selPlay.dataset.id); return; }
+  e.stopPropagation();
+  if (menuOpen) closeMenu(); else openMenu();
+});
+
+addEventListener('pointerdown', (e) => {
+  if (!menuOpen) return;
+  if (menu.contains(e.target) || soundSelect.contains(e.target)) return;
+  closeMenu();
+}, true);
+
+/* ————————————————— scripted choreography ————————————————— */
+const noodle = document.getElementById('noodle');
+const noodleHead = document.getElementById('noodleHead');
+const node = document.getElementById('protoNode');
+const bodyHi = document.getElementById('bodyHi');
+const coverRing = document.getElementById('coverRing');
+
+(function () {
+  const app = document.querySelector('.app');
+  const clip = document.createElement('div');
+  clip.id = 'zoomClip';
+  app.parentNode.insertBefore(clip, app);
+  clip.appendChild(app);
+  const cursor = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  cursor.id = 'protoCursor';
+  cursor.setAttribute('viewBox', '0 0 24 24');
+  cursor.innerHTML = '<path d="M5.5 3.2l13.2 11.4-6.5.6 3.6 5.5-2.9 1.6-3.4-5.7-4 4.4V3.2z" fill="#111" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/>';
+  clip.appendChild(cursor);
+
+  const W = app.offsetWidth, H = app.offsetHeight;
+  clip.style.width = W + 'px';
+  clip.style.height = H + 'px';
+
+  let fitScale = 1;
+  const fit = () => {
+    const pad = 40;
+    fitScale = Math.min((innerWidth - pad) / W, (innerHeight - pad) / H, 0.9);
+    // centered absolutely: grid centering leaves an oversized clip parked in
+    // its own overflowing track on narrow (mobile) viewports
+    clip.style.position = 'absolute';
+    clip.style.left = '50%';
+    clip.style.top = '50%';
+    clip.style.transform = `translate(-50%, -50%) scale(${fitScale})`;
+    clip.style.transformOrigin = '50% 50%';
+  };
+  addEventListener('resize', fit, { passive: true });
+  fit();
+
+  // clip-local position of an element's centre (works at any fit scale)
+  const clipPoint = (el, fx = 0.5, fy = 0.5) => {
+    const r = el.getBoundingClientRect();
+    const c = clip.getBoundingClientRect();
+    const cs = c.width / W;
+    return { x: (r.left + r.width * fx - c.left) / cs, y: (r.top + r.height * fy - c.top) / cs };
+  };
+  // clip-local position of a crop-local coordinate
+  const canvasPoint = (cx, cy) => {
+    const r = cnv.getBoundingClientRect();
+    const c = clip.getBoundingClientRect();
+    const cs = c.width / W;
+    return { x: (r.left - c.left) / cs + cx, y: (r.top - c.top) / cs + cy };
+  };
+  // client position of a clip-local point (for menu hover hit-testing)
+  const clientPoint = (p) => {
+    const c = clip.getBoundingClientRect();
+    const cs = c.width / W;
+    return { x: c.left + p.x * cs, y: c.top + p.y * cs };
+  };
+
+  const NODE = { x: 460, y: 388 };   // Cover's bottom-edge node, crop px
+  const DROP = { x: 460, y: 452 };   // released right on Body's top edge
+
+  const drawNoodle = (toY) => {
+    noodle.style.display = '';
+    noodleHead.style.display = '';
+    // thin line from the dot down to an open-chevron arrowhead, Figma-style
+    const tip = Math.max(NODE.y + 18, toY);
+    noodle.setAttribute('d', `M${NODE.x} ${NODE.y + 8}L${NODE.x} ${tip - 2}`);
+    noodleHead.setAttribute('d', `M${NODE.x - 7} ${tip - 8}L${NODE.x} ${tip}L${NODE.x + 7} ${tip - 8}`);
+  };
+  const clearNoodle = () => { noodle.style.display = 'none'; noodleHead.style.display = 'none'; };
+
+  const setCursor = (x, y) => { cursor.style.left = x + 'px'; cursor.style.top = y + 'px'; };
+  let running = false, epoch = 0;
+  const wait = (ms, e) => new Promise((res) => {
+    const t0 = performance.now();
+    const step = () => { if (e !== epoch) return res(false); if (performance.now() - t0 >= ms) return res(true); requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  });
+  const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+  const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const glide = (from, to, ms, e, onFrame) => new Promise((res) => {
+    const t0 = performance.now();
+    const step = () => {
+      if (e !== epoch) return res(false);
+      const t = Math.min(1, (performance.now() - t0) / ms);
+      const k = easeOut(t);
+      const x = from.x + (to.x - from.x) * k;
+      const y = from.y + (to.y - from.y) * k;
+      setCursor(x, y);
+      if (onFrame) onFrame(x, y, k);
+      if (t < 1) requestAnimationFrame(step); else res(true);
+    };
+    requestAnimationFrame(step);
+  });
+
+  // synthetic hover: light the row under the scripted cursor as it travels
+  const hoverUnderCursor = (x, y) => {
+    const p = clientPoint({ x, y });
+    let hit = null;
+    for (const item of menu.querySelectorAll('.menu-item, .menu-import')) {
+      const r = item.getBoundingClientRect();
+      if (p.y >= r.top && p.y <= r.bottom && p.x >= r.left && p.x <= r.right) { hit = item; break; }
+    }
+    if (!hit || hit.classList.contains('hover')) return;
+    menu.querySelectorAll('.hover').forEach((el) => el.classList.remove('hover'));
+    hit.classList.add('hover');
+  };
+
+  /* ?still — print/PDF pose: connection landed, panel up, dropdown open on
+     the selected token, cursor on the row. No animation, no messages. */
+  if (new URLSearchParams(location.search).has('still')) {
+    node.style.opacity = '1';
+    coverRing.classList.add('dashed');
+    drawNoodle(DROP.y);
+    ipanel.style.left = '500px';
+    ipanel.style.top = '300px';
+    ipanel.style.transition = 'none';
+    ipanel.classList.add('show');
+    applySelection('navigation.scroll');
+    openMenu();
+    const pose = () => {
+      const item = menu.querySelector('.menu-item[data-id="navigation.scroll"]');
+      if (!item) return;
+      const p = clipPoint(item, 0.42, 0.5);
+      setCursor(p.x, p.y);
+    };
+    cursor.style.transition = 'none';
+    cursor.style.opacity = '1';
+    pose();
+    addEventListener('resize', pose, { passive: true });
+    return;
+  }
+
+  const reset = () => {
+    closeMenu();
+    applySelection(null);
+    setPlaying(null);
+    engine.stop();
+    ipanel.classList.remove('show');
+    ipanel.style.transition = '';
+    ipanel.style.opacity = '';
+    clearNoodle();
+    coverRing.classList.remove('dashed');
+    node.style.opacity = '0';
+    bodyHi.style.opacity = '0';
+    cursor.style.opacity = '0';
+    cursor.style.transform = '';
+  };
+
+  const run = async () => {
+    const myEpoch = ++epoch;
+    while (epoch === myEpoch && running) {
+      reset();
+      // panel pops up to the side of the arrow, as in the recording —
+      // its header rides up over the cover's bottom edge
+      ipanel.style.left = '500px';
+      ipanel.style.top = '300px';
+
+      let at = { x: -30, y: H + 30 };
+      setCursor(at.x, at.y);
+      if (!await wait(520, myEpoch)) return;
+      cursor.style.opacity = '1';
+
+      // reach Cover's bottom edge — the connection dot only fades in
+      // once the cursor gets close, like the real prototype-mode node
+      const nodePt = clipPoint(node);
+      if (!await glide(at, nodePt, 680, myEpoch, (x, y) => {
+        if (Math.hypot(x - nodePt.x, y - nodePt.y) < 130) node.style.opacity = '1';
+      })) return;
+      at = nodePt;
+      if (!await wait(200, myEpoch)) return;
+
+      // grab and drag the noodle down toward Body
+      cursor.style.transform = 'scale(.85)';
+      const dropPt = canvasPoint(DROP.x, DROP.y);
+      if (!await new Promise((res) => {
+        const t0 = performance.now();
+        const step = () => {
+          if (myEpoch !== epoch) return res(false);
+          const t = Math.min(1, (performance.now() - t0) / 780);
+          const k = easeInOut(t);
+          const x = at.x + (dropPt.x - at.x) * k;
+          const y = at.y + (dropPt.y - at.y) * k;
+          setCursor(x, y);
+          drawNoodle(NODE.y + (DROP.y - NODE.y) * k);
+          if (k > 0.5) bodyHi.style.opacity = '1';
+          if (t < 1) requestAnimationFrame(step); else res(true);
+        };
+        requestAnimationFrame(step);
+      })) return;
+      at = dropPt;
+      if (!await wait(120, myEpoch)) return;
+
+      // release: the Interaction panel appears right where the noodle landed
+      cursor.style.transform = '';
+      bodyHi.style.opacity = '0';
+      coverRing.classList.add('dashed');
+      if (!await wait(180, myEpoch)) return;
+      ipanel.classList.add('show');
+      if (window.__protoSoundOn) window.__kickAudio();
+      if (!await wait(820, myEpoch)) return;
+
+      // open the Sound dropdown
+      const selPt = clipPoint(soundSelect);
+      if (!await glide(at, selPt, 640, myEpoch)) return;
+      at = selPt;
+      if (!await wait(130, myEpoch)) return;
+      cursor.style.transform = 'scale(.82)';
+      openMenu();
+      if (!await wait(130, myEpoch)) return;
+      cursor.style.transform = '';
+      if (!await wait(420, myEpoch)) return;
+
+      // travel down the menu to navigation.scroll, the blue pill following
+      const scrollItem = menu.querySelector('.menu-item[data-id="navigation.scroll"]');
+      if (!scrollItem) return;
+      const itemPt = clipPoint(scrollItem, 0.42, 0.5);
+      if (!await glide(at, itemPt, 600, myEpoch, hoverUnderCursor)) return;
+      at = itemPt;
+      if (!await wait(220, myEpoch)) return;
+
+      // select it: the menu closes, the control takes the token, the sound plays
+      cursor.style.transform = 'scale(.82)';
+      applySelection('navigation.scroll');
+      closeMenu();
+      playToken('navigation.scroll');
+      if (!await wait(130, myEpoch)) return;
+      cursor.style.transform = '';
+      if (!await wait(1500, myEpoch)) return;
+
+      // no drift-off: the cursor holds briefly where it clicked, then
+      // cursor, panel and noodle all fade out together in one smooth exit
+      if (!await wait(480, myEpoch)) return;
+      ipanel.style.transition = 'opacity 450ms ease';
+      noodle.style.transition = 'opacity 450ms ease';
+      noodleHead.style.transition = 'opacity 450ms ease';
+      cursor.style.opacity = '0';
+      ipanel.style.opacity = '0';
+      noodle.style.opacity = '0';
+      noodleHead.style.opacity = '0';
+      if (!await wait(500, myEpoch)) return;
+      ipanel.classList.remove('show');
+      ipanel.style.transition = '';
+      ipanel.style.opacity = '';
+      clearNoodle();
+      noodle.style.opacity = '';
+      noodleHead.style.opacity = '';
+      noodle.style.transition = '';
+      noodleHead.style.transition = '';
+      if (!await wait(480, myEpoch)) return;
+    }
+  };
+
+  addEventListener('message', (event) => {
+    const data = event.data;
+    if (!data || data.type !== 'sound-proto') return;
+    if (typeof data.sound === 'boolean') window.__setProtoSound(data.sound);
+    if (typeof data.run === 'boolean' && data.run !== running) {
+      running = data.run;
+      epoch += 1;
+      if (running) run();
+      else reset();
+    }
+  });
+})();
+</script>
+</body>
+</html>

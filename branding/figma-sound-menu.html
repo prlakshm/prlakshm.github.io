@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Figma Interaction panel — Sound</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" />
+<style>
+  /*
+    Token values sampled from Figma UI3 (light/dark) and measured against
+    desktop Interaction panel screenshots: rows 32px, selects 24px,
+    font 11px/16 Inter, panel radius 13px, section padding 8px,
+    menu rows 24px, menu radius 13px, shadow 0 0 .5px + 0 10px 16px.
+    Dark brand blue #0c8ce9; light #0d99ff.
+  */
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    display: flex;
+    min-height: 100vh;
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif;
+    font-size: 11px;
+    line-height: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .canvas {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+  }
+  .canvas.light {
+    background: #f5f5f5;
+    --bg: #fff; --bg-secondary: #f5f5f5; --bg-hover: #f5f5f5;
+    --border: #e6e6e6; --text: #000000e5; --text-secondary: #00000080;
+    --icon: #000000e5; --icon-secondary: #00000080;
+    --brand: #0d99ff; --panel-border: transparent;
+  }
+  .canvas.dark {
+    background: #1e1e1e;
+    --bg: #2c2c2c; --bg-secondary: #383838; --bg-hover: #383838;
+    --border: #444; --text: #fff; --text-secondary: #ffffffb2;
+    --icon: #fff; --icon-secondary: #ffffffb2;
+    --brand: #0c8ce9; --panel-border: #444;
+  }
+
+  .panel {
+    width: 280px;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--panel-border);
+    border-radius: 13px;
+    box-shadow: 0 0 .5px rgba(0,0,0,.12), 0 10px 16px rgba(0,0,0,.12), 0 2px 5px rgba(0,0,0,.15);
+    user-select: none;
+  }
+  .panel-header {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 8px 0 16px;
+  }
+  .panel-title { font-weight: 600; letter-spacing: .005em; }
+  .panel-header .spacer { flex: 1; }
+  .icon-btn {
+    width: 24px; height: 24px;
+    display: grid; place-items: center;
+    border: 0; background: none; padding: 0;
+    color: var(--icon);
+    border-radius: 5px;
+    cursor: default;
+  }
+  .icon-btn:hover { background: var(--bg-hover); }
+
+  .section { border-top: 1px solid var(--border); padding: 8px 8px 8px 16px; }
+  .row {
+    display: flex;
+    align-items: center;
+    height: 32px;
+  }
+  .row-label { flex: 1; color: var(--text-secondary); }
+
+  .select {
+    width: 164px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 0 0 4px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text);
+    font: inherit;
+    letter-spacing: inherit;
+    cursor: default;
+    text-align: left;
+  }
+  .select.sound-select:hover { border-color: color-mix(in srgb, var(--text) 25%, var(--border)); }
+  .select.sound-select:focus-visible { outline: 1px solid var(--brand); outline-offset: -1px; }
+  .select .value {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .select .lead { display: grid; place-items: center; width: 16px; height: 16px; color: var(--icon); flex: none; }
+  .select .chev { display: grid; place-items: center; width: 24px; height: 24px; color: var(--icon-secondary); flex: none; }
+
+  .panel-footer {
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 40px;
+    padding: 0 16px 0 10px;
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+  .panel-footer svg { color: var(--icon-secondary); }
+
+  /* Dark menu surface in both themes — Figma UI3 */
+  .menu {
+    position: fixed;
+    z-index: 10;
+    min-width: 176px;
+    background: #1e1e1e;
+    border: 1px solid #383838;
+    border-radius: 13px;
+    padding: 8px 0;
+    box-shadow: 0 0 .5px rgba(0,0,0,.12), 0 10px 16px rgba(0,0,0,.12), 0 2px 5px rgba(0,0,0,.15);
+    color: #fff;
+    display: none;
+  }
+  .menu.open { display: block; }
+  .menu-item {
+    display: flex;
+    align-items: center;
+    height: 24px;
+    margin: 0 6px;
+    padding: 0 10px 0 8px;
+    border-radius: 5px;
+    cursor: default;
+  }
+  .menu-item .check {
+    width: 16px;
+    display: grid;
+    place-items: center;
+    flex: none;
+    visibility: hidden;
+    margin-right: 8px;
+  }
+  .menu-item.selected .check { visibility: visible; }
+  /* Highlight is JS-driven (.hover), matching Animation menu: selected opens
+     pre-highlighted, then the blue pill follows the pointer. */
+  .menu-item.hover { background: var(--brand, #0d99ff); }
+  .menu-sep { height: 1px; background: #383838; margin: 8px 0; }
+  svg { display: block; }
+</style>
+</head>
+<body>
+  <template id="panel-template">
+    <div class="panel" role="dialog" aria-label="Interaction">
+      <div class="panel-header">
+        <span class="panel-title">Interaction</span>
+        <span class="spacer"></span>
+        <button type="button" class="icon-btn" tabindex="-1" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </button>
+        <button type="button" class="icon-btn" tabindex="-1" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.2 4.2l7.6 7.6M11.8 4.2l-7.6 7.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <div class="section">
+        <div class="row">
+          <span class="row-label">Trigger</span>
+          <div class="select" aria-hidden="true">
+            <span class="lead">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5.9 5.2l7.9 2.9c.38.14.38.66 0 .8l-3.2 1.2a.45.45 0 00-.27.27l-1.2 3.2c-.14.38-.66.38-.8 0L5.2 5.9a.5.5 0 01.7-.7z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M6.6 3.4V1.6M3.9 3.9L2.6 2.6M3.4 6.6H1.6" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+            </span>
+            <span class="value">On click</span>
+            <span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.5 6.5L8 10l3.5-3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="row">
+          <span class="row-label">Action</span>
+          <div class="select" aria-hidden="true">
+            <span class="lead">
+              <!-- Navigate to -->
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M2.5 8h10.2M9.4 4.6L13.1 8l-3.7 3.4" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="value">Navigate to</span>
+            <span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.5 6.5L8 10l3.5-3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </div>
+        <div class="row">
+          <span class="row-label">Destination</span>
+          <div class="select" aria-hidden="true">
+            <span class="value" style="padding-left: 4px">Config_2027</span>
+            <span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.5 6.5L8 10l3.5-3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="row">
+          <span class="row-label">Animation</span>
+          <div class="select" aria-hidden="true">
+            <span class="value" style="padding-left: 4px">Instant</span>
+            <span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.5 6.5L8 10l3.5-3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="row">
+          <span class="row-label">Sound</span>
+          <button type="button" class="select sound-select" tabindex="0" aria-haspopup="menu" aria-expanded="false" aria-label="Sound">
+            <span class="value sound-value" style="padding-left: 4px">None</span>
+            <span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.5 6.5L8 10l3.5-3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="panel-footer">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 4.5L9.5 8 6 11.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>State</span>
+      </div>
+    </div>
+  </template>
+
+  <div class="canvas light"></div>
+  <div class="canvas dark"></div>
+
+<script>
+(() => {
+  const CHECK_ICON = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.6 8.4l2.9 2.9 5.9-6.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  /* Animation-style menu: check + label only (no leading icons). */
+  const SOUNDS = [
+    { id: 'none', label: 'None' },
+    { sep: true },
+    { id: 'tap', label: 'Tap' },
+    { id: 'notification', label: 'Notification' },
+    { id: 'success', label: 'Feedback Success' },
+    { id: 'error', label: 'Feedback Error' },
+  ];
+
+  let ctx;
+  const tone = (freq, t0, dur, type = 'sine', gain = 0.06) => {
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(0, ctx.currentTime + t0);
+    g.gain.linearRampToValueAtTime(gain, ctx.currentTime + t0 + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + t0 + dur);
+    o.connect(g).connect(ctx.destination);
+    o.start(ctx.currentTime + t0); o.stop(ctx.currentTime + t0 + dur + 0.05);
+  };
+  const play = (id) => {
+    try {
+      ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+      if (ctx.state === 'suspended') ctx.resume();
+      if (id === 'tap') tone(1150, 0, 0.05, 'square', 0.035);
+      else if (id === 'notification') { tone(880, 0, 0.14); tone(1318.5, 0.11, 0.22); }
+      else if (id === 'success') { tone(660, 0, 0.11); tone(830.6, 0.09, 0.18); }
+      else if (id === 'error') { tone(220, 0, 0.16, 'sawtooth', 0.04); tone(185, 0.14, 0.2, 'sawtooth', 0.04); }
+    } catch (e) { /* selection still works without audio */ }
+  };
+
+  const menu = document.createElement('div');
+  menu.className = 'menu';
+  menu.setAttribute('role', 'menu');
+  document.body.appendChild(menu);
+  let openFor = null;
+
+  function renderMenu(state) {
+    menu.innerHTML = SOUNDS.map((s) =>
+      s.sep
+        ? '<div class="menu-sep"></div>'
+        : `<div class="menu-item${s.id === state.selected ? ' selected hover' : ''}" role="menuitem" data-id="${s.id}">` +
+          `<span class="check">${CHECK_ICON}</span>` +
+          `<span>${s.label}</span></div>`
+    ).join('');
+  }
+
+  menu.addEventListener('pointerover', (e) => {
+    const item = e.target.closest('.menu-item');
+    if (!item || item.classList.contains('hover')) return;
+    menu.querySelectorAll('.menu-item.hover').forEach((el) => el.classList.remove('hover'));
+    item.classList.add('hover');
+  });
+
+  function openMenu(button, state, brand) {
+    openFor = { button, state };
+    renderMenu(state);
+    menu.style.setProperty('--brand', brand);
+    menu.classList.add('open');
+    button.setAttribute('aria-expanded', 'true');
+    const r = button.getBoundingClientRect();
+    menu.style.left = Math.min(r.left, innerWidth - menu.offsetWidth - 8) + 'px';
+    const selectedEl = menu.querySelector('.selected') || menu.querySelector('.menu-item');
+    const offsetInMenu = selectedEl ? selectedEl.offsetTop : 0;
+    let top = r.top - offsetInMenu;
+    top = Math.max(8, Math.min(top, innerHeight - menu.offsetHeight - 8));
+    menu.style.top = top + 'px';
+  }
+
+  function closeMenu() {
+    if (openFor) openFor.button.setAttribute('aria-expanded', 'false');
+    menu.classList.remove('open');
+    openFor = null;
+  }
+
+  menu.addEventListener('click', (e) => {
+    const item = e.target.closest('.menu-item');
+    if (!item || !openFor) return;
+    const id = item.dataset.id;
+    openFor.state.selected = id;
+    openFor.state.apply();
+    play(id);
+    closeMenu();
+  });
+
+  addEventListener('pointerdown', (e) => {
+    if (!menu.classList.contains('open')) return;
+    if (menu.contains(e.target)) return;
+    if (openFor && openFor.button.contains(e.target)) return;
+    closeMenu();
+  }, true);
+
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+
+  for (const canvas of document.querySelectorAll('.canvas')) {
+    canvas.appendChild(document.getElementById('panel-template').content.cloneNode(true));
+    const panel = canvas.querySelector('.panel');
+    const button = panel.querySelector('.sound-select');
+    const valueEl = panel.querySelector('.sound-value');
+    const brand = getComputedStyle(canvas).getPropertyValue('--brand').trim();
+    const state = {
+      selected: 'none',
+      apply() {
+        valueEl.textContent = SOUNDS.find((x) => x.id === this.selected).label;
+      },
+    };
+    state.apply();
+    button.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (openFor && openFor.button === button) closeMenu();
+      else openMenu(button, state, brand);
+    });
+  }
+})();
+</script>
+</body>
+</html>

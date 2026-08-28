@@ -1,0 +1,767 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Local variables — Sound</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" />
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: #1e1e1e;
+    color: #fff;
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 11px;
+    line-height: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    cursor: default;
+    user-select: none;
+  }
+  button, input { font: inherit; }
+
+  .app {
+    position: relative;
+    width: 1036px;
+    height: 580px;
+    background: #2c2c2c;
+    border: 1px solid #444;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.24), 0 16px 48px rgba(0,0,0,.48);
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* —— left nav rail (File / Assets / Tools / Variables) —— */
+  .rail {
+    width: 76px;
+    flex: none;
+    border-right: 1px solid rgba(255,255,255,.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 18px 0 14px;
+    gap: 4px;
+  }
+  .rail-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 0 6px;
+    color: #d5d5d5;
+    font-size: 11px;
+    line-height: 1;
+  }
+  .rail-item + .rail-item { margin-top: 14px; }
+  .rail-icon {
+    width: 32px; height: 32px;
+    display: grid; place-items: center;
+    border-radius: 8px;
+  }
+  .rail-item.active .rail-icon { background: #4a587a; }
+  .rail-item.active { color: #fff; }
+  .rail-rule {
+    width: 34px; height: 1px;
+    background: rgba(255,255,255,.16);
+    margin: 15px 0 11px;
+  }
+
+  /* —— collections sidebar —— */
+  .sidebar {
+    width: 200px;
+    flex: none;
+    border-right: 1px solid rgba(255,255,255,.1);
+    display: flex;
+    flex-direction: column;
+    padding: 4px 0 12px;
+  }
+  .sec-label {
+    display: flex;
+    align-items: center;
+    height: 32px;
+    padding: 0 8px 0 16px;
+    color: #ffffffb2;
+  }
+  .sec-label .name { flex: 1; }
+  .sec-plus {
+    width: 24px; height: 24px;
+    display: grid; place-items: center;
+    color: #ffffffb2;
+    border-radius: 4px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    height: 24px;
+    margin: 1px 8px;
+    padding: 0 8px;
+    border-radius: 5px;
+    color: #fff;
+  }
+  .nav-item .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .nav-item.selected { background: #394360; }
+  .nav-item.selected-gray { background: #383838; }
+  .nav-item.indent { padding-left: 24px; }
+
+  /* —— center table —— */
+  .main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .toolbar {
+    display: flex;
+    align-items: center;
+    height: 48px;
+    padding: 0 12px 0 16px;
+    gap: 8px;
+    flex: none;
+  }
+  .toolbar-title {
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: .01em;
+  }
+  .toolbar .spacer { flex: 1; }
+  .search {
+    height: 32px;
+    width: 200px;
+    background: #383838;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px 0 10px;
+    color: #ffffff66;
+    gap: 6px;
+  }
+  .search svg { color: #ffffffb2; flex: none; }
+  .btn-share {
+    height: 32px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 6px;
+    background: #0c8ce9;
+    color: #fff;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .table {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid rgba(255,255,255,.1);
+  }
+  .thead, .row {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) minmax(240px, 1.4fr) 48px;
+    align-items: stretch;
+  }
+  .thead {
+    height: 40px;
+    color: #fff;
+    font-weight: 600;
+    flex: none;
+    border-bottom: 1px solid rgba(255,255,255,.1);
+  }
+  .thead > span, .thead > div {
+    display: flex;
+    align-items: center;
+    padding: 0 12px 0 16px;
+  }
+  .thead .col-mode, .row .cell-mode {
+    border-left: 1px solid rgba(255,255,255,.1);
+    border-right: 1px solid rgba(255,255,255,.1);
+  }
+  .thead .col-add {
+    padding: 0;
+    justify-content: center;
+    color: #ffffffb2;
+  }
+  .rows { flex: 1; overflow: auto; }
+  .row {
+    height: 40px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+  .row:hover { background: #383838; }
+  .row.selected { background: #394360; }
+  .row.selected:hover { background: #394360; }
+  .cell-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px 0 16px;
+    min-width: 0;
+  }
+  .type-icon { width: 16px; height: 16px; color: #ffffffb2; flex: none; }
+  .var-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cell-mode {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 12px 0 12px;
+    min-width: 0;
+  }
+  .cell-end {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff00;
+  }
+  .row:hover .cell-end, .row.selected .cell-end { color: #ffffffb2; }
+  .chip {
+    height: 24px;
+    padding: 0 8px;
+    background: #383838;
+    border: 0;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .chip.chip-tap { background: #3d5a82; }
+  .play {
+    width: 24px; height: 24px;
+    border: 0; background: none; padding: 0;
+    color: #ffffffb2;
+    cursor: pointer;
+    display: grid; place-items: center;
+    border-radius: 5px;
+    flex: none;
+  }
+  .play:hover { color: #fff; }
+  .play.is-playing { color: #0c8ce9; }
+  .play .i-pause { display: none; }
+  .play.is-playing .i-play { display: none; }
+  .play.is-playing .i-pause { display: block; }
+  .play svg { display: block; }
+
+  .table-foot {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 12px 0 16px;
+    color: #ffffffb2;
+    flex: none;
+    border-top: 1px solid rgba(255,255,255,.1);
+  }
+  .table-foot svg { flex: none; }
+
+  .help {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    width: 32px; height: 32px;
+    border: 1px solid #444;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    color: #fff;
+    background: #2c2c2c;
+    box-shadow: 0 2px 8px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1;
+    z-index: 2;
+  }
+  svg { display: block; }
+
+  /* —— deck embed: chapter ground + scale-to-fit + scripted cursor —— */
+  html, body { overflow: hidden; }
+  body { background: #052427; }
+  .app { flex: none; }
+  #protoCursor {
+    position: absolute;
+    z-index: 60;
+    width: 21px;
+    pointer-events: none;
+    opacity: 0;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,.45));
+  }
+</style>
+<script>
+/* Gate every AudioContext output behind a gain the deck controls via
+   postMessage, and remember contexts so they can be resumed after the deck's
+   first user gesture unlocks audio. */
+(function () {
+  const Real = window.AudioContext || window.webkitAudioContext;
+  if (!Real) return;
+  const desc = Object.getOwnPropertyDescriptor(BaseAudioContext.prototype, "destination");
+  window.__protoSoundOn = false;
+  window.__gates = [];
+  window.__ctxs = [];
+  class Gated extends Real {
+    constructor(...a) {
+      super(...a);
+      window.__ctxs.push(this);
+    }
+    get destination() {
+      if (!this.__gate) {
+        this.__gate = this.createGain();
+        this.__gate.gain.value = window.__protoSoundOn ? 1 : 0;
+        this.__gate.connect(desc.get.call(this));
+        window.__gates.push(this.__gate);
+      }
+      return this.__gate;
+    }
+  }
+  window.AudioContext = Gated;
+  window.webkitAudioContext = Gated;
+  window.__setProtoSound = (on) => {
+    window.__protoSoundOn = on;
+    for (const g of window.__gates) g.gain.value = on ? 1 : 0;
+    if (on) window.__kickAudio();
+  };
+  window.__kickAudio = () => {
+    for (const c of window.__ctxs) { if (c.state === "suspended") c.resume().catch(() => {}); }
+  };
+  // a context created mid-run (the synth builds one on the first click)
+  // starts suspended; wake it as soon as it exists, and on any real gesture
+  const RealCtor = Gated;
+  const origPush = window.__ctxs.push.bind(window.__ctxs);
+  window.__ctxs.push = (c) => { const r = origPush(c); if (window.__protoSoundOn) queueMicrotask(window.__kickAudio); return r; };
+  addEventListener("pointerdown", () => window.__kickAudio(), true);
+})();
+</script>
+</head>
+<body>
+  <div class="app" role="application" aria-label="Local variables">
+    <svg id="protoCursor" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 3.2l13.2 11.4-6.5.6 3.6 5.5-2.9 1.6-3.4-5.7-4 4.4V3.2z" fill="#111" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>
+
+    <nav class="rail" aria-label="Editor navigation">
+      <div class="rail-item">
+        <span class="rail-icon">
+          <!-- File: page with a folded corner -->
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M5.4 2.8h6l3.8 3.8v9.8a1 1 0 01-1 1H5.4a1 1 0 01-1-1V3.8a1 1 0 011-1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+            <path d="M11 3v3.6a.4.4 0 00.4.4H15" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        File
+      </div>
+      <div class="rail-item">
+        <span class="rail-icon">
+          <!-- Assets: circled plus -->
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M11 7.8v6.4M7.8 11h6.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </span>
+        Assets
+      </div>
+      <div class="rail-item">
+        <span class="rail-icon">
+          <!-- Tools: chest with a lid handle -->
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <rect x="4.6" y="7.2" width="12.8" height="10" rx="1.6" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M4.6 11h12.8" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M9.3 11v1.4a.7.7 0 00.7.7h2a.7.7 0 00.7-.7V11" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M8.6 7.2V6a1.6 1.6 0 011.6-1.6h1.6A1.6 1.6 0 0113.4 6v1.2" stroke="currentColor" stroke-width="1.3"/>
+          </svg>
+        </span>
+        Tools
+      </div>
+      <div class="rail-rule" aria-hidden="true"></div>
+      <div class="rail-item active" aria-current="page">
+        <span class="rail-icon">
+          <!-- Variables: rounded container with a token dot -->
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M11 3.2l5.6 3.2a1.5 1.5 0 01.75 1.3v6.6a1.5 1.5 0 01-.75 1.3L11 18.8l-5.6-3.2a1.5 1.5 0 01-.75-1.3V7.7a1.5 1.5 0 01.75-1.3L11 3.2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+            <circle cx="11" cy="11" r="2.5" stroke="currentColor" stroke-width="1.3"/>
+          </svg>
+        </span>
+        Variables
+      </div>
+    </nav>
+
+    <aside class="sidebar">
+      <div class="sec-label">
+        <span class="name">Collections</span>
+        <span class="sec-plus" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </span>
+      </div>
+      <div class="nav-item"><span class="name">M3</span></div>
+      <div class="nav-item"><span class="name">Typescale</span></div>
+      <div class="nav-item"><span class="name">Font theme</span></div>
+      <div class="nav-item"><span class="name">Shape</span></div>
+      <div class="nav-item selected selected-gray"><span class="name">Sound</span></div>
+      <div class="sec-label" style="margin-top:8px"><span class="name">Groups</span></div>
+      <div class="nav-item selected"><span class="name">All</span></div>
+      <div class="nav-item indent"><span class="name">Interactions</span></div>
+    </aside>
+
+    <section class="main">
+      <div class="toolbar">
+        <span class="toolbar-title">Sound</span>
+        <span class="spacer"></span>
+        <div class="search" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.1" stroke="currentColor" stroke-width="1.2"/><path d="M10.2 10.2L13 13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <span>Search</span>
+        </div>
+        <div class="btn-share">Share</div>
+      </div>
+
+      <div class="table">
+        <div class="thead">
+          <span>Name</span>
+          <span class="col-mode">Default</span>
+          <div class="col-add" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="rows" id="rows"></div>
+        <div class="table-foot" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Create variable
+        </div>
+      </div>
+    </section>
+
+    <div class="help" aria-hidden="true">?</div>
+  </div>
+
+<script>
+const SPEAKER = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.2 6.1h2.05L8.1 3.8v8.4L5.25 9.9H3.2V6.1z" fill="currentColor"/><path d="M10.15 6.15c.85.7.85 2.9 0 3.6M11.85 5.05c1.4 1.15 1.4 4.75 0 5.9" stroke="currentColor" stroke-width="1.15" stroke-linecap="round"/></svg>';
+const PLAY_SVG = '<svg class="i-play" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5.2 3.7v8.6L13 8 5.2 3.7z" fill="currentColor"/></svg><svg class="i-pause" width="16" height="16" viewBox="0 0 16 16" fill="none" hidden><rect x="4.6" y="3.8" width="2.2" height="8.4" rx=".5" fill="currentColor"/><rect x="9.2" y="3.8" width="2.2" height="8.4" rx=".5" fill="currentColor"/></svg>';
+const SLIDER = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 5h10M3 8h10M3 11h10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="6.2" cy="5" r="1.35" fill="#2c2c2c" stroke="currentColor" stroke-width="1.15"/><circle cx="10.2" cy="8" r="1.35" fill="#2c2c2c" stroke="currentColor" stroke-width="1.15"/><circle cx="7.5" cy="11" r="1.35" fill="#2c2c2c" stroke="currentColor" stroke-width="1.15"/></svg>';
+
+const VARS = [
+  { name: 'tap.primary', file: 'tap.wav', tap: true },
+  { name: 'feedback.success', file: 'success.wav' },
+  { name: 'navigation.scroll', file: 'scroll.wav' },
+  { name: 'notification.high', file: 'notify.wav' }
+];
+
+document.getElementById('rows').innerHTML = VARS.map((v, i) =>
+  `<div class="row${i === 0 ? ' selected' : ''}">` +
+    `<div class="cell-name"><span class="type-icon">${SPEAKER}</span><span class="var-name">${v.name}</span></div>` +
+    `<div class="cell-mode"><span class="chip${v.tap ? ' chip-tap' : ''}">${v.file}</span>` +
+      `<button type="button" class="play" data-id="${v.name}" aria-label="Play ${v.name}">${PLAY_SVG}</button>` +
+    `</div><div class="cell-end">${SLIDER}</div></div>`
+).join('');
+
+function createSoundEngine() {
+  let ctx, master;
+  const noiseBuf = {};
+  const voices = [];
+
+  function ensure() {
+    if (ctx) {
+      if (ctx.state === 'suspended') ctx.resume();
+      return;
+    }
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    master = ctx.createGain();
+    master.gain.value = 0.5;
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 9800;
+    lp.Q.value = 0.5;
+    const d1 = ctx.createDelay(0.2);
+    d1.delayTime.value = 0.038;
+    const d2 = ctx.createDelay(0.2);
+    d2.delayTime.value = 0.071;
+    const g1 = ctx.createGain(); g1.gain.value = 0.12;
+    const g2 = ctx.createGain(); g2.gain.value = 0.07;
+    const hip = ctx.createBiquadFilter();
+    hip.type = 'highpass';
+    hip.frequency.value = 220;
+    master.connect(lp);
+    lp.connect(ctx.destination);
+    lp.connect(hip); hip.connect(d1); d1.connect(g1); g1.connect(ctx.destination);
+    hip.connect(d2); d2.connect(g2); g2.connect(ctx.destination);
+    const n = ctx.createBuffer(1, ctx.sampleRate * 1.2, ctx.sampleRate);
+    const ch = n.getChannelData(0);
+    for (let i = 0; i < ch.length; i++) ch[i] = Math.random() * 2 - 1;
+    noiseBuf.white = n;
+  }
+
+  function env(g, t0, a, d, peak) {
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(peak, t0 + a);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + a + d);
+  }
+
+  function sine(freq, t0, a, d, peak, type) {
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(freq, t0);
+    env(g, t0, a, d, peak);
+    o.connect(g).connect(master);
+    o.start(t0); o.stop(t0 + a + d + 0.05);
+    voices.push(o);
+    return o;
+  }
+
+  function noise(t0, a, d, peak, hp, lpQ) {
+    const src = ctx.createBufferSource();
+    src.buffer = noiseBuf.white;
+    const hpF = ctx.createBiquadFilter(); hpF.type = 'highpass'; hpF.frequency.value = hp[0];
+    const lpF = ctx.createBiquadFilter(); lpF.type = 'bandpass'; lpF.frequency.value = hp[1]; lpF.Q.value = lpQ || 1.2;
+    const g = ctx.createGain();
+    env(g, t0, a, d, peak);
+    src.connect(hpF).connect(lpF).connect(g).connect(master);
+    src.start(t0); src.stop(t0 + a + d + 0.05);
+    voices.push(src);
+  }
+
+  function stopAll() {
+    if (!ctx) return;
+    const t = ctx.currentTime;
+    voices.splice(0).forEach((n) => { try { n.stop(t); } catch (e) {} });
+  }
+
+  function tick(t0, pitch) {
+    noise(t0, 0.001, 0.02, 0.3, [2800, 7200], 1.6);
+    sine(pitch || 3400 + Math.random() * 500, t0, 0.001, 0.016, 0.035, 'sine');
+  }
+
+  function thock(t0) {
+    sine(72, t0, 0.002, 0.1, 0.32, 'sine');
+    sine(148, t0, 0.002, 0.055, 0.09, 'triangle');
+    noise(t0, 0.002, 0.048, 0.2, [350, 1600], 0.95);
+  }
+
+  function typewriterBell(t0) {
+    sine(2093, t0, 0.003, 0.62, 0.15, 'sine');
+    sine(2093 * 2.73, t0, 0.004, 0.2, 0.045, 'sine');
+    sine(1568, t0, 0.005, 0.32, 0.05, 'sine');
+  }
+
+  const pack = {
+    tap() {
+      ensure();
+      tick(ctx.currentTime);
+    },
+    success() {
+      ensure();
+      const t = ctx.currentTime;
+      thock(t);
+      // fixed rising spread — the exact rendition used by the deck's sound-on chime
+      for (let i = 0; i < 4; i++) tick(t + 0.04 + i * 0.016, 3400 + i * 137);
+      typewriterBell(t + 0.09);
+    },
+    scroll() {
+      // scroll.wav's construction: two soft sine taps, 505Hz then 758Hz at
+      // +44ms, each with a whisper of grain at the onset
+      ensure();
+      const t = ctx.currentTime;
+      sine(505, t, 0.002, 0.1, 0.3, 'sine');
+      noise(t, 0.001, 0.02, 0.07, [400, 1200], 1);
+      sine(758, t + 0.044, 0.002, 0.08, 0.17, 'sine');
+      noise(t + 0.044, 0.001, 0.015, 0.04, [500, 1500], 1);
+    },
+    notify() {
+      ensure();
+      const t = ctx.currentTime;
+      sine(2637, t, 0.02, 0.7, 0.11, 'sine');
+      sine(2637 * 2.76, t, 0.024, 0.22, 0.022, 'sine');
+      sine(4186, t, 0.026, 0.28, 0.018, 'sine');
+    }
+  };
+
+  const map = {
+    'tap.primary': 'tap',
+    'feedback.success': 'success',
+    'navigation.scroll': 'scroll',
+    'notification.high': 'notify'
+  };
+
+  const durs = { tap: 0.06, success: 0.72, scroll: 0.16, notify: 0.55 };
+
+  return {
+    play(id) {
+      const k = map[id] || id;
+      stopAll();
+      if (pack[k]) pack[k]();
+      return durs[k] || 0.3;
+    },
+    stop() { stopAll(); }
+  };
+}
+
+const engine = createSoundEngine();
+let current = null;
+let endTimer = 0;
+
+function setPlaying(id) {
+  document.querySelectorAll('.play').forEach((btn) => {
+    const on = id && btn.dataset.id === id;
+    btn.classList.toggle('is-playing', on);
+    const playI = btn.querySelector('.i-play');
+    const pauseI = btn.querySelector('.i-pause');
+    if (playI) playI.hidden = !!on;
+    if (pauseI) pauseI.hidden = !on;
+  });
+}
+
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.play');
+  if (!btn) return;
+  const id = btn.dataset.id;
+  // any click restarts from the top, silencing whatever was playing —
+  // including this same sound
+  engine.stop();
+  clearTimeout(endTimer);
+  if (window.__kickAudio) window.__kickAudio();
+  const dur = engine.play(id);
+  current = id;
+  setPlaying(id);
+  endTimer = setTimeout(() => {
+    if (current === id) { current = null; setPlaying(null); }
+  }, (dur * 1000) + 40);
+});
+</script>
+
+<script>
+/* Scripted walkthrough: the cursor rises from the bottom-left, clicks each
+   token's play button in turn, then rests and loops. The deck starts and stops
+   it by postMessage as the slide enters and leaves the viewport. */
+(function () {
+  const app = document.querySelector(".app");
+  const cursor = document.getElementById("protoCursor");
+  let scale = 1;
+
+  const fit = () => {
+    const pad = 40;
+    scale = Math.min(
+      (innerWidth - pad) / app.offsetWidth,
+      (innerHeight - pad) / app.offsetHeight,
+    );
+    scale = Math.min(scale, 1.0);
+    // centered absolutely: grid centering leaves an oversized app parked in
+    // its own overflowing track on narrow (mobile) viewports
+    app.style.position = "absolute";
+    app.style.left = "50%";
+    app.style.top = "50%";
+    app.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    app.style.transformOrigin = "50% 50%";
+  };
+  addEventListener("resize", fit, { passive: true });
+  fit();
+
+  const appPoint = (clientX, clientY) => {
+    const r = app.getBoundingClientRect();
+    return { x: (clientX - r.left) / scale, y: (clientY - r.top) / scale };
+  };
+  const targetFor = (el) => {
+    const r = el.getBoundingClientRect();
+    return appPoint(r.left + r.width / 2, r.top + r.height / 2);
+  };
+
+  let running = false;
+  let epoch = 0;
+
+  const setCursor = (x, y) => {
+    cursor.style.left = x + "px";
+    cursor.style.top = y + "px";
+  };
+
+  /* ?still — print/PDF pose: cursor on navigation.scroll's play button with
+     the token playing. No animation, no messages. */
+  if (new URLSearchParams(location.search).has("still")) {
+    const btn = document.querySelector('.play[data-id="navigation.scroll"]');
+    if (btn) {
+      const pose = () => {
+        const rr = btn.getBoundingClientRect();
+        const aa = app.getBoundingClientRect();
+        setCursor((rr.left + rr.width / 2 - aa.left) / scale, (rr.top + rr.height / 2 - aa.top) / scale);
+      };
+      pose();
+      addEventListener("resize", pose, { passive: true });
+      cursor.style.opacity = "1";
+      setPlaying("navigation.scroll");
+    }
+    return;
+  }
+  const wait = (ms, myEpoch) => new Promise((resolve) => {
+    const t0 = performance.now();
+    const step = () => {
+      if (myEpoch !== epoch) return resolve(false);
+      if (performance.now() - t0 >= ms) return resolve(true);
+      requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+  const glide = (from, to, ms, myEpoch, inOut = false) => new Promise((resolve) => {
+    const t0 = performance.now();
+    const ease = inOut
+      ? (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
+      : (t) => 1 - Math.pow(1 - t, 3);
+    const step = () => {
+      if (myEpoch !== epoch) return resolve(false);
+      const t = Math.min(1, (performance.now() - t0) / ms);
+      const k = ease(t);
+      setCursor(from.x + (to.x - from.x) * k, from.y + (to.y - from.y) * k);
+      if (t < 1) requestAnimationFrame(step);
+      else resolve(true);
+    };
+    requestAnimationFrame(step);
+  });
+
+  const run = async () => {
+    const myEpoch = ++epoch;
+    const buttons = [...document.querySelectorAll(".play")];
+    if (!buttons.length) return;
+    while (epoch === myEpoch && running) {
+      const h = app.offsetHeight, w = app.offsetWidth;
+      let at = { x: -30, y: h + 30 };
+      cursor.style.opacity = "0";
+      setCursor(at.x, at.y);
+      if (!await wait(460, myEpoch)) return;
+      cursor.style.opacity = "1";
+      const entry = { x: w * 0.24, y: h * 0.72 };
+      if (!await glide(at, entry, 680, myEpoch)) return;
+      at = entry;
+      for (const button of buttons) {
+        const last = button === buttons[buttons.length - 1];
+        const to = targetFor(button);
+        if (!await glide(at, to, 650, myEpoch)) return;
+        at = to;
+        if (!await wait(130, myEpoch)) return;
+        cursor.style.transform = "scale(.82)";
+        button.click();
+        if (!await wait(130, myEpoch)) return;
+        cursor.style.transform = "";
+        // the last click flows straight into the exit glide — a full dwell
+        // there read as a stall on the way up from the bottom-right
+        if (!await wait(last ? 240 : 840, myEpoch)) return;
+      }
+      const rest = { x: w * 0.62, y: h * 0.55 };
+      if (!await glide(at, rest, 940, myEpoch, true)) return;
+      if (!await wait(1200, myEpoch)) return;
+      cursor.style.opacity = "0";
+      if (!await wait(720, myEpoch)) return;
+    }
+  };
+
+  addEventListener("message", (event) => {
+    const data = event.data;
+    if (!data || data.type !== "sound-proto") return;
+    if (typeof data.sound === "boolean") window.__setProtoSound(data.sound);
+    if (typeof data.run === "boolean" && data.run !== running) {
+      running = data.run;
+      epoch += 1;
+      if (running) run();
+      else cursor.style.opacity = "0";
+    }
+  });
+})();
+</script>
+</body>
+</html>
