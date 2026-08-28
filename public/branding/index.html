@@ -169,6 +169,11 @@
       .figma-title-word,
       .sound-title-word { display: inline-flex; }
       .figma-title-word { color: #b8d0cf; margin-right: .18em; }
+      /* phones stack the lockup — the DOM fallback mirrors the particle title */
+      @media (max-width: 700px) {
+        .title-lockup { flex-direction: column; gap: .12em; }
+        .figma-title-word { margin-right: 0; }
+      }
       .title-letter {
         display: inline-block;
         opacity: 0;
@@ -963,14 +968,35 @@
           const TRACK = 0.16;
           const WORD_GAP = 0.42;
           const widths = TITLE_LETTERS.map((character) => GLYPHS[character].w);
-          const units = widths.reduce((sum, w) => sum + w, 0) + TRACK * (TITLE_LETTERS.length - 1) + WORD_GAP;
-          const capH = Math.min((width * 0.82) / units, height * 0.3);
-          const lineW = units * capH;
-          const offsets = [];
-          let cursor = 0;
+          /* Phones stack the lockup: FIGMA on the first line, SOUND under it.
+             Every letter keeps its own line's width and vertical centre; the
+             flight and assembly run unchanged on the shifted rest points. */
+          const stacked = width < 700;
+          const lineOf = (index) => (stacked && index >= WORD_BREAK ? 1 : 0);
+          const GAP_Y = 0.55;
+          const lineUnits = [0, 0];
           TITLE_LETTERS.forEach((character, index) => {
-            offsets.push(cursor);
-            cursor += (widths[index] + TRACK + (index === WORD_BREAK - 1 ? WORD_GAP : 0)) * capH;
+            lineUnits[lineOf(index)] += widths[index];
+          });
+          if (stacked) {
+            lineUnits[0] += TRACK * (WORD_BREAK - 1);
+            lineUnits[1] += TRACK * (TITLE_LETTERS.length - WORD_BREAK - 1);
+          } else {
+            lineUnits[0] += TRACK * (TITLE_LETTERS.length - 1) + WORD_GAP;
+          }
+          const units = stacked ? Math.max(lineUnits[0], lineUnits[1]) : lineUnits[0];
+          const capH = stacked
+            ? Math.min((width * 0.82) / units, height * 0.14)
+            : Math.min((width * 0.82) / units, height * 0.3);
+          const lineWs = [lineUnits[0] * capH, lineUnits[1] * capH];
+          const lineW = stacked ? Math.max(lineWs[0], lineWs[1]) : lineWs[0];
+          const lineShift = (line) => (stacked ? (line === 0 ? -1 : 1) * (capH * (1 + GAP_Y)) / 2 : 0);
+          const offsets = [];
+          const cursors = [0, 0];
+          TITLE_LETTERS.forEach((character, index) => {
+            const line = lineOf(index);
+            offsets.push(cursors[line]);
+            cursors[line] += (widths[index] + TRACK + (!stacked && index === WORD_BREAK - 1 ? WORD_GAP : 0)) * capH;
           });
 
           let step = Math.max(3, capH / 11);
@@ -980,6 +1006,7 @@
               raw: sampleLetter(character, capH, step),
               boxW: widths[index] * capH,
               originX: offsets[index],
+              line: lineOf(index),
             }));
             const total = built.reduce((sum, item) => sum + item.raw.length / 3, 0);
             if (total <= MAX_POINTS) break;
@@ -1012,9 +1039,10 @@
             const seedB = new Float32Array(count);
             const seedC = new Float32Array(count);
             const seedD = new Float32Array(count);
+            const ownLineW = lineWs[item.line] || lineW;
             for (let i = 0; i < count; i += 1) {
-              points[i * 2] = item.originX + item.raw[i * 3] - lineW / 2;
-              points[i * 2 + 1] = item.raw[i * 3 + 1] - capH / 2;
+              points[i * 2] = item.originX + item.raw[i * 3] - ownLineW / 2;
+              points[i * 2 + 1] = item.raw[i * 3 + 1] - capH / 2 + lineShift(item.line);
               depth[i] = item.raw[i * 3 + 2];
               seedA[i] = Math.random();
               seedB[i] = Math.random();
@@ -1029,8 +1057,8 @@
               seedC,
               seedD,
               count,
-              centerX: item.originX + item.boxW / 2 - lineW / 2,
-              pan: Math.max(-0.85, Math.min(0.85, ((item.originX + item.boxW / 2) / lineW - 0.5) * 1.7)),
+              centerX: item.originX + item.boxW / 2 - ownLineW / 2,
+              pan: Math.max(-0.85, Math.min(0.85, ((item.originX + item.boxW / 2) / ownLineW - 0.5) * 1.7)),
             };
           });
         };
