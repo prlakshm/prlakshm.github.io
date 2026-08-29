@@ -5,6 +5,7 @@ import "../../styles/tokens.css";
 import "./home.css";
 import "../about/about.css";
 import Journal from "./Journal.js";
+import Decks from "./Decks.js";
 import ContactIcons from "./ContactIcons.js";
 import Manifesto from "../about/Manifesto.js";
 import { attachUnderlineWipe, prefersReducedMotion, PIN_MS, PIN_SLOP } from "./interactions.js";
@@ -1042,6 +1043,8 @@ function Home() {
             ))}
           </ul>
         </section>
+
+        <Decks />
 
         <section
           className="archive"

@@ -52,6 +52,7 @@
 /* --- Shared shells ------------------------------------------------------- */
 .hero,
 .shelf,
+.decks,
 .archive {
   max-width: var(--page-max);
   margin-inline: auto;
@@ -64,9 +65,12 @@
    only the breathing room changes.
    The shelf matches it so the outer notebooks land on exactly the line the
    pocket starts from. On the narrower column they stopped 16px short of it at
-   both ends, which read as the row not quite reaching the page's edges. */
+   both ends, which read as the row not quite reaching the page's edges.
+   The decks match too: their windows' outer edges sit on the same lines the
+   notebooks and the pocket answer to. */
 .archive,
-.shelf {
+.shelf,
+.decks {
   max-width: calc(var(--page-max) + var(--grid-minor-step));
 }
 
@@ -253,7 +257,8 @@
 /* Shared tip plate — opaque parchment kills the cutting-mat grid underneath. */
 .hero-pron,
 .jr-tooltip,
-.scrap-tooltip {
+.scrap-tooltip,
+.deck-tooltip {
   background: var(--tooltip-fill);
   border: 1px solid color-mix(in srgb, var(--espresso) 12%, transparent);
   border-radius: 1px;
@@ -1119,6 +1124,355 @@
   outline-offset: 10px;
 }
 
+/* --- Concept decks ------------------------------------------------------- */
+/* Two macOS windows playing the speculative decks, between the shelf and the
+   fabric. The breath above is exactly the shelf's bottom pad — walked up and
+   down by eye until it settled here (no extra pad, no negative pull); the
+   section's own bottom pad owns the breath down to the archive. */
+.decks {
+  /* One px above the zero-pad seat — asked for by eye. */
+  margin-top: -1px;
+  padding-block: 0 clamp(72px, 11.5vh, 152px);
+}
+
+.decks-row {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(64px, 7vw, 112px);
+  /* End, not start: the windows are the same height, so this keeps the pair
+     level even at widths where one label wraps to more lines than the other —
+     the labels then float at their own heights, the way the shelf's do. */
+  align-items: end;
+}
+
+/* Same reveal as the notebooks: opacity only, staggered by index, class from
+   an IntersectionObserver in Decks.tsx.
+   The gap is the leader's run: the dotted rule drops out of the label and
+   crosses most of it, stopping a breath above the window's chrome the way the
+   shelf's rules stop above the covers. */
+.deck {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  opacity: 0;
+  transition: opacity 620ms var(--ease-settle) calc(var(--di) * 90ms);
+}
+
+/* From the desktop tier up the windows run 88% of their columns and hug the
+   page's centre line — a pair sitting centre-left and centre-right of the
+   table rather than stretching to its edges. The slack falls to the outside. */
+@media (min-width: 1024px) {
+  .deck {
+    width: 92%;
+  }
+
+  .deck:first-child {
+    justify-self: end;
+  }
+
+  .deck:last-child {
+    justify-self: start;
+  }
+}
+
+.decks-row.is-in .deck {
+  opacity: 1;
+}
+
+/* Label over the window — the shelf annotation, verbatim: 14px system mono at
+   1.9, hanging indent off a fixed number column, the same width cap and 21ch
+   copy measure, and the dotted leader below (see .jr-annotation). Standalone
+   rules rather than shared selectors only because these labels are anchored to
+   the window's left edge, not centred over a cover. */
+.deck-annotation {
+  --label-indent: 25px;
+  --lead-h: 14px;
+  position: relative;
+  /* Roomy on purpose: the kicker's two-line shape comes from an explicit
+     break in Decks.tsx (title + "· SPECULATIVE" over the rest), not from this
+     cap — so the cap only governs the copy's measure and narrow-viewport
+     wrapping, and never fights the chosen break point. */
+  max-width: min(440px, 92%);
+  /* Centred over the window, left-aligned inside — exactly how the shelf's
+     labels sit over their covers — then eased a touch left of true centre,
+     asked for by eye. `left`, not a margin: a relative nudge moves the label,
+     its wash and its leader together without disturbing the centring math. */
+  align-self: center;
+  left: -14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  color: var(--mono-secondary);
+  pointer-events: none;
+}
+
+/* Same grid-softening wash as .jr-annotation, for the same reason. */
+.deck-annotation::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -9px -15px -11px -14px;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--parchment) 50%, transparent);
+  mask-image:
+    linear-gradient(to right, transparent 0%, #000 10%, #000 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%);
+  mask-composite: intersect;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, #000 10%, #000 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%);
+  -webkit-mask-composite: source-in;
+}
+
+.deck-kicker {
+  padding-left: var(--label-indent);
+  text-indent: calc(-1 * var(--label-indent));
+  font-family: var(--font-mono-system);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.9;
+  letter-spacing: normal;
+}
+
+.deck-num {
+  display: inline-block;
+  width: var(--label-indent);
+  /* Kills the kicker's inherited hanging indent inside this box — see
+     .jr-annotation-num for the failure it prevents. */
+  text-indent: 0;
+}
+
+
+.deck-copy {
+  max-width: 37ch;
+  padding-left: var(--label-indent);
+  font-family: var(--font-mono-system);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.9;
+  letter-spacing: normal;
+}
+
+/* Hug each copy to its own longest wrapped line (the first), measured from
+   the string itself — in a mono every character is exactly 1ch, and the
+   half-character is rounding slack. Without this the 37ch box above carries
+   ~5ch of dead space right of the text (no global border-box here, so the
+   cap is content width), and since the whole label is centred as a BOX over
+   the window, that invisible slack dragged the words visibly left of centre.
+   Re-derive these if either annotation string changes:
+     cursor: "Cursor as a creative tool for" = 29ch
+     figma:  "Sound as a new design system"  = 28ch */
+.deck[data-deck="cursor"] .deck-copy {
+  max-width: 29.5ch;
+}
+
+.deck[data-deck="figma"] .deck-copy {
+  max-width: 28.5ch;
+}
+
+/* The dotted leader, exactly the shelf's (.jr-leader): one rule in the number
+   column, from just under the kicker's first line down into the gap toward the
+   window, bottom-anchored so the partial dash hides under the kicker. */
+.deck-leader {
+  position: absolute;
+  left: calc(var(--label-indent) * 0.3);
+  top: 27px;
+  bottom: calc(-1 * var(--lead-h));
+  width: 1.3px;
+  background-image: repeating-linear-gradient(
+    to top,
+    currentColor 0 4px,
+    transparent 4px 9px
+  );
+  opacity: 0.52;
+}
+
+/* The window. Motion scales this on hover (Decks.tsx), so no transform may be
+   declared here — and nothing inside is position:fixed; the tooltip lives on
+   <body> precisely because this box takes a transform. */
+.deck-frame {
+  --chrome-h: 28px;
+  position: relative;
+  will-change: transform;
+}
+
+.deck-link {
+  display: block;
+  border-radius: 10px;
+  /* Clips the slides to the window's rounded corners. */
+  overflow: hidden;
+  text-decoration: none;
+  outline: none;
+  cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--espresso) 24%, transparent);
+  /* macOS window shadow, in the site's one espresso family. */
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--espresso) 24%, transparent),
+    0 22px 48px color-mix(in srgb, var(--espresso) 28%, transparent);
+  transition: box-shadow 340ms var(--ease-settle);
+}
+
+/* Deeper, longer shadow while Motion holds the window up — the light stays
+   put, so a thing that rises throws further. Toggled from Decks.tsx; safe in
+   CSS because Motion owns only the frame's transform. */
+.deck-frame.is-lifted .deck-link {
+  box-shadow:
+    0 4px 6px color-mix(in srgb, var(--espresso) 18%, transparent),
+    0 42px 88px color-mix(in srgb, var(--espresso) 40%, transparent);
+}
+
+.deck-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 6px;
+}
+
+/* Title bar: the thin gray line with the three lights. Decorative only. */
+.deck-chrome {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--chrome-h);
+  padding-inline: 12px;
+  background: linear-gradient(180deg, #eae6df, #dad5cc);
+  border-bottom: 1px solid color-mix(in srgb, var(--espresso) 18%, transparent);
+}
+
+.deck-light {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  /* The hairline every real traffic light carries. */
+  box-shadow: inset 0 0 0 0.5px rgb(0 0 0 / 0.14);
+}
+
+.deck-light--red {
+  background: #ff5f57;
+}
+
+.deck-light--yellow {
+  background: #febc2e;
+}
+
+.deck-light--green {
+  background: #28c840;
+}
+
+/* The slides are 16:9 exactly (960x540 PDF pages), and the screen holds that
+   ratio. Each slide carries its own inline zoom (`zooms` in Decks.tsx), tuned
+   per slide until the words read at window scale — the clip below is what
+   keeps the zoomed overflow off the title bar. */
+.deck-screen {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  /* Under the cover while it decodes; both decks open on dark slides. */
+  background: #16100b;
+  overflow: hidden;
+}
+
+.deck-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Only opacity — the per-slide zoom rides the inline transform. */
+  opacity: 0;
+  transition: opacity 300ms var(--ease-settle);
+}
+
+.deck-slide.is-active {
+  opacity: 1;
+}
+
+/* Flip arrows — bare chevrons over the slide, no chip or plate behind them;
+   the drop-shadow is what keeps them legible on the light slides as well as
+   the dark. Always present, resting at a quiet translucent gray; hovering the
+   ARROW itself brings it to full parchment and grows it. Siblings of the link
+   (never nested in it), floated above so a click flips rather than navigates.
+   Centred on the SCREEN, not the frame: the chrome bar is outside the picture
+   they page through. The 40px box is the hit target — invisible, but a
+   finger-sized thing to press. */
+.deck-nav {
+  position: absolute;
+  top: calc(var(--chrome-h) + (100% - var(--chrome-h)) / 2);
+  translate: 0 -50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: color-mix(in srgb, var(--parchment) 52%, transparent);
+  filter: drop-shadow(0 1px 5px rgb(0 0 0 / 0.6));
+  cursor: pointer;
+  transition: color 200ms var(--ease-settle),
+    transform 200ms var(--ease-settle);
+}
+
+.deck-nav--prev {
+  left: 8px;
+}
+
+.deck-nav--next {
+  right: 8px;
+}
+
+/* Hovering the WINDOW is what turns them white — the pair brightens together
+   the moment the window answers, not one arrow at a time. */
+.deck-frame:hover .deck-nav,
+.deck-frame:focus-within .deck-nav {
+  color: #fff;
+}
+
+/* `transform`, while `translate` carries the centring — the two properties
+   compose, so the grow never un-centres the arrow. */
+.deck-nav:hover {
+  color: #fff;
+  transform: scale(1.18);
+}
+
+.deck-nav:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  color: #fff;
+}
+
+.deck-nav-icon {
+  width: 21px;
+  height: 21px;
+}
+
+/* CTA chip riding the cursor — plate chrome shared with the other tips (see
+   the .hero-pron group). Parked on <body> because the frame it belongs to is
+   scaled by Motion while hovered. */
+.deck-tooltip {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 13px;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--mono-secondary);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 4px 12px var(--shadow-soft);
+  -webkit-text-stroke: 0.35px currentColor;
+}
+
 /* --- Fabric archive ------------------------------------------------------ */
 .archive {
   /* Extra top room so fabric can stick up out of the pocket mouth.
@@ -1788,6 +2142,13 @@
     transition-duration: 140ms;
   }
 
+  /* One window per row once two would fall under ~340px each. The arrows are
+     already always-on at coarse pointers; nothing else changes. */
+  .decks-row {
+    grid-template-columns: 1fr;
+    gap: 44px;
+  }
+
   /* Phone: single stacked column — no wrap, no overlap. */
   .scrap-row {
     flex-direction: column;
@@ -1816,7 +2177,8 @@
    only the pre-JS resting state and the transitions CSS still owns. */
 @media (prefers-reduced-motion: reduce) {
   .jr-stage,
-  .jr-shadow {
+  .jr-shadow,
+  .deck-nav {
     transition: none !important;
   }
 
