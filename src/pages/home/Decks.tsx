@@ -369,9 +369,12 @@ function Decks() {
      and CSS owns the (opacity-only) motion. The trigger line sits much lower
      than the shelf's -34%, though — the row's top edge is the LABELS, with
      the windows well below, so the shelf's line left a long stretch of empty
-     section on screen before anything faded in. -12% matches the hero and
-     manifesto entrances: the windows are already arriving as the section
-     clears the fold. (Top-edge + rootMargin rather than a ratio threshold for
+     section on screen before anything faded in. But -12% overshot: it fired
+     while the WINDOWS were still under the fold, the fade finished off
+     screen, and they arrived already opaque — no visible entrance at all.
+     -22% is the line where the windows' top edge has just cleared the fold
+     as the fade begins, so the same staggered fade the notebooks make is
+     actually seen. (Top-edge + rootMargin rather than a ratio threshold for
      the shelf's reason: a ratio is unsatisfiable once the stacked phone
      layout grows taller than the screen.) */
   useEffect(() => {
@@ -389,7 +392,7 @@ function Decks() {
           observer.unobserve(entry.target);
         });
       },
-      { threshold: 0, rootMargin: "0px 0px -12% 0px" }
+      { threshold: 0, rootMargin: "0px 0px -22% 0px" }
     );
     observer.observe(row);
     return () => observer.disconnect();
