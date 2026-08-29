@@ -130,6 +130,46 @@
       .print-still, .print-still body { scroll-snap-type: none !important; scroll-behavior: auto !important; }
       .print-still .sound-toggle { display: none !important; }
 
+      /* ——— chapter motion ————————————————————————————————————————————
+         Two moves only, armed via html.anim-armed (never under
+         prefers-reduced-motion or print capture): copy slides rise line by
+         line in step with their ticks, and the two artworks settle out of a
+         slight zoom on one beat. */
+      .sound-copy .reveal-line { display: block; overflow: hidden; padding-bottom: .1em; margin-bottom: -.1em; }
+      .sound-copy .reveal-line > span { display: block; }
+      .sound-art { overflow: hidden; }
+      .sound-art picture, .sound-art img { display: block; }
+      html.anim-armed [data-reveal-lines] .reveal-line > span {
+        transform: translateY(114%);
+        transition: transform .62s cubic-bezier(.16,.84,.26,1);
+      }
+      html.anim-armed .is-on [data-reveal-lines] .reveal-line > span {
+        transform: none;
+        transition-delay: calc(.10s + var(--li, 0) * .09s);
+      }
+      html.anim-armed .sound-art img {
+        transform: scale(1.045);
+        transition: transform 5.2s cubic-bezier(.22,.61,.36,1);
+      }
+      html.anim-armed .sound-art.is-on img { transform: scale(1); }
+      /* key phrases: one tone brighter, with a selection-blue underline that
+         draws in after their line lands (already drawn in static renders) */
+      .key-phrase { color: #b8d0cf; font-style: normal; position: relative; white-space: nowrap; }
+      .key-phrase::after {
+        content: "";
+        position: absolute;
+        left: 0; right: 0; bottom: -.06em;
+        height: 2px;
+        background: #0d99ff;
+        transform: scaleX(1);
+        transform-origin: 0 50%;
+      }
+      html.anim-armed .key-phrase::after { transform: scaleX(0); }
+      html.anim-armed .is-on .key-phrase::after {
+        transform: scaleX(1);
+        transition: transform .5s cubic-bezier(.2,.8,.2,1) .92s;
+      }
+
       /* Figma Sound chapter */
       .sound-slide {
         background: var(--sound-ground);
@@ -421,12 +461,19 @@
 
       <section class="slide sound-slide" data-slide="12" data-slide-audio="select" aria-label="Figma Sound campaign thesis">
         <span class="folio" aria-hidden="true">03 / 09</span>
-        <p class="sound-copy">Figma Sound makes sound a design system material.</p>
+        <p class="sound-copy" data-reveal-lines aria-label="Figma Sound makes sound a design system material.">
+          <span class="reveal-line" style="--li:0" aria-hidden="true"><span>Figma Sound makes sound</span></span>
+          <span class="reveal-line" style="--li:1" aria-hidden="true"><span>a <em class="key-phrase">design system material</em>.</span></span>
+        </p>
       </section>
 
       <section class="slide sound-slide" data-slide="13" data-slide-audio="select" aria-label="Sonic behavior">
         <span class="folio" aria-hidden="true">04 / 09</span>
-        <p class="sound-copy">A component can have visual states and motion behavior. Now, it can have sonic behavior.</p>
+        <p class="sound-copy" data-reveal-lines aria-label="A component can have visual states and motion behavior. Now, it can have sonic behavior.">
+          <span class="reveal-line" style="--li:0" aria-hidden="true"><span>A component can have visual states</span></span>
+          <span class="reveal-line" style="--li:1" aria-hidden="true"><span>and motion behavior. Now, it can</span></span>
+          <span class="reveal-line" style="--li:2" aria-hidden="true"><span>have <em class="key-phrase">sonic behavior</em>.</span></span>
+        </p>
       </section>
 
       <section class="slide sound-slide product-slide" data-slide="14" data-slide-audio="select" aria-label="Figma prototype Sound control">
@@ -449,7 +496,9 @@
 
       <section class="slide sound-slide" data-slide="17" data-slide-audio="select" aria-label="What does your interface sound like">
         <span class="folio" aria-hidden="true">08 / 09</span>
-        <p class="sound-copy closing">What will your interface sound like?</p>
+        <p class="sound-copy closing" data-reveal-lines aria-label="What will your interface sound like?">
+          <span class="reveal-line" style="--li:0" aria-hidden="true"><span>What will your interface <em class="key-phrase">sound</em> like?</span></span>
+        </p>
       </section>
 
       <section class="slide sound-slide sound-art piano-art" data-slide="18" data-slide-audio="resolve" aria-label="Ambient keyboard laboratory campaign artwork">
@@ -532,6 +581,134 @@
 
       const playDropCue = () => playAudioCue("drop", { volume: .38 });
 
+      /* ---- chapter cue scale ----------------------------------------------
+         One ascending A-rooted line instead of a reused click: a felt thump
+         under the megaphone, pitched ticks as the copy lines land (the
+         closing question takes the top tick), the scroll two-tap stepped up
+         per interface slide, and the felt piano key alone at the finale. */
+      const CUE_SEMITONES = [0, 2, 4, 7, 9, 12];
+      const cueRatio = (step) => Math.pow(2, CUE_SEMITONES[Math.max(0, Math.min(CUE_SEMITONES.length - 1, step))] / 12);
+      const CHAPTER_CUES = {
+        "11": { kind: "felt", step: 0 },
+        "12": { kind: "lines", step: 1, swipe: 1 },
+        "13": { kind: "lines", step: 2, swipe: 0.749 },
+        "14": { kind: "voice", step: 3 },
+        "15": { kind: "voice", step: 4 },
+        "16": { kind: "voice", step: 5 },
+        "17": { kind: "lines", step: 3, swipe: 0.667 },
+        "18": { kind: "resolve" },
+      };
+      const playTickCue = (mul, peak = 0.05) => {
+        const ctx = audioReady();
+        if (!ctx) return;
+        const t0 = ctx.currentTime + 0.02;
+        const bus = toneBus(ctx, 0, 1, 0.16);
+        const osc = ctx.createOscillator();
+        osc.frequency.value = 3400 * mul;
+        toneEnv(ctx, osc, t0, peak, 0.002, 0.05).connect(bus);
+        osc.start(t0); osc.stop(t0 + 0.09);
+        const hiss = ctx.createBufferSource();
+        hiss.buffer = noiseBuffer;
+        const band = ctx.createBiquadFilter();
+        band.type = "bandpass"; band.frequency.value = 5200 * mul; band.Q.value = 1.5;
+        hiss.connect(band);
+        toneEnv(ctx, band, t0, peak * 2.4, 0.001, 0.035).connect(bus);
+        hiss.start(t0); hiss.stop(t0 + 0.08);
+      };
+      const playFeltCue = (step) => {
+        const ctx = audioReady();
+        if (!ctx) return;
+        const r = cueRatio(step);
+        const t0 = ctx.currentTime + 0.02;
+        const bus = toneBus(ctx, -0.1, 1, 0.3);
+        for (const [freq, peak, dur] of [[110 * r, 0.22, 0.34], [220 * r, 0.06, 0.2]]) {
+          const osc = ctx.createOscillator();
+          osc.frequency.value = freq;
+          toneEnv(ctx, osc, t0, peak, 0.004, dur).connect(bus);
+          osc.start(t0); osc.stop(t0 + dur + 0.05);
+        }
+        const thud = ctx.createBufferSource();
+        thud.buffer = noiseBuffer;
+        const low = ctx.createBiquadFilter();
+        low.type = "bandpass"; low.frequency.value = 420; low.Q.value = 0.9;
+        thud.connect(low);
+        toneEnv(ctx, low, t0, 0.12, 0.003, 0.09).connect(bus);
+        thud.start(t0); thud.stop(t0 + 0.14);
+      };
+      const playSwipeCue = (depth = 1) => {
+        // charcoal with paper grain: the deep drag (170 -> 420 Hz) and soft
+        // tip-touch from the audition page, plus a quiet high grain layer
+        // (2.6 -> 5.2 kHz) and a drier send so the low body stays crisp.
+        // depth < 1 shifts the whole stroke down: the underlines descend
+        // across the chapter (slide 3 as written, then lower and lower),
+        // with a small level lift so the deeper strokes keep their weight.
+        const ctx = audioReady();
+        if (!ctx) return;
+        const t0 = ctx.currentTime + 0.02;
+        const dur = 0.5;
+        const lift = 1 + (1 - depth) * 0.5;
+        const bus = toneBus(ctx, 0.05, 1.3 * lift, 0.08);
+        const drag = ctx.createBufferSource();
+        drag.buffer = noiseBuffer;
+        const tip = ctx.createBiquadFilter();
+        tip.type = "bandpass";
+        tip.Q.value = 1.2;
+        tip.frequency.setValueAtTime(170 * depth, t0);
+        tip.frequency.exponentialRampToValueAtTime(420 * depth, t0 + dur * 0.85);
+        drag.connect(tip);
+        const env = ctx.createGain();
+        env.gain.setValueAtTime(0.0001, t0);
+        env.gain.exponentialRampToValueAtTime(0.07, t0 + 0.07);
+        env.gain.setValueAtTime(0.07, t0 + dur * 0.72);
+        env.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        tip.connect(env).connect(bus);
+        drag.start(t0);
+        drag.stop(t0 + dur + 0.05);
+        const touch = ctx.createBufferSource();
+        touch.buffer = noiseBuffer;
+        const low = ctx.createBiquadFilter();
+        low.type = "bandpass";
+        low.frequency.value = 280 * depth;
+        low.Q.value = 0.9;
+        touch.connect(low);
+        const tap = ctx.createGain();
+        tap.gain.setValueAtTime(0.0001, t0);
+        tap.gain.exponentialRampToValueAtTime(0.045, t0 + 0.008);
+        tap.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.07);
+        low.connect(tap).connect(bus);
+        touch.start(t0);
+        touch.stop(t0 + 0.12);
+        const grain = ctx.createBufferSource();
+        grain.buffer = noiseBuffer;
+        const tooth = ctx.createBiquadFilter();
+        tooth.type = "bandpass";
+        tooth.Q.value = 1.1;
+        tooth.frequency.setValueAtTime(2600 * depth, t0);
+        tooth.frequency.exponentialRampToValueAtTime(5200 * depth, t0 + dur * 0.85);
+        grain.connect(tooth);
+        const paper = ctx.createGain();
+        paper.gain.setValueAtTime(0.0001, t0);
+        paper.gain.exponentialRampToValueAtTime(0.02, t0 + 0.07);
+        paper.gain.setValueAtTime(0.02, t0 + dur * 0.72);
+        paper.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        tooth.connect(paper).connect(bus);
+        grain.start(t0);
+        grain.stop(t0 + dur + 0.05);
+      };
+      const playVoiceCue = (step) => {
+        const ctx = audioReady();
+        if (!ctx) return;
+        const r = Math.pow(2, ((step - 3) * 2) / 12);
+        const t0 = ctx.currentTime + 0.02;
+        const bus = toneBus(ctx, 0.08, 1, 0.2);
+        for (const [freq, at, peak, dur] of [[505 * r, 0, 0.16, 0.11], [758 * r, 0.044, 0.09, 0.09]]) {
+          const osc = ctx.createOscillator();
+          osc.frequency.value = freq;
+          toneEnv(ctx, osc, t0 + at, peak, 0.002, dur).connect(bus);
+          osc.start(t0 + at); osc.stop(t0 + at + dur + 0.05);
+        }
+      };
+
       // The title's canvas score remains independent. Every following Figma
       // campaign slide uses the shared selection cue; the piano closes on its
       // own restrained felt-piano key.
@@ -547,10 +724,12 @@
         }
         if (!force && index === lastCampaignCueIndex) return;
         if (!soundEnabled || !audioUnlocked) return;
-        const cue = slide.dataset.slideAudio;
         lastCampaignCueIndex = index;
-        if (cue === "select") playAudioCue("select", { volume: .28, playbackRate: 1 });
-        if (cue === "resolve") playAudioCue("resolve", { volume: .2, playbackRate: .94 });
+        const cue = CHAPTER_CUES[slide.dataset.slide];
+        if (!cue || cue.kind === "lines") return; // copy slides sound as their lines land
+        if (cue.kind === "felt") playFeltCue(cue.step);
+        else if (cue.kind === "voice") playVoiceCue(cue.step);
+        else if (cue.kind === "resolve") playAudioCue("resolve", { volume: .2, playbackRate: .94 });
       };
 
       const clearTitleTimers = () => {
@@ -1476,17 +1655,23 @@
          straight to one slide, freeze the embedded mocks on their money pose,
          and hide the fixed chrome. Driven by headless Chrome + a virtual-time
          budget, so the title particles run their assembly to the settle. */
-      const printSlide = new URLSearchParams(location.search).get("print");
-      if (printSlide) {
-        document.documentElement.classList.add("print-still");
-        for (const { frame } of protoFrames) {
-          if (!frame) continue;
-          frame.loading = "eager";
-          frame.src = frame.getAttribute("src") + "?still=1";
+      const captureParams = new URLSearchParams(location.search);
+      const printSlide = captureParams.get("print");
+      const goSlide = captureParams.get("go");
+      const isoSlide = printSlide || goSlide;
+      if (isoSlide) {
+        if (printSlide) {
+          document.documentElement.classList.add("print-still");
+          for (const { frame } of protoFrames) {
+            if (!frame) continue;
+            frame.loading = "eager";
+            frame.src = frame.getAttribute("src") + "?still=1";
+          }
         }
         // headless capture must not depend on scrolling: keep only the target
-        // slide so it renders at the top of an unscrolled page
-        const target = document.querySelector(`[data-slide="${printSlide}"]`);
+        // slide so it renders at the top of an unscrolled page. ?go=N keeps
+        // the motion system armed (QA); ?print=N disarms it (PDF stills).
+        const target = document.querySelector(`[data-slide="${isoSlide}"]`);
         if (target) {
           for (const s of [...slides]) if (s !== target) s.remove();
           window.scrollTo(0, 0);
@@ -1495,6 +1680,53 @@
           setTimeout(() => window.dispatchEvent(new Event("resize")), 250);
           setTimeout(() => window.dispatchEvent(new Event("resize")), 900);
         }
+      }
+
+      /* ---- chapter motion boot -------------------------------------------
+         Copy lines rise as their ticks sound; the two artworks settle out of
+         a slight zoom. Armed only for motion-friendly, non-capture visits so
+         the resting document and the PDF stills stay untouched. */
+      const animArmed = !reducedMotion.matches && !printSlide;
+      if (animArmed) document.documentElement.classList.add("anim-armed");
+
+      const lineTickTimers = new Map();
+      const scheduleLineTicks = (slide) => {
+        const cue = CHAPTER_CUES[slide.dataset.slide];
+        const lines = slide.querySelectorAll(".reveal-line").length;
+        if (!cue || cue.kind !== "lines" || !lines) return;
+        const timers = [];
+        for (let i = 0; i < lines; i += 1) {
+          timers.push(window.setTimeout(() => {
+            if (slide.classList.contains("is-on")) playTickCue(cueRatio(cue.step) * (1 + i * 0.07), 0.045);
+          }, 210 + i * 90 + 300));
+        }
+        if (slide.querySelector(".key-phrase")) {
+          // the underline starts drawing .92s after the slide arms
+          timers.push(window.setTimeout(() => {
+            if (slide.classList.contains("is-on")) playSwipeCue(cue.swipe || 1);
+          }, 920));
+        }
+        lineTickTimers.set(slide, timers);
+      };
+      const clearLineTicks = (slide) => {
+        for (const timer of lineTickTimers.get(slide) || []) window.clearTimeout(timer);
+        lineTickTimers.delete(slide);
+      };
+
+      if (animArmed) {
+        const entrances = new IntersectionObserver((entries) => {
+          for (const entry of entries) {
+            const slide = entry.target;
+            if (entry.intersectionRatio >= 0.55 && !slide.classList.contains("is-on")) {
+              slide.classList.add("is-on");
+              scheduleLineTicks(slide);
+            } else if (entry.intersectionRatio <= 0.12 && slide.classList.contains("is-on")) {
+              slide.classList.remove("is-on");
+              clearLineTicks(slide);
+            }
+          }
+        }, { threshold: [0.12, 0.55] });
+        for (const slide of document.querySelectorAll(".sound-slide")) entrances.observe(slide);
       }
     </script>
   </body>
