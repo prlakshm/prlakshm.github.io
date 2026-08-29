@@ -2142,18 +2142,22 @@
     transition-duration: 140ms;
   }
 
-  /* One window per row once two would fall under ~340px each. */
+  /* One window per row once two would fall under ~340px each. The 84px gap is
+     the shelf's own stacked rhythm, MEASURED at 375x812: Mixr's book bottom to
+     the Pinnables label above the next notebook. Both seams — window → next
+     label here, and book → Cursor label via the margin below — are pinned to
+     that same number so the whole column reads as one cadence. */
   .decks-row {
     grid-template-columns: 1fr;
-    gap: 44px;
+    gap: 84px;
   }
 
-  /* Stacked, the decks join the shelf's own column rhythm: cancel the shelf's
-     bottom pad and put back the 40px its stacked notebooks use between rows,
-     so the breath above the Cursor label matches the breath above each
-     notebook. Mirrors .shelf's padding-bottom — retune together. */
+  /* Stacked, the decks join the shelf's column rhythm: cancel the shelf's
+     bottom pad and put back the measured 84px seam (48px of it lands as
+     margin; the label's own offset supplies the rest — derived from the same
+     375x812 measurement). Mirrors .shelf's padding-bottom — retune together. */
   .decks {
-    margin-top: calc(40px - clamp(80px, 14vh, 176px));
+    margin-top: calc(88px - clamp(80px, 14vh, 176px));
   }
 
   /* The 14px left-of-centre ease is a desktop optical nudge (two windows side
