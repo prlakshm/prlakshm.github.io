@@ -2142,11 +2142,24 @@
     transition-duration: 140ms;
   }
 
-  /* One window per row once two would fall under ~340px each. The arrows are
-     already always-on at coarse pointers; nothing else changes. */
+  /* One window per row once two would fall under ~340px each. */
   .decks-row {
     grid-template-columns: 1fr;
     gap: 44px;
+  }
+
+  /* Stacked, the decks join the shelf's own column rhythm: cancel the shelf's
+     bottom pad and put back the 40px its stacked notebooks use between rows,
+     so the breath above the Cursor label matches the breath above each
+     notebook. Mirrors .shelf's padding-bottom — retune together. */
+  .decks {
+    margin-top: calc(40px - clamp(80px, 14vh, 176px));
+  }
+
+  /* The 14px left-of-centre ease is a desktop optical nudge (two windows side
+     by side); a single stacked window wants its label truly centred. */
+  .deck-annotation {
+    left: 0;
   }
 
   /* Phone: single stacked column — no wrap, no overlap. */
