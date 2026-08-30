@@ -30,6 +30,15 @@
         stroke: #fff;
         stroke-width: 1.25px;
       }
+      /* Phone: the lockup stacks — "indie", the heart, then "cursor", each on
+         its own line. Every line is sized in proportion to its own width, so
+         one glyph scale carries across all three. */
+      #wordmark.is-stacked {
+        display: grid;
+        justify-items: center;
+        gap: 3.2vw;
+      }
+      #wordmark.is-stacked .wm-line { margin: 0 auto; }
     </style>
   </head>
   <body>
@@ -1576,9 +1585,48 @@
     return { svg, play, stop: () => cancelAnimationFrame(raf), timeline };
   }
 
+  /* Phone: the settled lockup, stacked on three lines. The orbit itself is a
+     desktop affordance — this page mounts it already settled, and a phone has
+     no hover to drive the letters, so each line is drawn once and left still. */
+  function mountStackedLockup(hostEl, glyphs, splits) {
+    const laid = splits.map(([a, b]) => layoutGlyphs(glyphs.slice(a, b), { cellSize: CELL }));
+    const widest = Math.max(...laid.map((l) => l.totalWidth), 1);
+    hostEl.innerHTML = laid.map((l) => {
+      const parts = l.placed.map((g) => {
+        const y = (CELL - g.width) / 2 + (g.offsetY ?? 0);
+        // phase 0 renders the settled pretzel exactly: 2π/3 is this curve's own
+        // symmetry period, so the orbit's landing phase and 0 are one shape.
+        const d = pathForGlyph({ ...g, width: CELL }, RES, 0);
+        return `<g transform="translate(${(g.x + (g.offsetX ?? 0)).toFixed(2)}, ${y.toFixed(2)})"><g transform="rotate(${(g.rotation ?? 0).toFixed(2)} ${CELL / 2} ${CELL / 2})"><path d="${d}" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></g></g>`;
+      }).join("");
+      return `<div class="wm-line" style="width:${(l.totalWidth / widest * 100).toFixed(3)}%"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${l.totalWidth} ${CELL}" class="wordmark" aria-hidden="true" fill="none" style="overflow:visible">${parts}</svg></div>`;
+    }).join("");
+    return { stop() {} };
+  }
+
   // js/orbit-runtime.js
   var host = document.getElementById("wordmark");
-  mountOrbit(host, { startSettled: true });
+  // Glyph runs inside phraseIndieHeartCursor(): "indie", the heart, "cursor".
+  var STACK_LINES = [[0, 5], [5, 6], [6, 12]];
+  var PHONE = window.matchMedia("(max-width: 700px)");
+  var mounted = null;
+  function renderLockup() {
+    if (mounted && typeof mounted.stop === "function") { try { mounted.stop(); } catch (e) {} }
+    if (PHONE.matches) {
+      host.classList.add("is-stacked");
+      host.setAttribute("role", "img");
+      host.setAttribute("aria-label", "indie loves cursor");
+      mounted = mountStackedLockup(host, phraseIndieHeartCursor(), STACK_LINES);
+      return;
+    }
+    host.classList.remove("is-stacked");
+    host.removeAttribute("role");
+    host.removeAttribute("aria-label");
+    mounted = mountOrbit(host, { startSettled: true });
+  }
+  renderLockup();
+  if (PHONE.addEventListener) PHONE.addEventListener("change", renderLockup);
+  else PHONE.addListener(renderLockup);
 })();
 
     </script>
