@@ -30,6 +30,15 @@
         stroke: #fff;
         stroke-width: 1.25px;
       }
+      /* Phone: the lockup stacks — "cursor", the heart, then "indie", each on
+         its own line. Every line is sized in proportion to its own width, so
+         one glyph scale carries across all three. */
+      #wordmark.is-stacked {
+        display: grid;
+        justify-items: center;
+        gap: 3.2vw;
+      }
+      #wordmark.is-stacked .wm-line { margin: 0 auto; }
     </style>
   </head>
   <body>
@@ -1542,16 +1551,50 @@
 
   // js/bake-runtime.js
   var host = document.getElementById("wordmark");
-  var { svg, placed } = buildWordmarkSVG(phraseCursorHeartIndie(), {
-    ariaLabel: "cursor loves indie",
-    className: "wordmark",
-    interactive: true
-  });
-  host.innerHTML = svg;
-  mountCompileMotion(host.querySelector("svg"), placed, {
-    intro: [],
-    hover: DEFAULT_HOVER
-  });
+  // Glyph runs inside phraseCursorHeartIndie(): "cursor", the heart, "indie".
+  var STACK_LINES = [[0, 6], [6, 7], [7, 12]];
+  var PHONE = window.matchMedia("(max-width: 700px)");
+  var teardown = [];
+  function buildLine(glyphs, ariaLabel) {
+    return buildWordmarkSVG(glyphs, { ariaLabel, className: "wordmark", interactive: true });
+  }
+  function renderWordmark() {
+    for (const stop of teardown) {
+      if (typeof stop === "function") { try { stop(); } catch (e) {} }
+    }
+    teardown = [];
+    if (PHONE.matches) {
+      const glyphs = phraseCursorHeartIndie();
+      const built = STACK_LINES.map(([a, b]) => buildLine(glyphs.slice(a, b), ""));
+      const widest = Math.max(...built.map((b) => b.totalWidth), 1);
+      host.innerHTML = built.map(
+        (b) => `<div class="wm-line" style="width:${(b.totalWidth / widest * 100).toFixed(3)}%">${b.svg}</div>`
+      ).join("");
+      host.classList.add("is-stacked");
+      host.setAttribute("role", "img");
+      host.setAttribute("aria-label", "cursor loves indie");
+      const svgs = host.querySelectorAll("svg");
+      built.forEach((b, i) => {
+        svgs[i].removeAttribute("role");
+        svgs[i].removeAttribute("aria-label");
+        svgs[i].setAttribute("aria-hidden", "true");
+        teardown.push(mountCompileMotion(svgs[i], b.placed, { intro: [], hover: DEFAULT_HOVER }));
+      });
+      return;
+    }
+    host.classList.remove("is-stacked");
+    host.removeAttribute("role");
+    host.removeAttribute("aria-label");
+    const line = buildLine(phraseCursorHeartIndie(), "cursor loves indie");
+    host.innerHTML = line.svg;
+    teardown.push(mountCompileMotion(host.querySelector("svg"), line.placed, {
+      intro: [],
+      hover: DEFAULT_HOVER
+    }));
+  }
+  renderWordmark();
+  if (PHONE.addEventListener) PHONE.addEventListener("change", renderWordmark);
+  else PHONE.addListener(renderWordmark);
 })();
 
     </script>
