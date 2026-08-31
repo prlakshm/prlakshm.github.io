@@ -310,8 +310,29 @@ async function draw(){
   let tagIdx=pick(true);
   if(tagIdx<0)tagIdx=pick(false);
   const tagSpot=spots[tagIdx];
-  spots.forEach((p,i)=>{
-    if(i!==tagIdx)roughWord(GWORD,WORD_FS,GRAF,p.x,p.y+TYPO_Y+DOWN,p.rot,p.fade);
+
+  // Fill only the four reviewed pockets while keeping the alternate poster's
+  // wider generated aura intact. These draw before the figure so the words
+  // tuck naturally behind her silhouette.
+  {
+    const OFF=TYPO_Y+DOWN;
+    const POCKET_FILL=[
+      [332,624],[560,556],[812,486],       // above left arm and close above head
+      [1182,700],[1302,776],               // above right arm
+      [300,998],[452,1052],                // below left arm
+    ];
+    for(const [px,py] of POCKET_FILL){
+      const sy=py-OFF, e=7;
+      const dx=dist(px+e,sy)-dist(px-e,sy), dy=dist(px,sy+e)-dist(px,sy-e);
+      let rot=Math.atan2(dx,-dy);
+      if(Math.cos(rot)<0)rot+=Math.PI;
+      rot+=(rnd()-.5)*.16;
+      spots.push({x:px,y:sy,rot,fade:.97,L:RING_START});
+    }
+  }
+
+  spots.forEach(p=>{
+    if(p!==tagSpot)roughWord(GWORD,WORD_FS,GRAF,p.x,p.y+TYPO_Y+DOWN,p.rot,p.fade);
   });
 
   // ── the wave-band system ────────────────────────────────────────
