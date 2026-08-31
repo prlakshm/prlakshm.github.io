@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Mixr — Poster (side)</title>
+<title>Mixr — Poster (focus 2)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Caveat+Brush&family=Rubik+Spray+Paint&family=Rubik+Dirt&family=Rock+Salt&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
@@ -17,7 +17,7 @@
 const W=1600,H=2000;
 // ---- MIXR APP PALETTE (MixrColors.swift), tinted to the reference's value ----
 const Q=new URLSearchParams(location.search);
-const BGHEX='#'+(Q.get('bg')||'D9C9ED').replace('#','');   // CEB9E8, 5% lighter
+const BGHEX='#'+(Q.get('bg')||'E4E2EC').replace('#','');
 const BG_TOP=BGHEX, BG_MID=BGHEX, BG_BOT=BGHEX;               // flat ground
 
 // candidate letterforms for the tag — each sized to hold the same optical
@@ -52,37 +52,26 @@ const MICRO_FS=21;           // the small type the wave bands are built from
 const BAND_ROWS=10;           // rows of it stacked to make one band
 const LINE_H=22;
 const BAND_GAP=520;
-// ── the cut ─────────────────────────────────────────────────────────────
-// A loose wave down the sheet. The graffiti field is drawn exactly as it is
-// on the full poster, then CLIPPED to the left of this line — so tags that
-// straddle it are sliced mid-letter, as though a section were cut away.
-// A real wave, not a near-vertical edge. Two big lobes: the cut opens the
-// top-right wide, swells right around her arm at mid-height, pinches back in
-// at her hip, then opens again at the foot. ~450px of swing is what makes it
-// read as a curve rather than a trimmed margin.
-const CUT=[[-40,988],[180,1036],[420,1198],[640,1366],[860,1434],
-           [1080,1358],[1300,1216],[1520,1152],[1740,1228],[1960,1382],[2060,1424]];
-// The lower pinch is eased out along her right hip — it was cutting in too
-// hard there and left the hip reading empty.
-const cutX=y=>{
-  if(y<=CUT[0][0])return CUT[0][1];
-  for(let i=1;i<CUT.length;i++){
-    if(y<=CUT[i][0]){
-      const [y0,x0]=CUT[i-1],[y1,x1]=CUT[i];
-      const t=(y-y0)/(y1-y0);
-      return x0+(x1-x0)*((1-Math.cos(t*Math.PI))/2);   // eased — reads hand-drawn
-    }
-  }
-  return CUT[CUT.length-1][1];
-};
 const MB=74;                 // plain poster border, like the RUN reference
 const TYPO_Y=-MB;            // all typography lifts by exactly that, so the
 const DOWN=20;               // bands + purple tags only, nudged back down
                              // bottom rows clear the border instead of being cut          // one spacing for every band — perfectly even
-const RING_STEP=118;         // orbit lines packed tight — an aura, not a field         // distance between contour rings
-const RING_START=74;         // the first orbit hugs her silhouette        // first ring sits clear of her silhouette
-const RIGHT_HIP_EXTEND=10;   // move only the right-hip contour 10px farther out
+const RING_STEP=100;         // orbit lines packed tight — an aura, not a field         // distance between contour rings
+const RING_START=72;         // the first orbit hugs her silhouette        // first ring sits clear of her silhouette
 const STRIPE_HW=21;          // half-thickness of a wave stripe (~42px band)
+const FIGURE_SCALE=0.96;       // girl — 4% down
+const GRAFFITI_SCALE=0.96;     // purple + white tags — 4% down; stripes stay full size
+const GRAF_Y=-14;               // whole graffiti field, nudged up a little
+const PIVOT_X=W/2, PIVOT_Y=H;
+
+function withScale(scale,fn){
+  x.save();
+  x.translate(PIVOT_X,PIVOT_Y);
+  x.scale(scale,scale);
+  x.translate(-PIVOT_X,-PIVOT_Y);
+  fn();
+  x.restore();
+}
 
 function grain(alpha){
   const g=document.createElement('canvas');g.width=256;g.height=256;
@@ -222,7 +211,7 @@ async function draw(){
   // the edit extends her dress downward — lock typography to the original
   // canvas positions so the upper field still reads the same
   const REF_MID_SCALP=736, REF_RING_CY=1296, REF_TAG_Y=690;
-  const STRIPE_Y=0;
+  const STRIPE_Y=16;
   const ringCy=fig.cy0;
 
   // distance field from baseline silhouette — graffiti stays locked when FIG_Y moves
@@ -336,9 +325,10 @@ async function draw(){
   if(tagIdx<0)tagIdx=pick(false);
   const tagSpot=spots[tagIdx];
 
-  // ── The pockets marked in review. Tags draw BEFORE the figure. The general
-  //    fills stay hand-placed, while the right hip is rebuilt below from the
-  //    actual silhouette so intact words — not the figure's edge — make its curve.
+  // ── The pockets marked in review. Tags draw BEFORE the figure, so placing
+  //    them tight against her means they tuck under her silhouette the way the
+  //    one below her right arm does. Rotation comes from the same contour
+  //    tangent the orbits use, so they read as part of the aura.
   {
     const OFF=TYPO_Y+DOWN;
     const FILL=[
@@ -354,84 +344,24 @@ async function draw(){
         const gx=dist(px+e,sy)-dist(px-e,sy), gy=dist(px,sy+e)-dist(px,sy-e);
         rot=Math.atan2(gx,-gy);
         if(Math.cos(rot)<0)rot+=Math.PI;
-        rot+=(rnd()-.5)*.14;
+        rot+=(rnd()-.5)*.16;
       }
       spots.push({x:px,y:sy,rot,fade:.97,L:RING_START});
     }
-
-    // Walk the real right-hip outline at the inner-ring distance plus 10px.
-    // Words are emitted by accumulated arc length, so their painted shapes
-    // overlap into one continuous curve instead of reading as spaced labels.
-    const RIGHT_HIP_TOP=1380, RIGHT_HIP_BOTTOM=1900;
-    const RIGHT_HIP_DISTANCE=RING_START+RIGHT_HIP_EXTEND;
-    const RIGHT_HIP_EXTRA_Y=1540;
-    const RIGHT_HIP_EXTRA_DISTANCE=RIGHT_HIP_DISTANCE+RING_STEP;
-    const rightHipContour=()=>{
-      const path=[];
-      for(let py=RIGHT_HIP_TOP;py<=RIGHT_HIP_BOTTOM;py+=4){
-        let crossedBody=false;
-        for(let px=Math.floor(cx0Graf);px<W-MB;px+=4){
-          if(graf.maskAt(px,py)>128){crossedBody=true;continue}
-          if(crossedBody&&dist(px,py)>=RIGHT_HIP_DISTANCE){
-            path.push([px,py]);
-            break;
-          }
-        }
-      }
-      if(!path.length)return [];
-      const out=[];
-      let arc=wordW*.28,prev=path[0];
-      for(const p of path){
-        arc+=Math.hypot(p[0]-prev[0],p[1]-prev[1]);
-        prev=p;
-        if(arc<wordW*.55)continue;
-        arc=0;
-        const [px,py]=p,e=7;
-        const gx=dist(px+e,py)-dist(px-e,py), gy=dist(px,py+e)-dist(px,py-e);
-        let rot=Math.atan2(gx,-gy);
-        if(Math.cos(rot)<0)rot+=Math.PI;
-        out.push({x:px,y:py-OFF,rot,fade:.97,L:RING_START,hipContour:true});
-      }
-      return out;
-    };
-    const rightHipExtraWord=()=>{
-      let crossedBody=false;
-      for(let px=Math.floor(cx0Graf);px<W-MB;px+=4){
-        if(graf.maskAt(px,RIGHT_HIP_EXTRA_Y)>128){crossedBody=true;continue}
-        if(!crossedBody||dist(px,RIGHT_HIP_EXTRA_Y)<RIGHT_HIP_EXTRA_DISTANCE)continue;
-        const e=7;
-        const gx=dist(px+e,RIGHT_HIP_EXTRA_Y)-dist(px-e,RIGHT_HIP_EXTRA_Y);
-        const gy=dist(px,RIGHT_HIP_EXTRA_Y+e)-dist(px,RIGHT_HIP_EXTRA_Y-e);
-        let rot=Math.atan2(gx,-gy);
-        if(Math.cos(rot)<0)rot+=Math.PI;
-        return {
-          x:px,y:RIGHT_HIP_EXTRA_Y-OFF,rot,fade:.97,
-          L:RING_START+RING_STEP,hipContour:true,hipContourLayer:2
-        };
-      }
-      return null;
-    };
-
-    // Replace only the old inner orbit through this corridor. Outer rings and
-    // every non-hip area keep their current layout.
-    const hipPad=WORD_FS*.55;
-    for(let i=spots.length-1;i>=0;i--){
-      const p=spots[i], sy=p.y+OFF;
-      if(p===tagSpot||p.L>RING_START+1||p.x<cx0Graf)continue;
-      if(sy>=RIGHT_HIP_TOP-hipPad&&sy<=RIGHT_HIP_BOTTOM+hipPad)spots.splice(i,1);
-    }
-    spots.push(...rightHipContour());
-    const extraHipWord=rightHipExtraWord();
-    if(extraHipWord)spots.push(extraHipWord);
-
-    const tooClose=(px,py)=>{
-      for(const p of spots){
-        if(Math.hypot(px-p.x,py-(p.y+OFF))<wordW*0.62)return true;
+    // Three more, placed STRATEGICALLY: search outward from each marked area
+    // for ground that isn't already carrying a tag, and take the orbit tangent
+    // there so the new word clusters the way the rest of the aura does.
+    const tooClose=(px,py,rot)=>{
+      const c=Math.cos(-rot), sn=Math.sin(-rot);
+      for(const q of spots){
+        const qx=q.x-px, qy=(q.y+OFF)-py;
+        if(Math.abs(qx)>560||Math.abs(qy)>340)continue;
+        const lx=qx*c-qy*sn, ly=qx*sn+qy*c;
+        if(Math.abs(lx)<wordW*0.62&&Math.abs(ly)<WORD_FS*0.72)return true;
       }
       return false;
     };
-    const maxR=90;
-    const placeNear=(tx,ty)=>{
+    const placeNear=(tx,ty,maxR=260)=>{
       for(let r=0;r<=maxR;r+=15)for(let k=0;k<14;k++){
         const a=k*Math.PI/7+r*0.11;
         const px=tx+Math.cos(a)*r, py=ty+Math.sin(a)*r;
@@ -465,17 +395,10 @@ async function draw(){
   }
 
 
-  // The left edge of the field is made of WHOLE WORDS — the outermost orbit
-  // simply ends where its words end. Clipping the right edge instead sliced
-  // glyphs mid-letter, which is a different mechanism and reads mechanical.
-  // So the cut selects words rather than cutting them: a tag is kept when its
-  // centre falls left of the curve, and is then drawn intact. The boundary is
-  // built from word shapes on both sides.
-  spots.forEach((p,i)=>{
-    if(p===tagSpot)return;
-    const sy=p.y+TYPO_Y+DOWN;
-    if(!p.hipContour&&p.x>cutX(sy))return;
-    roughWord(GWORD,WORD_FS,GRAF,p.x,sy,p.rot,p.fade);
+  withScale(GRAFFITI_SCALE,()=>{
+    spots.forEach((p,i)=>{
+      if(p!==tagSpot)roughWord(GWORD,WORD_FS,GRAF,p.x,p.y+TYPO_Y+DOWN+GRAF_Y,p.rot,p.fade);
+    });
   });
 
   // ── the wave-band system ────────────────────────────────────────
@@ -489,7 +412,7 @@ async function draw(){
   // disappears into her head and reappears past her silhouette — which is why
   // no face-clearance search is needed here any more.
   const stack=sh=>{const r=[];for(let y=-BAND_GAP*2+sh;y<H+BAND_GAP*2;y+=BAND_GAP)r.push(y);return r};
-  const midScalp=headTop+gh*0.05+TYPO_Y+DOWN;
+  const midScalp=headTop+gh*0.05+TYPO_Y+DOWN+STRIPE_Y;
   const topOff=-(BAND_ROWS-1)/2*LINE_H;                  // where a band's row 0 sits
   const wantCentre=midScalp-topOff;                      // ...so row 0 lands above scalp
   const wantY0=wantCentre-A*Math.sin(2*Math.PI*cx0/L+PH);
@@ -518,8 +441,8 @@ async function draw(){
     const y=yAt(rows[headBand],cx0)+(r-(BAND_ROWS-1)/2)*LINE_H;
     if(maskAt(cx0,y)>110){headRow=r;break}
   }
-  mark(headBand,headRow+3);             // three rows down from the first that
-                                        // touches her — rides over, going lavender
+  mark(headBand,headRow+5);             // two rows down from the previous front row
+                                        // — rides over, going lavender; old one stays behind in black
 
   // across her chest, only the LOWER row — the upper one runs behind
   const chest=zone(0.36,0.60);
@@ -534,11 +457,21 @@ async function draw(){
   rows.forEach((y0,i)=>{const y=yAt(y0,cx0);if(y<H-40&&y>bottomY){bottomY=y;bottomBand=i}});
   if(bottomBand>=0&&bottomBand!==headBand){
     const br=Math.floor(BAND_ROWS/2);
-    mark(bottomBand,br);                // the row already riding over her…
-    mark(bottomBand,br+2);              // …and the next one down, a row apart
+    mark(bottomBand,br+1);              // both front rows one down from before
+    mark(bottomBand,br+3);              // previous pair now sits behind in black
+    const hipFront=(frontRows.get(bottomBand)||[]).slice().sort((a,b)=>a-b);
+    if(hipFront.length>2)frontRows.set(bottomBand,hipFront.slice(1));  // top extra row goes behind
   }
 
   const WORD='MIXR', TRACK=4;
+  // Overlay colour follows the DRAWN girl. She is scaled from the bottom, so
+  // the unscaled mask sits a little outside her — which is what turned the
+  // Mixr row lavender in the empty air left of her head.
+  const overMaskAt=(X,Y)=>{
+    const mx=PIVOT_X+(X-PIVOT_X)/FIGURE_SCALE;
+    const my=PIVOT_Y+(Y-PIVOT_Y)/FIGURE_SCALE;
+    return maskAt(mx,my);
+  };
   const band=(y0,keep,over)=>{
     x.font=`700 ${MICRO_FS}px "Space Mono"`;
     x.textAlign='center';x.textBaseline='middle';x.letterSpacing='4px';
@@ -551,7 +484,7 @@ async function draw(){
         const cw=x.measureText(ch).width;
         const cxp=t+cw/2, cy=yAt(y0,cxp)+off;
         x.save();x.translate(cxp,cy);x.rotate(Math.atan(slopeAt(cxp)));
-        x.fillStyle = (over && maskAt(cxp,cy)>110) ? LAV : BLACK;
+        x.fillStyle = (over && overMaskAt(cxp,cy)>110) ? LAV : BLACK;
         x.fillText(ch,0,0);
         x.restore();
         t+=cw+TRACK;
@@ -564,19 +497,23 @@ async function draw(){
   rows.forEach((y0,i)=>{const f=frontRows.get(i)||[];band(y0,r=>!f.includes(r),false)});
 
   // ── L4 · the figure — a purple plate a hair off-register, then her
-  const plate=document.createElement('canvas');plate.width=W;plate.height=H;
-  const pl=plate.getContext('2d');
-  pl.drawImage(mask,0,0);
-  pl.globalCompositeOperation='source-in';
-  pl.fillStyle=GHOST;pl.fillRect(0,0,W,H);
-  x.save();x.globalAlpha=.30;x.drawImage(plate,9,10);x.restore();
-  x.drawImage(mask,0,0);                       // true black-and-white figure
+  withScale(FIGURE_SCALE,()=>{
+    const plate=document.createElement('canvas');plate.width=W;plate.height=H;
+    const pl=plate.getContext('2d');
+    pl.drawImage(mask,0,0);
+    pl.globalCompositeOperation='source-in';
+    pl.fillStyle=GHOST;pl.fillRect(0,0,W,H);
+    x.save();x.globalAlpha=.30;x.drawImage(plate,9,10);x.restore();
+    x.drawImage(mask,0,0);                       // true black-and-white figure
+  });
 
   // ── L4b · the few bands that ride OVER her, going lavender as they cross
   rows.forEach((y0,i)=>{const f=frontRows.get(i)||[];if(f.length)band(y0,r=>f.includes(r),true)});
 
   // the aura's one white slot, drawn last so nothing buries it
-  if(tagSpot)roughWord(TAG,TAG_FS,WHITE,tagSpot.x,tagSpot.y+TYPO_Y,tagSpot.rot+TAG_TILT,tagSpot.fade);
+  if(tagSpot)withScale(GRAFFITI_SCALE,()=>{
+    roughWord(TAG,TAG_FS,WHITE,tagSpot.x,tagSpot.y+TYPO_Y+GRAF_Y,tagSpot.rot+TAG_TILT,tagSpot.fade);
+  });
 
   // ── L5 · the one white line, same size as every other word
 

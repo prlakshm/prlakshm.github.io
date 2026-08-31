@@ -1,0 +1,170 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>C — Refraction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#17181C;display:grid;place-items:center;min-height:100vh}
+  canvas{height:min(96vh,1200px);width:auto;box-shadow:0 30px 90px rgba(0,0,0,.55)}
+  body.export canvas{height:2000px;box-shadow:none}
+</style>
+</head>
+<body>
+<canvas id="c" width="1600" height="2000"></canvas>
+<script src="mixr-kit.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   C — REFRACTION
+   One idea: the app is a lens you put over your music. The Mixr icon —
+   a superellipse, drawn here as maths rather than an asset — is dropped on
+   the sheet at a metre wide, and the artwork behind it is genuinely
+   re-sampled through it: zero displacement through the middle, rising hard
+   at the rim, with R, G and B pulled from three different places so the
+   glass disperses light the way real glass does.
+   Nothing here is an image file. The field, the mark and the bend are code.
+   ═══════════════════════════════════════════════════════════════════════ */
+const {W,H,C} = MK;
+const {cv,x} = MK.boot('c');
+
+const M    = 100;
+const LX   = 862, LY = 1178, LR = 452;      // the lens
+const LANE = [C.pink, C.purple, C.blue, C.yellow, C.red, C.purpleLt];
+
+/* The app's mark, drawn from its proportions rather than pasted in. */
+function iconMark(ctx, cx, cy, w, h, color, o = {}) {
+  const F = [0.40, 0.62, 1.00, 0.45, 0.76, 0.30];
+  const bw = w / (F.length * 1.9);
+  const gap = (w - F.length * bw) / (F.length - 1);
+  ctx.save();
+  ctx.fillStyle = color;
+  if (o.glow) { ctx.shadowColor = o.glowColor || color; ctx.shadowBlur = o.glow; }
+  F.forEach((f, i) => {
+    const bh = h * f, bx = cx - w / 2 + i * (bw + gap);
+    MK.rrect(ctx, bx, cy - bh / 2, bw, bh, bw / 2);
+    ctx.fill();
+  });
+  ctx.restore();
+}
+
+async function draw(){
+  await MK.fonts();
+  MK.srnd(4404);
+
+  /* ══ PASS 1 · what the lens will look at ══════════════════════════ */
+
+  /* ── LAYER · BACKGROUND ─────────────────────────────────────────── */
+  x.fillStyle = C.black; x.fillRect(0,0,W,H);
+  const bloom = x.createRadialGradient(LX, LY, 40, LX, LY, 1180);
+  bloom.addColorStop(0, MK.rgba(C.purple,.34));
+  bloom.addColorStop(.42, MK.rgba(C.purpleDk,.13));
+  bloom.addColorStop(1, 'rgba(5,8,22,0)');
+  x.fillStyle = bloom; x.fillRect(0,0,W,H);
+
+  /* ── LAYER · SIGNAL FIELD ───────────────────────────────────────
+     Sixteen lanes of generated audio, dead straight and evenly spaced.
+     Straight lines are what makes a bend legible. */
+  const N = 16, TOP = 214, SPAN = 1580;
+  function field(ctx){
+    for (let i = 0; i < N; i++) {
+      const y = TOP + SPAN * (i / (N - 1));
+      const col = LANE[i % LANE.length];
+      const d = Math.abs(y - LY) / 1000;
+      ctx.strokeStyle = MK.rgba(col,.13); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+      MK.waveLane(ctx, -40, y - 26, W + 80, 52, col,
+                  { s: 1200 + i * 77, body:false, bar:3, gap:5,
+                    alpha: .26 + .52 * Math.max(0, 1 - d),
+                    swell:.66, floor:.12, jag:.55 });
+    }
+  }
+  field(x);
+
+  /* ── LAYER · DISPLAY TYPE · laid across the lens, to be bent ────── */
+  x.save();
+  x.shadowColor = 'rgba(5,8,22,.9)'; x.shadowBlur = 46;
+  x.fillStyle = C.white;
+  MK.fillStretched(x, 'MIXR', 68, 1428, 1464, 336, '900 200px Archivo');
+  x.restore();
+
+  /* ══ PASS 2 · the glass ═══════════════════════════════════════════ */
+
+  // it casts a shadow — but only outside itself, so the field underneath
+  // survives intact for the lens to re-sample
+  x.save();
+  x.beginPath(); x.rect(0,0,W,H);
+  MK.squircle(x, LX, LY, LR, LR, 4.4, 240, false);
+  x.clip('evenodd');
+  x.shadowColor = 'rgba(0,0,0,.66)'; x.shadowBlur = 64; x.shadowOffsetY = 30;
+  x.fillStyle = 'rgba(0,0,0,.55)';
+  MK.squircle(x, LX, LY, LR, LR, 4.4); x.fill();
+  x.restore();
+
+  /* ── the bend itself: every pixel under the tile re-sampled, per channel ── */
+  MK.refractSquircle(x, cv, LX, LY, LR, LR,
+                     { n:4.4, strength:48, rim:.33, power:2.2,
+                       disperse:.30, zoom:1.03 });
+  MK.glassSurface(x, LX, LY, LR, LR,
+                  { n:4.4, frost:.018, gloss:.20, spec:.24, bounce:C.purple, rim:.75 });
+
+  /* ══ PASS 3 · the crisp layer ═════════════════════════════════════ */
+
+  // header — the mark again, at logo size, drawn from the same maths
+  iconMark(x, M + 24, 132, 42, 40, C.purpleLt, {});
+  x.fillStyle = C.white;
+  x.font = '900 52px Archivo, system-ui'; x.letterSpacing = '-1px';
+  x.textBaseline = 'alphabetic'; x.fillText('Mixr', M + 62, 150);
+  x.letterSpacing = '0px';
+  MK.meta(x,'iOS DJ APP', W-M, 150,
+          {fs:22, track:8, weight:500, color:MK.rgba(C.white,.78), align:'right'});
+  x.strokeStyle = MK.rgba(C.white,.28); x.lineWidth = 1.5;
+  x.beginPath(); x.moveTo(M,178); x.lineTo(W-M,178); x.stroke();
+
+  // leader line to the tile, and what it is
+  x.strokeStyle = MK.rgba(C.white,.42); x.lineWidth = 1;
+  x.beginPath();
+  x.moveTo(W-M, 640); x.lineTo(1372, 640); x.lineTo(1276, 786);
+  x.stroke();
+  x.beginPath(); x.arc(1276, 786, 3.5, 0, 7); x.fillStyle = MK.rgba(C.white,.7); x.fill();
+  MK.meta(x,'THE APP ICON, AT 900 mm, IN GLASS', W-M, 626,
+          {fs:12, track:3, weight:600, color:MK.rgba(C.white,.66), align:'right'});
+  MK.meta(x,'R / G / B SAMPLED APART AT THE RIM', W-M, 668,
+          {fs:11, track:3, weight:400, color:MK.rgba(C.white,.42), align:'right'});
+
+  // dispersion legend — three offsets, which is literally what happened
+  const gx = M, gy = 1734;
+  x.save(); x.globalCompositeOperation = 'screen';
+  [[C.red,-9],['#22C55E',0],[C.blue,9]].forEach(([col,d])=>{
+    x.fillStyle = col; MK.rrect(x, gx + d, gy, 40, 9, 4.5); x.fill();
+  });
+  x.restore();
+  MK.meta(x,'DISPERSION — THREE OFFSETS, ONE PIXEL', gx + 66, gy + 9,
+          {fs:11, track:3, weight:600, color:MK.rgba(C.white,.5)});
+
+  // footer
+  x.strokeStyle = MK.rgba(C.white,.24); x.lineWidth = 1.4;
+  x.beginPath(); x.moveTo(M,1836); x.lineTo(W-M,1836); x.stroke();
+  x.font = '400 13px "Space Mono", monospace'; x.letterSpacing = '2px';
+  x.fillStyle = MK.rgba(C.white,.55);
+  x.fillText('C / REFRACTION', M, 1886);
+  x.fillText('16 LANES · ONE LENS · SAMPLED PER PIXEL', M, 1912);
+  ['1600 × 2000','MMXXVI'].forEach((t,i)=>{
+    const w = x.measureText(t).width;
+    x.fillText(t, W-M-w, 1886 + i*26);
+  });
+  x.letterSpacing = '0px';
+
+  /* ── LAYER · FINISH ────────────────────────────────────────────── */
+  MK.regMark(x, 44, 44, MK.rgba(C.white,.30), 11);
+  MK.regMark(x, W-44, 44, MK.rgba(C.white,.30), 11);
+  MK.regMark(x, 44, H-44, MK.rgba(C.purple,.9), 11);
+  MK.regMark(x, W-44, H-44, MK.rgba(C.white,.30), 11);
+  MK.vignette(x, {inner:.40, outer:.98, amount:.42});
+  MK.filmGrain(x, {alpha:.26, size:220, amp:30});
+}
+draw();
+</script>
+</body>
+</html>

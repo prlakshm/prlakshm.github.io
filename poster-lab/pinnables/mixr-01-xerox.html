@@ -1,0 +1,213 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>01 — Documentary Xerox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#1b1c20;display:grid;place-items:center;min-height:100vh}
+  canvas{height:min(96vh,1200px);width:auto;box-shadow:0 30px 90px rgba(0,0,0,.55)}
+  body.export canvas{height:2000px;box-shadow:none}
+</style>
+</head>
+<body>
+<canvas id="c" width="1600" height="2000"></canvas>
+<script src="mixr-kit.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   01 — DOCUMENTARY XEROX
+   One editor screenshot, inverted and run through a photocopier: the app
+   treated as a documentary photograph of a scene rather than a product
+   shot. Achromatic throughout except one screen-printed pink plate that
+   missed its register — lifted straight out of the real waveform colour.
+   ═══════════════════════════════════════════════════════════════════════ */
+const {W,H,C} = MK;
+const {cv,x} = MK.boot('c');
+const M = 112;                       // editorial margin
+const SAFE = 150;                    // crop-safe inset for essential type
+
+async function draw(){
+  await MK.fonts();
+  MK.srnd(20260831);
+  const ipad  = await MK.load('assets/mixr/ipad.png');
+  const clip  = await MK.load('assets/mixr/clip-menu.png');
+  const icon  = await MK.load('assets/mixr/icon.png');
+
+  /* ── LAYER · BACKGROUND ─────────────────────────────────────────── */
+  x.fillStyle = C.paper; x.fillRect(0,0,W,H);
+  // copier platen falloff — darker toward the edges, brightest under the lid
+  const vg = x.createRadialGradient(W*.46,H*.44,H*.18, W*.5,H*.5,H*.92);
+  vg.addColorStop(0,'rgba(0,0,0,0)');
+  vg.addColorStop(.62,'rgba(60,52,40,.05)');
+  vg.addColorStop(1,'rgba(40,34,28,.20)');
+  x.fillStyle = vg; x.fillRect(0,0,W,H);
+  // the gutter shadow of a page lifted off the glass
+  const gut = x.createLinearGradient(0,0,168,0);
+  gut.addColorStop(0,'rgba(20,19,26,.34)');
+  gut.addColorStop(.45,'rgba(20,19,26,.06)');
+  gut.addColorStop(1,'rgba(20,19,26,0)');
+  x.fillStyle = gut; x.fillRect(0,0,168,H);
+
+  /* ── LAYER · PAPER & TEXTURE ────────────────────────────────────── */
+  MK.fibre(x, 0,0,W,H, '#8B8474', 420, .05);
+  MK.dotField(x, 0,0,W,H, 9, .5, 'rgba(20,19,26,.20)', .5);   // stock tooth
+
+  /* ── LAYER · REGISTRATION GRID (drafting underlay, upper field) ─── */
+  MK.grid(x, M, 196, W-2*M, 300, 27, 'rgba(20,19,26,.055)', 1, 4, 'rgba(20,19,26,.10)');
+
+  /* ══ LAYER · PRODUCT IMAGERY ═════════════════════════════════════
+     The editor, inverted so near-black chrome becomes paper and the UI
+     reads as something that was printed, then dot-screened. Original
+     source stays intact underneath every effect. */
+  const PW = 1338, PH = 834, PX = 2, PY = 600;
+  const src = {sx:20, sy:126, sw:1004, sh:626};                // bold crop: six lanes, edge to edge
+  const plate = MK.xerox(ipad, src.sx,src.sy,src.sw,src.sh, PW,PH,
+                         {invert:true, contrast:1.42, bright:.03, dust:.0006});
+  MK.scanStreaks(plate.getContext('2d'), 0,0,PW,PH, 22, .13);
+  const dots  = MK.halftone(plate, 5, C.toner, {angle:.34, minR:.14, maxR:.60});
+
+  // the pink plate: the real waveformPink pulled out of the untouched
+  // screenshot and printed flat, 14px out of register
+  const raw = MK.offc(PW,PH);
+  raw.ctx.drawImage(ipad, src.sx,src.sy,src.sw,src.sh, 0,0,PW,PH);
+  const pinkPlate = MK.spotPlate(raw.canvas,
+    (r,g,b) => r>165 && b>100 && g < r-62 && r-b > 34, C.pink);
+
+  x.save();
+  x.translate(PX+PW/2, PY+PH/2); x.rotate(-.011); x.translate(-(PX+PW/2), -(PY+PH/2));
+
+  // dropped shadow of the scrap
+  x.save();
+  x.fillStyle='rgba(20,19,26,.30)'; x.shadowColor='rgba(20,19,26,.34)';
+  x.shadowBlur=22; x.shadowOffsetX=6; x.shadowOffsetY=13;
+  MK.tornPath(x,PX,PY,PW,PH,'rb',13,17); x.fill();
+  x.restore();
+
+  MK.srnd(4411);
+  x.save(); MK.tornPath(x,PX,PY,PW,PH,'rb',13,17); x.clip();
+    x.drawImage(plate, PX,PY);
+    x.globalAlpha=.46; x.globalCompositeOperation='multiply';
+    x.drawImage(dots, PX,PY);
+    x.globalCompositeOperation='source-over'; x.globalAlpha=1;
+    // ── LAYER · COLOUR OVERLAY · pink spot plate, out of register
+    x.globalCompositeOperation='multiply'; x.globalAlpha=.92;
+    x.drawImage(pinkPlate, PX+14, PY-9);
+    x.globalCompositeOperation='source-over'; x.globalAlpha=1;
+    MK.tonerBand(x, PX, PY+540, PW, 190, .22);           // drum dropout
+  x.restore();
+  MK.srnd(4411);
+  x.save(); MK.tornPath(x,PX,PY,PW,PH,'rb',13,17); x.clip();
+    MK.srnd(4411); MK.tornPath(x,PX,PY,PW,PH,'rb',13,17);
+    x.strokeStyle='#F7F4ED'; x.lineWidth=4; x.globalAlpha=.9; x.stroke();
+  x.restore();
+  x.restore();
+  MK.srnd(90210);
+
+  /* ── LAYER · FIXINGS · the scrap is taped and stapled down ──────── */
+  MK.tape(x, 1252, 646, 196, 46, -.42, {tint:'rgba(255,255,255,.30)'});
+  MK.tape(x, 96, 1392, 218, 44, .10,  {tint:'rgba(255,255,255,.30)'});
+  MK.staple(x, 236, 620, -.06);
+  MK.staple(x, 1160, 1390, .10);
+
+  /* ══ LAYER · DISPLAY TYPOGRAPHY ══════════════════════════════════
+     One dominant mark: MIXR, hand-painted, oversized, sitting on the
+     paper above the photograph and overrunning its top edge. */
+  // its own screen-printed pink shadow, a hair off register
+  MK.srnd(777); MK.tag(x,'MIXR',430,MK.rgba(C.pink,.95), 748+21, 424-14, -.028,
+                       {alpha:.88, erode:.55});
+  MK.srnd(777); MK.tag(x,'MIXR',430,C.toner, 748, 424, -.028, {alpha:.97, erode:1.05});
+
+  /* ── LAYER · HAND-DRAWN MARKS ──────────────────────────────────── */
+  MK.arrow(x, [[1420,884],[1360,912],[1300,920]], C.toner, 4.5, 22, .8);
+  MK.circleMark(x, 212, 782, 196, 50, C.pink, 3.4, .9);      // rings one track row
+
+  /* ── LAYER · SIDE RAIL · a second, smaller photocopy ───────────── */
+  const CW = 328, CH = 58, CX = 1178, CY = 1108;
+  const chip = MK.xerox(clip, 780,84, 552,98, CW,CH,
+                        {invert:true, contrast:1.6, bright:.02, dust:.001});
+  const chipD = MK.halftone(chip, 4, C.toner, {angle:.9, maxR:.62});
+  MK.srnd(618);
+  MK.pasteTorn(x, chip, CX, CY, CW, CH, .045,
+               {edges:'lr', rough:7, step:10, shadow:.26, lip:'#F7F4ED', lipW:2.5});
+  x.save(); x.globalAlpha=.42; x.globalCompositeOperation='multiply';
+  x.translate(CX+CW/2,CY+CH/2); x.rotate(.045); x.translate(-(CX+CW/2),-(CY+CH/2));
+  x.drawImage(chipD, CX,CY); x.restore();
+  MK.tape(x, CX+CW-26, CY+CH/2, 90, 28, .045, {tint:'rgba(255,255,255,.32)'});
+
+  // ── LAYER · APP ICON · one oversized fragment, photocopied
+  const ico  = MK.xerox(icon, 22,22, 376,376, 132,132,
+                        {invert:true, contrast:1.5, bright:.02, dust:.0016});
+  const icoD = MK.halftone(ico, 4, C.toner, {angle:.2, maxR:.66});
+  MK.srnd(2255);
+  MK.pasteTorn(x, ico, 1348, 236, 132, 132, -.06,
+               {edges:'trbl', rough:6, step:9, shadow:.24, lip:'#F7F4ED', lipW:2.5});
+  x.save(); x.globalAlpha=.5; x.globalCompositeOperation='multiply';
+  x.translate(1348+66,236+66); x.rotate(-.06); x.translate(-(1348+66),-(236+66));
+  x.drawImage(icoD, 1348,236); x.restore();
+  MK.tape(x, 1348, 232, 74, 26, -.55, {tint:'rgba(255,255,255,.30)'});
+
+  /* ══ LAYER · LABELS & METADATA ═══════════════════════════════════ */
+  // masthead strip
+  x.strokeStyle='rgba(20,19,26,.78)'; x.lineWidth=2.2;
+  x.beginPath(); x.moveTo(M,176); x.lineTo(W-M,176); x.stroke();
+  MK.meta(x,'AN iOS DJ APP', M, 158, {fs:17, track:7, weight:700, color:C.toner});
+  MK.meta(x,'DOCUMENTARY XEROX / 01', W-M, 158,
+          {fs:17, track:7, weight:500, color:'rgba(20,19,26,.72)', align:'right'});
+
+  // the concept line — reading order 3, set as a caption not a paragraph
+  x.strokeStyle='rgba(20,19,26,.5)'; x.lineWidth=1.2;
+  x.beginPath(); x.moveTo(M,1596); x.lineTo(W-M,1596); x.stroke();
+  x.fillStyle = C.toner;
+  MK.fillStretched(x,'DJING SHOULDN’T REQUIRE', M, 1704, W-2*M, 76,
+                   '900 200px Archivo');
+  x.fillStyle = C.toner;
+  MK.fillStretched(x,'YOU BEING A DJ', M, 1796, 940, 76, '900 200px Archivo');
+  // pink screen-print slab closing the line
+  x.save(); x.globalCompositeOperation='multiply';
+  x.fillStyle = MK.rgba(C.pink,.9);
+  x.fillRect(M+968, 1728, W-M-(M+968), 70);
+  x.restore();
+  MK.meta(x,'AN iOS DJ APP', M+988, 1772, {fs:16,track:5,weight:800,color:C.paper});
+
+  // technical captions along the plate
+  MK.meta(x,'FIG. 1 · SIX TRACKS · 102 BPM · G MAJOR · EXPORTED',
+          M, 1552, {fs:14, track:4, weight:500, color:'rgba(20,19,26,.74)'});
+  MK.meta(x,'FIG. 2 · CLIP MENU — SPLIT · SPEED · DUPLICATE · DELETE', W-M, 1204,
+          {fs:12, track:3, weight:600, color:'rgba(20,19,26,.82)', align:'right'});
+  MK.meta(x,'FIG. 3', 1348, 214, {fs:11, track:3, weight:700, color:'rgba(20,19,26,.6)'});
+
+  // vertical rail metadata beside the plate
+  x.save(); x.translate(1496, 1392); x.rotate(-Math.PI/2);
+  MK.meta(x,'IMPORT — ARRANGE — CUT — MIX — EXPORT', 0,0,
+          {fs:14, track:8, weight:600, color:'rgba(20,19,26,.6)'});
+  x.restore();
+
+  // pencilled annotation in the marker hand
+  MK.srnd(1201);
+  MK.tag(x,'one timeline.',54,'rgba(20,19,26,.80)', 1290, 1512, -.05,
+         {erode:.8, align:'center'});
+
+  /* ── LAYER · PRESS FURNITURE ───────────────────────────────────── */
+  MK.colourBar(x, M, H-136, 40, 20, [C.toner, C.gray, C.pink], 5);
+  MK.meta(x,'MIXR', M, H-72, {fs:15, track:9, weight:900, color:C.toner});
+  MK.meta(x,'MMXXVI', W-M, H-72,
+          {fs:15, track:9, weight:500, color:'rgba(20,19,26,.6)', align:'right'});
+  MK.regMark(x, 60, 60, 'rgba(20,19,26,.55)', 13);
+  MK.regMark(x, W-60, 60, 'rgba(20,19,26,.55)', 13);
+  MK.regMark(x, 60, H-60, MK.rgba(C.pink,.8), 13);           // the pink plate's mark,
+  MK.regMark(x, W-60, H-60, 'rgba(20,19,26,.55)', 13);       // deliberately off
+  MK.cropMarks(x, 40, 30, 'rgba(20,19,26,.5)', 1.3);
+
+  /* ── LAYER · FINAL PASS ────────────────────────────────────────── */
+  MK.scanStreaks(x, 0,0,W,H, 10, .05);
+  MK.grain(x, .55, 240, 24, 'multiply');
+  x.save(); x.globalAlpha=.22; x.globalCompositeOperation='screen';
+  x.fillStyle = x.createPattern(MK.noiseCanvas(200,20),'repeat');
+  x.fillRect(0,0,W,H); x.restore();
+}
+draw();
+</script>
+</body>
+</html>

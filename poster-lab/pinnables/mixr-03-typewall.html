@@ -1,0 +1,258 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>03 — Type + Sticker Wall</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#1b1c20;display:grid;place-items:center;min-height:100vh}
+  canvas{height:min(96vh,1200px);width:auto;box-shadow:0 30px 90px rgba(0,0,0,.55)}
+  body.export canvas{height:2000px;box-shadow:none}
+</style>
+</head>
+<body>
+<canvas id="c" width="1600" height="2000"></canvas>
+<script src="mixr-kit.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   03 — OVERSIZED TYPE + STICKER WALL
+   MIXR at the size of a hoarding, cropped by the sheet, with earlier
+   pastings still showing underneath. Everything else in the product is a
+   sticker slapped across it. Editorial structure, rough physical marks,
+   one dominant purple.
+   ═══════════════════════════════════════════════════════════════════════ */
+const {W,H,C} = MK;
+const {cv,x} = MK.boot('c');
+const M = 108;
+
+/* A die-cut sticker: white border, wobbling cut line, drop shadow, gloss. */
+function sticker(src, X, Y, w, h, rot, o = {}) {
+  const { radius = 22, border = 12, shadow = .55, gloss = true, sd = 1 } = o;
+  const cx = X + w/2, cy = Y + h/2;
+  MK.srnd(sd);
+  x.save();
+  x.translate(cx, cy); x.rotate(rot); x.translate(-cx, -cy);
+
+  // the die-cut plate, its edge slightly out of true
+  x.save();
+  x.shadowColor = `rgba(0,0,0,${shadow})`; x.shadowBlur = 26;
+  x.shadowOffsetX = 7; x.shadowOffsetY = 14;
+  x.fillStyle = '#F4F1EA';
+  MK.rrect(x, X-border, Y-border, w+border*2, h+border*2, radius+border*.6);
+  x.fill();
+  x.restore();
+  // cut-edge wobble, so it is not a perfect vector round-rect
+  x.save(); x.globalAlpha = .5; x.strokeStyle = 'rgba(120,116,132,.5)'; x.lineWidth = 1;
+  MK.rrect(x, X-border+.5, Y-border+.5, w+border*2-1, h+border*2-1, radius+border*.6);
+  x.stroke(); x.restore();
+
+  x.save();
+  MK.rrect(x, X, Y, w, h, radius); x.clip();
+  x.drawImage(src, X, Y, w, h);
+  if (gloss) {                                  // vinyl sheen across the face
+    const g = x.createLinearGradient(X, Y, X + w*.7, Y + h);
+    g.addColorStop(0,'rgba(255,255,255,.20)');
+    g.addColorStop(.38,'rgba(255,255,255,.03)');
+    g.addColorStop(1,'rgba(255,255,255,0)');
+    x.fillStyle = g; x.fillRect(X, Y, w, h);
+  }
+  x.restore();
+  x.restore();
+}
+
+/* Paste the wordmark: stretch MIXR edge to edge and let the sheet crop it. */
+function wordmark(fill, X, base, w, cap, o = {}) {
+  const { stroke = false, lw = 4, alpha = 1 } = o;
+  x.save(); x.globalAlpha = alpha;
+  x.fillStyle = fill; x.strokeStyle = fill;
+  MK.fillStretched(x, 'MIXR', X, base, w, cap, '900 200px Archivo', { stroke, lw });
+  x.restore();
+}
+
+async function draw(){
+  await MK.fonts();
+  MK.srnd(30303);
+  const icon = await MK.load('assets/mixr/icon.png');
+  const efx  = await MK.load('assets/mixr/effects.jpg');
+  const clip = await MK.load('assets/mixr/clip-menu.png');
+  const ipad = await MK.load('assets/mixr/ipad.png');
+
+  /* ── LAYER · BACKGROUND ─────────────────────────────────────────── */
+  x.fillStyle = C.navy; x.fillRect(0,0,W,H);
+  const bl = x.createRadialGradient(300,1560,80, 420,1500,1250);
+  bl.addColorStop(0, MK.rgba(C.purple,.13));
+  bl.addColorStop(.5, MK.rgba(C.purpleDk,.05));
+  bl.addColorStop(1, 'rgba(8,11,22,0)');
+  x.fillStyle = bl; x.fillRect(0,0,W,H);
+  x.fillStyle = MK.rgba(C.black,.55); x.fillRect(0,0,W,420);
+
+  /* ── LAYER · PAPER & TEXTURE · the wall itself ──────────────────── */
+  MK.dotField(x, 0,0,W,H, 7, .55, 'rgba(156,163,175,.16)', .55);
+  MK.grid(x, M, 0, W-2*M, H, (W-2*M)/8, 'rgba(156,163,175,.055)', 1);
+  x.strokeStyle = 'rgba(156,163,175,.10)'; x.lineWidth = 1;
+  [420, 760, 1520, 1780].forEach(y=>{
+    x.beginPath(); x.moveTo(M,y); x.lineTo(W-M,y); x.stroke();
+  });
+
+  /* ── LAYER · WAVEFORMS · one quiet rule across the empty upper field ─ */
+  MK.waveRibbon(x, [[-80,352],[520,352],[1120,352],[1700,352]], 40,
+                MK.rgba(C.purple,.62), {s:404, bar:4, gap:5, cap:true});
+  MK.waveRibbon(x, [[-80,352],[520,352],[1120,352],[1700,352]], 16,
+                MK.rgba(C.pink,.55), {s:404, bar:2, gap:9, cap:true});
+
+  /* ══ LAYER · DISPLAY TYPOGRAPHY ══════════════════════════════════
+     Layers of pasted posters: earlier printings ghosted underneath, then
+     the current one, cropped by both edges of the sheet. */
+  const BASE = 1400, CAP = 470, WX = -34, WW = 1662;
+  wordmark(MK.rgba(C.white,.055), WX-46, BASE-34, WW, CAP);          // older paste
+  wordmark(MK.rgba(C.purpleLt,.10), WX+64, BASE+22, WW, CAP);        // older paste
+  wordmark(MK.rgba(C.white,.09), WX-14, BASE+4, WW, CAP, {stroke:true, lw:5});
+
+  // purple plate, out of register behind the live printing
+  x.save(); x.globalCompositeOperation = 'screen';
+  wordmark(MK.rgba(C.purple,.80), WX+14, BASE-11, WW, CAP);
+  x.restore();
+  wordmark(C.paper, WX, BASE, WW, CAP);
+
+  // the printing is a physical sheet: rough it up where the wall shows
+  x.save(); x.globalCompositeOperation = 'destination-out';
+  for (let i=0;i<520;i++){
+    x.globalAlpha = .18 + MK.rnd()*.5;
+    x.beginPath();
+    x.arc(MK.rr(WX, WX+WW), MK.rr(BASE-CAP, BASE+18), 1 + MK.rnd()*5, 0, 7);
+    x.fill();
+  }
+  for (let i=0;i<16;i++){                       // dry scrapes across the paste
+    x.globalAlpha = .10 + MK.rnd()*.22;
+    x.fillRect(MK.rr(WX, WX+WW), MK.rr(BASE-CAP, BASE), 60+MK.rnd()*300, 1+MK.rnd()*3);
+  }
+  x.restore();
+
+  /* ── LAYER · HAND-DRAWN MARKS · tags over the paste ─────────────── */
+  MK.srnd(6161);
+  MK.tag(x,'Mixr',206, MK.rgba(C.purpleDk,.95), 448, 1120, -.13, {erode:1, spray:.8});
+  MK.tag(x,'Mixr',92,  MK.rgba(C.pink,.92), 1420, 1500, .09, {erode:.9, spray:.5});
+  MK.tag(x,'Mixr',60,  MK.rgba(C.purpleLt,.70), 862, 1834, -.06, {erode:.9});
+  MK.scrawl(x, [[980,872],[1090,852],[1200,868],[1290,844]],
+            MK.rgba(C.purpleLt,.55), 5, 3, 1);
+
+  /* ══ LAYER · PRODUCT IMAGERY · stickers slapped across the type ═══ */
+
+  // the app icon, oversized, in the empty upper field
+  sticker(icon, 1128, 176, 248, 248, .085, {radius:56, border:15, sd:11});
+  MK.tape(x, 1128, 182, 118, 36, .085 - .5, {tint:'rgba(255,255,255,.24)',
+          edge:'rgba(255,255,255,.34)', shade:'rgba(114,49,221,.18)'});
+
+  // two effect cards, cut out of the tray one at a time
+  const card = (sx0, w0, W2, H2, X, Y, rot, sd) => {
+    const g = MK.offc(W2, H2);
+    g.ctx.drawImage(efx, sx0, 690, w0, 168, 0,0, W2, H2);
+    sticker(g.canvas, X, Y, W2, H2, rot, {radius:20, border:11, sd});
+  };
+  card(370, 340, 318, 157,  204, 1178, -.075, 21);      // Reverb
+  card(1075, 340, 300, 148, 1116, 1252,  .062, 22);     // Flanger
+
+  // a lane cut straight out of the timeline, kept in its own colour
+  const lane = MK.offc(430, 116);
+  lane.ctx.drawImage(ipad, 320,150, 700,190, 0,0, 430,116);
+  sticker(lane.canvas, 806, 1470, 430, 116, -.045, {radius:14, border:10, sd:33});
+
+  // the clip menu, photocopied, taped over the R
+  const cm = MK.xerox(clip, 762,70, 592,124, 380,80,
+                      {invert:true, contrast:1.6, bright:.02, dust:.0012});
+  MK.srnd(818);
+  MK.pasteTorn(x, cm, 1092, 852, 380, 80, .035,
+               {edges:'lr', rough:7, step:10, shadow:.45, lip:'#F7F4ED', lipW:2.5});
+  MK.tape(x, 1092, 892, 88, 30, 1.52, {tint:'rgba(255,255,255,.22)',
+          edge:'rgba(255,255,255,.32)', shade:'rgba(114,49,221,.16)'});
+
+  // one album cover already living in the track list
+  const art = MK.offc(132,132);
+  art.ctx.drawImage(ipad, 26,456, 58,58, 0,0, 132,132);
+  sticker(art.canvas, 596, 1688, 132, 132, .11, {radius:18, border:10, sd:44});
+
+  /* ══ LAYER · LABELS & METADATA ═══════════════════════════════════ */
+  // torn labels: the four moves, staggered along the base of the paste
+  const STEPS = [['IMPORT', 122, 1616, -.045, 0],['ARRANGE', 372, 1668, .035, 1],
+                 ['MIX', 1006, 1668, .05, 0],['PLAY', 1258, 1742, -.04, 1]];
+  STEPS.forEach(([t,X,Y,rot,alt],i)=>{
+    MK.srnd(770+i*13);
+    x.save(); x.translate(X,Y); x.rotate(rot);
+    const fs = 26, pad = 20;
+    x.font = `800 ${fs}px Archivo, system-ui`; x.letterSpacing = '4px';
+    const wl = x.measureText(t).width + pad*2;
+    x.shadowColor='rgba(0,0,0,.5)'; x.shadowBlur=14; x.shadowOffsetY=7;
+    x.fillStyle = alt ? C.purple : C.paper;
+    MK.tornPath(x, 0,-26, wl, 52, 'lr', 6, 9); x.fill();
+    x.shadowColor='transparent';
+    x.fillStyle = alt ? C.white : C.black; x.textBaseline='middle';
+    x.fillText(t, pad, 2);
+    x.letterSpacing='0px';
+    x.restore();
+  });
+
+  // header
+  x.strokeStyle = MK.rgba(C.white,.45); x.lineWidth = 1.6;
+  x.beginPath(); x.moveTo(M,132); x.lineTo(W-M,132); x.stroke();
+  MK.meta(x,'MIXR', M, 114, {fs:17, track:9, weight:900, color:C.white});
+  MK.meta(x,'AN iOS DJ APP', W-M, 114,
+          {fs:17, track:7, weight:600, color:MK.rgba(C.white,.8), align:'right'});
+
+  // the concept, set clean against everything rough
+  x.fillStyle = C.white;
+  MK.fillStretched(x,'DJING SHOULDN’T REQUIRE', M, 552, 700, 56, '900 200px Archivo');
+  MK.fillStretched(x,'YOU BEING A DJ.', M, 634, 452, 56, '900 200px Archivo');
+  MK.meta(x,'SIX TRACKS · ONE TIMELINE · NO BEATMATCHING', M, 700,
+          {fs:14, track:5, weight:500, color:MK.rgba(C.white,.55)});
+
+  // the editorial ladder, right column — structure under the chaos
+  const LADDER = [['01','IMPORT','drop songs straight in'],
+                  ['02','ARRANGE','split, speed, duplicate'],
+                  ['03','MIX','effects, transitions, sfx'],
+                  ['04','PLAY','export the whole set']];
+  LADDER.forEach(([n,t,d],i)=>{
+    const Y = 500 + i*54;
+    MK.meta(x, n, 1046, Y, {fs:13, track:3, weight:700, color:MK.rgba(C.purpleLt,.9)});
+    MK.meta(x, t, 1096, Y, {fs:13, track:3, weight:700, color:C.white});
+    MK.meta(x, d.toUpperCase(), 1240, Y,
+            {fs:12, track:2, weight:400, color:MK.rgba(C.white,.45)});
+    x.strokeStyle = MK.rgba(C.white,.14); x.lineWidth = 1;
+    x.beginPath(); x.moveTo(1046, Y+16); x.lineTo(W-M, Y+16); x.stroke();
+  });
+
+  MK.meta(x,'FIG. 1  APP ICON', 1128, 452, {fs:11, track:3, weight:600,
+          color:MK.rgba(C.white,.5)});
+  MK.meta(x,'FIG. 2  CLIP MENU', 1092, 832, {fs:11, track:3, weight:600,
+          color:MK.rgba(C.white,.55)});
+  MK.meta(x,'FIG. 3  EFFECT CARDS', 206, 1382, {fs:11, track:3, weight:600,
+          color:MK.rgba(C.black,.6)});
+
+  /* ── LAYER · PRESS FURNITURE ───────────────────────────────────── */
+  x.strokeStyle = MK.rgba(C.white,.32); x.lineWidth = 1.4;
+  x.beginPath(); x.moveTo(M,1856); x.lineTo(W-M,1856); x.stroke();
+  MK.meta(x,'OVERSIZED TYPE + STICKER WALL / 03', M, 1908,
+          {fs:14, track:6, weight:600, color:MK.rgba(C.white,.62)});
+  MK.meta(x,'MMXXVI', W-M, 1908,
+          {fs:14, track:8, weight:500, color:MK.rgba(C.white,.5), align:'right'});
+  MK.colourBar(x, M, 1806, 34, 16, [C.purple,C.purpleLt,C.pink,C.white], 5);
+  MK.regMark(x, 56, 56, MK.rgba(C.white,.4), 12);
+  MK.regMark(x, W-56, 56, MK.rgba(C.purple,.9), 12);
+  MK.regMark(x, 56, H-56, MK.rgba(C.white,.4), 12);
+  MK.regMark(x, W-56, H-56, MK.rgba(C.white,.4), 12);
+  MK.cropMarks(x, 38, 28, MK.rgba(C.white,.3), 1.2);
+
+  /* ── LAYER · FINAL PASS ────────────────────────────────────────── */
+  MK.scanStreaks(x, 0,0,W,H, 9, .05);
+  x.save(); x.globalCompositeOperation='overlay'; x.globalAlpha=.26;
+  x.fillStyle = x.createPattern(MK.noiseCanvas(240,32),'repeat');
+  x.fillRect(0,0,W,H); x.restore();
+  const edge = x.createRadialGradient(W/2,H*.55,H*.38, W/2,H*.55,H*.92);
+  edge.addColorStop(0,'rgba(0,0,0,0)'); edge.addColorStop(1,'rgba(0,0,0,.38)');
+  x.fillStyle = edge; x.fillRect(0,0,W,H);
+}
+draw();
+</script>
+</body>
+</html>

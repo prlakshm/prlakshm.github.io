@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Mixr — Poster Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#0B0C10;color:#EDEBE6;
+            font:500 14px/1.45 Archivo,system-ui,sans-serif;min-height:100vh}
+  header{padding:26px 30px 18px;display:flex;gap:18px;align-items:baseline;
+         border-bottom:1px solid rgba(237,235,230,.14)}
+  h1{font-size:15px;margin:0;letter-spacing:.14em;font-weight:900}
+  header span{opacity:.45;letter-spacing:.06em;font-size:12px;
+              font-family:"Space Mono",monospace}
+  main{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+       gap:26px;padding:26px 30px 44px}
+  a.card{display:block;text-decoration:none;color:inherit}
+  .wrap{aspect-ratio:4/5;overflow:hidden;position:relative;background:#15161B;
+        border-radius:3px;box-shadow:0 18px 48px rgba(0,0,0,.55)}
+  iframe{width:1600px;height:2000px;border:0;transform-origin:0 0;
+         pointer-events:none;display:block}
+  figcaption{padding:13px 2px 0;font-size:11px;letter-spacing:.14em;font-weight:700}
+  figcaption em{display:block;font-style:normal;font-weight:400;opacity:.45;
+                letter-spacing:.03em;margin-top:6px;text-transform:none;
+                font-size:12px;line-height:1.5}
+  @media (max-width:1100px){main{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<header>
+  <h1>MIXR — POSTER LAB</h1>
+  <span>canvas · 1600 × 2000 · 4:5 · click to open full size</span>
+</header>
+<main>
+  <a class="card" href="mixr-a-waveform-type.html">
+    <div class="wrap"><iframe src="mixr-a-waveform-type.html?export" scrolling="no"></iframe></div>
+    <figcaption>A — WAVEFORM TYPE<em>Generative modular type: MIXR rebuilt from the app's own peak bars, laid out as four clips on a timeline</em></figcaption>
+  </a>
+  <a class="card" href="mixr-b-chroma-slice.html">
+    <div class="wrap"><iframe src="mixr-b-chroma-slice.html?export" scrolling="no"></iframe></div>
+    <figcaption>B — CHROMA SLICE<em>True per-channel displacement on a beat grid; every fringe graded onto Mixr's pink and blue</em></figcaption>
+  </a>
+  <a class="card" href="mixr-c-refraction.html">
+    <div class="wrap"><iframe src="mixr-c-refraction.html?export" scrolling="no"></iframe></div>
+    <figcaption>C — REFRACTION<em>The app icon as a glass tile, re-sampling the sheet per pixel with real dispersion at the rim</em></figcaption>
+  </a>
+</main>
+<script>
+  const fit=()=>document.querySelectorAll('.wrap').forEach(w=>{
+    w.querySelector('iframe').style.transform=`scale(${w.clientWidth/1600})`;
+  });
+  addEventListener('resize',fit); fit();
+</script>
+</body>
+</html>

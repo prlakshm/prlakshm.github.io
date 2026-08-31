@@ -1,0 +1,218 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>A — Waveform Type</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#17181C;display:grid;place-items:center;min-height:100vh}
+  canvas{height:min(96vh,1200px);width:auto;box-shadow:0 30px 90px rgba(0,0,0,.55)}
+  body.export canvas{height:2000px;box-shadow:none}
+</style>
+</head>
+<body>
+<canvas id="c" width="1600" height="2000"></canvas>
+<script src="mixr-kit.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   A — WAVEFORM TYPE
+   One idea: the poster IS a Mixr timeline, and the four tracks loaded into
+   it spell the name. Every letter is rebuilt column by column out of the
+   app's own module — a rounded peak bar — so the type is literally made of
+   audio. Letters keep their true widths, so M is a long clip and I is a
+   short one, exactly as clips of different durations sit on real lanes.
+   Everything is generated; nothing is a screenshot.
+   ═══════════════════════════════════════════════════════════════════════ */
+const {W,H,C} = MK;
+const {cv,x} = MK.boot('c');
+
+const M      = 88;                    // sheet margin
+const HEADW  = 196;                   // track-header column
+const TX     = M + HEADW + 20;        // timeline left edge
+const TW     = W - M - TX;            // timeline width
+const LANE_H = 334, LANE_G = 18, LANE_Y = 268;
+const PAD    = 24;                    // air inside a clip
+const CAP    = LANE_H - PAD * 2;      // letter cap height
+const PLAY   = TX + TW * 0.805;       // playhead
+
+/* Each letter is a clip: it has a start time and a length, and no two are
+   the same. Read top to bottom you get M-I-X-R; read left to right you get
+   an arrangement. `w` and `at` are fractions of the timeline. */
+const LANES = [
+  { ch:'M', color:C.pink,   n:'01', name:'IMPORT',  t:'0:00', d:'3:50', at:0.000, w:0.465 },
+  { ch:'I', color:C.purple, n:'02', name:'ARRANGE', t:'0:41', d:'1:12', at:0.300, w:0.188 },
+  { ch:'X', color:C.blue,   n:'03', name:'MIX',     t:'1:04', d:'3:04', at:0.440, w:0.300 },
+  { ch:'R', color:C.yellow, n:'04', name:'PLAY',    t:'1:42', d:'2:58', at:0.705, w:0.295 },
+];
+
+async function draw(){
+  await MK.fonts();
+  MK.srnd(102);
+
+  /* ── LAYER · BACKGROUND ─────────────────────────────────────────── */
+  x.fillStyle = C.black; x.fillRect(0,0,W,H);
+  const bloom = x.createRadialGradient(240,1740,40, 420,1660,1500);
+  bloom.addColorStop(0, MK.rgba(C.purple,.20));
+  bloom.addColorStop(.55, MK.rgba(C.purpleDk,.07));
+  bloom.addColorStop(1, 'rgba(5,8,22,0)');
+  x.fillStyle = bloom; x.fillRect(0,0,W,H);
+
+  /* ── LAYER · CONSTRUCTION GRID ──────────────────────────────────── */
+  MK.grid(x, 0, 0, W, H, 40, 'rgba(156,163,175,.038)', 1, 4, 'rgba(156,163,175,.075)');
+
+  /* ── LAYER · TIMELINE FURNITURE ─────────────────────────────────── */
+  MK.meta(x,'TRACKS', M, 176, {fs:13, track:5, weight:700, color:MK.rgba(C.white,.55)});
+  MK.meta(x,'CONTROLS', W-M, 176,
+          {fs:13, track:5, weight:700, color:MK.rgba(C.white,.30), align:'right'});
+  MK.ruler(x, TX, 230, TW, ['0:00',null,'0:30',null,'1:00',null,'1:30',null,'2:00'],
+           {color:MK.rgba(C.white,.38), tick:8, big:15});
+
+  // bar lines dropping through every lane — the app's time grid
+  x.save();
+  x.strokeStyle = 'rgba(156,163,175,.10)'; x.lineWidth = 1;
+  for (let i=0;i<=8;i++){
+    const px = TX + TW*(i/8);
+    x.beginPath(); x.moveTo(px, 246); x.lineTo(px, LANE_Y + 4*(LANE_H+LANE_G) - LANE_G);
+    x.stroke();
+  }
+  x.restore();
+
+  /* ══ LAYER · THE LANES · generative waveform type ═════════════════
+     One letter per track. Bar width is constant across the whole poster,
+     so the four letters share one module system; only their lengths
+     differ, because their letterforms do. */
+  LANES.forEach((L, i) => {
+    const y  = LANE_Y + i * (LANE_H + LANE_G);
+    const cx = TX + TW * L.at;                          // clip start
+    const cw = TW * L.w;                                // clip length
+
+    // the empty track it sits on
+    MK.rrect(x, TX, y, TW, LANE_H, 14);
+    x.fillStyle = MK.rgba(C.white,.016); x.fill();
+    x.strokeStyle = MK.rgba(C.white,.065); x.lineWidth = 1; x.stroke();
+
+    // the rest of the track: the same song, just not the loud part
+    [[TX, cx - TX], [cx + cw, TX + TW - cx - cw]].forEach(([gx, gw2], k) => {
+      if (gw2 < 24) return;
+      x.save();
+      x.beginPath(); x.rect(gx + 6, y, gw2 - 12, LANE_H); x.clip();
+      MK.waveLane(x, TX, y + LANE_H/2 - 34, TW, 68, L.color,
+                  {s: 8100 + i*31, body:false, bar:3, gap:4, alpha:.20,
+                   swell:.34, floor:.10, jag:.62});
+      x.restore();
+    });
+
+    // the clip
+    MK.rrect(x, cx, y, cw, LANE_H, 14);
+    x.fillStyle = MK.rgba(L.color,.06); x.fill();
+    x.strokeStyle = MK.rgba(L.color,.34); x.lineWidth = 1.4; x.stroke();
+    // clip handles, the way Mixr caps a region
+    x.fillStyle = MK.rgba(L.color,.55);
+    x.beginPath(); x.arc(cx, y + LANE_H/2, 5, 0, 7); x.fill();
+    x.beginPath(); x.arc(cx + cw, y + LANE_H/2, 5, 0, 7); x.fill();
+
+    const opts = {
+      bar: 10, gap: 6, font:'900 200px Archivo', jitter: 3, seed: 400 + i*17,
+      spark: (col, y0, len, r) => (r() > .985 ? C.white : null),
+    };
+    const bx = cx + PAD, bw = cw - PAD*2, by = y + PAD;
+
+    // solid where the playhead has already passed …
+    x.save();
+    x.beginPath(); x.rect(TX-2, y-2, PLAY-TX+2, LANE_H+4); x.clip();
+    MK.barType(x, L.ch, bx, by, bw, CAP, {...opts, color:L.color});
+    x.restore();
+    // … outlined where it has not. The playhead becomes a state change.
+    x.save();
+    x.beginPath(); x.rect(PLAY, y-2, TX+TW-PLAY+2, LANE_H+4); x.clip();
+    MK.barType(x, L.ch, bx, by, bw, CAP,
+               {...opts, color:MK.rgba(L.color,.9), stroke:true, lw:1.7, spark:null});
+    x.restore();
+
+    /* ── LAYER · TRACK HEADER ─────────────────────────────────────── */
+    x.fillStyle = L.color;
+    MK.rrect(x, M, y + LANE_H/2 - 26, 5, 52, 2.5); x.fill();
+    x.font = '700 13px "Space Mono", monospace'; x.letterSpacing='2px';
+    x.textBaseline = 'alphabetic'; x.fillStyle = L.color;
+    x.fillText(L.n, M+20, y + LANE_H/2 - 18);
+    x.font = '600 26px Archivo, system-ui'; x.letterSpacing='1px';
+    x.fillStyle = C.white; x.fillText(L.name, M+20, y + LANE_H/2 + 14);
+    x.font = '400 13px "Space Mono", monospace'; x.letterSpacing='1px';
+    x.fillStyle = MK.rgba(C.white,.42);
+    x.fillText(L.t + '  ' + L.d, M+20, y + LANE_H/2 + 42);
+    x.letterSpacing = '0px';
+  });
+
+  /* ── LAYER · PLAYHEAD ───────────────────────────────────────────── */
+  const py0 = 230, py1 = LANE_Y + 4*(LANE_H+LANE_G) - LANE_G;
+  x.save();
+  x.shadowColor = MK.rgba(C.white,.55); x.shadowBlur = 12;
+  x.strokeStyle = C.white; x.lineWidth = 2;
+  x.beginPath(); x.moveTo(PLAY, py0); x.lineTo(PLAY, py1); x.stroke();
+  x.restore();
+  x.fillStyle = C.white;
+  x.beginPath();
+  x.moveTo(PLAY-13, py0-20); x.lineTo(PLAY+13, py0-20); x.lineTo(PLAY, py0+2);
+  x.closePath(); x.fill();
+  MK.meta(x,'1:16', PLAY+18, py0-26,
+          {fs:12, track:2, weight:700, color:MK.rgba(C.white,.8)});
+
+  /* ── LAYER · MASTER · the four tracks summed, the thing you export ── */
+  const my = py1 + 36;
+  MK.rrect(x, TX, my, TW, 52, 10);
+  x.fillStyle = MK.rgba(C.white,.03); x.fill();
+  x.strokeStyle = MK.rgba(C.white,.10); x.lineWidth = 1; x.stroke();
+  MK.waveLane(x, TX+10, my+7, TW-20, 38, C.white,
+              {s:9091, body:false, bar:3, gap:2, alpha:.72, swell:.7, floor:.22});
+  MK.meta(x,'MASTER', M, my+26, {fs:13, track:4, weight:700, color:MK.rgba(C.white,.55)});
+  MK.meta(x,'EXPORT', M+HEADW, my+26,
+          {fs:13, track:4, weight:400, color:MK.rgba(C.white,.30), align:'right'});
+
+  /* ══ LAYER · TITLE ════════════════════════════════════════════════ */
+  x.strokeStyle = MK.rgba(C.white,.22); x.lineWidth = 1.4;
+  x.beginPath(); x.moveTo(M, 1786); x.lineTo(W-M, 1786); x.stroke();
+
+  x.fillStyle = C.white;
+  x.font = '900 78px Archivo, system-ui'; x.letterSpacing = '-2px';
+  x.textBaseline = 'alphabetic';
+  x.fillText('Mixr', M, 1874);
+  x.letterSpacing = '0px';
+  MK.meta(x,'iOS DJ APP', M + 200, 1874,
+          {fs:26, track:8, weight:500, color:MK.rgba(C.white,.72)});
+
+  x.font = '400 13px "Space Mono", monospace'; x.letterSpacing = '2px';
+  x.fillStyle = MK.rgba(C.white,.45);
+  ['A / WAVEFORM TYPE','FOUR TRACKS · ONE TIMELINE','1600 × 2000 · MMXXVI']
+    .forEach((t,i)=>{
+      const w = x.measureText(t).width;
+      x.fillText(t, W-M-w, 1818 + i*26);
+    });
+  x.letterSpacing = '0px';
+
+  // the module legend — states the system the poster is built from
+  const lx = M, ly2 = 1926;
+  x.fillStyle = MK.rgba(C.white,.5);
+  MK.rrect(x, lx, ly2-9, 11, 18, 5.5); x.fill();
+  MK.rrect(x, lx+18, ly2-14, 11, 28, 5.5); x.fill();
+  MK.rrect(x, lx+36, ly2-6, 11, 12, 5.5); x.fill();
+  x.strokeStyle = MK.rgba(C.white,.5); x.lineWidth=1.6;
+  MK.rrect(x, lx+55, ly2-11, 10, 22, 5); x.stroke();
+  MK.meta(x,'PEAK MODULE  ·  PLAYED / UNPLAYED', lx+82, ly2+4,
+          {fs:11, track:3, weight:500, color:MK.rgba(C.white,.42)});
+
+  /* ── LAYER · PRESS FURNITURE ───────────────────────────────────── */
+  MK.regMark(x, 44, 44, MK.rgba(C.white,.30), 11);
+  MK.regMark(x, W-44, 44, MK.rgba(C.white,.30), 11);
+  MK.regMark(x, 44, H-44, MK.rgba(C.white,.30), 11);
+  MK.regMark(x, W-44, H-44, MK.rgba(C.purple,.9), 11);
+
+  /* ── LAYER · FINISH ────────────────────────────────────────────── */
+  MK.vignette(x, {inner:.42, outer:.95, amount:.30});
+  MK.filmGrain(x, {alpha:.26, size:220, amp:30});
+}
+draw();
+</script>
+</body>
+</html>

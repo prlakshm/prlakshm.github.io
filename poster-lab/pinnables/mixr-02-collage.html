@@ -1,0 +1,292 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>02 — Waveform Collage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#1b1c20;display:grid;place-items:center;min-height:100vh}
+  canvas{height:min(96vh,1200px);width:auto;box-shadow:0 30px 90px rgba(0,0,0,.55)}
+  body.export canvas{height:2000px;box-shadow:none}
+</style>
+</head>
+<body>
+<canvas id="c" width="1600" height="2000"></canvas>
+<script src="mixr-kit.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   02 — WAVEFORM CUT-AND-PASTE COLLAGE
+   The editing model as the composition: pieces of the interface cut from
+   several printed sheets and re-arranged down a diagonal, with waveform
+   ribbons doing the splicing. Purple leads; the other lane colours only
+   appear where the product actually put them.
+   ═══════════════════════════════════════════════════════════════════════ */
+const {W,H,C} = MK;
+const {cv,x} = MK.boot('c');
+const M = 96;
+
+/* A cut letter: one glyph on its own scrap of stock. `knockout` cuts the
+   letter clean out of the scrap so the collage shows through the hole. */
+function letterChip(ch, cw, chh, o = {}) {
+  const { paper = C.paper, ink = C.black, knockout = false,
+          padX = .13, base = .90, grit = true } = o;
+  const g = MK.offc(cw, chh), c = g.ctx;
+  c.fillStyle = paper; c.fillRect(0, 0, cw, chh);
+  if (grit) {                                   // stock tooth on the scrap
+    c.globalAlpha = .07;
+    for (let i = 0; i < cw * chh / 90; i++) {
+      c.fillStyle = MK.rnd() > .5 ? '#000' : '#fff';
+      c.fillRect(MK.rnd() * cw, MK.rnd() * chh, 1.5, 1.5);
+    }
+    c.globalAlpha = 1;
+  }
+  if (knockout) c.globalCompositeOperation = 'destination-out';
+  c.fillStyle = ink;
+  MK.fillStretched(c, ch, cw * padX, chh * base, cw * (1 - padX * 2), chh * (base - .16),
+                   '900 200px Archivo');
+  c.globalCompositeOperation = 'source-over';
+  return g.canvas;
+}
+
+/* Paste a scrap, tearing its edges. Knockout scraps get a rim shadow only,
+   so the hole in the letter stays open onto the collage below. */
+function pasteChip(src, X, Y, w, h, rot, sd, o = {}) {
+  const { knockout = false, edges = 'trbl', rough = 10, step = 14,
+          lip = '#F7F4ED', lipW = 3, shadow = .5 } = o;
+  if (!knockout) {
+    MK.srnd(sd);
+    MK.pasteTorn(x, src, X, Y, w, h, rot,
+                 { edges, rough, step, lip, lipW, shadow, sdx: 6, sdy: 11, sblur: 18 });
+    return;
+  }
+  const cx = X + w / 2, cy = Y + h / 2;
+  x.save();
+  x.translate(cx, cy); x.rotate(rot); x.translate(-cx, -cy);
+  MK.srnd(sd);
+  x.save();                                    // rim shadow, ring only
+  x.strokeStyle = `rgba(0,0,0,${shadow})`; x.lineWidth = 20;
+  x.shadowColor = `rgba(0,0,0,${shadow})`; x.shadowBlur = 20;
+  x.shadowOffsetX = 6; x.shadowOffsetY = 11;
+  MK.tornPath(x, X, Y, w, h, edges, rough, step); x.stroke();
+  x.restore();
+  MK.srnd(sd);
+  x.save(); MK.tornPath(x, X, Y, w, h, edges, rough, step); x.clip();
+  x.drawImage(src, X, Y);
+  MK.srnd(sd); MK.tornPath(x, X, Y, w, h, edges, rough, step);
+  x.strokeStyle = lip; x.lineWidth = lipW; x.globalAlpha = .85; x.stroke();
+  x.restore();
+  x.restore();
+}
+
+async function draw(){
+  await MK.fonts();
+  MK.srnd(710412);
+  const ipad = await MK.load('assets/mixr/ipad.png');
+  const clip = await MK.load('assets/mixr/clip-menu.png');
+  const sfx  = await MK.load('assets/mixr/sfx.png');
+  const trns = await MK.load('assets/mixr/transitions.png');
+  const efx  = await MK.load('assets/mixr/effects.jpg');
+  const icon = await MK.load('assets/mixr/icon.png');
+
+  /* ── LAYER · BACKGROUND ─────────────────────────────────────────── */
+  x.fillStyle = C.black; x.fillRect(0,0,W,H);
+  const bloom = x.createRadialGradient(760,900,60, 760,900,1180);
+  bloom.addColorStop(0, MK.rgba(C.purple,.30));
+  bloom.addColorStop(.45, MK.rgba(C.purpleDk,.14));
+  bloom.addColorStop(1, 'rgba(5,8,22,0)');
+  x.fillStyle = bloom; x.fillRect(0,0,W,H);
+  x.fillStyle = MK.rgba(C.navy,.5); x.fillRect(0,0,W,260);
+  x.fillStyle = MK.rgba(C.black,.55); x.fillRect(0,H-300,W,300);
+
+  /* ── LAYER · PAPER & TEXTURE · torn stock patches under the clusters ─ */
+  MK.srnd(31);
+  [[ -70, 232, 900, 420, C.concrete, -.055, .10],
+   [ 700, 1060, 980, 560, C.paperDk, .045, .09],
+   [ 120, 1520, 760, 340, C.concrete, -.03, .07]].forEach(([X,Y,w,h,col,rot,al])=>{
+    x.save(); x.globalAlpha = al;
+    x.translate(X+w/2,Y+h/2); x.rotate(rot); x.translate(-(X+w/2),-(Y+h/2));
+    x.fillStyle = col; MK.tornPath(x,X,Y,w,h,'trbl',18,22); x.fill();
+    x.restore();
+  });
+
+  // purple dot screen — the dominant ink laid as a flat tint field
+  MK.dotField(x, 0, 520, W, 640, 12, 2.0, MK.rgba(C.purple,.30), 1);
+  MK.grid(x, 0, 0, W, H, 64, 'rgba(156,163,175,.05)', 1, 4, 'rgba(156,163,175,.09)');
+
+  /* ══ LAYER · WAVEFORMS (behind) ══════════════════════════════════
+     Three ribbons on one descending diagonal — the splice that carries
+     the eye from the imported tracks at the top to the mix at the base. */
+  const DIAG = [[-140, 470],[430, 640],[1010, 880],[1740, 1030]];
+  MK.waveRibbon(x, DIAG, 74, MK.rgba(C.purple,.85), {s:301, bar:5, gap:4, cap:true});
+  MK.waveRibbon(x, DIAG.map(([a,b])=>[a,b+128]), 40, MK.rgba(C.purpleLt,.55),
+                {s:77, bar:3, gap:5, cap:true});
+  MK.waveRibbon(x, [[-120,1320],[560,1470],[1180,1690],[1760,1780]], 52,
+                MK.rgba(C.purple,.8), {s:512, bar:5, gap:4, cap:true});
+  MK.waveRibbon(x, [[-120,1372],[560,1522],[1180,1742],[1760,1832]], 22,
+                MK.rgba(C.pink,.75), {s:88, bar:3, gap:5, cap:true});
+
+  /* ══ LAYER · PRODUCT IMAGERY · the cut-up ════════════════════════ */
+
+  // 1 · IMPORT — the track list, album art intact, cut off the left sheet
+  const tl = MK.offc(430, 700);
+  tl.ctx.drawImage(ipad, 8,132, 296,616, 0,0, 430,700);
+  pasteChip(tl.canvas, -46, 196, 430, 700, .035, 9001, {rough:13, step:17});
+
+  // 2 · ARRANGE — the transition controls, upper right, cut on the bias
+  const tr = MK.offc(880, 250);
+  tr.ctx.drawImage(trns, 330,104, 880,250, 0,0, 880,250);
+  pasteChip(tr.canvas, 470, 268, 880, 250, -.075, 4402, {rough:11, step:15});
+
+  // 3 · the six lanes — the anchor, bleeding off the right edge
+  const ln = MK.offc(1180, 430);
+  ln.ctx.drawImage(ipad, 300,126, 880,320, 0,0, 1180,430);
+  pasteChip(ln.canvas, 468, 620, 1180, 430, -.028, 7773, {rough:12, step:16});
+
+  // 4 · CUT — the clip menu, photocopied to off-white so it reads as a
+  //     different print run from the pieces around it
+  const cm = MK.xerox(clip, 762,70, 592,124, 592,124,
+                      {invert:true, contrast:1.6, bright:.02, dust:.0012});
+  pasteChip(cm, 118, 1112, 592, 124, .062, 5510, {rough:9, step:12});
+
+  // 5 · MIX — the sound-effects library, also inverted
+  const sx2 = MK.xerox(sfx, 252,58, 1000,532, 660,351,
+                       {invert:true, contrast:1.5, bright:.04, dust:.0008});
+  const sxd = MK.halftone(sx2, 5, C.purpleDk, {angle:.5, maxR:.58});
+  const sxc = MK.offc(660,351);
+  sxc.ctx.drawImage(sx2,0,0);
+  sxc.ctx.globalAlpha = .42; sxc.ctx.globalCompositeOperation='multiply';
+  sxc.ctx.drawImage(sxd,0,0);
+  pasteChip(sxc.canvas, 812, 1252, 660, 351, -.04, 6620, {rough:12, step:16});
+
+  // 6 · the effect tray, full colour, bleeding off the left edge
+  const ef = MK.offc(1120, 190);
+  ef.ctx.drawImage(efx, 20,668, 1500,196, 0,0, 1120,190);
+  pasteChip(ef.canvas, -110, 1650, 1120, 190, .028, 3311, {rough:10, step:14});
+
+  // 7 · album artwork already living in the track list, cut into squares
+  const arts = [[26,155],[26,256],[26,356],[26,456],[26,556],[26,656]];
+  [[1268, 176, 132, -.09, 1],[1408, 1092, 108, .12, 3],[300, 1430, 118, -.06, 4]]
+    .forEach(([X,Y,S,rot,k],i)=>{
+      const a = MK.offc(S,S);
+      a.ctx.drawImage(ipad, arts[k][0], arts[k][1], 58,58, 0,0, S,S);
+      pasteChip(a.canvas, X, Y, S, S, rot, 8800+i*7, {rough:7, step:10});
+    });
+
+  // 8 · the app icon, oversized and cropped by the right edge
+  const ic = MK.offc(360,360);
+  ic.ctx.drawImage(icon, 0,0, 420,420, 0,0, 360,360);
+  pasteChip(ic.canvas, 1330, 1420, 360, 360, .09, 2244, {rough:12, step:15});
+
+  /* ══ LAYER · WAVEFORMS (in front) · rebuilt lanes that splice the
+       scraps together, drawn over the cut edges ═════════════════════ */
+  MK.waveLane(x, 214, 1006, 700, 74, C.pink,   {s:41, radius:12, bar:4, gap:3, tint:.14});
+  MK.waveLane(x, 902, 1030, 620, 62, C.blue,   {s:63, radius:11, bar:4, gap:3, tint:.12});
+  MK.waveLane(x, 60,  1330, 520, 54, C.yellow, {s:29, radius:10, bar:3, gap:3, tint:.12});
+  MK.waveLane(x, 24,  1416, 300, 44, C.purpleLt,{s:17, radius:9,  bar:3, gap:3, tint:.14});
+  MK.waveLane(x, 24,  1478, 208, 38, C.red,     {s:53, radius:8,  bar:3, gap:3, tint:.12});
+  MK.waveRibbon(x, DIAG, 46, MK.rgba(C.white,.85), {s:301, bar:2, gap:9, cap:true});
+
+  /* ══ LAYER · DISPLAY TYPOGRAPHY ══════════════════════════════════
+     MIXR cut into four letters, each pasted on its own scrap, stepping
+     down the diagonal. The X is knocked clean out of its scrap. */
+  const LET = [
+    ['M', 128, 656, 250, 272, -.055, C.paper,  C.black,  false, 1101],
+    ['I', 430, 748, 140, 264,  .048, C.purple, C.paper,  false, 1102],
+    ['X', 676, 852, 262, 278, -.030, C.paper,  null,     true,  1103],
+    ['R',1002, 946, 246, 270,  .062, C.paper,  C.black,  false, 1104],
+  ];
+  for (const [ch,X,Y,w,h,rot,paper,ink,knock,sd] of LET) {
+    MK.srnd(sd);
+    const chip = letterChip(ch, w, h, {paper, ink: ink||'#000', knockout:knock});
+    // purple plate, out of register behind every letter
+    x.save(); x.globalAlpha=.62; x.globalCompositeOperation='screen';
+    const gh = MK.inkify(chip, C.purple);
+    x.translate(X+w/2+8, Y+h/2-6); x.rotate(rot); x.translate(-(X+w/2), -(Y+h/2));
+    x.drawImage(gh, X, Y); x.restore();
+    pasteChip(chip, X, Y, w, h, rot, sd, {knockout:knock, rough:11, step:14});
+    MK.tape(x, X+w*.5, Y-6, w*.44, 34, rot+ (MK.rnd()-.5)*.2,
+            {tint:'rgba(255,255,255,.20)', edge:'rgba(255,255,255,.30)',
+             shade:'rgba(114,49,221,.16)'});
+  }
+
+  // the hand-painted repeat — the same name, written rather than cut
+  MK.srnd(9182);
+  MK.tag(x,'Mixr',162, MK.rgba(C.purpleLt,.95), 1276, 762, -.11, {erode:1, spray:.7});
+  MK.tag(x,'Mixr',70,  MK.rgba(C.pink,.9), 252, 1544, .10, {erode:.9});
+
+  /* ── LAYER · HAND-DRAWN MARKS · the cut line and the splice ─────── */
+  x.save(); x.setLineDash([16,13]);
+  MK.scrawl(x, [[60,1078],[420,1100],[860,1150],[1300,1236],[1560,1268]],
+            MK.rgba(C.white,.55), 2.4, 2, 1);
+  x.setLineDash([]); x.restore();
+  MK.arrow(x, [[1120,1102],[1198,1082],[1272,1104]], C.pink, 4, 22, .95);
+  MK.arrow(x, [[406,1580],[470,1546],[556,1560]], MK.rgba(C.white,.8), 3.6, 20, .9);
+  MK.circleMark(x, 1180, 1552, 118, 92, MK.rgba(C.purpleLt,.85), 3.4, .9);
+
+  /* ══ LAYER · LABELS & METADATA ═══════════════════════════════════ */
+  x.strokeStyle = MK.rgba(C.white,.5); x.lineWidth = 1.6;
+  x.beginPath(); x.moveTo(M,160); x.lineTo(W-M,160); x.stroke();
+  MK.meta(x,'MIXR', M, 142, {fs:17, track:9, weight:900, color:C.white});
+  MK.meta(x,'AN iOS DJ APP', W-M, 142,
+          {fs:17, track:7, weight:600, color:MK.rgba(C.white,.8), align:'right'});
+
+  // torn labels naming the four moves the collage is performing
+  const STEPS = [['IMPORT', 176, 214, -.05],['ARRANGE', 1148, 578, .06],
+                 ['CUT', 92, 1084, .05],['MIX', 1330, 1308, -.05]];
+  STEPS.forEach(([t,X,Y,rot],i)=>{
+    MK.srnd(400+i);
+    x.save(); x.translate(X,Y); x.rotate(rot);
+    const wl = 22 + t.length*17;
+    x.fillStyle = i%2 ? C.paper : C.purple;
+    MK.tornPath(x, 0,-20, wl, 40, 'lr', 5, 8); x.fill();
+    MK.meta(x, t, 12, 7, {fs:16, track:3, weight:800,
+                          color: i%2 ? C.black : C.white});
+    x.restore();
+  });
+
+  MK.meta(x,'FIG. A  TRACK LIST', 14, 976,
+          {fs:12, track:3, weight:600, color:MK.rgba(C.white,.65)});
+  MK.meta(x,'FIG. B  TRANSITIONS', 492, 256,
+          {fs:12, track:3, weight:600, color:MK.rgba(C.white,.65)});
+  MK.meta(x,'FIG. C  SIX LANES · ONE TIMELINE', 476, 604,
+          {fs:12, track:3, weight:600, color:MK.rgba(C.white,.65)});
+  MK.meta(x,'FIG. D  SOUND EFFECTS LIBRARY', 812, 1234,
+          {fs:12, track:3, weight:600, color:MK.rgba(C.white,.65)});
+  MK.meta(x,'RISER · DOWNLIFTER · IMPACT · CRASH', 812, 1638,
+          {fs:12, track:3, weight:500, color:MK.rgba(C.white,.5)});
+
+  /* ── LAYER · THE CONCEPT LINE ──────────────────────────────────── */
+  x.fillStyle = C.white;
+  MK.fillStretched(x,'CUT IT. MOVE IT. MIX IT.', M, 1858, W-2*M, 74,
+                   '900 200px Archivo');
+  MK.meta(x,'NO DECKS. NO CROSSFADER. NO BEATMATCHING.', M, 1912,
+          {fs:14, track:5, weight:500, color:MK.rgba(C.white,.62)});
+
+  /* ── LAYER · PRESS FURNITURE ───────────────────────────────────── */
+  MK.colourBar(x, W-M-5*30-4*4, 1896, 30, 16,
+               [C.purple,C.pink,C.blue,C.red,C.yellow], 4);
+  MK.regMark(x, 54, 54, MK.rgba(C.white,.45), 12);
+  MK.regMark(x, W-54, 54, MK.rgba(C.purple,.9), 12);
+  MK.regMark(x, 54, H-54, MK.rgba(C.white,.45), 12);
+  MK.regMark(x, W-54, H-54, MK.rgba(C.white,.45), 12);
+  MK.cropMarks(x, 36, 26, MK.rgba(C.white,.35), 1.2);
+  x.save(); x.translate(1524, 1180); x.rotate(-Math.PI/2);
+  MK.meta(x,'WAVEFORM COLLAGE / 02', 0,0,
+          {fs:13, track:7, weight:600, color:MK.rgba(C.white,.5)});
+  x.restore();
+
+  /* ── LAYER · FINAL PASS ────────────────────────────────────────── */
+  MK.scanStreaks(x, 0,0,W,H, 12, .06);
+  x.save(); x.globalCompositeOperation='overlay'; x.globalAlpha=.30;
+  x.fillStyle = x.createPattern(MK.noiseCanvas(220,34),'repeat');
+  x.fillRect(0,0,W,H); x.restore();
+  const edge = x.createRadialGradient(W/2,H/2,H*.35, W/2,H/2,H*.86);
+  edge.addColorStop(0,'rgba(0,0,0,0)'); edge.addColorStop(1,'rgba(0,0,0,.42)');
+  x.fillStyle = edge; x.fillRect(0,0,W,H);
+}
+draw();
+</script>
+</body>
+</html>

@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Mixr — Poster (side)</title>
+<title>Mixr — Poster (wave)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Caveat+Brush&family=Rubik+Spray+Paint&family=Rubik+Dirt&family=Rock+Salt&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
@@ -52,25 +52,19 @@ const MICRO_FS=21;           // the small type the wave bands are built from
 const BAND_ROWS=10;           // rows of it stacked to make one band
 const LINE_H=22;
 const BAND_GAP=520;
-// ── the cut ─────────────────────────────────────────────────────────────
-// A loose wave down the sheet. The graffiti field is drawn exactly as it is
-// on the full poster, then CLIPPED to the left of this line — so tags that
-// straddle it are sliced mid-letter, as though a section were cut away.
-// A real wave, not a near-vertical edge. Two big lobes: the cut opens the
-// top-right wide, swells right around her arm at mid-height, pinches back in
-// at her hip, then opens again at the foot. ~450px of swing is what makes it
-// read as a curve rather than a trimmed margin.
-const CUT=[[-40,988],[180,1036],[420,1198],[640,1366],[860,1434],
-           [1080,1358],[1300,1216],[1520,1152],[1740,1228],[1960,1382],[2060,1424]];
-// The lower pinch is eased out along her right hip — it was cutting in too
-// hard there and left the hip reading empty.
+// A wave down the sheet, traced from the green cut. The graffiti field is
+// the current orbits, run far enough to fill the left — then only words
+// whose centre sits left of this line are drawn, intact.
+const CUT=[[-40,1180],[126,1181],[207,1238],[325,1279],[433,1295],[581,1295],
+           [809,1263],[1026,1230],[1254,1267],[1467,1366],[1626,1502],
+           [1711,1519],[1941,1537],[2060,1540]];
 const cutX=y=>{
   if(y<=CUT[0][0])return CUT[0][1];
   for(let i=1;i<CUT.length;i++){
     if(y<=CUT[i][0]){
       const [y0,x0]=CUT[i-1],[y1,x1]=CUT[i];
       const t=(y-y0)/(y1-y0);
-      return x0+(x1-x0)*((1-Math.cos(t*Math.PI))/2);   // eased — reads hand-drawn
+      return x0+(x1-x0)*((1-Math.cos(t*Math.PI))/2);
     }
   }
   return CUT[CUT.length-1][1];
@@ -79,9 +73,8 @@ const MB=74;                 // plain poster border, like the RUN reference
 const TYPO_Y=-MB;            // all typography lifts by exactly that, so the
 const DOWN=20;               // bands + purple tags only, nudged back down
                              // bottom rows clear the border instead of being cut          // one spacing for every band — perfectly even
-const RING_STEP=118;         // orbit lines packed tight — an aura, not a field         // distance between contour rings
-const RING_START=74;         // the first orbit hugs her silhouette        // first ring sits clear of her silhouette
-const RIGHT_HIP_EXTEND=10;   // move only the right-hip contour 10px farther out
+const RING_STEP=100;         // orbit lines packed tight — an aura, not a field         // distance between contour rings
+const RING_START=72;         // the first orbit hugs her silhouette        // first ring sits clear of her silhouette
 const STRIPE_HW=21;          // half-thickness of a wave stripe (~42px band)
 
 function grain(alpha){
@@ -265,9 +258,9 @@ async function draw(){
   const wordW=x.measureText(GWORD).width;
   const GAP=22;
   const spots=[];
-  // Three orbits only. A field of tags competes with her for the first read;
-  // a halo supports her instead — and leaves the sheet somewhere to breathe.
-  const MAXD=72+100*2.5;          // fires rings at 72, 172, 272
+  // Same spacing as the focus halo, kept going until the left of the wave is
+  // a filled field rather than three rings.
+  const MAXD=880;
   for(let L=RING_START;L<MAXD;L+=RING_STEP){
     const pts=[];
     for(let ang=0;ang<Math.PI*2;ang+=Math.PI/360){
@@ -294,7 +287,7 @@ async function draw(){
       let rot=Math.atan2(dx,-dy);
       if(Math.cos(rot)<0)rot+=Math.PI;
       rot+=(rnd()-.5)*.16;                                   // only slightly random
-      const fade=.97;             // no fade — all three orbits at full weight
+      const fade=.97;             // no fade — the whole field at full weight
       spots.push({x:X+(rnd()-.5)*9,y:Y+(rnd()-.5)*9,rot,fade,L});
     }
   }
@@ -336,102 +329,63 @@ async function draw(){
   if(tagIdx<0)tagIdx=pick(false);
   const tagSpot=spots[tagIdx];
 
-  // ── The pockets marked in review. Tags draw BEFORE the figure. The general
-  //    fills stay hand-placed, while the right hip is rebuilt below from the
-  //    actual silhouette so intact words — not the figure's edge — make its curve.
+  // Hand-placed pockets — the orbit field misses the tight gaps above/below her
+  // left arm. One Mixr traces the right of her head instead of a cluster there.
   {
     const OFF=TYPO_Y+DOWN;
     const FILL=[
       [332,624],[560,556],[812,486],            // above her left arm + over her head
-      [1182,700],[1302,776],                    // right of her head, over her right arm
       [300,998],[452,1052],                     // below her left arm
     ];
     for(const [px,py,fixed] of FILL){
       const sy=py-OFF, e=7;
       let rot;
-      if(fixed!==undefined){ rot=fixed; }          // angle set by hand
+      if(fixed!==undefined){ rot=fixed; }
       else{
         const gx=dist(px+e,sy)-dist(px-e,sy), gy=dist(px,sy+e)-dist(px,sy-e);
         rot=Math.atan2(gx,-gy);
         if(Math.cos(rot)<0)rot+=Math.PI;
-        rot+=(rnd()-.5)*.14;
+        rot+=(rnd()-.5)*.16;
       }
-      spots.push({x:px,y:sy,rot,fade:.97,L:RING_START});
+      spots.push({x:px,y:sy,rot,fade:.97,L:RING_START,pocket:true});
     }
 
-    // Walk the real right-hip outline at the inner-ring distance plus 10px.
-    // Words are emitted by accumulated arc length, so their painted shapes
-    // overlap into one continuous curve instead of reading as spaced labels.
-    const RIGHT_HIP_TOP=1380, RIGHT_HIP_BOTTOM=1900;
-    const RIGHT_HIP_DISTANCE=RING_START+RIGHT_HIP_EXTEND;
-    const RIGHT_HIP_EXTRA_Y=1540;
-    const RIGHT_HIP_EXTRA_DISTANCE=RIGHT_HIP_DISTANCE+RING_STEP;
-    const rightHipContour=()=>{
-      const path=[];
-      for(let py=RIGHT_HIP_TOP;py<=RIGHT_HIP_BOTTOM;py+=4){
-        let crossedBody=false;
-        for(let px=Math.floor(cx0Graf);px<W-MB;px+=4){
-          if(graf.maskAt(px,py)>128){crossedBody=true;continue}
-          if(crossedBody&&dist(px,py)>=RIGHT_HIP_DISTANCE){
-            path.push([px,py]);
-            break;
-          }
+    // Walk the head's right outline and place one Mixr down it — tangent from
+    // the path so the word rides the silhouette instead of sitting as a cluster.
+    const HEAD_TOP=headTop+gh*0.02, HEAD_BOTTOM=headTop+gh*0.36;
+    const HEAD_OUT=RING_START*.55;
+    const headPath=[];
+    for(let py=HEAD_TOP;py<=HEAD_BOTTOM;py+=3){
+      let crossedBody=false;
+      for(let px=Math.floor(cx0Graf);px<W-MB;px+=3){
+        if(maskAt(px,py)>128){crossedBody=true;continue}
+        if(crossedBody){
+          headPath.push([px+HEAD_OUT,py]);
+          break;
         }
       }
-      if(!path.length)return [];
-      const out=[];
-      let arc=wordW*.28,prev=path[0];
-      for(const p of path){
-        arc+=Math.hypot(p[0]-prev[0],p[1]-prev[1]);
-        prev=p;
-        if(arc<wordW*.55)continue;
-        arc=0;
-        const [px,py]=p,e=7;
-        const gx=dist(px+e,py)-dist(px-e,py), gy=dist(px,py+e)-dist(px,py-e);
-        let rot=Math.atan2(gx,-gy);
-        if(Math.cos(rot)<0)rot+=Math.PI;
-        out.push({x:px,y:py-OFF,rot,fade:.97,L:RING_START,hipContour:true});
-      }
-      return out;
-    };
-    const rightHipExtraWord=()=>{
-      let crossedBody=false;
-      for(let px=Math.floor(cx0Graf);px<W-MB;px+=4){
-        if(graf.maskAt(px,RIGHT_HIP_EXTRA_Y)>128){crossedBody=true;continue}
-        if(!crossedBody||dist(px,RIGHT_HIP_EXTRA_Y)<RIGHT_HIP_EXTRA_DISTANCE)continue;
-        const e=7;
-        const gx=dist(px+e,RIGHT_HIP_EXTRA_Y)-dist(px-e,RIGHT_HIP_EXTRA_Y);
-        const gy=dist(px,RIGHT_HIP_EXTRA_Y+e)-dist(px,RIGHT_HIP_EXTRA_Y-e);
-        let rot=Math.atan2(gx,-gy);
-        if(Math.cos(rot)<0)rot+=Math.PI;
-        return {
-          x:px,y:RIGHT_HIP_EXTRA_Y-OFF,rot,fade:.97,
-          L:RING_START+RING_STEP,hipContour:true,hipContourLayer:2
-        };
-      }
-      return null;
-    };
-
-    // Replace only the old inner orbit through this corridor. Outer rings and
-    // every non-hip area keep their current layout.
-    const hipPad=WORD_FS*.55;
-    for(let i=spots.length-1;i>=0;i--){
-      const p=spots[i], sy=p.y+OFF;
-      if(p===tagSpot||p.L>RING_START+1||p.x<cx0Graf)continue;
-      if(sy>=RIGHT_HIP_TOP-hipPad&&sy<=RIGHT_HIP_BOTTOM+hipPad)spots.splice(i,1);
     }
-    spots.push(...rightHipContour());
-    const extraHipWord=rightHipExtraWord();
-    if(extraHipWord)spots.push(extraHipWord);
+    if(headPath.length>=5){
+      const idx=Math.floor(headPath.length*0.42);
+      const [px,py]=headPath[idx];
+      const [px0,py0]=headPath[Math.max(0,idx-4)];
+      const [px1,py1]=headPath[Math.min(headPath.length-1,idx+4)];
+      let rot=Math.atan2(py1-py0,px1-px0)+Math.PI/2;
+      if(Math.cos(rot)<0)rot+=Math.PI;
+      spots.push({x:px,y:py-OFF,rot,fade:.97,L:RING_START,pocket:true,headContour:true});
+    }
 
-    const tooClose=(px,py)=>{
-      for(const p of spots){
-        if(Math.hypot(px-p.x,py-(p.y+OFF))<wordW*0.62)return true;
+    const tooClose=(px,py,rot)=>{
+      const c=Math.cos(-rot), sn=Math.sin(-rot);
+      for(const q of spots){
+        const qx=q.x-px, qy=(q.y+OFF)-py;
+        if(Math.abs(qx)>560||Math.abs(qy)>340)continue;
+        const lx=qx*c-qy*sn, ly=qx*sn+qy*c;
+        if(Math.abs(lx)<wordW*0.62&&Math.abs(ly)<WORD_FS*0.72)return true;
       }
       return false;
     };
-    const maxR=90;
-    const placeNear=(tx,ty)=>{
+    const placeNear=(tx,ty,maxR=260)=>{
       for(let r=0;r<=maxR;r+=15)for(let k=0;k<14;k++){
         const a=k*Math.PI/7+r*0.11;
         const px=tx+Math.cos(a)*r, py=ty+Math.sin(a)*r;
@@ -442,40 +396,29 @@ async function draw(){
         if(Math.cos(rot)<0)rot+=Math.PI;
         rot+=(rnd()-.5)*.14;
         if(tooClose(px,py,rot))continue;
-        spots.push({x:px,y:sy,rot,fade:.97,L:RING_START});
+        spots.push({x:px,y:sy,rot,fade:.97,L:RING_START,pocket:true});
         return true;
       }
       return false;
     };
     placeNear(392,656);      // above her left arm
     placeNear(292,956);      // below her left arm
-    placeNear(452,1694);     // the gap at her left hip
 
-    // and lose the stray tag out at the right edge — test which tag's own
-    // footprint covers that point, rather than where its centre happens to be
-    const STRAY=[1467,1222], HWs=wordW/2+8, HHs=WORD_FS*0.5+8;
+    // Lose every other tag in the head-right corridor — only the one contour word stays.
+    const headPad=WORD_FS*1.2;
+    const HEAD_ZONE_L=cx0Graf+100, HEAD_ZONE_R=1310;
     for(let i=spots.length-1;i>=0;i--){
-      const p=spots[i];
-      if(p===tagSpot)continue;
-      const dx=STRAY[0]-p.x, dy=STRAY[1]-(p.y+OFF);
-      const c=Math.cos(-p.rot), sn=Math.sin(-p.rot);
-      const lx=dx*c-dy*sn, ly=dx*sn+dy*c;
-      if(Math.abs(lx)<=HWs&&Math.abs(ly)<=HHs)spots.splice(i,1);
+      const p=spots[i], sy=p.y+OFF;
+      if(p===tagSpot||p.headContour)continue;
+      if(sy<HEAD_TOP-headPad||sy>HEAD_BOTTOM+headPad)continue;
+      if(p.x>HEAD_ZONE_L&&p.x<HEAD_ZONE_R)spots.splice(i,1);
     }
   }
 
-
-  // The left edge of the field is made of WHOLE WORDS — the outermost orbit
-  // simply ends where its words end. Clipping the right edge instead sliced
-  // glyphs mid-letter, which is a different mechanism and reads mechanical.
-  // So the cut selects words rather than cutting them: a tag is kept when its
-  // centre falls left of the curve, and is then drawn intact. The boundary is
-  // built from word shapes on both sides.
   spots.forEach((p,i)=>{
-    if(p===tagSpot)return;
     const sy=p.y+TYPO_Y+DOWN;
-    if(!p.hipContour&&p.x>cutX(sy))return;
-    roughWord(GWORD,WORD_FS,GRAF,p.x,sy,p.rot,p.fade);
+    if(p!==tagSpot&&!p.pocket&&p.x>cutX(sy))return;
+    if(p!==tagSpot)roughWord(GWORD,WORD_FS,GRAF,p.x,sy,p.rot,p.fade);
   });
 
   // ── the wave-band system ────────────────────────────────────────

@@ -1,0 +1,180 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>B — Chroma Slice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#17181C;display:grid;place-items:center;min-height:100vh}
+  canvas{height:min(96vh,1200px);width:auto;box-shadow:0 30px 90px rgba(0,0,0,.55)}
+  body.export canvas{height:2000px;box-shadow:none}
+</style>
+</head>
+<body>
+<canvas id="c" width="1600" height="2000"></canvas>
+<script src="mixr-kit.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   B — CHROMA SLICE
+   One idea: the poster is the signal, and someone is scrubbing it. The
+   whole sheet is cut into horizontal bands on a beat grid and each band is
+   displaced — with red, green and blue sampled from three different places,
+   so the colour genuinely comes apart at the tear. Real per-channel
+   aberration, not a tinted copy laid on top.
+   Most bands sit at zero. Only the beats move.
+   ═══════════════════════════════════════════════════════════════════════ */
+const {W,H,C} = MK;
+const {cv,x} = MK.boot('c');
+
+const M      = 100;
+const GROUND = '#E6E3DC';       // concrete
+const INK    = '#111119';
+const BEATS  = 32;              // the grid the tear obeys
+
+async function draw(){
+  await MK.fonts();
+  MK.srnd(808);
+  const girl = await MK.load('assets/mixr-girl.png');
+
+  /* ══ PASS 1 · the clean plate ═════════════════════════════════════ */
+
+  /* ── LAYER · BACKGROUND ─────────────────────────────────────────── */
+  // flat, so the figure's own ground resolves into it without an edge
+  x.fillStyle = GROUND; x.fillRect(0,0,W,H);
+
+  /* ── LAYER · GRID · the beat divisions the slicing will obey ─────── */
+  x.save(); x.strokeStyle = 'rgba(17,17,25,.055)'; x.lineWidth = 1;
+  for (let i=0;i<=12;i++){
+    const px = M + (W-2*M)*(i/12);
+    x.beginPath(); x.moveTo(px,0); x.lineTo(px,H); x.stroke();
+  }
+  x.restore();
+
+  /* ── LAYER · FIGURE ─────────────────────────────────────────────
+     Duotoned so her own ground resolves to exactly the poster's ground:
+     she is not cut out, she is printed in the same two inks as the sheet. */
+  const FW = 1010, FH = 1300, FX = 556, FY = 214;
+  const fig = MK.duotone(girl, 118, 8, 786, 1012, FW, FH,
+                         { dark: INK, light: GROUND, contrast: 1.26, bright: .06 });
+  x.drawImage(fig, FX, FY);
+
+  /* ── LAYER · DISPLAY TYPE · cropped by both edges ───────────────── */
+  x.fillStyle = INK;
+  MK.fillStretched(x, 'MIXR', -16, 1774, 1632, 352, '900 200px Archivo');
+
+  /* ══ PASS 2 · the scrub ═══════════════════════════════════════════
+     Snapshot the plate, cut it into bands on the beat grid, displace the
+     beats, and sample R/G/B from three different x for each band. */
+  const snap = MK.offc(W,H);
+  snap.ctx.drawImage(cv, 0, 0);
+  let rows = MK.sliceTable(H, {
+    n: BEATS, seed: 4477, irregular: .5,
+    // most beats hold; a few tear. quantised, never random.
+    grid:   [0,0,0,0,0,0,0,0,0,0,0, 14,-14, 34,-34, 78,-78, 168,-124],
+    chroma: [0,0,0,0,0, 2,3, 6, 11, 18, 26],
+  });
+  // the picture may come apart; the wordmark under it has to stay readable
+  rows = MK.calmRows(rows, 1380, 1810, 20, 9);
+  rows = MK.calmRows(rows, 0, 205, 0, 0);
+
+  const sliced = MK.sliceRGB(snap.canvas, rows);
+  // real separation, brand inks: every fringe resolves to pink or blue
+  const graded = MK.chromaRemap(sliced, {
+    ink: INK, ground: GROUND, warm: C.pink, cool: C.blue,
+    strength: 4.4, dead: .07 });
+  x.clearRect(0,0,W,H);
+  x.drawImage(graded, 0, 0);
+
+  /* ── LAYER · LANE COLOURS · four hairlines, cut band by band on the
+       same grid, so they step with the tear instead of ignoring it ── */
+  [[C.pink, 486],[C.purple, 1042],[C.blue, 1196],[C.yellow, 1806]]
+    .forEach(([col, ly])=>{
+      x.fillStyle = col;
+      rows.forEach(r => {
+        if (ly + 5 < r.y0 || ly > r.y1) return;
+        const y0 = Math.max(ly, r.y0), y1 = Math.min(ly + 5, r.y1);
+        if (y1 <= y0) return;
+        x.fillRect(-200 + r.dx, y0, W + 400, y1 - y0);
+      });
+    });
+
+  /* ══ PASS 3 · the crisp layer ═════════════════════════════════════
+     Everything that has to stay information stays out of the tear. */
+
+  // header
+  x.strokeStyle = 'rgba(17,17,25,.45)'; x.lineWidth = 1.6;
+  x.beginPath(); x.moveTo(M,178); x.lineTo(W-M,178); x.stroke();
+  x.fillStyle = INK;
+  x.font = '900 52px Archivo, system-ui'; x.letterSpacing = '-1px';
+  x.textBaseline = 'alphabetic'; x.fillText('Mixr', M, 158);
+  x.letterSpacing = '0px';
+  MK.meta(x,'iOS DJ APP', W-M, 158,
+          {fs:22, track:8, weight:500, color:'rgba(17,17,25,.75)', align:'right'});
+
+  // the ladder — information, kept out of the tear on purpose
+  const LAD = [['01','IMPORT'],['02','ARRANGE'],['03','MIX'],['04','PLAY']];
+  LAD.forEach(([n,t],i)=>{
+    const y = 726 + i*78;
+    x.font = '700 13px "Space Mono", monospace'; x.letterSpacing = '2px';
+    x.fillStyle = 'rgba(17,17,25,.5)'; x.textBaseline='alphabetic';
+    x.fillText(n, M, y);
+    x.font = '700 36px Archivo, system-ui'; x.letterSpacing = '0px';
+    x.fillStyle = INK; x.fillText(t, M+52, y+3);
+    x.strokeStyle = 'rgba(17,17,25,.20)'; x.lineWidth = 1;
+    x.beginPath(); x.moveTo(M, y+22); x.lineTo(M+372, y+22); x.stroke();
+  });
+
+  // the beat ruler down the left edge — the grid the tear obeys, stated
+  x.save();
+  x.strokeStyle = 'rgba(17,17,25,.5)'; x.lineWidth = 1;
+  x.beginPath(); x.moveTo(52, 178); x.lineTo(52, H-178); x.stroke();
+  rows.forEach((r,i)=>{
+    const on = r.dx !== 0;
+    x.strokeStyle = on ? C.pink : 'rgba(17,17,25,.32)';
+    x.lineWidth = on ? 2.4 : 1;
+    x.beginPath(); x.moveTo(52, r.y0); x.lineTo(52 + (on?20:9), r.y0); x.stroke();
+  });
+  x.restore();
+  x.save(); x.translate(30, 1180); x.rotate(-Math.PI/2);
+  MK.meta(x,'BEAT GRID · 1/32', 0,0,
+          {fs:11, track:4, weight:600, color:'rgba(17,17,25,.5)'});
+  x.restore();
+
+  // footer
+  x.strokeStyle = 'rgba(17,17,25,.45)'; x.lineWidth = 1.4;
+  x.beginPath(); x.moveTo(M,1846); x.lineTo(W-M,1846); x.stroke();
+  x.font = '400 13px "Space Mono", monospace'; x.letterSpacing = '2px';
+  x.fillStyle = 'rgba(17,17,25,.62)';
+  x.fillText('B / CHROMA SLICE', M, 1896);
+  x.fillText('RGB DISPLACED PER BAND · 102 BPM', M, 1922);
+  ['1600 × 2000','MMXXVI'].forEach((t,i)=>{
+    const w = x.measureText(t).width;
+    x.fillText(t, W-M-w, 1896 + i*26);
+  });
+  x.letterSpacing = '0px';
+
+  // the channel legend: what actually happened to the picture
+  const kx = M + 560;
+  [['R', C.red, -1],['G', '#22C55E', 0],['B', C.blue, 1]].forEach(([t,col,d],i)=>{
+    x.fillStyle = col; x.fillRect(kx + i*70 + d*4, 1884, 26, 8);
+    x.font = '700 12px "Space Mono", monospace';
+    x.fillStyle = 'rgba(17,17,25,.62)';
+    x.fillText(t, kx + i*70 + 32, 1892);
+  });
+  MK.meta(x,'CHANNELS SAMPLED APART', kx, 1922,
+          {fs:11, track:3, weight:500, color:'rgba(17,17,25,.5)'});
+
+  /* ── LAYER · FINISH ────────────────────────────────────────────── */
+  MK.regMark(x, 44, 44, 'rgba(17,17,25,.35)', 11);
+  MK.regMark(x, W-44, 44, 'rgba(17,17,25,.35)', 11);
+  MK.regMark(x, 44, H-44, 'rgba(17,17,25,.35)', 11);
+  MK.regMark(x, W-44, H-44, MK.rgba(C.pink,.9), 11);
+  MK.filmGrain(x, {alpha:.34, size:210, amp:26, mode:'overlay'});
+  MK.vignette(x, {inner:.5, outer:1.0, amount:.16});
+}
+draw();
+</script>
+</body>
+</html>
