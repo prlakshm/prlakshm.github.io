@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mixr — Poster Direction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  :root{
+    --ink:#0E0D11; --panel:#16151A; --line:#26242D;
+    --fg:#EDEAF2; --mute:#8E8A9B; --accent:#C5B7E2;
+  }
+  html,body{margin:0;background:var(--ink);color:var(--fg);
+    font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .mono{font-family:'Space Mono',monospace}
+
+  header{display:flex;justify-content:space-between;align-items:baseline;
+    padding:30px 44px 26px;border-bottom:1px solid var(--line)}
+  header .brand{font-family:'Space Mono',monospace;font-weight:700;
+    letter-spacing:.22em;font-size:14px}
+  header .meta{font-family:'Space Mono',monospace;font-size:11px;
+    letter-spacing:.18em;color:var(--mute);text-transform:uppercase}
+
+  .intro{padding:52px 44px 10px;max-width:820px}
+  .intro h1{font-size:34px;line-height:1.18;margin:0 0 18px;font-weight:500;
+    letter-spacing:-.02em}
+  .intro p{margin:0 0 12px;font-size:15px;line-height:1.7;color:var(--mute);max-width:660px}
+  .intro b{color:var(--fg);font-weight:500}
+
+  section{padding:60px 44px 10px}
+  .shead{display:flex;align-items:baseline;gap:18px;
+    border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:34px}
+  .shead .n{font-family:'Space Mono',monospace;font-size:12px;color:var(--accent);
+    letter-spacing:.18em}
+  .shead h2{margin:0;font-size:17px;font-weight:500;letter-spacing:.14em;
+    text-transform:uppercase}
+  .shead .hint{margin-left:auto;font-size:12px;color:var(--mute)}
+
+  .grid{display:grid;gap:30px;grid-template-columns:repeat(auto-fill,minmax(255px,1fr))}
+  figure{margin:0}
+  .shot{position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:3px;
+    background:var(--panel);border:1px solid var(--line);cursor:zoom-in;
+    transition:transform .35s cubic-bezier(.22,1,.36,1), border-color .35s}
+  .shot img{width:100%;height:100%;object-fit:cover;display:block}
+  .shot:hover{transform:translateY(-4px);border-color:#4A4459}
+  .pick .shot{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+
+  figcaption{padding-top:13px;display:flex;flex-direction:column;gap:5px}
+  .row1{display:flex;align-items:center;gap:9px}
+  .swatch{width:13px;height:13px;border-radius:2px;border:1px solid rgba(255,255,255,.22);
+    flex:0 0 auto}
+  .name{font-family:'Space Mono',monospace;font-size:12.5px;letter-spacing:.06em}
+  .tag{margin-left:auto;font-family:'Space Mono',monospace;font-size:9.5px;
+    letter-spacing:.14em;color:var(--ink);background:var(--accent);
+    padding:3px 7px;border-radius:2px}
+  .note{font-size:12.5px;line-height:1.55;color:var(--mute)}
+
+  footer{margin:70px 44px 60px;padding-top:24px;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;font-family:'Space Mono',monospace;
+    font-size:11px;letter-spacing:.16em;color:var(--mute);text-transform:uppercase}
+
+  /* lightbox */
+  .lb{position:fixed;inset:0;background:rgba(8,7,10,.94);display:none;
+    place-items:center;z-index:50;cursor:zoom-out;padding:36px}
+  .lb.on{display:grid}
+  .lb img{max-width:min(92vw,900px);max-height:92vh;object-fit:contain;
+    border:1px solid var(--line)}
+  .lb .cap{position:fixed;bottom:26px;left:0;right:0;text-align:center;
+    font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.18em;
+    color:var(--mute);text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="brand">MIXR</span>
+  <span class="meta">Poster Direction · Option Deck · 2026</span>
+</header>
+
+<div class="intro">
+  <h1>Two variables, held apart.</h1>
+  <p>Everything below is the <b>same poster</b> — same figure, same wave bands, same
+     orbit geometry. Only one variable moves per row, so the comparison is honest.</p>
+  <p>The logic comes from the <b>RUN</b> reference: a dense mono field that runs the
+     full sheet, a hand-painted tag that never touches its neighbours, one figure
+     holding the centre, and a plain border framing the whole thing. Every letterform
+     below is <b>laid down as paint</b> — uneven coverage, ragged stroke edges and an
+     overspray halo — so the comparison is about the hand, not the texture.</p>
+</div>
+
+<section>
+  <div class="shead">
+    <span class="n">01</span>
+    <h2>Ground</h2>
+    <span class="hint">Letterform fixed · click any specimen to enlarge</span>
+  </div>
+  <div class="grid" id="grounds"></div>
+</section>
+
+<section>
+  <div class="shead">
+    <span class="n">02</span>
+    <h2>Letterform</h2>
+    <span class="hint">Ground fixed · every face carries the same spray treatment</span>
+  </div>
+  <div class="grid" id="faces"></div>
+</section>
+
+<footer>
+  <span>Mixr — iOS DJ App</span>
+  <span>1600 × 2000 · 4:5</span>
+</footer>
+
+<div class="lb" id="lb"><img id="lbimg" alt=""><div class="cap" id="lbcap"></div></div>
+
+<script>
+const GROUNDS=[
+  {hex:'C5B7E2', name:'C5B7E2', pick:true,
+   note:'The current ground. Greyed violet — the most restrained of the set, and the one that lets the black mono field stay loudest.'},
+  {hex:'CEB9E8', name:'CEB9E8',
+   note:'A clear step into violet. Warmer and more pigmented; the figure gains contrast without the tags losing their footing.'},
+  {hex:'C7ADE6', name:'C7ADE6',
+   note:'Same violet, more saturated. Starts to feel like a colour choice rather than a paper — the most confident of the middle range.'},
+  {hex:'CDB0F0', name:'CDB0F0',
+   note:'Pushed hardest. Genuinely electric, closest to the app’s primaryPurple family, but it begins to crowd the tag purple.'},
+  {hex:'C3A9E0', name:'C3A9E0',
+   note:'Violet with the light pulled down. Moodier and heavier; the aura reads quieter and the figure carries more of the poster.'},
+  {hex:'D5C3F0', name:'D5C3F0',
+   note:'Violet, lifted. Airy and print-like — flattering to the mono field, but the black starts to shout against it.'},
+  {hex:'DAC9F5', name:'DAC9F5',
+   note:'The palest violet here. Almost a tinted white; elegant, but it drains the poster of its wall-poster energy.'},
+];
+const FACES=[
+  {key:'marker', name:'Permanent Marker', pick:true,
+   note:'Fat marker tag. Rounded and quick — reads as something written fast on a surface, which is why it has held up.'},
+  {key:'spray', name:'Rubik Spray Paint',
+   note:'The most literally aerosol of the set: bubbled letterforms with genuinely fuzzed edges. Loudest and most obviously graffiti.'},
+  {key:'dirt', name:'Rubik Dirt',
+   note:'Same bones, but eaten away — reads as paint that has weathered on a wall. Grittier and less cartoon than the spray cut.'},
+  {key:'brush', name:'Caveat Brush',
+   note:'Painted with a dry brush drag. Nearest in spirit to the RUN reference, and the most fluid — but it thins out at small sizes.'},
+  {key:'salt', name:'Rock Salt',
+   note:'Scratched rather than sprayed. The most human and the least shouty — closer to a marker scrawl than a can.'},
+];
+
+const card=(src,swatch,name,note,pick)=>`
+  <figure class="${pick?'pick':''}">
+    <div class="shot" data-src="${src}" data-cap="${name}"><img src="${src}" alt="${name}" loading="lazy"></div>
+    <figcaption>
+      <div class="row1">
+        ${swatch?`<span class="swatch" style="background:#${swatch}"></span>`:''}
+        <span class="name">${name}</span>
+        ${pick?'<span class="tag">CURRENT</span>':''}
+      </div>
+      <div class="note">${note}</div>
+    </figcaption>
+  </figure>`;
+
+document.getElementById('grounds').innerHTML=
+  GROUNDS.map(g=>card(`exports/variants/bg-${g.hex}.png`,g.hex,'#'+g.name,g.note,g.pick)).join('');
+document.getElementById('faces').innerHTML=
+  FACES.map(f=>card(`exports/variants/font-${f.key}.png`,null,f.name,f.note,f.pick)).join('');
+
+const lb=document.getElementById('lb'), lbimg=document.getElementById('lbimg'),
+      lbcap=document.getElementById('lbcap');
+document.addEventListener('click',e=>{
+  const s=e.target.closest('.shot');
+  if(s){lbimg.src=s.dataset.src;lbcap.textContent=s.dataset.cap;lb.classList.add('on');return}
+  if(lb.classList.contains('on'))lb.classList.remove('on');
+});
+addEventListener('keydown',e=>{if(e.key==='Escape')lb.classList.remove('on')});
+</script>
+</body>
+</html>

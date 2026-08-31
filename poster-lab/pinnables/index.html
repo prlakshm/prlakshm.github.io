@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Pinnables Poster Lab</title>
+<style>
+  html,body{margin:0;background:#141519;color:#FAF8F7;font:500 14px/1.4 system-ui;min-height:100vh}
+  header{padding:20px 28px;display:flex;gap:16px;align-items:baseline}
+  h1{font-size:16px;margin:0;letter-spacing:.06em}
+  span{opacity:.5}
+  main{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:0 28px 28px}
+  a.card{display:block;position:relative;border-radius:6px;overflow:hidden;background:#1c1d22}
+  iframe{width:1600px;height:2000px;border:0;transform-origin:0 0;pointer-events:none;display:block}
+  .wrap{aspect-ratio:4/5;overflow:hidden;position:relative}
+  figcaption{padding:10px 14px;font-size:12px;letter-spacing:.08em;opacity:.7}
+</style>
+</head>
+<body>
+<header><h1>PINNABLES — POSTER LAB</h1><span>canvas · 1600×2000 · click to open full</span></header>
+<main>
+  <a class="card" href="poster-a.html"><div class="wrap"><iframe src="poster-a.html?export" scrolling="no"></iframe></div><figcaption>A · MODULE WALL</figcaption></a>
+  <a class="card" href="poster-b.html"><div class="wrap"><iframe src="poster-b.html?export" scrolling="no"></iframe></div><figcaption>B · REEDED BOARD</figcaption></a>
+  <a class="card" href="poster-c.html"><div class="wrap"><iframe src="poster-c.html?export" scrolling="no"></iframe></div><figcaption>C · LENS EDITORIAL</figcaption></a>
+</main>
+<script>
+  // scale iframes to their card width
+  const fit=()=>{document.querySelectorAll('.wrap').forEach(w=>{
+    const f=w.querySelector('iframe');const s=w.clientWidth/1600;
+    f.style.transform=`scale(${s})`;});};
+  addEventListener('resize',fit);fit();
+</script>
+</body>
+</html>

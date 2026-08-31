@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Mixr — Poster v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#1c1d22;display:grid;place-items:center;min-height:100vh}
+  canvas{height:min(96vh,1200px);width:auto;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+  body.export canvas{height:2000px;box-shadow:none}
+</style>
+</head>
+<body>
+<canvas id="c" width="1600" height="2000"></canvas>
+<script src="poster-mixr-v1.js"></script>
+<script>
+  const cv=document.getElementById('c');
+  if(new URLSearchParams(location.search).has('export'))document.body.classList.add('export');
+  window.posterReady=drawMixrPosterV1(cv);
+  window.exportPNG=()=>cv.toDataURL('image/png');
+</script>
+</body>
+</html>

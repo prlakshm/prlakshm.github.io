@@ -1,0 +1,334 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Mixr — Editorial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,700&family=Permanent+Marker&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#1c1d22;display:grid;place-items:center;min-height:100vh}
+  canvas{height:min(96vh,1200px);width:auto;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+  body.export canvas{height:2000px;box-shadow:none}
+</style>
+</head>
+<body>
+<canvas id="c" width="1600" height="2000"></canvas>
+<script>
+const W=1600,H=2000;
+// ── palette: app violets, laid on paper instead of over a violet field ──
+const PAPER   ='#F1EDE6';   // warm editorial stock
+const PAPER_D ='#E7E1D6';
+const INK     ='#121016';
+const VIOLET  ='#7231DD';   // primaryPurple
+const VIOLET_D='#4C1FA3';
+const LAV     ='#D9C9ED';   // the approved ground, now a block colour
+const LAV_PALE='#EDE5F8';
+const PINK    ='#FF5FA2';   // waveformPink — one accent only
+
+const cv=document.getElementById('c'), x=cv.getContext('2d');
+if(new URLSearchParams(location.search).has('export'))document.body.classList.add('export');
+let seed=31337;
+const rnd=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+const load=s=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=s});
+const M=104;                                     // editorial margin
+
+// ─────────────────────────── helpers ───────────────────────────
+function rrect(ctx,X,Y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(X+r,Y);ctx.arcTo(X+w,Y,X+w,Y+h,r);ctx.arcTo(X+w,Y+h,X,Y+h,r);
+  ctx.arcTo(X,Y+h,X,Y,r);ctx.arcTo(X,Y,X+w,Y,r);ctx.closePath();
+}
+function noiseCanvas(size,alpha){
+  const g=document.createElement('canvas');g.width=g.height=size;
+  const gc=g.getContext('2d'),id=gc.createImageData(size,size);
+  for(let i=0;i<id.data.length;i+=4){
+    const v=Math.random()*255|0;
+    id.data[i]=id.data[i+1]=id.data[i+2]=v;id.data[i+3]=alpha;
+  }
+  gc.putImageData(id,0,0);return g;
+}
+// marker word, eroded so it reads as paint rather than type
+function tag(txt,fs,color,cx,cy,rot,alpha=1){
+  const off=document.createElement('canvas'), o=off.getContext('2d');
+  o.font=`${fs}px "Permanent Marker"`;
+  const w=o.measureText(txt).width, pad=fs*.5;
+  off.width=Math.ceil(w+pad*2);off.height=Math.ceil(fs*1.9);
+  o.font=`${fs}px "Permanent Marker"`;o.textBaseline='alphabetic';
+  o.fillStyle=color;o.fillText(txt,pad,fs*1.3);
+  o.globalCompositeOperation='destination-out';
+  const pits=off.width*off.height/300;
+  for(let i=0;i<pits;i++){
+    o.globalAlpha=.3+rnd()*.5;
+    o.beginPath();o.arc(rnd()*off.width,rnd()*off.height,.5+rnd()*1.4,0,7);o.fill();
+  }
+  for(let i=0;i<4;i++){
+    o.globalAlpha=.2+rnd()*.3;
+    o.fillRect(rnd()*off.width,rnd()*off.height,18+rnd()*60,1+rnd()*1.5);
+  }
+  x.save();x.translate(cx,cy);x.rotate(rot);x.globalAlpha=alpha;
+  x.drawImage(off,-off.width/2,-off.height/2);x.restore();
+  return w;
+}
+// torn paper edge: a filled band whose top and bottom are ragged
+function tornBand(y0,h,color,rough=13){
+  x.save();x.fillStyle=color;x.beginPath();
+  x.moveTo(-10,y0);
+  for(let t=-10;t<=W+10;t+=16)x.lineTo(t,y0+(rnd()-.5)*rough);
+  x.lineTo(W+10,y0+h);
+  for(let t=W+10;t>=-10;t-=16)x.lineTo(t,y0+h+(rnd()-.5)*rough);
+  x.closePath();x.fill();
+  // torn fibre lip
+  x.globalAlpha=.5;x.strokeStyle='rgba(255,255,255,.65)';x.lineWidth=1.4;
+  x.beginPath();x.moveTo(-10,y0);
+  for(let t=-10;t<=W+10;t+=16)x.lineTo(t,y0+(rnd()-.5)*rough*.6);
+  x.stroke();x.restore();
+}
+// halftone disc — the printed-photo dot screen from the collage references
+function halftoneDisc(cx,cy,R,color,cell=13){
+  x.save();x.fillStyle=color;
+  for(let Y=cy-R;Y<=cy+R;Y+=cell)for(let X=cx-R;X<=cx+R;X+=cell){
+    const d=Math.hypot(X-cx,Y-cy)/R;
+    if(d>1)continue;
+    const r=cell*.52*(1-d*d*.85);
+    if(r<.35)continue;
+    x.globalAlpha=.92-d*.25;
+    x.beginPath();x.arc(X,Y,r,0,7);x.fill();
+  }
+  x.restore();
+}
+// a strip of tape holding the collage down
+function tape(cx,cy,w,h,rot){
+  x.save();x.translate(cx,cy);x.rotate(rot);
+  x.fillStyle='rgba(255,255,255,.42)';
+  x.fillRect(-w/2,-h/2,w,h);
+  x.fillStyle='rgba(120,110,140,.13)';
+  x.fillRect(-w/2,-h/2,w,h);
+  x.strokeStyle='rgba(255,255,255,.55)';x.lineWidth=1;
+  x.strokeRect(-w/2,-h/2,w,h);
+  x.globalAlpha=.35;x.fillStyle='rgba(140,130,160,.5)';   // torn ends
+  for(let i=0;i<10;i++){
+    x.fillRect(-w/2-2,-h/2+i*h/10,3,h/10*(.4+rnd()*.6));
+    x.fillRect(w/2-1,-h/2+i*h/10,3,h/10*(.4+rnd()*.6));
+  }
+  x.restore();
+}
+// ── GLASS: the Pinnables move — snapshot the sheet, blur it, and let the
+//    panel actually refract what is behind it, then gloss the surface.
+function glass(X,Y,w,h,rot,r=18){
+  const snap=document.createElement('canvas');snap.width=W;snap.height=H;
+  snap.getContext('2d').drawImage(cv,0,0);
+  const cx=X+w/2, cy=Y+h/2;
+  x.save();
+  x.translate(cx,cy);x.rotate(rot);x.translate(-cx,-cy);
+
+  x.save();rrect(x,X,Y,w,h,r);x.clip();
+  x.filter='blur(16px)';x.drawImage(snap,0,0);x.filter='none';   // refraction
+  x.fillStyle='rgba(255,255,255,.40)';x.fillRect(X,Y,w,h);        // frost
+  const gl=x.createLinearGradient(X,Y,X+w*.5,Y+h);                // top gloss
+  gl.addColorStop(0,'rgba(255,255,255,.55)');
+  gl.addColorStop(.42,'rgba(255,255,255,.06)');
+  gl.addColorStop(1,'rgba(255,255,255,0)');
+  x.fillStyle=gl;x.fillRect(X,Y,w,h);
+  const sp=x.createLinearGradient(X,Y,X+w,Y+h);                   // specular sweep
+  sp.addColorStop(.30,'rgba(255,255,255,0)');
+  sp.addColorStop(.40,'rgba(255,255,255,.42)');
+  sp.addColorStop(.455,'rgba(255,255,255,.06)');
+  sp.addColorStop(.52,'rgba(255,255,255,0)');
+  x.fillStyle=sp;x.fillRect(X,Y,w,h);
+  const bo=x.createLinearGradient(X,Y+h-70,X,Y+h);                // violet bounce
+  bo.addColorStop(0,'rgba(114,49,221,0)');
+  bo.addColorStop(1,'rgba(114,49,221,.14)');
+  x.fillStyle=bo;x.fillRect(X,Y+h-70,w,70);
+  x.restore();
+
+  rrect(x,X+.5,Y+.5,w-1,h-1,r);                                   // rim
+  x.strokeStyle='rgba(255,255,255,.85)';x.lineWidth=1.4;x.stroke();
+  rrect(x,X+2.5,Y+2.5,w-5,h-5,r-2);
+  x.strokeStyle='rgba(114,49,221,.16)';x.lineWidth=1;x.stroke();
+  x.restore();
+  return {cx,cy};
+}
+
+// ─────────────────────────── the sheet ───────────────────────────
+async function draw(){
+  await document.fonts.load('700 300px "Bodoni Moda"');
+  await document.fonts.load('400 120px "Permanent Marker"');
+  await document.fonts.load('700 20px "Space Mono"');
+  const girl=await load('assets/mixr-girl.png');
+
+  // ── L1 · paper
+  x.fillStyle=PAPER;x.fillRect(0,0,W,H);
+  const vg=x.createRadialGradient(W*.5,H*.42,H*.2,W*.5,H*.5,H*.85);
+  vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(90,70,40,.09)');
+  x.fillStyle=vg;x.fillRect(0,0,W,H);
+
+  // ── L2 · engineering grid block, upper right (Bonjour reference)
+  x.save();
+  x.beginPath();x.rect(884,556,W-M-884,430);x.clip();
+  x.fillStyle=PAPER_D;x.fillRect(884,556,W-M-884,430);
+  x.strokeStyle='rgba(80,70,110,.20)';x.lineWidth=1;
+  for(let gx=884;gx<=W-M;gx+=26){x.beginPath();x.moveTo(gx,556);x.lineTo(gx,986);x.stroke()}
+  for(let gy=556;gy<=986;gy+=26){x.beginPath();x.moveTo(884,gy);x.lineTo(W-M,gy);x.stroke()}
+  x.restore();
+
+  // ── L3 · halftone disc behind her head
+  halftoneDisc(806,742,318,VIOLET,14);
+
+  // ── L4 · torn violet band across her shoulders
+  tornBand(1004,206,LAV,15);
+  x.save();x.globalAlpha=.92;
+  x.beginPath();x.rect(0,1120,1180,80);x.clip();   // offset, stops short
+  tornBand(1146,40,VIOLET,10);x.restore();
+
+  // ── L5 · the masthead — fashion serif, edge to edge
+  x.fillStyle=INK;
+  x.font='700 400px "Bodoni Moda"';
+  let mw=x.measureText('MIXR').width;
+  const mfs=Math.floor(400*(W-2*M)/mw);
+  x.font=`700 ${mfs}px "Bodoni Moda"`;
+  x.textBaseline='alphabetic';
+  x.fillText('MIXR',M,470);
+
+  // hairline rules bracketing the masthead — editorial furniture
+  x.strokeStyle=INK;x.lineWidth=2;
+  x.beginPath();x.moveTo(M,196);x.lineTo(W-M,196);x.stroke();
+  x.lineWidth=1;
+  x.beginPath();x.moveTo(M,516);x.lineTo(W-M,516);x.stroke();
+
+  // ── L6 · the street tag, scrawled straight over the couture masthead
+  tag('Mixr',176,VIOLET_D,560,430,-.10,.96);
+  tag('Mixr',104,VIOLET,1268,286,.13,.9);
+
+  // ── L7 · the figure, cut out and lifted off the page
+  const gh=H*0.70, gw=gh*girl.width/girl.height;
+  const gx=(W-gw)/2, gy=H-gh+26;
+  const lvl=document.createElement('canvas');lvl.width=W;lvl.height=H;
+  const f2=lvl.getContext('2d');
+  f2.fillStyle='#fff';f2.fillRect(0,0,W,H);
+  f2.filter='grayscale(1) brightness(1.10) contrast(1.36)';
+  f2.drawImage(girl,gx,gy,gw,gh);
+  const px=f2.getImageData(0,0,W,H).data;
+  const N=W*H, PAPER_T=238;
+  const isP=new Uint8Array(N), seen=new Uint8Array(N);
+  for(let p=0;p<N;p++){const i=p*4;
+    isP[p]=(px[i]*.299+px[i+1]*.587+px[i+2]*.114)>=PAPER_T?1:0}
+  const q=new Int32Array(N);let head=0,tail=0;
+  const push=p=>{if(isP[p]&&!seen[p]){seen[p]=1;q[tail++]=p}};
+  for(let X=0;X<W;X++){push(X);push((H-1)*W+X)}
+  for(let Y=0;Y<H;Y++){push(Y*W);push(Y*W+W-1)}
+  while(head<tail){const p=q[head++],X=p%W;
+    if(X>0)push(p-1); if(X<W-1)push(p+1);
+    if(p>=W)push(p-W); if(p<N-W)push(p+W)}
+  const mask=document.createElement('canvas');mask.width=W;mask.height=H;
+  const mk=mask.getContext('2d');
+  const md=mk.createImageData(W,H), mdd=md.data;
+  const A0=new Uint8Array(N);
+  for(let p=0;p<N;p++)A0[p]=seen[p]?0:255;
+  for(let Y=0;Y<H;Y++)for(let X=0;X<W;X++){
+    const p=Y*W+X,i=p*4;
+    let a=A0[p];
+    if(a&&X&&Y&&X<W-1&&Y<H-1)a=(A0[p]*4+A0[p-1]+A0[p+1]+A0[p-W]+A0[p+W])/8;
+    if(a>0){mdd[i]=px[i];mdd[i+1]=px[i+1];mdd[i+2]=px[i+2];mdd[i+3]=Math.round(a)}
+  }
+  mk.putImageData(md,0,0);
+
+  // cut-out shadow — she sits ON the collage, not in it
+  const sh=document.createElement('canvas');sh.width=W;sh.height=H;
+  const sc=sh.getContext('2d');
+  sc.drawImage(mask,0,0);sc.globalCompositeOperation='source-in';
+  sc.fillStyle='rgba(40,26,70,.42)';sc.fillRect(0,0,W,H);
+  x.save();x.filter='blur(11px)';x.drawImage(sh,15,17);x.restore();
+  x.drawImage(mask,0,0);
+
+  // ── L8 · mono spine, running up the left margin
+  x.save();x.translate(64,H-M);x.rotate(-Math.PI/2);
+  x.font='700 17px "Space Mono"';x.letterSpacing='7px';
+  x.fillStyle='rgba(18,16,22,.72)';
+  x.fillText('MIXR — AN iOS DJ APP · CUT · LAYER · SEND · 2026',0,0);
+  x.letterSpacing='0px';x.restore();
+
+  // ── L9 · the glass — a frosted card refracting the collage beneath it
+  const gX=930, gY=1452, gW=566, gH=272;
+  glass(gX,gY,gW,gH,.030,20);
+  x.save();
+  x.translate(gX+gW/2,gY+gH/2);x.rotate(.030);x.translate(-(gX+gW/2),-(gY+gH/2));
+  x.fillStyle=INK;
+  x.font='700 21px "Space Mono"';x.letterSpacing='4px';
+  x.fillText('AN iOS DJ APP',gX+40,gY+66);
+  x.letterSpacing='0px';
+  x.font='400 15px "Space Mono"';
+  x.fillStyle='rgba(18,16,22,.62)';
+  x.fillText('Cut the track. Layer the stems.',gX+40,gY+112);
+  x.fillText('Send the mix.',gX+40,gY+138);
+  x.strokeStyle='rgba(18,16,22,.22)';x.lineWidth=1;
+  x.beginPath();x.moveTo(gX+40,gY+170);x.lineTo(gX+gW-40,gY+170);x.stroke();
+  x.font='700 13px "Space Mono"';x.letterSpacing='3px';
+  x.fillStyle=VIOLET_D;
+  x.fillText('128 BPM',gX+40,gY+208);
+  x.fillStyle='rgba(18,16,22,.55)';
+  x.fillText('44.1kHz / 24-BIT',gX+190,gY+208);
+  x.letterSpacing='0px';
+  // the app's own violet chip, sitting on the glass
+  x.fillStyle=VIOLET;rrect(x,gX+40,gY+228,86,20,10);x.fill();
+  x.fillStyle='#fff';x.font='700 11px "Space Mono"';x.letterSpacing='2px';
+  x.fillText('MIXR',gX+58,gY+242);x.letterSpacing='0px';
+  x.restore();
+
+  // a second, smaller pane — a chip of glass over her shoulder
+  glass(268,1286,214,118,-.045,16);
+  x.save();x.translate(375,1345);x.rotate(-.045);
+  x.fillStyle=INK;x.font='700 15px "Space Mono"';x.letterSpacing='3px';
+  x.textAlign='center';x.fillText('SIDE A',0,-8);
+  x.font='400 12px "Space Mono"';x.fillStyle='rgba(18,16,22,.6)';
+  x.fillText('01 · HEADPHONES ON',0,18);
+  x.textAlign='start';x.letterSpacing='0px';x.restore();
+
+  // ── L9b · tracklist in the lower-left void — it balances the glass card
+  //          on the opposite diagonal instead of fighting the torn band
+  x.save();
+  x.fillStyle='rgba(18,16,22,.78)';
+  x.font='700 14px "Space Mono"';x.letterSpacing='3px';
+  x.fillText('TRACKLIST',248,1512);
+  x.strokeStyle='rgba(18,16,22,.3)';x.lineWidth=1;
+  x.beginPath();x.moveTo(248,1524);x.lineTo(540,1524);x.stroke();
+  x.font='400 13px "Space Mono"';x.letterSpacing='1.5px';
+  const rows=[['01','CUT'],['02','LAYER'],['03','EFFECT'],['04','SEND']];
+  rows.forEach(([n,t],i)=>{
+    const y=1560+i*30;
+    x.fillStyle='rgba(114,49,221,.9)';x.fillText(n,248,y);
+    x.fillStyle='rgba(18,16,22,.6)';x.fillText(t,298,y);
+  });
+  x.letterSpacing='0px';x.restore();
+
+  // ── L10 · tape, holding the collage to the page
+  tape(898,562,190,44,-.03);          // holding the grid block down
+  tape(1496,946,168,42,1.54);
+
+  // ── L11 · print furniture
+  x.fillStyle='rgba(18,16,22,.75)';
+  x.font='400 13px "Space Mono"';x.letterSpacing='3px';
+  x.fillText('MIXR / STREET EDITION',M,H-64);
+  const rt='NO. 01 — 2026';
+  x.fillText(rt,W-M-x.measureText(rt).width,H-64);
+  x.letterSpacing='0px';
+  // colour bar
+  const bars=[INK,VIOLET_D,VIOLET,LAV,PINK];
+  bars.forEach((c,i)=>{x.fillStyle=c;x.fillRect(M+i*34,H-116,30,16)});
+  // registration crosses
+  x.strokeStyle='rgba(18,16,22,.55)';x.lineWidth=1.2;
+  for(const [cx2,cy2] of [[52,52],[W-52,52],[52,H-52],[W-52,H-52]]){
+    x.beginPath();x.moveTo(cx2-11,cy2);x.lineTo(cx2+11,cy2);
+    x.moveTo(cx2,cy2-11);x.lineTo(cx2,cy2+11);x.stroke();
+    x.beginPath();x.arc(cx2,cy2,7,0,7);x.stroke();
+  }
+
+  // ── L12 · paper grain
+  x.save();x.globalAlpha=.5;x.globalCompositeOperation='multiply';
+  x.fillStyle=x.createPattern(noiseCanvas(220,26),'repeat');
+  x.fillRect(0,0,W,H);x.restore();
+}
+draw();
+window.exportPNG=()=>cv.toDataURL('image/png');
+</script>
+</body>
+</html>

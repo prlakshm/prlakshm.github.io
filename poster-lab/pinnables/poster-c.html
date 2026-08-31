@@ -1,0 +1,193 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Pinnables — Poster C · Lens Editorial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Inter:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#1c1d22;display:grid;place-items:center;min-height:100vh}
+  canvas{height:min(96vh,1200px);width:auto;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+  body.export canvas{height:2000px;box-shadow:none}
+</style>
+</head>
+<body>
+<canvas id="c" width="1600" height="2000"></canvas>
+<script>
+const W=1600,H=2000;
+const INK='#2D2E34',COBALT='#2451D4',SKY='#89C7F7',RED='#DF372A',PAPER='#FAF8F7';
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+if(new URLSearchParams(location.search).has('export'))document.body.classList.add('export');
+const load=s=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=s});
+
+function grain(ctx,alpha){
+  const g=document.createElement('canvas');g.width=256;g.height=256;
+  const gc=g.getContext('2d'),id=gc.createImageData(256,256);
+  for(let i=0;i<id.data.length;i+=4){const v=Math.random()*255|0;id.data[i]=v;id.data[i+1]=v;id.data[i+2]=v;id.data[i+3]=255}
+  gc.putImageData(id,0,0);
+  ctx.save();ctx.globalAlpha=alpha;ctx.globalCompositeOperation='overlay';
+  ctx.fillStyle=ctx.createPattern(g,'repeat');ctx.fillRect(0,0,W,H);ctx.restore();
+}
+function squircleIcon(ctx,img,cx,cy,S,rot){
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(rot*Math.PI/180);
+  ctx.beginPath();ctx.roundRect(-S/2,-S/2,S,S,S*.225);
+  ctx.fillStyle='#fff';ctx.fill();ctx.clip();
+  const n=img.width,sx=.186*n,sy=.161*n,sw=.628*n;
+  ctx.drawImage(img,sx,sy,sw,sw,-S/2,-S/2,S,S);
+  ctx.restore();
+}
+function pushpin(ctx,px,py,s,rot){
+  ctx.save();ctx.translate(px,py);ctx.rotate(rot*Math.PI/180);
+  const ng=ctx.createLinearGradient(0,0,s*.16,s*1.1);
+  ng.addColorStop(0,'#d6dae0');ng.addColorStop(1,'#7d8590');
+  ctx.fillStyle=ng;
+  ctx.beginPath();ctx.moveTo(-s*.055,0);ctx.lineTo(s*.055,0);ctx.lineTo(s*.16,s*1.05);ctx.lineTo(s*.10,s*1.1);ctx.closePath();ctx.fill();
+  ctx.save();ctx.globalAlpha=.18;ctx.fillStyle=INK;
+  ctx.beginPath();ctx.ellipse(s*.14,s*1.12,s*.5,s*.14,0,0,7);ctx.fill();ctx.restore();
+  ctx.fillStyle='#B02318';
+  ctx.beginPath();ctx.ellipse(0,-s*.1,s*.62,s*.26,0,0,7);ctx.fill();
+  const hg=ctx.createRadialGradient(-s*.18,-s*.62,s*.06,0,-s*.42,s*.62);
+  hg.addColorStop(0,'#ff8a7e');hg.addColorStop(.45,RED);hg.addColorStop(1,'#8f150c');
+  ctx.fillStyle=hg;
+  ctx.beginPath();ctx.arc(0,-s*.44,s*.5,0,7);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.85)';
+  ctx.beginPath();ctx.ellipse(-s*.17,-s*.62,s*.11,s*.07,-.6,0,7);ctx.fill();
+  ctx.restore();
+}
+function stringCurve(ctx,x1,y1,x2,y2,sag){
+  ctx.save();ctx.strokeStyle=RED;ctx.lineWidth=3;ctx.lineCap='round';
+  ctx.shadowColor='rgba(45,46,52,.22)';ctx.shadowBlur=4;ctx.shadowOffsetY=5;
+  ctx.beginPath();ctx.moveTo(x1,y1);
+  ctx.quadraticCurveTo((x1+x2)/2,Math.max(y1,y2)+sag,x2,y2);
+  ctx.stroke();ctx.restore();
+}
+function miniCard(ctx,cx,cy,rot){
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(rot*Math.PI/180);
+  ctx.shadowColor='rgba(45,46,52,.14)';ctx.shadowBlur=18;ctx.shadowOffsetY=8;
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.roundRect(0,0,200,140,10);ctx.fill();
+  ctx.shadowColor='transparent';
+  ctx.strokeStyle='rgba(45,46,52,.18)';ctx.lineWidth=1;ctx.stroke();
+  ctx.fillStyle='rgba(45,46,52,.25)';ctx.beginPath();ctx.roundRect(16,18,90,11,5.5);ctx.fill();
+  ctx.fillStyle='rgba(45,46,52,.10)';ctx.beginPath();ctx.roundRect(16,44,168,7,3.5);ctx.fill();
+  ctx.fillStyle='#C9E2FA';ctx.beginPath();ctx.roundRect(16,62,168,62,6);ctx.fill();
+  ctx.restore();
+}
+
+async function draw(){
+  await document.fonts.load('700 300px "Space Grotesk"');
+  await document.fonts.load('600 40px "Inter"');
+  await document.fonts.load('500 40px "Inter"');
+  const [icon,toolbar,promptbar,wordmark]=await Promise.all([
+    load('assets/icon.png'),load('assets/toolbar.png'),load('assets/promptbar.png'),load('assets/wordmark.svg')]);
+
+  // paper + fine grid
+  x.fillStyle=PAPER;x.fillRect(0,0,W,H);
+  for(let gx=400;gx<W;gx+=400){x.fillStyle='rgba(45,46,52,.07)';x.fillRect(gx,0,1,H)}
+  for(let gy=400;gy<H;gy+=400){x.fillStyle='rgba(45,46,52,.07)';x.fillRect(0,gy,W,1)}
+
+  // giant outlined DEVTOOL in its own band above the footer
+  x.save();
+  x.font='700 100px "Space Grotesk"';
+  const wd=x.measureText('DEVTOOL').width;
+  const fsD=1560/wd*100;
+  x.font=`700 ${fsD}px "Space Grotesk"`;
+  x.strokeStyle=COBALT;x.lineWidth=2.5;x.globalAlpha=.75;
+  x.strokeText('DEVTOOL',20,1806);
+  x.restore();
+
+  // wordmark + chips
+  x.drawImage(wordmark,96,66,240,240*442/1696);
+  x.font='500 19px "Inter"';x.letterSpacing='2px';
+  const chipLabels=[['BROWSER EXTENSION',COBALT],['2026',INK]];let cxr=1504;
+  for(let i=chipLabels.length-1;i>=0;i--){
+    const [t,c]=chipLabels[i];const tw=x.measureText(t).width,cw=tw+44;cxr-=cw;
+    x.strokeStyle=c;x.lineWidth=1.5;
+    x.beginPath();x.roundRect(cxr,80,cw,44,22);x.stroke();
+    x.fillStyle=c;x.fillText(t,cxr+22,108);
+    cxr-=14;
+  }
+  x.letterSpacing='0px';
+
+  // headline
+  x.fillStyle=INK;
+  x.font='700 100px "Space Grotesk"';
+  const wh=x.measureText('PINNABLES').width;
+  const fsH=1408/wh*100;
+  x.font=`700 ${fsH}px "Space Grotesk"`;
+  x.fillText('PINNABLES',96,560);
+  // supporting line
+  x.fillStyle=COBALT;x.font='700 62px "Space Grotesk"';
+  x.letterSpacing='30px';x.fillText('DEVTOOL',96,672);x.letterSpacing='0px';
+  x.fillStyle=RED;x.fillRect(560,632,20,20);
+  x.fillStyle='rgba(45,46,52,.7)';x.font='500 22px "Inter"';
+  x.letterSpacing='1.5px';x.fillText('Annotate local web apps. Tell your coding agent what to change.',96,724);x.letterSpacing='0px';
+
+  // ---- refraction lens over the headline ----
+  const LX=1080,LY=432,LR=295,Z=1.3;
+  const snap=document.createElement('canvas');snap.width=W;snap.height=H;
+  snap.getContext('2d').drawImage(cv,0,0);
+  x.save();
+  x.beginPath();x.arc(LX,LY,LR,0,7);x.clip();
+  x.filter='blur(0.6px)';
+  const sr=LR/Z*2;
+  x.drawImage(snap,LX-LR/Z,LY-LR/Z,sr,sr,LX-LR,LY-LR,LR*2,LR*2);
+  x.filter='none';
+  x.fillStyle='rgba(255,255,255,.08)';x.fillRect(LX-LR,LY-LR,LR*2,LR*2);
+  // rim shading
+  const rim=x.createRadialGradient(LX,LY,LR*.72,LX,LY,LR);
+  rim.addColorStop(0,'rgba(45,46,52,0)');rim.addColorStop(.85,'rgba(45,46,52,.05)');rim.addColorStop(1,'rgba(45,46,52,.18)');
+  x.fillStyle=rim;x.fillRect(LX-LR,LY-LR,LR*2,LR*2);
+  x.restore();
+  // rim highlights
+  x.save();x.lineCap='round';
+  x.strokeStyle='rgba(255,255,255,.95)';x.lineWidth=3.5;
+  x.beginPath();x.arc(LX,LY,LR-2,Math.PI*1.05,Math.PI*1.45);x.stroke();
+  x.strokeStyle='rgba(255,255,255,.6)';x.lineWidth=2.5;
+  x.beginPath();x.arc(LX,LY,LR-2,Math.PI*.1,Math.PI*.32);x.stroke();
+  x.strokeStyle='rgba(255,255,255,.85)';x.lineWidth=1.5;
+  x.beginPath();x.arc(LX,LY,LR-.5,0,7);x.stroke();
+  x.restore();
+  // pin sealed in the lens
+  squircleIcon(x,icon,LX,LY-6,196,10);
+
+  // ---- middle: toolbar strip + board diagram wired to the real bar ----
+  x.save();
+  x.shadowColor='rgba(45,46,52,.12)';x.shadowBlur=24;x.shadowOffsetY=10;
+  x.fillStyle='#fff';x.beginPath();x.roundRect(804,806,700,700*300/1610,18);x.fill();
+  x.shadowColor='transparent';x.clip();
+  x.drawImage(toolbar,120,340,1610,300,804,806,700,700*300/1610);
+  x.restore();
+  x.strokeStyle='rgba(45,46,52,.15)';x.lineWidth=1;
+  x.beginPath();x.roundRect(804,806,700,700*300/1610,18);x.stroke();
+
+  miniCard(x,96,880,-3);
+  miniCard(x,400,950,2);
+  // real prompt bar pinned bottom-right of the diagram flow
+  x.save();
+  x.shadowColor='rgba(45,46,52,.14)';x.shadowBlur=20;x.shadowOffsetY=8;
+  x.fillStyle='#fff';x.beginPath();x.roundRect(919,1210,585,585*74/650,12);x.fill();
+  x.shadowColor='transparent';x.clip();
+  x.drawImage(promptbar,919,1210,585,585*74/650);
+  x.restore();
+
+  stringCurve(x,196,888,500,958,140);
+  stringCurve(x,500,958,1211,1218,220);
+  pushpin(x,196,888,28,-6);
+  pushpin(x,500,958,28,4);
+  pushpin(x,1211,1218,28,-2);
+
+  // footer
+  x.fillStyle=COBALT;x.fillRect(96,1840,1408,2);
+  x.fillStyle='rgba(45,46,52,.78)';x.font='500 20px "Inter"';
+  x.letterSpacing='2.2px';x.fillText('PINNABLES — DEVTOOL',96,1892);
+  const r2='github.com/prlakshm/pinnables';
+  const rw=x.measureText(r2).width;
+  x.fillText(r2,1504-rw,1892);x.letterSpacing='0px';
+
+  grain(x,0.055);
+}
+draw();
+window.exportPNG=()=>cv.toDataURL('image/png');
+</script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { animate } from "motion";
 import { SPRING_HEAVY, prefersReducedMotion } from "./interactions.js";
@@ -362,21 +362,27 @@ function DeckWindow({ deck, index }: { deck: Deck; index: number }) {
   );
 }
 
-function Decks() {
+function Decks({ shelfRef }: { shelfRef: RefObject<HTMLUListElement | null> }) {
   const rowRef = useRef<HTMLUListElement>(null);
 
   /* Reveal on scroll, the shelf's mechanism: the observer only adds a class
-     and CSS owns the (opacity-only) motion. The trigger line sits much lower
-     than the shelf's -34%, though — the row's top edge is the LABELS, with
-     the windows well below, so the shelf's line left a long stretch of empty
-     section on screen before anything faded in. But -12% overshot: it fired
-     while the WINDOWS were still under the fold, the fade finished off
-     screen, and they arrived already opaque — no visible entrance at all.
-     -22% is the line where the windows' top edge has just cleared the fold
-     as the fade begins, so the same staggered fade the notebooks make is
-     actually seen. (Top-edge + rootMargin rather than a ratio threshold for
-     the shelf's reason: a ratio is unsatisfiable once the stacked phone
-     layout grows taller than the screen.) */
+     and CSS owns the (opacity-only) motion.
+
+     Desktop: the trigger sits lower than the shelf's -34%. The row's top
+     edge is the LABELS, with the windows well below, so the shelf's line
+     left a long stretch of empty section on screen before anything faded
+     in. But -12% overshot: it fired while the WINDOWS were still under the
+     fold, the fade finished off screen, and they arrived already opaque —
+     no visible entrance at all. -22% is the line where the windows' top
+     edge has just cleared the fold as the fade begins, so the staggered
+     fade is actually seen.
+
+     Phone: the windows stack, so that later line makes Cursor a second
+     visible entrance after Mixr. Join the shelf's own -34% wave instead —
+     both decks fade with the notebooks, off-screen, and are already there
+     when you scroll to them. (Top-edge + rootMargin rather than a ratio
+     threshold: a ratio is unsatisfiable once the stacked layout grows
+     taller than the screen.) */
   useEffect(() => {
     const row = rowRef.current;
     if (!row) return;
@@ -384,11 +390,39 @@ function Decks() {
       row.classList.add("is-in");
       return;
     }
+
+    const reveal = () => row.classList.add("is-in");
+    const phone = window.matchMedia("(max-width: 767px)").matches;
+    const shelf = shelfRef.current;
+
+    /* Phone joins the notebooks' wave by watching the shelf's class — the
+       same add("is-in") Home.tsx writes — not a second observer on the
+       shelf. Two observers on that node race: the shelf can flicker through
+       the -34% line while the hero is still settling, Home fires, then the
+       books drop below the line and the decks' observer never sees them. */
+    if (phone && shelf) {
+      const line = window.innerHeight * 0.66;
+      const shelfReady = () =>
+        shelf.classList.contains("is-in") ||
+        shelf.getBoundingClientRect().top <= line;
+      if (shelfReady()) {
+        reveal();
+        return;
+      }
+      const mo = new MutationObserver(() => {
+        if (!shelfReady()) return;
+        reveal();
+        mo.disconnect();
+      });
+      mo.observe(shelf, { attributes: true, attributeFilter: ["class"] });
+      return () => mo.disconnect();
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
-          entry.target.classList.add("is-in");
+          reveal();
           observer.unobserve(entry.target);
         });
       },
@@ -396,7 +430,7 @@ function Decks() {
     );
     observer.observe(row);
     return () => observer.disconnect();
-  }, []);
+  }, [shelfRef]);
 
   return (
     <section className="decks" aria-label="Speculative concept decks">

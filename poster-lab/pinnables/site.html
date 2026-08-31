@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pinnables</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:#000}
+  body{display:grid;place-items:center;overflow:hidden}
+
+  .stage{perspective:1700px;perspective-origin:50% 50%}
+
+  .pane{position:relative;width:min(44vw,520px);aspect-ratio:4/5;
+    isolation:isolate;will-change:transform;
+    transition:box-shadow .55s cubic-bezier(.22,1,.36,1);
+    box-shadow:0 26px 64px rgba(0,0,0,.9)}
+  .pane img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
+    backface-visibility:hidden}
+  .lyr{position:absolute;inset:0;pointer-events:none}
+
+  /* glass thickness glowing behind the sheet */
+  .thick{inset:-14px;z-index:-1;
+    background:linear-gradient(160deg,rgba(137,199,247,.34),rgba(36,81,212,.22));
+    filter:blur(13px);opacity:.45;transition:opacity .55s}
+
+  /* UV VARNISH — iridescent film that only shows where light strikes */
+  .uv{mix-blend-mode:screen;opacity:.34;transition:opacity .55s;
+    background:linear-gradient(var(--uva,105deg),
+      rgba(36,81,212,0) 18%, rgba(137,199,247,.30) 33%,
+      rgba(255,255,255,.42) 43%, rgba(223,55,42,.16) 50%,
+      rgba(137,199,247,.26) 58%, rgba(36,81,212,0) 76%);
+    background-size:250% 100%;background-position:120% 0}
+  /* hard specular band — the wet-varnish highlight */
+  .spec{mix-blend-mode:screen;opacity:0;transition:opacity .5s;
+    background:linear-gradient(101deg,
+      transparent 40.45%, rgba(255,255,255,.5) 47.1%,
+      rgba(255,255,255,.10) 50.9%, transparent 57.55%);
+    background-size:250% 100%;background-position:120% 0}
+  /* the light source pooling under the cursor */
+  .glare{mix-blend-mode:screen;opacity:0;transition:opacity .5s;
+    background:radial-gradient(28% 32% at var(--gx,50%) var(--gy,50%),
+      rgba(255,255,255,.42), rgba(180,214,255,.15) 42%, transparent 70%)}
+  /* stock texture, so it reads as print not screen */
+  .tex{mix-blend-mode:overlay;opacity:.35;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23p)' opacity='.42'/%3E%3C/svg%3E")}
+  .rim{box-shadow:inset 0 0 0 1px rgba(255,255,255,.16),
+    inset 0 1px 0 rgba(255,255,255,.42), inset 0 -1px 0 rgba(137,199,247,.24)}
+
+  .pane:hover .uv{opacity:.85}
+  .pane:hover .spec{opacity:1}
+  .pane:hover .glare{opacity:1}
+  .pane:hover .thick{opacity:.95}
+  .pane:hover{box-shadow:0 58px 116px rgba(0,0,0,.95), 0 0 96px rgba(36,81,212,.34)}
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="pane" data-rest="-2.2">
+    <img src="exports/pinnables-poster-a.png" alt="">
+    <div class="lyr thick"></div>
+    <div class="lyr uv"></div>
+    <div class="lyr spec"></div>
+    <div class="lyr glare"></div>
+    <div class="lyr tex"></div>
+    <div class="lyr rim"></div>
+  </div>
+</div>
+
+<script>
+const MAX=11;                                  // degrees of tilt
+document.querySelectorAll('.pane').forEach(pane=>{
+  const uv=pane.querySelector('.uv'), spec=pane.querySelector('.spec'),
+        glare=pane.querySelector('.glare');
+  const rest=parseFloat(pane.dataset.rest)||0;
+  let c={x:0,y:0,z:rest,l:0}, t={x:0,y:0,z:rest,l:0}, raf=null, live=false;
+
+  const loop=()=>{
+    const k=.12;
+    c.x+=(t.x-c.x)*k; c.y+=(t.y-c.y)*k; c.z+=(t.z-c.z)*k; c.l+=(t.l-c.l)*k;
+    pane.style.transform=
+      `rotateX(${c.x.toFixed(3)}deg) rotateY(${c.y.toFixed(3)}deg) `+
+      `rotateZ(${c.z.toFixed(3)}deg) scale(${(1+c.l*.045).toFixed(4)})`;
+    // the light source stays put, so the bands travel opposite the tilt
+    const p = 50 - (c.y/MAX)*72 + (c.x/MAX)*12;
+    spec.style.backgroundPosition = p.toFixed(1)+'% 0';
+    uv.style.backgroundPosition   = (50-(c.y/MAX)*54).toFixed(1)+'% 0';
+    // the varnish shifts hue with viewing angle
+    uv.style.setProperty('--uva', (105 + c.y*1.6 - c.x*1.1).toFixed(1)+'deg');
+    if(Math.abs(t.x-c.x)+Math.abs(t.y-c.y)+Math.abs(t.z-c.z)+Math.abs(t.l-c.l)>.0015)
+      raf=requestAnimationFrame(loop); else raf=null;
+  };
+  const kick=()=>{ if(!raf) raf=requestAnimationFrame(loop) };
+
+  pane.addEventListener('pointerenter',()=>{ live=true; t.l=1; t.z=rest*0.14; kick() });
+  pane.addEventListener('pointermove',e=>{
+    if(!live)return;
+    const r=pane.getBoundingClientRect();
+    const px=(e.clientX-r.left)/r.width-.5, py=(e.clientY-r.top)/r.height-.5;
+    t.y=px*MAX*2; t.x=-py*MAX*1.5;
+    glare.style.setProperty('--gx',((px+.5)*100).toFixed(1)+'%');
+    glare.style.setProperty('--gy',((py+.5)*100).toFixed(1)+'%');
+    kick();
+  });
+  pane.addEventListener('pointerleave',()=>{
+    live=false; t.x=0; t.y=0; t.z=rest; t.l=0; kick();
+  });
+  pane.style.transform=`rotateZ(${rest}deg)`;   // resting pose
+});
+</script>
+</body>
+</html>

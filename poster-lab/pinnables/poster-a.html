@@ -1,0 +1,272 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Pinnables — Poster A · Module Wall</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Inter:wght@500&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#1c1d22;display:grid;place-items:center;min-height:100vh}
+  canvas{height:min(96vh,1200px);width:auto;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+  body.export canvas{height:2000px;box-shadow:none}
+</style>
+</head>
+<body>
+<canvas id="c" width="1600" height="2000"></canvas>
+<script>
+const W=1600,H=2000;
+const INK='#2D2E34',COBALT='#2451D4',SKY='#89C7F7',RED='#DF372A';
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+if(new URLSearchParams(location.search).has('export'))document.body.classList.add('export');
+const hash=(a,b)=>{let h=(a*73856093)^(b*19349663);h=(h^(h>>13))>>>0;return (h%10000)/10000};
+
+// ---- layout constants: the module system ----
+const M=36;                    // sheet margin
+const RAIL_W=250, RAIL_X=W-M-RAIL_W;
+const MAIN_X=M,   MAIN_W=RAIL_X-40-MAIN_X;
+const ROWS=['PIN','NAB','LES'];
+const GAP=68;        // air between rows
+const TYPE_M=96;     // the word block sits inside the sheet margin
+const ROW_H=(H-2*TYPE_M-GAP*(ROWS.length-1))/ROWS.length;
+const CELL=32;
+
+// draw text stretched to exactly fill a box
+function fillStretched(ctx,t,bx,by,bw,bh,mode){
+  ctx.save();
+  ctx.font='700 100px "Space Grotesk"';
+  const m=ctx.measureText(t);
+  const asc=m.actualBoundingBoxAscent;
+  ctx.translate(bx,by+bh);
+  ctx.scale(bw/m.width, bh/asc);
+  if(mode==='stroke'){ctx.lineWidth=3*(m.width/bw);ctx.strokeText(t,0,0)}
+  else ctx.fillText(t,0,0);
+  ctx.restore();
+}
+
+function grain(ctx,alpha){
+  const g=document.createElement('canvas');g.width=256;g.height=256;
+  const gc=g.getContext('2d'),id=gc.createImageData(256,256);
+  for(let i=0;i<id.data.length;i+=4){const v=Math.random()*255|0;id.data[i]=v;id.data[i+1]=v;id.data[i+2]=v;id.data[i+3]=255}
+  gc.putImageData(id,0,0);
+  ctx.save();ctx.globalAlpha=alpha;ctx.globalCompositeOperation='overlay';
+  ctx.fillStyle=ctx.createPattern(g,'repeat');ctx.fillRect(0,0,W,H);ctx.restore();
+}
+
+async function draw(){
+  await document.fonts.load('700 300px "Space Grotesk"');
+  await document.fonts.load('500 30px "Inter"');
+
+  // ── L1 · icy ground
+  const bg=x.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#FBFDFE');bg.addColorStop(.55,'#F5F9FD');bg.addColorStop(1,'#ECF4FC');
+  x.fillStyle=bg;x.fillRect(0,0,W,H);
+
+  // ── L2 · construction grid, drawn on the module (32px), heavier every 4th
+  for(let gx=MAIN_X;gx<=W-M;gx+=CELL){
+    const k=Math.round((gx-MAIN_X)/CELL);
+    x.fillStyle=k%4?'rgba(36,81,212,.055)':'rgba(36,81,212,.13)';
+    x.fillRect(gx,M,1,H-2*M);
+  }
+  for(let gy=M;gy<=H-M;gy+=CELL){
+    const k=Math.round((gy-M)/CELL);
+    x.fillStyle=k%4?'rgba(36,81,212,.055)':'rgba(36,81,212,.13)';
+    x.fillRect(MAIN_X,gy,W-M-MAIN_X,1);
+  }
+  // row register marks
+  x.strokeStyle='rgba(36,81,212,.5)';x.lineWidth=1.5;
+  for(let r=0;r<=ROWS.length;r++){
+    const y=TYPE_M+r*(ROW_H+GAP)-(r?GAP/2:0);
+    x.beginPath();x.moveTo(MAIN_X,y);x.lineTo(MAIN_X+26,y);x.stroke();
+    x.beginPath();x.moveTo(W-M-26,y);x.lineTo(W-M,y);x.stroke();
+  }
+
+  // ── build the stretched type mask (letters fill each row box, both axes)
+  const off=document.createElement('canvas');off.width=W;off.height=H;
+  const o=off.getContext('2d');o.fillStyle='#000';
+  ROWS.forEach((t,i)=>fillStretched(o,t,MAIN_X,TYPE_M+i*(ROW_H+GAP),MAIN_W,ROW_H));
+  const px=o.getImageData(0,0,W,H).data;
+
+  const cover=(ix,iy,step)=>{
+    let acc=0,n=0;
+    for(let sy=4;sy<CELL;sy+=step)for(let sx=4;sx<CELL;sx+=step){
+      const X=ix*CELL+sx,Y=iy*CELL+sy;
+      if(X>=0&&X<W&&Y>=0&&Y<H){acc+=px[(Y*W+X)*4+3];n++}
+    }
+    return n?acc/n/255:0;
+  };
+  const cols=Math.ceil(W/CELL),rws=Math.ceil(H/CELL);
+
+  // ── L3 · registration ghost: the same wall, offset, in sky
+  x.save();x.globalAlpha=.5;
+  for(let iy=0;iy<rws;iy++)for(let ix=0;ix<cols;ix++){
+    if(cover(ix,iy,8)<0.38)continue;
+    const s=CELL*0.86;
+    x.fillStyle=SKY;
+    x.beginPath();x.roundRect(ix*CELL+CELL/2-s/2+15,iy*CELL+CELL/2-s/2+15,s,s,6);x.fill();
+  }
+  x.restore();
+
+  // ── L4 · the module wall
+  for(let iy=0;iy<rws;iy++)for(let ix=0;ix<cols;ix++){
+    const cv2=cover(ix,iy,7);
+    if(cv2<0.38)continue;
+    const cx=ix*CELL+CELL/2,cy=iy*CELL+CELL/2;
+    const r1=hash(ix,iy),r2=hash(iy+7,ix+3);
+    const d=cx+cy;
+    let col=INK;
+    if(d>1380&&d<1820)col=COBALT;
+    else if(d>2320&&d<2640)col=SKY;
+    if(r1<0.015)col=RED;
+    // partial cells step down a size — the grid resolving the letterform's edge
+    const unit=cv2<0.70?0.72:(0.86+0.14*r2);
+    const s=CELL*unit;
+    x.save();x.translate(cx,cy);
+    if(r1>0.86)x.rotate(((r2-0.5)*8)*Math.PI/180);
+    if(r1>0.965&&cv2>=0.70){            // outlined module: a fourth texture
+      x.strokeStyle=col;x.lineWidth=3;
+      x.beginPath();x.roundRect(-s/2,-s/2,s,s,4);x.stroke();
+    }else{
+      x.fillStyle=col;
+      if(r1>0.80){x.beginPath();x.arc(0,0,s/2,0,7);x.fill()}
+      else{x.beginPath();x.roundRect(-s/2,-s/2,s,s,r1>0.5?7:2);x.fill()}
+    }
+    x.restore();
+  }
+
+  // ── L5 · overlap bands (multiply registration, 2ser-style)
+  x.save();x.globalCompositeOperation='multiply';
+  // the strip centres on the first letter of every row — P · N · L
+  x.font='700 100px "Space Grotesk"';
+  let cAcc=0,wAcc=0;
+  for(const t of ROWS){
+    const sx=MAIN_W/x.measureText(t).width;
+    const w1=x.measureText(t[0]).width*sx;
+    cAcc+=MAIN_X+w1/2; wAcc+=w1;
+  }
+  const bandW=Math.round(wAcc/ROWS.length/CELL)*CELL;    // as wide as the letter itself
+  const bandX=Math.round((cAcc/ROWS.length-bandW/2)/CELL)*CELL;  // centred on P · N · L
+  x.fillStyle='rgba(36,81,212,.12)';
+  x.fillRect(bandX,M,bandW,H-2*M);
+  x.fillStyle='rgba(137,199,247,.22)';
+  x.fillRect(MAIN_X,TYPE_M+ROW_H+GAP+CELL*6,W-M-MAIN_X,CELL*5);
+  x.restore();
+
+  // ── L6 · DEVTOOL: outlined, stretched to the full sheet height, reading bottom-up
+  x.save();
+  x.translate(RAIL_X,H-M);
+  x.rotate(-Math.PI/2);
+  x.strokeStyle=COBALT;x.globalAlpha=.92;x.lineJoin='round';
+  fillStretched(x,'DEVTOOL',0,0,H-2*M,RAIL_W,'stroke');
+  x.restore();
+  // rail rules
+  x.strokeStyle='rgba(36,81,212,.35)';x.lineWidth=1;
+  x.beginPath();x.moveTo(RAIL_X-20,M);x.lineTo(RAIL_X-20,H-M);x.stroke();
+
+  // ── L7 · structural microtype
+  x.font='500 17px "Inter"';x.letterSpacing='5px';
+  x.fillStyle='rgba(36,81,212,.75)';
+  ROWS.forEach((t,i)=>{
+    x.save();
+    x.translate(MAIN_X-4,TYPE_M+i*(ROW_H+GAP)+24);
+    x.fillText(String(i+1).padStart(2,'0'),0,0);
+    x.restore();
+  });
+  x.letterSpacing='0px';
+
+  // ── L8 · FRACTAL GLASS — the sheet recursively splits into facets,
+  //          each one refracting what sits behind it
+  {
+    const FG = +(new URLSearchParams(location.search).get('fg') ?? 0); // off by default; ?fg=0.45 to preview
+    if(FG>0){
+      const snap=document.createElement('canvas');snap.width=W;snap.height=H;
+      snap.getContext('2d').drawImage(cv,0,0);
+
+      let seed=20260829;
+      const rnd=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+      // clip a polygon to the half-plane nx·x + ny·y <= d
+      const clipPoly=(poly,nx,ny,d)=>{
+        const out=[];
+        for(let i=0;i<poly.length;i++){
+          const A=poly[i],B=poly[(i+1)%poly.length];
+          const da=nx*A[0]+ny*A[1]-d, db=nx*B[0]+ny*B[1]-d;
+          if(da<=0)out.push(A);
+          if((da<0&&db>0)||(da>0&&db<0)){
+            const t=da/(da-db);
+            out.push([A[0]+t*(B[0]-A[0]),A[1]+t*(B[1]-A[1])]);
+          }
+        }
+        return out;
+      };
+      const centroid=p=>{let cx=0,cy=0;for(const q of p){cx+=q[0];cy+=q[1]}return [cx/p.length,cy/p.length]};
+      const shards=[];
+      (function split(poly,depth){
+        if(depth<=0||poly.length<3){if(poly.length>2)shards.push(poly);return}
+        const [cx,cy]=centroid(poly);
+        const ang=rnd()*Math.PI;
+        const nx=Math.cos(ang),ny=Math.sin(ang);
+        const d=nx*cx+ny*cy+(rnd()-0.5)*260;
+        const a=clipPoly(poly,nx,ny,d), b=clipPoly(poly,-nx,-ny,-d);
+        split(a,depth-1); split(b,depth-1);
+      })([[0,0],[W,0],[W,H],[0,H]],7);
+
+      const trace=poly=>{
+        x.beginPath();x.moveTo(poly[0][0],poly[0][1]);
+        for(let i=1;i<poly.length;i++)x.lineTo(poly[i][0],poly[i][1]);
+        x.closePath();
+      };
+      for(const poly of shards){
+        const [cx,cy]=centroid(poly);
+        const dx=(rnd()-0.5)*11*FG, dy=(rnd()-0.5)*11*FG;
+        const sc=1+(rnd()-0.5)*0.022*FG;
+        x.save();
+        trace(poly);x.clip();
+        x.translate(cx,cy);x.scale(sc,sc);x.translate(-cx,-cy);
+        x.drawImage(snap,dx,dy);
+        const t=rnd();                                   // facet colour cast
+        if(t<0.30){x.fillStyle='rgba(255,255,255,.055)';x.fillRect(0,0,W,H)}
+        else if(t<0.48){x.fillStyle='rgba(137,199,247,.055)';x.fillRect(0,0,W,H)}
+        else if(t<0.56){x.fillStyle='rgba(36,81,212,.022)';x.fillRect(0,0,W,H)}
+        x.restore();
+        x.save();                                        // facet seam
+        trace(poly);
+        x.strokeStyle=rnd()>0.4?'rgba(255,255,255,.42)':'rgba(36,81,212,.10)';
+        x.lineWidth=1;x.stroke();
+        x.restore();
+      }
+    }
+  }
+
+  // ── L9 · the light-blue glass sheet
+  x.fillStyle='rgba(137,199,247,.07)';x.fillRect(0,0,W,H);
+  const sheen=x.createLinearGradient(0,0,W,H);
+  sheen.addColorStop(0,'rgba(255,255,255,0)');
+  sheen.addColorStop(.26,'rgba(255,255,255,0)');
+  sheen.addColorStop(.33,'rgba(255,255,255,.11)');
+  sheen.addColorStop(.40,'rgba(255,255,255,0)');
+  sheen.addColorStop(.55,'rgba(255,255,255,0)');
+  sheen.addColorStop(.61,'rgba(255,255,255,.17)');
+  sheen.addColorStop(.645,'rgba(255,255,255,.05)');
+  sheen.addColorStop(.68,'rgba(255,255,255,0)');
+  sheen.addColorStop(1,'rgba(255,255,255,0)');
+  x.fillStyle=sheen;x.fillRect(0,0,W,H);
+  x.save();
+  x.translate(W/2,H/2);x.rotate(Math.atan2(H,W)-Math.PI/2);
+  x.fillStyle='rgba(255,255,255,.34)';x.fillRect(210,-1700,7,3400);
+  x.fillStyle='rgba(255,255,255,.22)';x.fillRect(238,-1700,3,3400);
+  x.restore();
+  const glare=x.createRadialGradient(140,90,0,140,90,560);
+  glare.addColorStop(0,'rgba(255,255,255,.22)');glare.addColorStop(1,'rgba(255,255,255,0)');
+  x.fillStyle=glare;x.fillRect(0,0,W,H);
+  const deep=x.createRadialGradient(1560,1960,0,1560,1960,760);
+  deep.addColorStop(0,'rgba(36,81,212,.08)');deep.addColorStop(1,'rgba(36,81,212,0)');
+  x.fillStyle=deep;x.fillRect(0,0,W,H);
+  x.strokeStyle='rgba(255,255,255,.5)';x.lineWidth=2.5;x.strokeRect(1.5,1.5,W-3,H-3);
+  x.strokeStyle='rgba(137,199,247,.3)';x.lineWidth=1;x.strokeRect(5.5,5.5,W-11,H-11);
+
+  grain(x,0.05);
+}
+draw();
+window.exportPNG=()=>cv.toDataURL('image/png');
+</script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Pinnables — Poster B · Reeded Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Inter:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#1c1d22;display:grid;place-items:center;min-height:100vh}
+  canvas{height:min(96vh,1200px);width:auto;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+  body.export canvas{height:2000px;box-shadow:none}
+</style>
+</head>
+<body>
+<canvas id="c" width="1600" height="2000"></canvas>
+<script>
+const W=1600,H=2000;
+const INK='#2D2E34',COBALT='#2451D4',SKY='#89C7F7',RED='#DF372A',PAPER='#FAF8F7';
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+if(new URLSearchParams(location.search).has('export'))document.body.classList.add('export');
+const load=s=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=s});
+
+function grain(ctx,alpha){
+  const g=document.createElement('canvas');g.width=256;g.height=256;
+  const gc=g.getContext('2d'),id=gc.createImageData(256,256);
+  for(let i=0;i<id.data.length;i+=4){const v=Math.random()*255|0;id.data[i]=v;id.data[i+1]=v;id.data[i+2]=v;id.data[i+3]=255}
+  gc.putImageData(id,0,0);
+  ctx.save();ctx.globalAlpha=alpha;ctx.globalCompositeOperation='overlay';
+  ctx.fillStyle=ctx.createPattern(g,'repeat');ctx.fillRect(0,0,W,H);ctx.restore();
+}
+function squircleIcon(ctx,img,cx,cy,S,rot){
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(rot*Math.PI/180);
+  ctx.shadowColor='rgba(16,45,120,.35)';ctx.shadowBlur=50;ctx.shadowOffsetY=20;
+  ctx.beginPath();ctx.roundRect(-S/2,-S/2,S,S,S*.225);
+  ctx.fillStyle='#fff';ctx.fill();ctx.shadowColor='transparent';
+  ctx.clip();
+  const n=img.width,sx=.186*n,sy=.161*n,sw=.628*n;
+  ctx.drawImage(img,sx,sy,sw,sw,-S/2,-S/2,S,S);
+  ctx.restore();
+}
+function pushpin(ctx,px,py,s,rot){
+  ctx.save();ctx.translate(px,py);ctx.rotate(rot*Math.PI/180);
+  // needle
+  const ng=ctx.createLinearGradient(0,0,s*.16,s*1.1);
+  ng.addColorStop(0,'#d6dae0');ng.addColorStop(1,'#7d8590');
+  ctx.fillStyle=ng;
+  ctx.beginPath();ctx.moveTo(-s*.055,0);ctx.lineTo(s*.055,0);ctx.lineTo(s*.16,s*1.05);ctx.lineTo(s*.10,s*1.1);ctx.closePath();ctx.fill();
+  // soft contact shadow
+  ctx.save();ctx.globalAlpha=.22;ctx.fillStyle='#102d78';
+  ctx.beginPath();ctx.ellipse(s*.14,s*1.12,s*.5,s*.14,0,0,7);ctx.fill();ctx.restore();
+  // collar
+  ctx.fillStyle='#B02318';
+  ctx.beginPath();ctx.ellipse(0,-s*.1,s*.62,s*.26,0,0,7);ctx.fill();
+  // head
+  const hg=ctx.createRadialGradient(-s*.18,-s*.62,s*.06,0,-s*.42,s*.62);
+  hg.addColorStop(0,'#ff8a7e');hg.addColorStop(.45,RED);hg.addColorStop(1,'#8f150c');
+  ctx.fillStyle=hg;
+  ctx.beginPath();ctx.arc(0,-s*.44,s*.5,0,7);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.85)';
+  ctx.beginPath();ctx.ellipse(-s*.17,-s*.62,s*.11,s*.07,-.6,0,7);ctx.fill();
+  ctx.restore();
+}
+function stringCurve(ctx,x1,y1,x2,y2,sag){
+  ctx.save();
+  ctx.strokeStyle=RED;ctx.lineWidth=3.5;ctx.lineCap='round';
+  ctx.shadowColor='rgba(16,45,120,.30)';ctx.shadowBlur=5;ctx.shadowOffsetY=6;
+  ctx.beginPath();ctx.moveTo(x1,y1);
+  ctx.quadraticCurveTo((x1+x2)/2,Math.max(y1,y2)+sag,x2,y2);
+  ctx.stroke();ctx.restore();
+}
+function skeletonCard(ctx,cx,cy,w,h,rot,blockCol,blockAlpha){
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(rot*Math.PI/180);
+  ctx.shadowColor='rgba(16,45,120,.28)';ctx.shadowBlur=30;ctx.shadowOffsetY=14;
+  ctx.fillStyle='#fff';
+  ctx.beginPath();ctx.roundRect(0,0,w,h,14);ctx.fill();
+  ctx.shadowColor='transparent';
+  ctx.strokeStyle='rgba(45,46,52,.12)';ctx.lineWidth=1;ctx.stroke();
+  ctx.fillStyle='rgba(45,46,52,.25)';ctx.beginPath();ctx.roundRect(24,26,w*.5,16,8);ctx.fill();
+  ctx.fillStyle='rgba(45,46,52,.10)';
+  ctx.beginPath();ctx.roundRect(24,60,w-48,9,4.5);ctx.fill();
+  ctx.beginPath();ctx.roundRect(24,78,(w-48)*.68,9,4.5);ctx.fill();
+  if(blockCol){ctx.globalAlpha=blockAlpha;ctx.fillStyle=blockCol;
+    ctx.beginPath();ctx.roundRect(24,104,w-48,h-128,8);ctx.fill();ctx.globalAlpha=1}
+  ctx.restore();
+}
+
+async function draw(){
+  await document.fonts.load('700 320px "Space Grotesk"');
+  await document.fonts.load('600 40px "Inter"');
+  await document.fonts.load('500 40px "Inter"');
+  const [icon,toolbar,promptbar]=await Promise.all([load('assets/icon.png'),load('assets/toolbar.png'),load('assets/promptbar.png')]);
+
+  // sky field
+  const bg=x.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#A3D3FA');bg.addColorStop(.55,SKY);bg.addColorStop(1,'#7ABDF3');
+  x.fillStyle=bg;x.fillRect(0,0,W,H);
+  for(let gx=400;gx<W;gx+=400){x.fillStyle='rgba(255,255,255,.10)';x.fillRect(gx,0,1,H)}
+  for(let gy=400;gy<H;gy+=400){x.fillStyle='rgba(255,255,255,.10)';x.fillRect(0,gy,W,1)}
+
+  // ---- board scene (large, dipping into the glass band) ----
+  skeletonCard(x,120,560,360,440,-4,SKY,0.55);
+  skeletonCard(x,600,500,430,370,3,null,0);
+  skeletonCard(x,1130,600,360,560,-2.5,COBALT,0.16);
+
+  // prompt bar pinned to middle card
+  x.save();x.translate(600,500);x.rotate(3*Math.PI/180);
+  x.beginPath();x.roundRect(24,130,382,382*74/650,8);x.clip();
+  x.drawImage(promptbar,24,130,382,382*74/650);x.restore();
+  x.save();x.translate(600,500);x.rotate(3*Math.PI/180);
+  x.fillStyle='rgba(137,199,247,.5)';x.beginPath();x.roundRect(24,196,382,140,8);x.fill();x.restore();
+
+  // toolbar panel (real component, cropped from the reference render) — bottom edge enters the glass
+  x.save();x.translate(340,1010);x.rotate(-1.5*Math.PI/180);
+  x.shadowColor='rgba(16,45,120,.3)';x.shadowBlur=40;x.shadowOffsetY=16;
+  x.fillStyle='#fff';x.beginPath();x.roundRect(0,0,880,880*300/1610,20);x.fill();
+  x.shadowColor='transparent';x.clip();
+  x.drawImage(toolbar,120,340,1610,300,0,0,880,880*300/1610);
+  x.restore();
+
+  // strings then pins
+  stringCurve(x,300,568,815,525,90);
+  stringCurve(x,815,525,1310,638,110);
+  pushpin(x,300,568,34,-8);
+  pushpin(x,815,525,34,5);
+  pushpin(x,1310,638,34,-3);
+
+  // giant wordmark — drawn BEFORE the glass band so it gets fluted
+  x.fillStyle=INK;
+  x.font='700 100px "Space Grotesk"';
+  const w100=x.measureText('PINNABLES').width;
+  const fs=1520/w100*100;
+  x.font=`700 ${fs}px "Space Grotesk"`;
+  x.fillText('PINNABLES',(W-1520)/2,1400);
+
+  // ---- reeded glass band: refract everything behind it ----
+  const BAND_Y=1130,BAND_H=440,SW=25,N=Math.ceil(W/SW);
+  const snap=document.createElement('canvas');snap.width=W;snap.height=H;
+  snap.getContext('2d').drawImage(cv,0,0);
+  for(let i=0;i<N;i++){
+    const dx=Math.sin(i*0.72)*11+(((i*37)%41)-20)*0.55;
+    const wob=(((i*7)%13)-6)*1.2;
+    x.save();
+    x.beginPath();x.rect(i*SW,BAND_Y,SW,BAND_H);x.clip();
+    x.filter='blur(1.3px)';
+    x.drawImage(snap,i*SW+dx,BAND_Y-wob,SW,BAND_H+wob*2,i*SW,BAND_Y,SW,BAND_H);
+    x.filter='none';
+    const veil=((i*13)%4)*0.028;
+    if(veil){x.fillStyle=`rgba(255,255,255,${veil})`;x.fillRect(i*SW,BAND_Y,SW,BAND_H)}
+    const tint=i%2?'rgba(137,199,247,.05)':'rgba(223,55,42,.028)';
+    x.fillStyle=tint;x.fillRect(i*SW,BAND_Y,SW,BAND_H);
+    x.fillStyle='rgba(255,255,255,.35)';x.fillRect(i*SW,BAND_Y,2,BAND_H);
+    x.fillStyle='rgba(45,46,52,.10)';x.fillRect(i*SW+SW-1,BAND_Y,1,BAND_H);
+    x.restore();
+  }
+  x.fillStyle='rgba(255,255,255,.65)';x.fillRect(0,BAND_Y,W,2);
+  x.fillStyle='rgba(255,255,255,.4)';x.fillRect(0,BAND_Y+BAND_H-1,W,2);
+
+  // icon over everything, top-left
+  squircleIcon(x,icon,238,268,280,-8);
+
+  // footer
+  x.fillStyle=RED;x.fillRect(96,1642,20,20);
+  x.fillStyle=INK;x.font='700 54px "Space Grotesk"';
+  x.letterSpacing='22px';x.fillText('DEVTOOL',140,1662);x.letterSpacing='0px';
+  x.fillStyle='rgba(45,46,52,.75)';x.font='500 21px "Inter"';
+  x.letterSpacing='2.4px';x.fillText('PINNABLES · BROWSER EXTENSION · 2026',96,1716);x.letterSpacing='0px';
+  // version-key chips
+  const chips=['⌥1','⌥2','⌥3'];let cxr=1504;
+  x.font='600 21px "Inter"';
+  for(let i=chips.length-1;i>=0;i--){
+    const tw=x.measureText(chips[i]).width,cw=tw+32;cxr-=cw;
+    x.strokeStyle='rgba(45,46,52,.55)';x.lineWidth=1.5;
+    x.beginPath();x.roundRect(cxr,1628,cw,44,10);x.stroke();
+    x.fillStyle=INK;x.fillText(chips[i],cxr+16,1658);
+    cxr-=12;
+  }
+  grain(x,0.06);
+}
+draw();
+window.exportPNG=()=>cv.toDataURL('image/png');
+</script>
+</body>
+</html>

@@ -1044,7 +1044,7 @@ function Home() {
           </ul>
         </section>
 
-        <Decks />
+        <Decks shelfRef={shelfRef} />
 
         <section
           className="archive"
