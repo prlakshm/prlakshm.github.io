@@ -1,0 +1,125 @@
+<!doctype html><html><head><meta charset="utf-8"><title>stripes data</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>html,body{margin:0;background:#fff}</style></head><body>
+<canvas id="c" width="1600" height="2000"></canvas>
+<script>
+/* Recomputes mixr-focus2's wave-band system, but anchored to the CLOUD
+   poster's figure (gh = H*0.63, centred, bottom-aligned) — which is the figure
+   sitting in the Figma "Mixr — Stripes" frame. Emits one record per row so the
+   rows can be rebuilt in Figma as text-on-path nodes. */
+const W=1600,H=2000;
+const x=document.getElementById('c').getContext('2d');
+function offc(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;
+  return{canvas:c,ctx:c.getContext('2d',{willReadFrequently:true})};}
+const load=s=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=s;});
+
+// ── focus2's band constants, verbatim ──
+const MICRO_FS=21, BAND_ROWS=10, LINE_H=22, BAND_GAP=520;
+const A=62, L=920, PH=0, WORD='MIXR', TRACK=4;
+const yAt=(y0,t)=>y0+A*Math.sin(2*Math.PI*t/L+PH);
+
+(async()=>{
+  const girl=await load('assets/mixr-girl.png');
+  await document.fonts.load(`700 ${MICRO_FS}px "Space Mono"`);
+  await document.fonts.ready;
+
+  // ── the figure, exactly as the cloud poster places it ──
+  const gh=H*0.63, gw=gh*girl.width/girl.height, gx=(W-gw)/2, gy=H-gh;
+  const f=offc(W,H),fc=f.ctx;
+  fc.fillStyle='#fff';fc.fillRect(0,0,W,H);
+  fc.filter='grayscale(1) brightness(1.09) contrast(1.40)';
+  fc.drawImage(girl,gx,gy,gw,gh);fc.filter='none';
+  const px=fc.getImageData(0,0,W,H).data;
+  const N=W*H,PAPER_L=236;
+  const isPaper=new Uint8Array(N),seen=new Uint8Array(N);
+  for(let p=0;p<N;p++){const i=p*4;
+    isPaper[p]=(px[i]*.299+px[i+1]*.587+px[i+2]*.114)>=PAPER_L?1:0;}
+  const q=new Int32Array(N);let head=0,tail=0;
+  const push=p=>{if(isPaper[p]&&!seen[p]){seen[p]=1;q[tail++]=p;}};
+  for(let X=0;X<W;X++){push(X);push((H-1)*W+X);}
+  for(let Y=0;Y<H;Y++){push(Y*W);push(Y*W+W-1);}
+  while(head<tail){const p=q[head++],X=p%W;
+    if(X>0)push(p-1);if(X<W-1)push(p+1);if(p>=W)push(p-W);if(p<N-W)push(p+W);}
+  const alpha=new Uint8Array(N);
+  let sx=0,sy=0,sn=0,headTop=H;
+  for(let p=0;p<N;p++){ alpha[p]=seen[p]?0:255;
+    if(alpha[p]){const X=p%W,Y=(p/W)|0;sx+=X;sy+=Y;sn++;if(Y<headTop)headTop=Y;} }
+  const maskAt=(X,Y)=>(X<0||Y<0||X>=W||Y>=H)?0:alpha[((Y|0)*W+(X|0))];
+  const cx0=sn?sx/sn:W/2;
+
+  // ── anchor the stack so the head band's top row sits at her mid-scalp ──
+  const stack=sh=>{const r=[];for(let y=-BAND_GAP*2+sh;y<H+BAND_GAP*2;y+=BAND_GAP)r.push(y);return r};
+  const midScalp=headTop+gh*0.05;
+  const topOff=-(BAND_ROWS-1)/2*LINE_H;
+  const wantCentre=midScalp-topOff;
+  const wantY0=wantCentre-A*Math.sin(2*Math.PI*cx0/L+PH);
+  const shift=((wantY0%BAND_GAP)+BAND_GAP)%BAND_GAP;
+  const rows=stack(shift);
+  let headBand=0,hbd=1e9;
+  rows.forEach((y0,i)=>{const d=Math.abs(yAt(y0,cx0)-wantCentre);if(d<hbd){hbd=d;headBand=i}});
+
+  // ── which individual rows ride in FRONT of her ──
+  const frontRows=new Map();
+  const mark=(i,r)=>{if(r<0||r>=BAND_ROWS)return;const f2=frontRows.get(i)||[];
+    if(!f2.includes(r)){f2.push(r);frontRows.set(i,f2)}};
+  const zone=(lo,hi)=>{const out=[];
+    rows.forEach((y0,i)=>{for(let r=0;r<BAND_ROWS;r++){
+      const y=yAt(y0,cx0)+(r-(BAND_ROWS-1)/2)*LINE_H;
+      if(y>headTop+gh*lo&&y<headTop+gh*hi)out.push({i,r,y});}});
+    return out.sort((p,q2)=>p.y-q2.y);};
+  let headRow=0;
+  for(let r=0;r<BAND_ROWS;r++){
+    const y=yAt(rows[headBand],cx0)+(r-(BAND_ROWS-1)/2)*LINE_H;
+    if(maskAt(cx0,y)>110){headRow=r;break}}
+  mark(headBand,headRow+5);
+  const chest=zone(0.36,0.60);
+  if(chest.length)mark(chest[chest.length-1].i,chest[chest.length-1].r);
+  const torso=zone(0.62,0.90);
+  if(torso.length)mark(torso[Math.floor(torso.length/2)].i,torso[Math.floor(torso.length/2)].r);
+  let bottomBand=-1,bottomY=-1e9;
+  rows.forEach((y0,i)=>{const y=yAt(y0,cx0);if(y<H-40&&y>bottomY){bottomY=y;bottomBand=i}});
+  if(bottomBand>=0&&bottomBand!==headBand){
+    const br=Math.floor(BAND_ROWS/2);
+    mark(bottomBand,br+1); mark(bottomBand,br+3);
+    const hipFront=(frontRows.get(bottomBand)||[]).slice().sort((a,b)=>a-b);
+    if(hipFront.length>2)frontRows.set(bottomBand,hipFront.slice(1));}
+
+  // ── walk each row exactly as band() does, recording per-character state ──
+  x.font=`700 ${MICRO_FS}px "Space Mono"`;
+  x.textAlign='center';x.textBaseline='middle';x.letterSpacing='4px';
+  const advance=x.measureText('M').width+TRACK;      // canvas step per char
+  const out=[];
+  rows.forEach((y0,i)=>{
+    const front=frontRows.get(i)||[];
+    for(let r=0;r<BAND_ROWS;r++){
+      const off=(r-(BAND_ROWS-1)/2)*LINE_H;
+      const isFront=front.includes(r);
+      let t=-160,k=r*2,chars='',over=[],idx=0;
+      while(t<W+160){
+        const ch=WORD[k++%WORD.length];
+        const cw=x.measureText(ch).width;
+        const cxp=t+cw/2, cy=yAt(y0,cxp)+off;
+        chars+=ch;
+        if(isFront&&maskAt(cxp,cy)>110)over.push(idx);
+        idx++; t+=cw+TRACK;
+      }
+      // compress the over-indices into ranges
+      const ranges=[];
+      for(const v of over){ const last=ranges[ranges.length-1];
+        if(last&&v===last[1])last[1]=v+1; else ranges.push([v,v+1]); }
+      const yTop=yAt(y0,-160)+off;
+      out.push({b:i,r,y0:+(y0+off).toFixed(3),front:isFront,
+                n:chars.length,s0:chars[0],ranges:isFront?ranges:[]});
+    }
+  });
+
+  window.__stripes={
+    meta:{headTop,cx0:+cx0.toFixed(2),gh,advance:+advance.toFixed(4),
+          A,L,LINE_H,BAND_GAP,BAND_ROWS,MICRO_FS,TRACK,
+          bands:rows.map(v=>+v.toFixed(3)),headBand,
+          front:[...frontRows.entries()].map(([i,v])=>[i,v.slice().sort((a,b)=>a-b)])},
+    rows:out
+  };
+  document.title='READY '+out.length;
+})();
+</script></body></html>

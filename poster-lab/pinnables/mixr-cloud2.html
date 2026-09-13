@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Mixr — Cloud (clean)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#1c1d22;display:grid;place-items:center;min-height:100vh}
+  canvas{height:min(96vh,1200px);width:auto;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+  body.export canvas,body.lab canvas{height:2000px;box-shadow:none}
+  body.lab{background:#000}
+</style>
+</head>
+<body>
+<canvas id="c" width="1600" height="2000"></canvas>
+<script>
+/* Mixr — Cloud · clean black & white. Same Figma layout, no glitter. */
+const W = 1600, H = 2000;
+const Q = new URLSearchParams(location.search);
+const LAB = Q.has('lab');
+const cv = document.getElementById('c'), x = cv.getContext('2d');
+if (Q.has('export') || LAB) document.body.classList.add(LAB ? 'lab' : 'export');
+
+const PAPER = '#FFFFFF';
+const PAINT = '#0A0A0C';
+const FACE  = 'Permanent Marker';
+
+const load = s => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = s; });
+
+const MIXR = [
+  {cx:843.9125,cy:239.6575,r:-21.11},
+  {cx:564.6895,cy:335.1075,r:1.99},
+  {cx:255.914,cy:516.1895,r:-38.24},
+  {cx:390.4015,cy:977.329,r:87.16},
+  {cx:654.5865,cy:1052.088,r:40.43},
+  {cx:908.4975,cy:1111.994,r:-12.92},
+  {cx:1252.8315,cy:1007.834,r:-48.36},
+  {cx:1162.146,cy:396.582,r:-1.91},
+  {cx:253.214,cy:750.193,r:75.99},
+  {cx:417.3655,cy:471.262,r:-55.39},
+  {cx:254.9265,cy:941.9265,r:61.88},
+  {cx:1365.1795,cy:490.936,r:80.05},
+  {cx:1284.188,cy:614.9375,r:62.34},
+  {cx:533.982,cy:1086.78,r:18.14},
+  {cx:1077.5025,cy:1082.6425,r:34.28},
+  {cx:879.8715,cy:329.79,r:-11.72},
+  {cx:755.738,cy:436.2995,r:11.78},
+  {cx:492.2325,cy:534.4945,r:-63.86},
+  {cx:675.3645,cy:961.703,r:25.69},
+  {cx:932.143,cy:975.7125,r:2.68},
+  {cx:1431.0735,cy:746.313,r:99.98},
+  {cx:473.81,cy:932.947,r:71.02},
+  {cx:1092.9385,cy:478.589,r:27.87},
+  {cx:326.956,cy:687.6795,r:72.15},
+  {cx:1169.786,cy:928.7715,r:-14.55},
+  {cx:839.649,cy:910.735,r:-7.97},
+  {cx:583.9335,cy:571.513,r:-43.59},
+  {cx:938.836,cy:505.5345,r:65.42},
+  {cx:1103.303,cy:597.134,r:29.79},
+  {cx:749.8185,cy:680.949,r:-20.41},
+  {cx:423.25,cy:715.293,r:-1.04},
+  {cx:601.6445,cy:789.959,r:-12.12},
+  {cx:646.7085,cy:631.1685,r:-42.98},
+  {cx:903.009,cy:603.3395,r:39.65},
+  {cx:1171.3805,cy:722.796,r:18.62},
+  {cx:1075.3775,cy:844.7945,r:0.71},
+];
+
+const TAG = {
+  cx: 1073.9995,
+  cy: 783.0645,
+  r: 11.46,
+  txt: 'iOS DJ APP',
+  fs: 115,
+  color: '#ABABAB',
+};
+
+const MIXR_FS = 140;
+
+function drawText(ctx, layer) {
+  const fs = layer.fs || MIXR_FS;
+  const txt = layer.txt || 'Mixr';
+  ctx.save();
+  ctx.translate(layer.cx, layer.cy);
+  ctx.rotate(layer.r * Math.PI / 180);
+  ctx.font = `${fs}px "${FACE}"`;
+  ctx.fillStyle = layer.color || PAINT;
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'center';
+  ctx.fillText(txt, 0, 0);
+  ctx.restore();
+}
+
+async function init() {
+  const [figureImg] = await Promise.all([
+    document.fonts.load(`400 ${MIXR_FS}px "${FACE}"`),
+    document.fonts.load(`400 ${TAG.fs}px "${FACE}"`),
+    document.fonts.ready,
+    load('assets/mixr-cloud-figure.png?v=cutout'),
+  ]).then(r => [r[3]]);
+
+  x.fillStyle = PAPER;
+  x.fillRect(0, 0, W, H);
+  MIXR.forEach(layer => drawText(x, layer));
+  x.drawImage(figureImg, 0, 0, W, H);
+  drawText(x, TAG);
+}
+
+init();
+window.exportPNG = () => cv.toDataURL('image/png');
+</script>
+</body>
+</html>

@@ -1,0 +1,393 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>D — Cloud</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#1c1d22;display:grid;place-items:center;min-height:100vh}
+  canvas{height:min(96vh,1200px);width:auto;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+  body.export canvas{height:2000px;box-shadow:none}
+</style>
+</head>
+<body>
+<canvas id="c" width="1600" height="2000"></canvas>
+<script src="mixr-kit.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   D — CLOUD
+   Monochrome. What she is hearing, made visible: a cumulus built entirely
+   out of the word Mixr, tagged over and over, packed so that no two words
+   touch. One of them is grey, and it says what the thing is.
+   White paper, black paint, one grey. Nothing else on the sheet.
+   ═══════════════════════════════════════════════════════════════════════ */
+const W = 1600, H = 2000;
+const cv = document.getElementById('c'), x = cv.getContext('2d');
+if (new URLSearchParams(location.search).has('export'))
+  document.body.classList.add('export');
+
+const PAPER = '#FFFFFF';
+const PAINT = '#0A0A0C';
+const GREY  = '#8E8E96';
+const FACE  = 'Permanent Marker';
+
+let seed = 7311;
+const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+const rr  = (a, b) => a + rnd() * (b - a);
+const load = s => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = s; });
+function offc(w, h) {
+  const c = document.createElement('canvas');
+  c.width = Math.ceil(w); c.height = Math.ceil(h);
+  return { canvas: c, ctx: c.getContext('2d', { willReadFrequently: true }) };
+}
+
+/* ── THE CLOUD ────────────────────────────────────────────────────────
+   A union of discs — three low body lobes plus bumps spaced so the top
+   notches between them. */
+const TOPY = 181, BASE = 1206;
+const LOBES = [
+  [ 800, 840, 315], [ 545, 840, 270], [1070, 830, 282],   // the body, kept low
+  [ 330, 630, 190], [ 585, 500, 218],                     // the bumps along
+  [ 900, 425, 244], [1225, 545, 212], [1395, 745, 174],   // the top, spaced
+  [ 300, 868, 152], [ 520, 958, 192],                     // so they notch
+  [ 830, 998, 206], [1130, 963, 196], [1350, 878, 156],
+];
+function cloudPath(ctx, k = 1) {
+  ctx.beginPath();
+  for (const [cx, cy, r] of LOBES) {
+    ctx.moveTo((cx + r) * k, cy * k);
+    ctx.arc(cx * k, cy * k, r * k, 0, Math.PI * 2);
+  }
+}
+
+const SC = 0.5;                                   // mask resolution
+const GW = Math.round(W * SC), GH = Math.round(H * SC);
+let maskD;
+function buildMask() {
+  const m = offc(GW, GH);
+  m.ctx.fillStyle = '#fff';
+  cloudPath(m.ctx, SC);
+  m.ctx.fill();
+  maskD = m.ctx.getImageData(0, 0, GW, GH).data;
+}
+const inCloud = (px, py) => {
+  const gx = (px * SC) | 0, gy = (py * SC) | 0;
+  if (gx < 0 || gy < 0 || gx >= GW || gy >= GH) return false;
+  return maskD[(gy * GW + gx) * 4 + 3] > 140;
+};
+
+/* ── THE DISTANCE FIELD ────────────────────────────────────────────────
+   How far every point inside the cloud sits from the nearest edge, by a
+   two-pass chamfer. The contours of this field are what the tags ride. */
+let DF;
+function buildField() {
+  const INF = 1e9;
+  DF = new Float32Array(GW * GH);
+  for (let i = 0, q = 0; i < GW * GH; i++, q += 4)
+    DF[i] = maskD[q + 3] > 140 ? INF : 0;
+  for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) {
+    const i = y * GW + x; if (!DF[i]) continue;
+    let d = DF[i];
+    if (x)                        d = Math.min(d, DF[i - 1] + 3);
+    if (y)                        d = Math.min(d, DF[i - GW] + 3);
+    if (x && y)                   d = Math.min(d, DF[i - GW - 1] + 4);
+    if (x < GW - 1 && y)          d = Math.min(d, DF[i - GW + 1] + 4);
+    DF[i] = d;
+  }
+  for (let y = GH - 1; y >= 0; y--) for (let x = GW - 1; x >= 0; x--) {
+    const i = y * GW + x; if (!DF[i]) continue;
+    let d = DF[i];
+    if (x < GW - 1)               d = Math.min(d, DF[i + 1] + 3);
+    if (y < GH - 1)               d = Math.min(d, DF[i + GW] + 3);
+    if (x < GW - 1 && y < GH - 1) d = Math.min(d, DF[i + GW + 1] + 4);
+    if (x && y < GH - 1)          d = Math.min(d, DF[i + GW - 1] + 4);
+    DF[i] = d;
+  }
+}
+function dist(px, py) {                          // in poster pixels
+  const gx = (px * SC) | 0, gy = (py * SC) | 0;
+  if (gx < 0 || gy < 0 || gx >= GW || gy >= GH) return 0;
+  return DF[gy * GW + gx] / 3 / SC;
+}
+function grad(px, py) {
+  const h = 5;
+  const gx = dist(px + h, py) - dist(px - h, py);
+  const gy = dist(px, py + h) - dist(px, py - h);
+  const L = Math.hypot(gx, gy);
+  if (L < 1e-4) return null;
+  return { x: gx / L, y: gy / L };
+}
+
+const placed = [];
+const FS = 140;                                  // ONE size for every tag
+const TAG_FS = Math.round(FS * 0.82);            // the grey reads heavier,
+                                                 // so it is set a little smaller
+const mctx = offc(8, 8).ctx;
+function measure(txt, fs) {
+  mctx.font = `${fs}px "${FACE}"`;
+  const m = mctx.measureText(txt);
+  const asc = m.actualBoundingBoxAscent, desc = m.actualBoundingBoxDescent;
+  return { w: m.width, h: asc + desc, asc, desc };
+}
+
+/* ── THE ARRANGEMENT ───────────────────────────────────────────────────
+   Every tag is the same size and rides a contour of the field: the outer
+   ring hugs the outline, the next sits one word inside it, and so on. The
+   rotation is the contour's tangent, so around every bump and into every
+   notch the tags turn — they end up pointing every which way, and each one
+   runs slightly into the next. */
+function contourPass() {
+  const m = measure('Mixr', FS);
+  const ADV  = m.w * 0.92;                       // tags run into each other
+  const STEP = m.h * 0.88;                       // ring to ring
+  const seen  = new Uint8Array(GW * GH);         // seeds already used, per level
+  const taken = new Uint8Array(GW * GH);         // ground already painted, global
+
+  /* The walk wanders where the field flattens out, so a tag is only laid
+     down if its own footprint is still clear. Marking a rotated box rather
+     than a disc means it blocks along the contour but not across it, and
+     the next ring inside can still land. */
+  const HW = m.w * 0.50, HH = m.h * 0.45;
+  const probe = (cx, cy, rot) => {
+    const c = Math.cos(rot), sn = Math.sin(rot);
+    for (const d of [-m.w * 0.30, 0, m.w * 0.30]) {
+      const gx = ((cx + d * c) * SC) | 0, gy = ((cy + d * sn) * SC) | 0;
+      if (gx < 0 || gy < 0 || gx >= GW || gy >= GH) return false;
+      if (taken[gy * GW + gx]) return false;
+    }
+    return true;
+  };
+  // a genuinely empty patch: fifteen samples across the whole footprint
+  const clearPatch = (cx, cy, rot) => {
+    const c = Math.cos(rot), sn = Math.sin(rot);
+    for (const d of [-m.w * .38, -m.w * .19, 0, m.w * .19, m.w * .38])
+      for (const e of [-m.h * .34, 0, m.h * .34]) {
+        const gx = ((cx + d * c - e * sn) * SC) | 0;
+        const gy = ((cy + d * sn + e * c) * SC) | 0;
+        if (gx < 0 || gy < 0 || gx >= GW || gy >= GH) return false;
+        if (taken[gy * GW + gx]) return false;
+      }
+    return true;
+  };
+  const mark = (cx, cy, rot) => {
+    const c = Math.cos(rot), sn = Math.sin(rot), R = Math.hypot(HW, HH);
+    const x0 = Math.max(0, ((cx - R) * SC) | 0), x1 = Math.min(GW - 1, ((cx + R) * SC) | 0);
+    const y0 = Math.max(0, ((cy - R) * SC) | 0), y1 = Math.min(GH - 1, ((cy + R) * SC) | 0);
+    for (let gy = y0; gy <= y1; gy++) for (let gx = x0; gx <= x1; gx++) {
+      const px = gx / SC - cx, py = gy / SC - cy;
+      const u = px * c + py * sn, v = -px * sn + py * c;
+      if (Math.abs(u) <= HW && Math.abs(v) <= HH) taken[gy * GW + gx] = 1;
+    }
+  };
+
+  for (let L = m.h * 0.54, lvl = 0; L < 560 && lvl < 12; L += STEP, lvl++) {
+    seen.fill(0);
+    let n = 0;
+    for (let sy = 3; sy < GH; sy += 5) for (let sx = 3; sx < GW; sx += 5) {
+      const px0 = sx / SC, py0 = sy / SC;
+      if (Math.abs(dist(px0, py0) - L) > STEP * 0.34) continue;
+      if (seen[sy * GW + sx]) continue;
+
+      let p = { x: px0, y: py0 };                // settle onto the level set
+      for (let k = 0; k < 6; k++) {
+        const g = grad(p.x, p.y); if (!g) break;
+        const e = L - dist(p.x, p.y);
+        p.x += g.x * e * 0.9; p.y += g.y * e * 0.9;
+      }
+      const sX = p.x, sY = p.y;
+      let steps = 0;
+      while (steps++ < 200) {
+        const g = grad(p.x, p.y); if (!g) break;
+        const tx = -g.y, ty = g.x;               // the tangent
+        let rot = Math.atan2(ty, tx);
+        if (Math.cos(rot) < 0) rot += Math.PI;   // upright, still every angle
+        rot += 0.20 + (rnd() - .5) * 0.38;       // and every one of them leans
+        if (probe(p.x, p.y, rot)) {
+          placed.push({ txt: 'Mixr', fs: FS, rot, m, cx: p.x, cy: p.y, color: PAINT });
+          mark(p.x, p.y, rot);
+          n++;
+        }
+        const gxc = (p.x * SC) | 0, gyc = (p.y * SC) | 0;   // seed dedup
+        for (let yy = -6; yy <= 6; yy++) for (let xx = -6; xx <= 6; xx++) {
+          const a = gxc + xx, b = gyc + yy;
+          if (a >= 0 && b >= 0 && a < GW && b < GH) seen[b * GW + a] = 1;
+        }
+
+        p.x += tx * ADV; p.y += ty * ADV;        // step along, correct back
+        for (let k = 0; k < 3; k++) {
+          const g2 = grad(p.x, p.y); if (!g2) break;
+          const e = L - dist(p.x, p.y);
+          p.x += g2.x * e * 0.8; p.y += g2.y * e * 0.8;
+        }
+        if (!inCloud(p.x, p.y)) break;
+        if (steps > 3 && Math.hypot(p.x - sX, p.y - sY) < ADV * 0.75) break;
+      }
+    }
+    if (!n && lvl > 2) break;
+  }
+
+  /* Contours leave holes wherever two of them part company — most visibly
+     the one that opened above the grey line. Sweep the whole mass and drop a
+     tag into anything still bare, angled to the local contour so it belongs
+     to the pile rather than sitting on top of it. */
+  {
+    for (let sy = 3; sy < GH; sy += 4) for (let sx = 3; sx < GW; sx += 4) {
+      const px = sx / SC, py = sy / SC;
+      if (!inCloud(px, py)) continue;
+      if (dist(px, py) < m.h * 0.40) continue;   // leave the outline alone
+      const g = grad(px, py);
+      let rot = g ? Math.atan2(g.x, -g.y) : 0;   // the local tangent
+      if (Math.cos(rot) < 0) rot += Math.PI;
+      rot += 0.20 + (rnd() - .5) * 0.38;
+      if (!clearPatch(px, py, rot)) continue;
+      placed.push({ txt: 'Mixr', fs: FS, rot, m, cx: px, cy: py, color: PAINT });
+      mark(px, py, rot);
+    }
+  }
+}
+
+/* A tag that reaches the sheet edge stops reading as part of the mass and
+   starts reading as a stray. Half the tag's own height counts toward its
+   horizontal reach once it is steeply rotated, which is what let one out
+   past x 1590 on the right. */
+const RIGHT_LIMIT = 1524;
+function dropStrays() {
+  for (let i = placed.length - 1; i >= 0; i--) {
+    const p = placed[i];
+    const reach = p.m.w / 2 * Math.abs(Math.cos(p.rot))
+                + p.m.h / 2 * Math.abs(Math.sin(p.rot));
+    if (p.cx + reach > RIGHT_LIMIT) placed.splice(i, 1);
+  }
+}
+
+/* The grey line does not ride a contour — it is placed where focus puts it,
+   just off her head to the right, at a slight rightward slant, and every tag
+   it would collide with is lifted out. */
+const GREY_AT = { x: 1136, y: 790, rot: 0.20 };
+function clearForGrey(txt) {
+  const m = measure(txt, TAG_FS);
+  const { x: gx, y: gy, rot } = GREY_AT;
+  const c = Math.cos(rot), sn = Math.sin(rot);
+  for (let i = placed.length - 1; i >= 0; i--) {
+    const p = placed[i];
+    const ux =  (p.cx - gx) * c + (p.cy - gy) * sn;
+    const uy = -(p.cx - gx) * sn + (p.cy - gy) * c;
+    if (Math.abs(ux) < m.w / 2 + p.m.w * 0.46 && Math.abs(uy) < m.h * 0.72)
+      placed.splice(i, 1);
+  }
+  return m;
+}
+
+/* ── PAINT ────────────────────────────────────────────────────────────
+   Marker on paper: laid down solid, then given a light, even bite so it
+   reads as pigment rather than as vector type. Kept deliberately shallow —
+   the poster is meant to be crisp. */
+function paintLayer(list) {
+  const L = offc(W, H);
+  const c = L.ctx;
+  c.textBaseline = 'alphabetic';
+  for (const p of list) {
+    c.save();
+    c.translate(p.cx, p.cy); c.rotate(p.rot);
+    c.font = `${p.fs}px "${FACE}"`;
+    c.fillStyle = p.color;
+    c.fillText(p.txt, -p.m.w / 2, (p.m.asc - p.m.desc) / 2);
+    c.restore();
+  }
+  c.globalCompositeOperation = 'destination-out';
+  const pits = 17000;
+  for (let i = 0; i < pits; i++) {                  // uneven coverage
+    c.globalAlpha = 0.18 + rnd() * 0.42;
+    c.beginPath();
+    c.arc(rr(0, W), rr(TOPY - 60, BASE + 60), 0.5 + rnd() * 1.15, 0, 7);
+    c.fill();
+  }
+  for (let i = 0; i < 95; i++) {                    // dry drags
+    c.globalAlpha = 0.10 + rnd() * 0.22;
+    c.fillRect(rr(0, W), rr(TOPY - 40, BASE + 40), 14 + rnd() * 52, 0.8 + rnd() * 1.4);
+  }
+  c.globalAlpha = 1;
+  return L.canvas;
+}
+
+/* ── THE FIGURE ───────────────────────────────────────────────────────
+   Flood-filled from the sheet edges through her paper, so what is left is
+   a true cut-out with a soft edge — she meets pure white with no seam. */
+function cutout(img, gx, gy, gw, gh) {
+  const f = offc(W, H), fc = f.ctx;
+  fc.fillStyle = '#fff'; fc.fillRect(0, 0, W, H);
+  fc.filter = 'grayscale(1) brightness(1.09) contrast(1.40)';
+  fc.drawImage(img, gx, gy, gw, gh);
+  fc.filter = 'none';
+  const px = fc.getImageData(0, 0, W, H).data;
+  const N = W * H, PAPER_L = 236;
+  const isPaper = new Uint8Array(N), seen = new Uint8Array(N);
+  for (let p = 0; p < N; p++) {
+    const i = p * 4;
+    isPaper[p] = (px[i] * .299 + px[i+1] * .587 + px[i+2] * .114) >= PAPER_L ? 1 : 0;
+  }
+  const q = new Int32Array(N); let head = 0, tail = 0;
+  const push = p => { if (isPaper[p] && !seen[p]) { seen[p] = 1; q[tail++] = p; } };
+  for (let X = 0; X < W; X++) { push(X); push((H - 1) * W + X); }
+  for (let Y = 0; Y < H; Y++) { push(Y * W); push(Y * W + W - 1); }
+  while (head < tail) {
+    const p = q[head++], X = p % W;
+    if (X > 0) push(p - 1);
+    if (X < W - 1) push(p + 1);
+    if (p >= W) push(p - W);
+    if (p < N - W) push(p + W);
+  }
+  const A0 = new Uint8Array(N);
+  for (let p = 0; p < N; p++) A0[p] = seen[p] ? 0 : 255;
+  const out = offc(W, H), oc = out.ctx;
+  const id = oc.createImageData(W, H), d = id.data;
+  let headTop = H;
+  for (let Y = 0; Y < H; Y++) for (let X = 0; X < W; X++) {
+    const p = Y * W + X, i = p * 4;
+    let a = A0[p];
+    if (a && X && Y && X < W - 1 && Y < H - 1)
+      a = (A0[p] * 4 + A0[p-1] + A0[p+1] + A0[p-W] + A0[p+W]) / 8;
+    if (a > 0) {
+      d[i] = px[i]; d[i+1] = px[i+1]; d[i+2] = px[i+2]; d[i+3] = Math.round(a);
+      if (a > 128 && Y < headTop) headTop = Y;
+    }
+  }
+  oc.putImageData(id, 0, 0);
+  return { canvas: out.canvas, headTop };
+}
+
+async function draw(){
+  await document.fonts.load(`400 200px "${FACE}"`);
+  await document.fonts.ready;
+  const girl = await load('assets/mixr-girl.png');
+
+  /* ── LAYER · PAPER ──────────────────────────────────────────────── */
+  x.fillStyle = PAPER; x.fillRect(0, 0, W, H);
+
+  /* ── LAYER · THE CLOUD, WRITTEN ─────────────────────────────────── */
+  buildMask();
+  buildField();
+  contourPass();
+  dropStrays();
+  const GTXT = 'iOS DJ APP';
+  const gm = clearForGrey(GTXT);
+
+  x.drawImage(paintLayer(placed), 0, 0);
+
+  /* ── LAYER · THE FIGURE ─────────────────────────────────────────── */
+  const gh = H * 0.63, gw = gh * girl.width / girl.height;
+  const gx = (W - gw) / 2, gy = H - gh;
+  const fig = cutout(girl, gx, gy, gw, gh);
+  x.drawImage(fig.canvas, 0, 0);
+
+  /* ── LAYER · THE GREY LINE · last, so it reads over her hair the way the
+     white one does on the focus sheet ──────────────────────────────────── */
+  x.drawImage(paintLayer([{ txt: GTXT, fs: TAG_FS, rot: GREY_AT.rot, m: gm,
+                            cx: GREY_AT.x, cy: GREY_AT.y, color: GREY }]), 0, 0);
+}
+draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,416 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Mixr — Cloud</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#1c1d22;display:grid;place-items:center;min-height:100vh}
+  canvas{height:min(96vh,1200px);width:auto;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+  body.export canvas,body.lab canvas{height:2000px;box-shadow:none}
+  body.lab{background:#000}
+</style>
+</head>
+<body>
+<canvas id="c" width="1600" height="2000"></canvas>
+<script>
+/* Mixr — Cloud · Figma frame 1:2 (center-anchored wrapper boxes)
+   Glitter is baked into a static base once; light updates only run a
+   cheap glint pass on top, so the poster loads fast and stays cheap. */
+const W = 1600, H = 2000;
+const Q = new URLSearchParams(location.search);
+const LAB = Q.has('lab');
+const cv = document.getElementById('c'), x = cv.getContext('2d');
+if (Q.has('export') || LAB) document.body.classList.add(LAB ? 'lab' : 'export');
+
+const PAPER = '#FFFFFF';
+const PAINT = '#0A0A0C';
+const FACE  = 'Permanent Marker';
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const load = s => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = s; });
+const offc = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return { canvas: c, ctx: c.getContext('2d') }; };
+const rng = seed => { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 0xffffffff; }; };
+
+/* Figma wrapper left/top + width/height → center anchor; rotation from inner frame. */
+const MIXR = [
+  {cx:843.9125,cy:239.6575,r:-21.11},
+  {cx:564.6895,cy:335.1075,r:1.99},
+  {cx:255.914,cy:516.1895,r:-38.24},
+  {cx:390.4015,cy:977.329,r:87.16},
+  {cx:654.5865,cy:1052.088,r:40.43},
+  {cx:908.4975,cy:1111.994,r:-12.92},
+  {cx:1252.8315,cy:1007.834,r:-48.36},
+  {cx:1162.146,cy:396.582,r:-1.91},
+  {cx:253.214,cy:750.193,r:75.99},
+  {cx:417.3655,cy:471.262,r:-55.39},
+  {cx:254.9265,cy:941.9265,r:61.88},
+  {cx:1365.1795,cy:490.936,r:80.05},
+  {cx:1284.188,cy:614.9375,r:62.34},
+  {cx:533.982,cy:1086.78,r:18.14},
+  {cx:1077.5025,cy:1082.6425,r:34.28},
+  {cx:879.8715,cy:329.79,r:-11.72},
+  {cx:755.738,cy:436.2995,r:11.78},
+  {cx:492.2325,cy:534.4945,r:-63.86},
+  {cx:675.3645,cy:961.703,r:25.69},
+  {cx:932.143,cy:975.7125,r:2.68},
+  {cx:1431.0735,cy:746.313,r:99.98},
+  {cx:473.81,cy:932.947,r:71.02},
+  {cx:1092.9385,cy:478.589,r:27.87},
+  {cx:326.956,cy:687.6795,r:72.15},
+  {cx:1169.786,cy:928.7715,r:-14.55},
+  {cx:839.649,cy:910.735,r:-7.97},
+  {cx:583.9335,cy:571.513,r:-43.59},
+  {cx:938.836,cy:505.5345,r:65.42},
+  {cx:1103.303,cy:597.134,r:29.79},
+  {cx:749.8185,cy:680.949,r:-20.41},
+  {cx:423.25,cy:715.293,r:-1.04},
+  {cx:601.6445,cy:789.959,r:-12.12},
+  {cx:646.7085,cy:631.1685,r:-42.98},
+  {cx:903.009,cy:603.3395,r:39.65},
+  {cx:1171.3805,cy:722.796,r:18.62},
+  {cx:1075.3775,cy:844.7945,r:0.71},
+];
+
+const TAG = {
+  cx: 1073.9995,
+  cy: 783.0645,
+  r: 11.46,
+  txt: 'iOS DJ APP',
+  fs: 115,
+  color: '#ABABAB',
+};
+
+const MIXR_FS = 140;
+const REST_LIGHT = { lx: 0.38, ly: -0.32, hot: 0 };
+const GRAFFITI_STRENGTH = 0.75;
+const FIGURE_STRENGTH = 0.55;
+
+let figureImg = null;
+let baseCanvas = null;
+let redrawRaf = null;
+let pendingLight = null;
+const speckleCache = new Map();
+let figureFlakes = null;
+
+/* ── flake registry (canvas space, typed for the per-frame glint loop) ── */
+const REG = { x: [], y: [], nx: [], ny: [], s: [], amp: [] };
+let RX = null, RY = null, RNX = null, RNY = null, RS = null, RAMP = null;
+
+function registerFlakes(flakes, tf, amp) {
+  if (RX) return;                       // registry already locked
+  const cos = tf ? Math.cos(tf.rad) : 1;
+  const sin = tf ? Math.sin(tf.rad) : 0;
+  for (let i = 0; i < flakes.length; i += 2) {   // subsample: every other flake
+    const f = flakes[i];
+    let X = f.x, Y = f.y, nx = f.nx, ny = f.ny;
+    if (tf) {
+      const ox = f.x - tf.gw / 2, oy = f.y - tf.gh / 2;
+      X = tf.cx + cos * ox - sin * oy;
+      Y = tf.cy + sin * ox + cos * oy;
+      nx = f.nx * cos - f.ny * sin;
+      ny = f.nx * sin + f.ny * cos;
+    }
+    REG.x.push(X); REG.y.push(Y);
+    REG.nx.push(nx); REG.ny.push(ny);
+    REG.s.push(f.s); REG.amp.push(f.halo ? amp * 0.7 : amp);
+  }
+}
+
+let RORD = null;
+function lockRegistry() {
+  RX = Float32Array.from(REG.x); RY = Float32Array.from(REG.y);
+  RNX = Float32Array.from(REG.nx); RNY = Float32Array.from(REG.ny);
+  RS = Float32Array.from(REG.s); RAMP = Float32Array.from(REG.amp);
+  REG.x = REG.y = REG.nx = REG.ny = REG.s = REG.amp = null;
+  // shuffled scan order, so the glint cap spreads over girl + graffiti alike
+  RORD = new Uint32Array(RX.length);
+  for (let i = 0; i < RORD.length; i++) RORD[i] = i;
+  const rnd = rng(0xD1A);
+  for (let i = RORD.length - 1; i > 0; i--) {
+    const j = (rnd() * (i + 1)) | 0;
+    const t = RORD[i]; RORD[i] = RORD[j]; RORD[j] = t;
+  }
+}
+
+function sparkle(c, cx, cy, r, a) {
+  c.strokeStyle = `rgba(255,255,255,${a})`;
+  c.lineWidth = 0.65;
+  c.beginPath();
+  c.moveTo(cx - r, cy); c.lineTo(cx + r, cy);
+  c.moveTo(cx, cy - r); c.lineTo(cx, cy + r);
+  c.stroke();
+  const d = r * 0.52;
+  c.strokeStyle = `rgba(255,255,255,${a * 0.4})`;
+  c.beginPath();
+  c.moveTo(cx - d, cy - d); c.lineTo(cx + d, cy + d);
+  c.moveTo(cx + d, cy - d); c.lineTo(cx - d, cy + d);
+  c.stroke();
+}
+
+function paintSpeckles(oc, flakes, lit, strength = 1) {
+  const hot = lit.hot || 0;
+  const lx = lit.lx, ly = lit.ly;
+  oc.globalCompositeOperation = 'lighter';
+  for (const f of flakes) {
+    const spec = Math.max(0, f.nx * lx + f.ny * ly);
+    const rest = (f.halo ? 0.22 : 0.32) * strength;
+    const a = Math.min(1, rest + spec * 0.55 * strength + hot * spec * 0.7 * strength);
+    oc.globalAlpha = a;
+    oc.fillStyle = spec > 0.55 ? '#FFFFFF' : '#E8E8E8';
+    oc.beginPath();
+    oc.arc(f.x, f.y, f.s * 0.45, 0, 7);
+    oc.fill();
+    if (!f.halo && spec > 0.72) {
+      oc.save();
+      sparkle(oc, f.x, f.y, 1.4 + f.s * 0.9, a * 0.85);
+      oc.restore();
+    }
+  }
+  oc.globalAlpha = 1;
+  oc.globalCompositeOperation = 'source-over';
+}
+
+function scatterFlakes(coreA, haloA, gw, gh, seed, coreDiv, haloDiv) {
+  const rnd = rng(seed);
+  const flakes = [];
+  const onCore = (gw * gh / coreDiv) | 0;
+  for (let n = 0, i = 0; n < onCore && i < onCore * 10; i++) {
+    const px = rnd() * gw, py = rnd() * gh;
+    const ix = px | 0, iy = py | 0;
+    if (coreA[(iy * gw + ix) * 4 + 3] < 90) continue;
+    n++;
+    const ang = rnd() * Math.PI * 2;
+    flakes.push({
+      x: px, y: py,
+      nx: Math.cos(ang), ny: Math.sin(ang),
+      s: rnd() < 0.78 ? 0.7 + rnd() * 0.9 : 1.2 + rnd() * 1.4,
+      halo: false,
+    });
+  }
+  const onHalo = (gw * gh / haloDiv) | 0;
+  for (let n = 0, i = 0; n < onHalo && i < onHalo * 14; i++) {
+    const px = rnd() * gw, py = rnd() * gh;
+    const ix = px | 0, iy = py | 0;
+    if (haloA[(iy * gw + ix) * 4 + 3] < 40) continue;
+    n++;
+    const ang = rnd() * Math.PI * 2;
+    flakes.push({
+      x: px, y: py,
+      nx: Math.cos(ang), ny: Math.sin(ang),
+      s: 0.55 + rnd() * 1.1,
+      halo: true,
+    });
+  }
+  return flakes;
+}
+
+/* Speckle maps are cached per glyph variant (3 variants shared across all
+   Mixr tags) instead of per layer — cuts startup work ~12×. */
+function getSpeckleMap(txt, fs, variant) {
+  const key = `${txt}|${fs}|${variant}`;
+  if (speckleCache.has(key)) return speckleCache.get(key);
+
+  const probe = offc(1, 1).ctx;
+  probe.font = `${fs}px "${FACE}"`;
+  const m = probe.measureText(txt);
+  const pad = Math.ceil(fs * 0.38);
+  const gw = Math.ceil(m.width + pad * 2);
+  const gh = Math.ceil(fs * 1.45 + pad * 2);
+
+  const core = offc(gw, gh);
+  core.ctx.font = `${fs}px "${FACE}"`;
+  core.ctx.textBaseline = 'middle';
+  core.ctx.textAlign = 'center';
+  core.ctx.fillStyle = '#fff';
+  core.ctx.fillText(txt, gw / 2, gh / 2);
+
+  const halo = offc(gw, gh);
+  const hc = halo.ctx;
+  hc.font = `${fs}px "${FACE}"`;
+  hc.textBaseline = 'middle';
+  hc.textAlign = 'center';
+  hc.fillStyle = '#fff';
+  const R = Math.max(3.2, fs * 0.034);
+  for (let a = 0; a < 8; a++) {
+    const ang = a / 8 * Math.PI * 2;
+    hc.fillText(txt, gw / 2 + Math.cos(ang) * R, gh / 2 + Math.sin(ang) * R);
+  }
+  hc.globalCompositeOperation = 'destination-out';
+  hc.drawImage(core.canvas, 0, 0);
+
+  const coreA = core.ctx.getImageData(0, 0, gw, gh).data;
+  const haloA = hc.getImageData(0, 0, gw, gh).data;
+  const flakes = scatterFlakes(coreA, haloA, gw, gh,
+    (0x9E37 + variant * 7919 + fs * 5) >>> 0, 28, 210);
+
+  // rest-light speckle overlay, baked once per variant
+  const overlay = offc(gw, gh);
+  paintSpeckles(overlay.ctx, flakes, REST_LIGHT, GRAFFITI_STRENGTH);
+
+  const map = { gw, gh, flakes, overlay: overlay.canvas };
+  speckleCache.set(key, map);
+  return map;
+}
+
+function drawGlitterText(ctx, layer, variant) {
+  const fs = layer.fs || MIXR_FS;
+  const txt = layer.txt || 'Mixr';
+  const rad = layer.r * Math.PI / 180;
+  const map = getSpeckleMap(txt, fs, variant);
+
+  registerFlakes(map.flakes, { cx: layer.cx, cy: layer.cy, rad, gw: map.gw, gh: map.gh }, GRAFFITI_STRENGTH);
+
+  ctx.save();
+  ctx.translate(layer.cx, layer.cy);
+  ctx.rotate(rad);
+  ctx.font = `${fs}px "${FACE}"`;
+  ctx.fillStyle = layer.color || PAINT;
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'center';
+  ctx.fillText(txt, 0, 0);
+  ctx.drawImage(map.overlay, -map.gw / 2, -map.gh / 2);
+  ctx.restore();
+}
+
+function figureSilhouette(img) {
+  const sil = offc(W, H);
+  sil.ctx.drawImage(img, 0, 0, W, H);
+  sil.ctx.globalCompositeOperation = 'source-in';
+  sil.ctx.fillStyle = '#fff';
+  sil.ctx.fillRect(0, 0, W, H);
+  return sil.canvas;
+}
+
+function getFigureFlakes(img) {
+  if (figureFlakes) return figureFlakes;
+  const sil = figureSilhouette(img);
+  const core = offc(W, H);
+  core.ctx.drawImage(sil, 0, 0);
+  const halo = offc(W, H);
+  const hc = halo.ctx;
+  const R = 4.5;
+  for (let a = 0; a < 8; a++) {
+    const ang = a / 8 * Math.PI * 2;
+    hc.drawImage(sil, Math.cos(ang) * R, Math.sin(ang) * R);
+  }
+  hc.globalCompositeOperation = 'destination-out';
+  hc.drawImage(sil, 0, 0);
+  const coreA = core.ctx.getImageData(0, 0, W, H).data;
+  const haloA = hc.getImageData(0, 0, W, H).data;
+  figureFlakes = scatterFlakes(coreA, haloA, W, H, 0xC0FFEE, 32, 220);
+  return figureFlakes;
+}
+
+function drawFigureGlitter(ctx, img) {
+  ctx.drawImage(img, 0, 0, W, H);
+  const flakes = getFigureFlakes(img);
+  // glints hit the girl as hard as the graffiti (base coat stays softer)
+  registerFlakes(flakes, null, GRAFFITI_STRENGTH);
+  const overlay = offc(W, H);
+  paintSpeckles(overlay.ctx, flakes, REST_LIGHT, FIGURE_STRENGTH);
+  ctx.drawImage(overlay.canvas, 0, 0);
+}
+
+/* ── GLINT PASS ───────────────────────────────────────────────────────
+   True-glitter behavior: most flakes stay quiet; only the few whose
+   facet aligns with the light AND sit near the specular band flare up,
+   like a diamond throwing points of light. */
+function render(lit) {
+  x.drawImage(baseCanvas, 0, 0);
+  if (!lit || !RX) return;
+  const mag = Math.min(1, Math.hypot(lit.lx, lit.ly));
+  const hot = lit.hot || 0;
+  if (hot < 0.03) return;
+  // light direction never collapses — falls back to overhead light so the
+  // lower half of the poster (the girl) glints just like the graffiti
+  const dx = mag > 0.05 ? lit.lx / mag : 0;
+  const dy = mag > 0.05 ? lit.ly / mag : -1;
+  // cursor hot-spot in poster space: flakes near the cursor flare hardest
+  const cxp = (lit.cx ?? 0.5) * W, cyp = (lit.cy ?? 0.45) * H;
+  const r2 = (W * 0.24) ** 2;
+  // specular band line in poster space (mirrors the lab's .spec sweep)
+  const band = lit.band ?? 50;
+  const bl = W * (1.225 - 0.015 * band);
+  const invSig = 1 / (W * 0.085);
+  const gain = (0.5 + 0.5 * mag) * (0.35 + hot * 0.65) * 1.9;
+  const TINT = ['255,186,196', '186,222,255', '255,234,176', '196,255,220'];
+
+  /* Diamond glints only — no speckle wash. A sparse set of flakes whose
+     facets align tightly with the light throw crisp star flashes, so the
+     ink and figure stay legible underneath. */
+  x.save();
+  x.globalCompositeOperation = 'lighter';
+  let stars = 0;
+  for (let k = 0; k < RORD.length && stars < 170; k++) {
+    const i = RORD[k];
+    const al = RNX[i] * dx + RNY[i] * dy;
+    if (al < 0.86) continue;                      // facet must face the light
+    const q = (RX[i] - bl - 0.19 * (RY[i] - H * 0.5)) * invSig;
+    const q2 = q * q;
+    const bandF = 0.12 + 0.88 / (1 + q2 * (1 + 0.6 * q2));   // near the band
+    const dxc = RX[i] - cxp, dyc = RY[i] - cyp;
+    const cursF = 0.3 + 0.7 / (1 + (dxc * dxc + dyc * dyc) / r2);
+    const a = Math.pow(al, 10) * bandF * cursF * gain * RAMP[i];
+    if (a < 0.34) continue;
+    stars++;
+    const g = Math.min(1, a);
+    if ((i & 7) < 2) {                            // a few glints split into color
+      x.fillStyle = `rgb(${TINT[i & 3]})`;
+      x.globalAlpha = g * 0.3;
+      x.beginPath();
+      x.arc(RX[i], RY[i], 2.6 + RS[i] * 1.6 + g * 3, 0, 7);
+      x.fill();
+    }
+    x.fillStyle = '#FFFFFF';
+    x.globalAlpha = g;
+    x.beginPath();
+    x.arc(RX[i], RY[i], 0.9 + RS[i] * 0.5 + g * 1.3, 0, 7);   // bright core
+    x.fill();
+    sparkle(x, RX[i], RY[i], 3.5 + RS[i] * 2 + g * 7, g);     // long thin rays
+  }
+  x.restore();
+}
+
+async function buildBase() {
+  const b = offc(W, H);
+  const bc = b.ctx;
+  bc.fillStyle = PAPER;
+  bc.fillRect(0, 0, W, H);
+  MIXR.forEach((layer, i) => drawGlitterText(bc, layer, i % 3));
+  drawFigureGlitter(bc, figureImg);
+  drawGlitterText(bc, TAG, 0);
+  lockRegistry();
+  return b.canvas;
+}
+
+async function init() {
+  await Promise.all([
+    document.fonts.load(`400 ${MIXR_FS}px "${FACE}"`),
+    document.fonts.load(`400 ${TAG.fs}px "${FACE}"`),
+    document.fonts.ready,
+    load('assets/mixr-cloud-figure.png?v=cutout').then(i => { figureImg = i; }),
+  ]);
+  baseCanvas = await buildBase();
+  render(null);
+}
+
+init();
+
+if (LAB && !REDUCED) {
+  addEventListener('message', e => {
+    if (e.data?.type !== 'mixr-cloud-light' || !baseCanvas) return;
+    pendingLight = e.data.light;
+    if (!redrawRaf) redrawRaf = requestAnimationFrame(() => {
+      redrawRaf = null;
+      render(pendingLight);
+    });
+  });
+}
+
+window.exportPNG = () => cv.toDataURL('image/png');
+</script>
+</body>
+</html>
