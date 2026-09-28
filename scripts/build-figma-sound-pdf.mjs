@@ -85,6 +85,8 @@ const html = `<!doctype html><html><head><meta charset="utf-8" /><style>
   .watch h1 { font-size: 36px; font-weight: 400; letter-spacing: -.01em; line-height: 1.25; margin: 0 0 34px; }
   .watch h1 em { color: #FFE38A; font-style: normal; }
   .watch .link { color: #F4EDE0; font-size: 17px; text-decoration: none; border-bottom: 2px solid rgba(244,237,224,.5); padding-bottom: 3px; }
+  /* the portfolio's own link arrow (src/pages/home/Home.tsx ExternalArrow), stroke for stroke */
+  .watch .ext-arrow { height: 12.5px; margin-left: 8px; vertical-align: .05em; width: 12.5px; }
   .watch .scan { align-items: center; display: flex; gap: 16px; margin-top: 40px; }
   .watch .qr { background: #F4EDE0; border-radius: 8px; height: 112px; padding: 10px; width: 112px; }
   .watch .qr path { fill: #0D0C0F; }
@@ -108,7 +110,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8" /><style>
     <div class="side">
       <p class="label">LAUNCH FILM · 0:27 · SOUND ON</p>
       <h1>Better with <em>sound</em>.</h1>
-      <a class="link" href="https://pranaviram.com/figma/">pranaviram.com/figma →</a>
+      <a class="link" href="https://pranaviram.com/figma/">pranaviram.com/figma<svg class="ext-arrow" viewBox="0 0 10 10" aria-hidden="true"><path d="M2.5 7.5 L7.5 2.5 M3.6 2.5 H7.5 V6.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" /></svg></a>
       <div class="scan">${qr}<span>SCAN TO<br />WATCH</span></div>
     </div>
     <span class="credit">Independent concept by Pranavi Ram</span>
