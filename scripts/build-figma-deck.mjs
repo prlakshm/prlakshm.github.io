@@ -6,9 +6,9 @@
 
      1. drops the Cursor-chapter sections (.cursor-slide),
      2. re-points the deck's own relative references at ../branding/,
-     3. shifts the chapter's index thresholds (the Figma hero is slide 0 once
-        the nine Cursor slides are gone; the three embedded prototypes move
-        from indexes 13/14/15 to 4/5/6),
+     3. shifts the chapter's index thresholds (the Figma hero — the launch
+        film — is slide 0 once the nine Cursor slides are gone; the three
+        embedded prototypes move from indexes 11/12/13 to 2/3/4),
      4. retitles the page.                                                    */
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
@@ -31,6 +31,7 @@ if (/<section class="slide cursor-slide/.test(html)) throw new Error("cursor sec
 html = html
   .replace(/src="\.\//g, 'src="../branding/')
   .replace(/srcset="\.\//g, 'srcset="../branding/')
+  .replace(/poster="\.\//g, 'poster="../branding/')
   .replace(/href="\.\/index\.html"/g, 'href="../branding/index.html"');
 
 // 3. chapter index thresholds
@@ -39,9 +40,9 @@ const patches = [
   ["if (opened && currentIndex() === 9) {", "if (opened && currentIndex() === 0) {"],
   ["} else if (opened && currentIndex() !== 9) {", "} else if (opened && currentIndex() !== 0) {"],
   ["if (currentIndex() === 9) playTitleSequence();", "if (currentIndex() === 0) playTitleSequence();"],
-  ['{ frame: document.getElementById("interactionProto"), index: 13 }', '{ frame: document.getElementById("interactionProto"), index: 4 }'],
-  ['{ frame: document.getElementById("variablesProto"), index: 14 }', '{ frame: document.getElementById("variablesProto"), index: 5 }'],
-  ['{ frame: document.getElementById("devmodeProto"), index: 15 }', '{ frame: document.getElementById("devmodeProto"), index: 6 }'],
+  ['{ frame: document.getElementById("interactionProto"), index: 11 }', '{ frame: document.getElementById("interactionProto"), index: 2 }'],
+  ['{ frame: document.getElementById("variablesProto"), index: 12 }', '{ frame: document.getElementById("variablesProto"), index: 3 }'],
+  ['{ frame: document.getElementById("devmodeProto"), index: 13 }', '{ frame: document.getElementById("devmodeProto"), index: 4 }'],
 ];
 for (const [from, to] of patches) {
   const count = html.split(from).length - 1;
