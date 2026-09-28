@@ -178,6 +178,36 @@
         .film-slide { height: 100svh; min-height: 100svh; }
         .film-stage { aspect-ratio: auto; height: 100svh; width: 100vw; }
       }
+      /* the film's type: its lines are cream JetBrains Mono, and the key word sits in the yellow "sound" pill
+         (d1_film_keys.wav_chip / the opening's "sound." pill), which swells in once its line has landed */
+      @font-face {
+        font-family: "JetBrains Mono";
+        src: url("../fonts/jetbrains-mono/JetBrainsMono-Variable.woff2") format("woff2");
+        font-weight: 100 800;
+        font-display: swap;
+      }
+      .sound-copy.film-type {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: clamp(17px, 2.9vw, 54px);
+        font-weight: 400;
+        letter-spacing: 0;
+        line-height: 1.6;
+        width: min(92vw, 30em);
+      }
+      .film-chip {
+        background: #FFE38A;
+        border-radius: 999px;
+        color: #0D0C0F;
+        display: inline-block;
+        line-height: 1.25;
+        padding: .08em .42em .1em;
+        white-space: nowrap;
+      }
+      html.anim-armed .film-chip { transform: scale(.82); }
+      html.anim-armed .is-on .film-chip {
+        transform: scale(1);
+        transition: transform .42s cubic-bezier(.34, 1.56, .64, 1) .9s;
+      }
       .sound-copy .reveal-line { display: block; overflow: hidden; padding-bottom: .1em; margin-bottom: -.1em; }
       .sound-copy .reveal-line > span { display: block; }
       .sound-art { overflow: hidden; }
@@ -500,9 +530,9 @@
 
       <section class="slide sound-slide" data-slide="12" data-slide-audio="select" aria-label="Figma Sound campaign thesis">
         <span class="folio" aria-hidden="true">02 / 05</span>
-        <p class="sound-copy" data-reveal-lines aria-label="Figma Sound makes sound a design system material.">
+        <p class="sound-copy film-type" data-reveal-lines aria-label="Figma Sound makes sound a design system material.">
           <span class="reveal-line" style="--li:0" aria-hidden="true"><span>Figma Sound makes sound</span></span>
-          <span class="reveal-line" style="--li:1" aria-hidden="true"><span>a <em class="key-phrase">design system material</em>.</span></span>
+          <span class="reveal-line" style="--li:1" aria-hidden="true"><span>a <span class="film-chip">design system material</span>.</span></span>
         </p>
       </section>
 
