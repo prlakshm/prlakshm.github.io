@@ -80,11 +80,11 @@ const html = `<!doctype html><html><head><meta charset="utf-8" /><style>
   .watch .play::after { border-bottom: 16px solid transparent; border-left: 26px solid #0D0C0F; border-top: 16px solid transparent;
     content: ""; left: 32px; position: absolute; top: 26px; }
   .watch .side { left: 832px; position: absolute; top: 50%; transform: translateY(-50%); width: 392px; }
-  /* the film's type: JetBrains Mono, cream; yellow marks only "sound", as in the film (so the link is cream) */
+  /* the film's type: JetBrains Mono, cream; yellow for "sound" and the link */
   .watch .label { color: rgba(244,237,224,.6); font-size: 14px; letter-spacing: .06em; margin: 0 0 20px; }
   .watch h1 { font-size: 36px; font-weight: 400; letter-spacing: -.01em; line-height: 1.25; margin: 0 0 34px; }
   .watch h1 em { color: #FFE38A; font-style: normal; }
-  .watch .link { color: #F4EDE0; font-size: 17px; text-decoration: none; border-bottom: 2px solid rgba(244,237,224,.5); padding-bottom: 3px; }
+  .watch .link { color: #FFE38A; font-size: 17px; text-decoration: none; border-bottom: 2px solid #FFE38A; padding-bottom: 3px; }
   /* the portfolio's own link arrow (src/pages/home/Home.tsx ExternalArrow), stroke for stroke */
   .watch .ext-arrow { height: 12.5px; margin-left: 8px; vertical-align: .05em; width: 12.5px; }
   .watch .scan { align-items: center; display: flex; gap: 16px; margin-top: 40px; }
