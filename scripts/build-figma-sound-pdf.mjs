@@ -28,7 +28,8 @@ const out = resolve(root, "public/figma-sound.pdf");
 const tmp = mkdtempSync(join(tmpdir(), "figma-pdf-"));
 const url = (p) => pathToFileURL(p).href;
 
-const browser = await chromium.launch({ args: ["--autoplay-policy=no-user-gesture-required"] });
+// PW_CHROMIUM=/path/to/chrome points it at an existing browser if Playwright's own download is missing
+const browser = await chromium.launch({ args: ["--autoplay-policy=no-user-gesture-required"], executablePath: process.env.PW_CHROMIUM || undefined });
 
 // ---- 4-7: the deck's slides after the film, as the site shows them (the sound toggle hidden)
 const deck = await browser.newPage({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1.5 });
