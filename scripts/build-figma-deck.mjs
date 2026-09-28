@@ -8,7 +8,8 @@
      2. re-points the deck's own relative references at ../branding/,
      3. shifts the chapter's index thresholds (the Figma hero — the launch
         film — is slide 0 once the nine Cursor slides are gone; the three
-        embedded prototypes move from indexes 11/12/13 to 2/3/4),
+        embedded prototypes move from indexes 11/12/13 to 2/3/4, the closing
+        wordmark from 14 to 5),
      4. retitles the page.                                                    */
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
@@ -43,6 +44,7 @@ const patches = [
   ['{ frame: document.getElementById("interactionProto"), index: 11 }', '{ frame: document.getElementById("interactionProto"), index: 2 }'],
   ['{ frame: document.getElementById("variablesProto"), index: 12 }', '{ frame: document.getElementById("variablesProto"), index: 3 }'],
   ['{ frame: document.getElementById("devmodeProto"), index: 13 }', '{ frame: document.getElementById("devmodeProto"), index: 4 }'],
+  ['{ frame: document.getElementById("orbitFrame"), index: 14 }', '{ frame: document.getElementById("orbitFrame"), index: 5 }'],
 ];
 for (const [from, to] of patches) {
   const count = html.split(from).length - 1;
