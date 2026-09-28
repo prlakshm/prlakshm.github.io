@@ -108,7 +108,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8" /><style>
   <section class="page watch mono">
     <a class="still" href="https://pranaviram.com/figma/"><img src="${url(join(film, "figma-sound-film-still.jpg"))}" alt="" /><span class="play"></span></a>
     <div class="side">
-      <p class="label">LAUNCH FILM · 0:27 · SOUND ON</p>
+      <p class="label">LAUNCH FILM · 0:29 · SOUND ON</p>
       <h1>Better with <em>sound</em>.</h1>
       <a class="link" href="https://pranaviram.com/figma/">pranaviram.com/figma<svg class="ext-arrow" viewBox="0 0 10 10" aria-hidden="true"><path d="M2.5 7.5 L7.5 2.5 M3.6 2.5 H7.5 V6.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" /></svg></a>
       <div class="scan">${qr}<span>SCAN TO<br />WATCH</span></div>
@@ -117,7 +117,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8" /><style>
   </section>
 
   <section class="page board mono">
-    <header><h2>Storyboard</h2><span class="mono">LAUNCH FILM · 27 S · 12 BEATS</span></header>
+    <header><h2>Storyboard</h2><span class="mono">LAUNCH FILM · 29 S · 12 BEATS</span></header>
     <div class="grid">${cells}
     </div>
   </section>
