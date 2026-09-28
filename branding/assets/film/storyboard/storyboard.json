@@ -1,0 +1,86 @@
+[
+ {
+  "n": 1,
+  "frame": 43,
+  "t": 1.79,
+  "caption": "Interfaces have color and motion.",
+  "src": "storyboard/sb-01-f043.jpg"
+ },
+ {
+  "n": 2,
+  "frame": 78,
+  "t": 3.25,
+  "caption": "Now they have sound.",
+  "src": "storyboard/sb-02-f078.jpg"
+ },
+ {
+  "n": 3,
+  "frame": 98,
+  "t": 4.08,
+  "caption": "Play sound \u00b7 the Sound list",
+  "src": "storyboard/sb-03-f098.jpg"
+ },
+ {
+  "n": 4,
+  "frame": 130,
+  "t": 5.42,
+  "caption": "SLURP!",
+  "src": "storyboard/sb-04-f130.jpg"
+ },
+ {
+  "n": 5,
+  "frame": 167,
+  "t": 6.96,
+  "caption": "FLICK!",
+  "src": "storyboard/sb-05-f167.jpg"
+ },
+ {
+  "n": 6,
+  "frame": 213,
+  "t": 8.88,
+  "caption": "CRASH!",
+  "src": "storyboard/sb-06-f213.jpg"
+ },
+ {
+  "n": 7,
+  "frame": 246,
+  "t": 10.25,
+  "caption": "BOUNCE!",
+  "src": "storyboard/sb-07-f246.jpg"
+ },
+ {
+  "n": 8,
+  "frame": 315,
+  "t": 13.12,
+  "caption": "MEOW!",
+  "src": "storyboard/sb-08-f315.jpg"
+ },
+ {
+  "n": 9,
+  "frame": 452,
+  "t": 18.83,
+  "caption": "Sunrise \u00b7 every sound selected",
+  "src": "storyboard/sb-09-f452.jpg"
+ },
+ {
+  "n": 10,
+  "frame": 497,
+  "t": 20.71,
+  "caption": "Every sound, a clip in Motion",
+  "src": "storyboard/sb-10-f497.jpg"
+ },
+ {
+  "n": 11,
+  "frame": 571,
+  "t": 23.79,
+  "caption": "What will your interface sound like?",
+  "src": "storyboard/sb-11-f571.jpg"
+ },
+ {
+  "n": 12,
+  "frame": 617,
+  "t": 25.71,
+  "caption": "Figma Sound",
+  "src": "storyboard/sb-12-f617.jpg"
+ }
+]

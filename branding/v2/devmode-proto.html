@@ -397,7 +397,7 @@
 
   /* —— deck embed: chapter ground, clipped zoom frame, scripted cursor —— */
   html, body { overflow: hidden; }
-  body { background-color: #0D0C0F; background-image: radial-gradient(circle at center, #34343A 0 calc(max(20px, 2.5vw) * .046), transparent calc(max(20px, 2.5vw) * .046 + .75px)); background-position: center; background-size: max(20px, 2.5vw) max(20px, 2.5vw); }
+  body { background: #052427; }
   .app { zoom: 1; box-shadow: none; margin: 0; will-change: transform; }
   #zoomClip {
     position: relative;
@@ -412,7 +412,23 @@
     width: 21px;
     pointer-events: none;
     opacity: 0;
+    transition: opacity 300ms ease;
     filter: drop-shadow(0 1px 2px rgba(0,0,0,.45));
+  }
+  /* Figma's multiplayer click ripple */
+  .ripple {
+    position: absolute;
+    width: 34px; height: 34px;
+    margin: -17px 0 0 -17px;
+    border: 2px solid #0d99ff;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 80;
+    animation: ripple-out 380ms cubic-bezier(.2,.7,.3,1) forwards;
+  }
+  @keyframes ripple-out {
+    from { opacity: .85; transform: scale(.25); }
+    to { opacity: 0; transform: scale(1); }
   }
 </style>
 <script>
@@ -922,6 +938,47 @@
   };
 
   const setCursor = (x, y) => { cursor.style.left = x + "px"; cursor.style.top = y + "px"; };
+  const ripple = (x, y) => {
+    const ring = document.createElement("div");
+    ring.className = "ripple";
+    ring.style.left = x + "px";
+    ring.style.top = y + "px";
+    clip.appendChild(ring);
+    setTimeout(() => ring.remove(), 430);
+  };
+  app.addEventListener("pointerdown", (event) => {
+    const c = clip.getBoundingClientRect();
+    const cs = c.width / W;
+    ripple((event.clientX - c.left) / cs, (event.clientY - c.top) / cs);
+  });
+  /* a filtered-noise sweep under the zoom — the scroll-token family */
+  const whoosh = (down) => {
+    try {
+      if (!window.__protoSoundOn) return;
+      if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+      if (ctx.state === "suspended") ctx.resume().catch(() => {});
+      const dur = down ? 1.15 : 0.9;
+      const t0 = ctx.currentTime + 0.02;
+      const frames = Math.floor(ctx.sampleRate * dur);
+      const buffer = ctx.createBuffer(1, frames, ctx.sampleRate);
+      const channel = buffer.getChannelData(0);
+      for (let i = 0; i < frames; i += 1) channel[i] = Math.random() * 2 - 1;
+      const src = ctx.createBufferSource();
+      src.buffer = buffer;
+      const band = ctx.createBiquadFilter();
+      band.type = "bandpass";
+      band.Q.value = 0.8;
+      band.frequency.setValueAtTime(down ? 320 : 1200, t0);
+      band.frequency.exponentialRampToValueAtTime(down ? 1400 : 300, t0 + dur);
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.0001, t0);
+      gain.gain.exponentialRampToValueAtTime(down ? 0.05 : 0.032, t0 + dur * 0.35);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      src.connect(band).connect(gain).connect(ctx.destination);
+      src.start(t0);
+      src.stop(t0 + dur + 0.05);
+    } catch {}
+  };
   let running = false, epoch = 0;
   const wait = (ms, e) => new Promise((res) => {
     const t0 = performance.now();
@@ -930,14 +987,37 @@
   });
   const easeOut = (t) => 1 - Math.pow(1 - t, 3);
   const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  /* Cursor glides bow along a slight arc and settle with a 2–3px overshoot. */
   const glide = (from, to, ms, e) => new Promise((res) => {
     const t0 = performance.now();
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const dist = Math.hypot(dx, dy) || 1;
+    const arc = dist > 70;
+    const bow = arc ? Math.min(48, dist * 0.13) * (dx >= 0 ? 1 : -1) : 0;
+    const mx = from.x + dx * 0.5 - (dy / dist) * bow;
+    const my = from.y + dy * 0.5 + (dx / dist) * bow;
+    const OVER = arc ? 130 : 0;
     const step = () => {
       if (e !== epoch) return res(false);
-      const t = Math.min(1, (performance.now() - t0) / ms);
-      const k = easeOut(t);
-      setCursor(from.x + (to.x - from.x) * k, from.y + (to.y - from.y) * k);
-      if (t < 1) requestAnimationFrame(step); else res(true);
+      const now = performance.now() - t0;
+      if (now <= ms) {
+        const k = easeOut(Math.min(1, now / ms));
+        const ik = 1 - k;
+        setCursor(
+          arc ? ik * ik * from.x + 2 * ik * k * mx + k * k * to.x : from.x + dx * k,
+          arc ? ik * ik * from.y + 2 * ik * k * my + k * k * to.y : from.y + dy * k,
+        );
+        requestAnimationFrame(step);
+      } else if (now <= ms + OVER) {
+        const u = (now - ms) / OVER;
+        const wob = Math.sin(Math.PI * u) * 2.4;
+        setCursor(to.x + (dx / dist) * wob, to.y + (dy / dist) * wob);
+        requestAnimationFrame(step);
+      } else {
+        setCursor(to.x, to.y);
+        res(true);
+      }
     };
     requestAnimationFrame(step);
   });
@@ -1011,6 +1091,7 @@
       if (!await wait(260, myEpoch)) return;
 
       // wheel down: panel to the bottom while the frame zooms in
+      whoosh(true);
       if (!await scrollAndZoom(true, 1500, myEpoch)) return;
       if (!await wait(300, myEpoch)) return;
 
@@ -1020,6 +1101,7 @@
         at = to;
         if (!await wait(130, myEpoch)) return false;
         cursor.style.transform = "scale(.82)";
+        ripple(to.x, to.y);
         el.click();
         if (!await wait(130, myEpoch)) return false;
         cursor.style.transform = "";
@@ -1035,6 +1117,7 @@
       if (!await clickAt(codeBtn, 640)) return;
 
       // wheel back up as the zoom releases
+      whoosh(false);
       if (!await scrollAndZoom(false, 1350, myEpoch)) return;
       if (!await wait(500, myEpoch)) return;
       cursor.style.opacity = "0";

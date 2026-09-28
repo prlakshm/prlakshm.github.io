@@ -248,6 +248,29 @@
   .play.is-playing .i-play { display: none; }
   .play.is-playing .i-pause { display: block; }
   .play svg { display: block; }
+  /* tiny equalizer beside a sounding token — sound made visible */
+  .eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 12px; margin-left: 4px; opacity: 0; transition: opacity .15s ease; flex: none; }
+  .eq i { width: 2px; height: 4px; background: #0c8ce9; border-radius: 1px; }
+  .row.is-sounding .eq { opacity: 1; }
+  .row.is-sounding .eq i { animation: eq-bounce .52s ease-in-out infinite; }
+  .row.is-sounding .eq i:nth-child(2) { animation-delay: .14s; }
+  .row.is-sounding .eq i:nth-child(3) { animation-delay: .27s; }
+  @keyframes eq-bounce { 0%, 100% { height: 4px; } 50% { height: 12px; } }
+  /* Figma's multiplayer click ripple */
+  .ripple {
+    position: absolute;
+    width: 34px; height: 34px;
+    margin: -17px 0 0 -17px;
+    border: 2px solid #0d99ff;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 70;
+    animation: ripple-out 380ms cubic-bezier(.2,.7,.3,1) forwards;
+  }
+  @keyframes ripple-out {
+    from { opacity: .85; transform: scale(.25); }
+    to { opacity: 0; transform: scale(1); }
+  }
 
   .table-foot {
     height: 40px;
@@ -281,7 +304,7 @@
 
   /* —— deck embed: chapter ground + scale-to-fit + scripted cursor —— */
   html, body { overflow: hidden; }
-  body { background-color: #0D0C0F; background-image: radial-gradient(circle at center, #34343A 0 calc(max(20px, 2.5vw) * .046), transparent calc(max(20px, 2.5vw) * .046 + .75px)); background-position: center; background-size: max(20px, 2.5vw) max(20px, 2.5vw); }
+  body { background: #052427; }
   .app { flex: none; }
   #protoCursor {
     position: absolute;
@@ -289,6 +312,7 @@
     width: 21px;
     pointer-events: none;
     opacity: 0;
+    transition: opacity 300ms ease;
     filter: drop-shadow(0 1px 2px rgba(0,0,0,.45));
   }
 </style>
@@ -451,6 +475,7 @@ document.getElementById('rows').innerHTML = VARS.map((v, i) =>
     `<div class="cell-name"><span class="type-icon">${SPEAKER}</span><span class="var-name">${v.name}</span></div>` +
     `<div class="cell-mode"><span class="chip${v.tap ? ' chip-tap' : ''}">${v.file}</span>` +
       `<button type="button" class="play" data-id="${v.name}" aria-label="Play ${v.name}">${PLAY_SVG}</button>` +
+      `<span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>` +
     `</div><div class="cell-end">${SLIDER}</div></div>`
 ).join('');
 
@@ -603,6 +628,8 @@ function setPlaying(id) {
   document.querySelectorAll('.play').forEach((btn) => {
     const on = id && btn.dataset.id === id;
     btn.classList.toggle('is-playing', on);
+    const row = btn.closest('.row');
+    if (row) row.classList.toggle('is-sounding', !!on);
     const playI = btn.querySelector('.i-play');
     const pauseI = btn.querySelector('.i-pause');
     if (playI) playI.hidden = !!on;
@@ -671,6 +698,18 @@ document.addEventListener('click', (e) => {
     cursor.style.left = x + "px";
     cursor.style.top = y + "px";
   };
+  const ripple = (x, y) => {
+    const ring = document.createElement("div");
+    ring.className = "ripple";
+    ring.style.left = x + "px";
+    ring.style.top = y + "px";
+    app.appendChild(ring);
+    setTimeout(() => ring.remove(), 430);
+  };
+  app.addEventListener("pointerdown", (event) => {
+    const point = appPoint(event.clientX, event.clientY);
+    ripple(point.x, point.y);
+  });
 
   /* ?still — print/PDF pose: cursor on navigation.scroll's play button with
      the token playing. No animation, no messages. */
@@ -698,18 +737,41 @@ document.addEventListener('click', (e) => {
     };
     requestAnimationFrame(step);
   });
+  /* Cursor glides bow along a slight arc and settle with a 2–3px overshoot;
+     the eased exit glide stays on its straight path. */
   const glide = (from, to, ms, myEpoch, inOut = false) => new Promise((resolve) => {
     const t0 = performance.now();
     const ease = inOut
       ? (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
       : (t) => 1 - Math.pow(1 - t, 3);
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const dist = Math.hypot(dx, dy) || 1;
+    const arc = !inOut && dist > 70;
+    const bow = arc ? Math.min(44, dist * 0.13) * (dx >= 0 ? 1 : -1) : 0;
+    const mx = from.x + dx * 0.5 - (dy / dist) * bow;
+    const my = from.y + dy * 0.5 + (dx / dist) * bow;
+    const OVER = arc ? 130 : 0;
     const step = () => {
       if (myEpoch !== epoch) return resolve(false);
-      const t = Math.min(1, (performance.now() - t0) / ms);
-      const k = ease(t);
-      setCursor(from.x + (to.x - from.x) * k, from.y + (to.y - from.y) * k);
-      if (t < 1) requestAnimationFrame(step);
-      else resolve(true);
+      const now = performance.now() - t0;
+      if (now <= ms) {
+        const k = ease(Math.min(1, now / ms));
+        const ik = 1 - k;
+        setCursor(
+          arc ? ik * ik * from.x + 2 * ik * k * mx + k * k * to.x : from.x + dx * k,
+          arc ? ik * ik * from.y + 2 * ik * k * my + k * k * to.y : from.y + dy * k,
+        );
+        requestAnimationFrame(step);
+      } else if (now <= ms + OVER) {
+        const u = (now - ms) / OVER;
+        const wob = Math.sin(Math.PI * u) * 2.4;
+        setCursor(to.x + (dx / dist) * wob, to.y + (dy / dist) * wob);
+        requestAnimationFrame(step);
+      } else {
+        setCursor(to.x, to.y);
+        resolve(true);
+      }
     };
     requestAnimationFrame(step);
   });
@@ -735,6 +797,7 @@ document.addEventListener('click', (e) => {
         at = to;
         if (!await wait(130, myEpoch)) return;
         cursor.style.transform = "scale(.82)";
+        ripple(to.x, to.y);
         button.click();
         if (!await wait(130, myEpoch)) return;
         cursor.style.transform = "";

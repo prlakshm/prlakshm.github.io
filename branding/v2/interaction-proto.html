@@ -19,7 +19,7 @@
     min-height: 100vh;
     display: grid;
     place-items: center;
-    background-color: #0D0C0F; background-image: radial-gradient(circle at center, #34343A 0 calc(max(20px, 2.5vw) * .046), transparent calc(max(20px, 2.5vw) * .046 + .75px)); background-position: center; background-size: max(20px, 2.5vw) max(20px, 2.5vw);
+    background: #052427;
     color: #1c1c1c;
     font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     font-size: 12px;
@@ -243,9 +243,36 @@
     transform: scale(.96);
     transform-origin: 25% 0%;
     visibility: hidden;
-    transition: opacity 140ms ease, transform 140ms ease;
   }
-  .ipanel.show { opacity: 1; transform: none; visibility: visible; }
+  .ipanel.show {
+    opacity: 1;
+    transform: none;
+    visibility: visible;
+    animation: ipanel-pop 340ms cubic-bezier(.2,.8,.2,1);
+  }
+  @keyframes ipanel-pop {
+    0% { opacity: 0; transform: scale(.96); }
+    62% { opacity: 1; transform: scale(1.012); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  /* dropdown rows rise in with a 16ms stagger (delays set inline) */
+  .menu.open > * { animation: menu-rise 240ms cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes menu-rise { from { opacity: 0; transform: translateY(5px); } }
+  /* Figma's multiplayer click ripple */
+  .ripple {
+    position: absolute;
+    width: 34px; height: 34px;
+    margin: -17px 0 0 -17px;
+    border: 2px solid #0d99ff;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 80;
+    animation: ripple-out 380ms cubic-bezier(.2,.7,.3,1) forwards;
+  }
+  @keyframes ripple-out {
+    from { opacity: .85; transform: scale(.25); }
+    to { opacity: 0; transform: scale(1); }
+  }
   .ipanel .hd {
     display: flex; align-items: center;
     height: 59px; padding: 0 15px 0 24px;
@@ -700,6 +727,7 @@ function renderMenu() {
     ).join('') +
     '<div class="menu-sep"></div>' +
     `<div class="menu-import" role="menuitem" data-import="1">${IMPORT_ICON}<span>Import Audio</span></div>`;
+  [...menu.children].forEach((el, i) => { el.style.animationDelay = (i * 16) + 'ms'; });
 }
 
 const ipanel = document.getElementById('ipanel');
@@ -791,6 +819,21 @@ const coverRing = document.getElementById('coverRing');
   clip.style.width = W + 'px';
   clip.style.height = H + 'px';
 
+  const ripple = (x, y) => {
+    const ring = document.createElement('div');
+    ring.className = 'ripple';
+    ring.style.left = x + 'px';
+    ring.style.top = y + 'px';
+    clip.appendChild(ring);
+    setTimeout(() => ring.remove(), 430);
+  };
+  // real clicks ripple too, same as the scripted ones
+  app.addEventListener('pointerdown', (event) => {
+    const c = clip.getBoundingClientRect();
+    const cs = c.width / W;
+    ripple((event.clientX - c.left) / cs, (event.clientY - c.top) / cs);
+  });
+
   let fitScale = 1;
   const fit = () => {
     const pad = 40;
@@ -849,17 +892,40 @@ const coverRing = document.getElementById('coverRing');
   });
   const easeOut = (t) => 1 - Math.pow(1 - t, 3);
   const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  /* Cursor glides bow along a slight arc and settle with a 2–3px overshoot,
+     the way a hand moves — straight-line lerps read robotic. */
   const glide = (from, to, ms, e, onFrame) => new Promise((res) => {
     const t0 = performance.now();
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const dist = Math.hypot(dx, dy) || 1;
+    const arc = dist > 70;
+    const bow = arc ? Math.min(48, dist * 0.13) * (dx >= 0 ? 1 : -1) : 0;
+    const mx = from.x + dx * 0.5 - (dy / dist) * bow;
+    const my = from.y + dy * 0.5 + (dx / dist) * bow;
+    const OVER = arc ? 140 : 0;
     const step = () => {
       if (e !== epoch) return res(false);
-      const t = Math.min(1, (performance.now() - t0) / ms);
-      const k = easeOut(t);
-      const x = from.x + (to.x - from.x) * k;
-      const y = from.y + (to.y - from.y) * k;
-      setCursor(x, y);
-      if (onFrame) onFrame(x, y, k);
-      if (t < 1) requestAnimationFrame(step); else res(true);
+      const now = performance.now() - t0;
+      if (now <= ms) {
+        const k = easeOut(Math.min(1, now / ms));
+        const ik = 1 - k;
+        const x = ik * ik * from.x + 2 * ik * k * mx + k * k * to.x;
+        const y = ik * ik * from.y + 2 * ik * k * my + k * k * to.y;
+        setCursor(x, y);
+        if (onFrame) onFrame(x, y, k);
+        requestAnimationFrame(step);
+      } else if (now <= ms + OVER) {
+        const u = (now - ms) / OVER;
+        const wob = Math.sin(Math.PI * u) * 2.6;
+        setCursor(to.x + (dx / dist) * wob, to.y + (dy / dist) * wob);
+        if (onFrame) onFrame(to.x, to.y, 1);
+        requestAnimationFrame(step);
+      } else {
+        setCursor(to.x, to.y);
+        if (onFrame) onFrame(to.x, to.y, 1);
+        res(true);
+      }
     };
     requestAnimationFrame(step);
   });
@@ -910,6 +976,7 @@ const coverRing = document.getElementById('coverRing');
     ipanel.classList.remove('show');
     ipanel.style.transition = '';
     ipanel.style.opacity = '';
+    ipanel.style.transform = '';
     clearNoodle();
     coverRing.classList.remove('dashed');
     node.style.opacity = '0';
@@ -977,6 +1044,7 @@ const coverRing = document.getElementById('coverRing');
       at = selPt;
       if (!await wait(130, myEpoch)) return;
       cursor.style.transform = 'scale(.82)';
+      ripple(at.x, at.y);
       openMenu();
       if (!await wait(130, myEpoch)) return;
       cursor.style.transform = '';
@@ -992,6 +1060,7 @@ const coverRing = document.getElementById('coverRing');
 
       // select it: the menu closes, the control takes the token, the sound plays
       cursor.style.transform = 'scale(.82)';
+      ripple(at.x, at.y);
       applySelection('navigation.scroll');
       closeMenu();
       playToken('navigation.scroll');
@@ -999,25 +1068,33 @@ const coverRing = document.getElementById('coverRing');
       cursor.style.transform = '';
       if (!await wait(1500, myEpoch)) return;
 
-      // no drift-off: the cursor holds briefly where it clicked, then
-      // cursor, panel and noodle all fade out together in one smooth exit
+      // reverse-out: the panel collapses, the noodle retracts into its dot
+      // and the ring returns to solid — an intentional undo, not a fade
       if (!await wait(480, myEpoch)) return;
-      ipanel.style.transition = 'opacity 450ms ease';
-      noodle.style.transition = 'opacity 450ms ease';
-      noodleHead.style.transition = 'opacity 450ms ease';
-      cursor.style.opacity = '0';
+      ipanel.style.transition = 'opacity 240ms ease, transform 240ms ease';
       ipanel.style.opacity = '0';
-      noodle.style.opacity = '0';
-      noodleHead.style.opacity = '0';
+      ipanel.style.transform = 'scale(.96)';
+      if (!await new Promise((res) => {
+        const t0 = performance.now();
+        const step = () => {
+          if (myEpoch !== epoch) return res(false);
+          const t = Math.min(1, (performance.now() - t0) / 360);
+          const k = 1 - Math.pow(1 - t, 3);
+          drawNoodle(DROP.y - (DROP.y - (NODE.y + 18)) * k);
+          if (t < 1) requestAnimationFrame(step); else res(true);
+        };
+        requestAnimationFrame(step);
+      })) return;
+      clearNoodle();
+      coverRing.classList.remove('dashed');
+      if (!await wait(220, myEpoch)) return;
+      cursor.style.opacity = '0';
+      node.style.opacity = '0';
       if (!await wait(500, myEpoch)) return;
       ipanel.classList.remove('show');
       ipanel.style.transition = '';
       ipanel.style.opacity = '';
-      clearNoodle();
-      noodle.style.opacity = '';
-      noodleHead.style.opacity = '';
-      noodle.style.transition = '';
-      noodleHead.style.transition = '';
+      ipanel.style.transform = '';
       if (!await wait(480, myEpoch)) return;
     }
   };
