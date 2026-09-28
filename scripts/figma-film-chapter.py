@@ -206,5 +206,4 @@ if __name__ == "__main__":
   .play {"""),
         ("<style>", "<style>\n" + FONT),
     ])
-# (applied separately, after the above) the Figma marks on the mock slides: brand colours -> currentColor, and
-# .figma-mark { color: rgba(244, 237, 224, .62) }  (the film's rule: no Figma brand colours)
+# The Figma marks in the mock slides' corners keep their brand colours (a later pass made them cream, then reverted).
