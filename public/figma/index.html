@@ -625,24 +625,28 @@
         toneEnv(ctx, band, t0, peak * 2.4, 0.001, 0.035).connect(bus);
         hiss.start(t0); hiss.stop(t0 + 0.08);
       };
-      // the pill's pop: a short sine drop A5 -> A4 (the chapter's cues are all in A) with a soft air tick on top
+      // the pill's pop: a round sine drop A5 -> A4 (the chapter's cues are all in A), an octave-and-a-fifth partial for
+      // presence on small speakers, and an air tick for the snap. Level: above the old arrival cue (0.16 peak) since
+      // it is shorter - v1 at 0.075 was too quiet to hear on laptop speakers.
       const playPopCue = () => {
         const ctx = audioReady();
         if (!ctx) return;
         const t0 = ctx.currentTime + 0.02;
-        const bus = toneBus(ctx, 0, 1, 0.16);
-        const osc = ctx.createOscillator();
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(880, t0);
-        osc.frequency.exponentialRampToValueAtTime(440, t0 + 0.07);
-        toneEnv(ctx, osc, t0, 0.075, 0.003, 0.11).connect(bus);
-        osc.start(t0); osc.stop(t0 + 0.16);
+        const bus = toneBus(ctx, 0, 1, 0.14);
+        for (const [f0, f1, peak, dur] of [[880, 440, 0.24, 0.14], [2640, 1320, 0.05, 0.07]]) {
+          const osc = ctx.createOscillator();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(f0, t0);
+          osc.frequency.exponentialRampToValueAtTime(f1, t0 + 0.07);
+          toneEnv(ctx, osc, t0, peak, 0.003, dur).connect(bus);
+          osc.start(t0); osc.stop(t0 + dur + 0.05);
+        }
         const hiss = ctx.createBufferSource();
         hiss.buffer = noiseBuffer;
         const band = ctx.createBiquadFilter();
-        band.type = "bandpass"; band.frequency.value = 2600; band.Q.value = 1.2;
+        band.type = "bandpass"; band.frequency.value = 3200; band.Q.value = 1.1;
         hiss.connect(band);
-        toneEnv(ctx, band, t0, 0.05, 0.001, 0.03).connect(bus);
+        toneEnv(ctx, band, t0, 0.12, 0.001, 0.03).connect(bus);
         hiss.start(t0); hiss.stop(t0 + 0.06);
       };
       const playFeltCue = (step) => {
