@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Figma Sound</title>
+    <!-- The Figma Sound chapter's closing wordmark: the launch film's end card, drawn in code. The film's twelve sound
+         icons orbit "Figma Sound" forever (one turn / 30 s, bob + sway, growing as they pass the front, exactly as the
+         film's end_card / wordmark_r2 move them); on each arrival the ring fades up as one, then "Figma", then "Sound"
+         (the film's 7 f ring fade, 6 f steps, 12 f word fades). Icons exported from the film's source by
+         x-projects figma-sound/kit/frames_d1v5/film/notes/n8/export_orbit_icons.py.
+         Driven by the deck like the prototypes: postMessage {type: "sound-proto", run, sound}. -->
+    <style>
+      @font-face {
+        font-family: "JetBrains Mono";
+        src: url("../fonts/jetbrains-mono/JetBrainsMono-Variable.woff2") format("woff2");
+        font-weight: 100 800;
+        font-display: swap;
+      }
+      html, body { height: 100%; margin: 0; }
+      body {
+        --dot-gap: max(20px, 2.5vw);
+        background-color: #0D0C0F;
+        background-image: radial-gradient(circle at center, #34343A 0 calc(var(--dot-gap) * .046), transparent calc(var(--dot-gap) * .046 + .75px));
+        background-position: center;
+        background-size: var(--dot-gap) var(--dot-gap);
+        overflow: hidden;
+      }
+      svg { display: block; height: 100%; left: 0; position: absolute; top: 0; width: 100%; }
+      .word { fill: #F4EDE0; font-family: "JetBrains Mono", ui-monospace, monospace; font-weight: 400; }
+    </style>
+  </head>
+  <body>
+    <svg id="stage" role="img" aria-label="Figma Sound, with sound icons orbiting the wordmark" preserveAspectRatio="xMidYMid meet">
+      <g id="ring"></g>
+      <g id="words"></g>
+    </svg>
+    <script>
+(() => {
+  const ICONS = [{"a0":-1.570796,"rot0":0.0,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(1.0000) translate(-50,-50)\" fill=\"none\" stroke=\"#F59AB0\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M28 32 L72 32 L66 90 L34 90 Z\"/><path d=\"M24 32 L76 32\"/><path d=\"M30 32 Q50 14 70 32\"/><path d=\"M52 24 L60 4 L72 4\"/><path d=\"M38 56 L62 56\"/></g>"},{"a0":-1.047198,"rot0":3.3495,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(1.1190) translate(-50,-50)\" fill=\"none\" stroke=\"#98CB4C\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 82 Q18 24 82 18 Q78 78 20 82 Z\"/><path d=\"M20 82 L66 34\"/><path d=\"M40 62 L36 46\"/><path d=\"M52 50 L62 56\"/></g>"},{"a0":-0.523599,"rot0":-6.5044,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(0.9693) translate(-50,-50)\" fill=\"none\" stroke=\"#5BB5EC\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M50 16 A30 30 0 1 1 49.9 16 Z\"/><path d=\"M24 32 Q50 52 78 36\"/><path d=\"M20 52 Q48 70 80 54\"/><path d=\"M36 18 Q28 46 40 74\"/><path d=\"M60 17 Q74 44 64 75\"/><path d=\"M28 70 Q14 92 2 84\"/></g>"},{"a0":0.0,"rot0":9.2816,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(0.8889) translate(-50,-50)\" fill=\"none\" stroke=\"#FFC53D\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M42 78 L42 22 L78 14 L78 68\"/><path d=\"M42 34 L78 26\"/><path d=\"M42 78 A10 8 0 1 1 41.9 78 Z\"/><path d=\"M78 68 A10 8 0 1 1 77.9 68 Z\"/></g>"},{"a0":0.523599,"rot0":-11.5196,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(1.0593) translate(-50,-50)\" fill=\"none\" stroke=\"#5BB5EC\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M16 60 Q32 38 58 46 Q68 36 80 38 L90 42 L80 46 Q72 66 46 70 Q28 70 16 60 Z\"/><path d=\"M74 42 L74 43\"/><path d=\"M38 54 Q52 44 62 56\"/><path d=\"M46 70 L44 80\"/><path d=\"M54 69 L54 80\"/></g>"},{"a0":1.047198,"rot0":13.0885,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(1.0958) translate(-50,-50)\" fill=\"none\" stroke=\"#F1DF6E\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M50 34 A16 16 0 1 1 49.9 34 Z\"/><path d=\"M74.0 50.0 L86.0 50.0\"/><path d=\"M67.0 67.0 L75.5 75.5\"/><path d=\"M50.0 74.0 L50.0 86.0\"/><path d=\"M33.0 67.0 L24.5 75.5\"/><path d=\"M26.0 50.0 L14.0 50.0\"/><path d=\"M33.0 33.0 L24.5 24.5\"/><path d=\"M50.0 26.0 L50.0 14.0\"/><path d=\"M67.0 33.0 L75.5 24.5\"/></g>"},{"a0":1.570796,"rot0":-13.8972,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(0.9160) translate(-50,-50)\" fill=\"none\" stroke=\"#F2A65A\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M22 42 L27 12 L44 29 Q50 27 56 29 L73 12 L78 42\"/><path d=\"M22 42 Q17 82 50 86 Q83 82 78 42\"/><path d=\"M36 50 L36 54\"/><path d=\"M64 50 L64 54\"/><path d=\"M46 61 L54 61 L50 65 Z\"/><path d=\"M50 65 Q50 73 44 73 Q39 73 39 68\"/><path d=\"M50 65 Q50 73 56 73 Q61 73 61 68\"/><path d=\"M30 64 L10 60\"/><path d=\"M30 69 L11 71\"/><path d=\"M70 64 L90 60\"/><path d=\"M70 69 L89 71\"/></g>"},{"a0":2.094395,"rot0":13.8987,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(0.842)\"><g id=\"orbit-chip\"><rect x=\"-59.4\" y=\"-29.7\" width=\"118.8\" height=\"59.4\" rx=\"29.7\" fill=\"#FFE38A\"/><g><path d=\"M-34.6 16.1 -38.4 -8.1H-34.4L-32.1 7.9Q-31.9 9 -31.8 10.3Q-31.6 11.7 -31.5 12.5Q-31.5 11.7 -31.3 10.3Q-31.1 9 -30.9 7.9L-28.4 -8.1H-24.4L-21.9 7.9Q-21.7 9 -21.5 10.4Q-21.3 11.7 -21.3 12.6Q-21.2 11.7 -21 10.3Q-20.8 9 -20.6 7.9L-18.3 -8.1H-14.4L-18.3 16.1H-23.3L-25.7 0.3Q-25.9 -0.9 -26.1 -2.3Q-26.3 -3.7 -26.4 -4.5Q-26.5 -3.7 -26.7 -2.3Q-26.9 -0.9 -27.1 0.3L-29.6 16.1ZM-2.4 16.5Q-6.2 16.5 -8.4 14.6Q-10.6 12.6 -10.6 9.2Q-10.6 5.8 -8.3 3.8Q-5.9 1.9 -1.9 1.9H4.8V-0.4Q4.8 -2.3 3.6 -3.4Q2.4 -4.5 0.1 -4.5Q-1.8 -4.5 -3.2 -3.7Q-4.5 -2.8 -4.7 -1.4H-9.4Q-9 -4.7 -6.4 -6.6Q-3.7 -8.5 0.3 -8.5Q4.6 -8.5 7.1 -6.4Q9.6 -4.2 9.6 -0.4V16.1H5V11.7H4.2L5 10.8Q5 13.4 2.9 15Q0.9 16.5 -2.4 16.5ZM-1 12.9Q1.5 12.9 3.2 11.6Q4.8 10.3 4.8 8.3V5.1H-1.8Q-3.7 5.1 -4.7 6.1Q-5.8 7.1 -5.8 8.9Q-5.8 10.7 -4.5 11.8Q-3.3 12.9 -1 12.9ZM23.3 16.1 15.3 -8.1H20.1L25.1 7.4Q25.6 8.8 25.9 10.1Q26.3 11.5 26.5 12.3Q26.7 11.5 27.1 10.1Q27.5 8.8 27.9 7.4L32.7 -8.1H37.5L29.5 16.1Z\" fill=\"#0E0E10\"/></g></g></g>"},{"a0":2.617994,"rot0":-13.0929,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(1.1031) translate(-50,-50)\" fill=\"none\" stroke=\"#F79BC6\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M50 12 Q54 46 88 50 Q54 54 50 88 Q46 54 12 50 Q46 46 50 12 Z\"/></g>"},{"a0":3.141593,"rot0":11.5267,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(1.0476) translate(-50,-50)\" fill=\"none\" stroke=\"#F1DF6E\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 50 Q50 36 96 50 Q50 60 4 50 Z\"/><path d=\"M40 44 Q50 30 60 44\"/><path d=\"M50 56 L50 92\"/><path d=\"M34 92 L66 92\"/><path d=\"M14 30 L6 20\"/><path d=\"M86 30 L94 20\"/><path d=\"M50 24 L50 12\"/></g>"},{"a0":3.665191,"rot0":-9.2909,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(0.8846) translate(-50,-50)\" fill=\"none\" stroke=\"#6CC4FF\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M18 42 L18 58\"/><path d=\"M28 30 L28 70\"/><path d=\"M38 18 L38 82\"/><path d=\"M48 36 L48 64\"/><path d=\"M58 22 L58 78\"/><path d=\"M68 32 L68 68\"/><path d=\"M78 40 L78 60\"/><path d=\"M88 46 L88 54\"/></g>"},{"a0":4.18879,"rot0":6.5154,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(0.9821) translate(-50,-50)\" fill=\"none\" stroke=\"#E0474C\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M14 90 L58 46\"/><path d=\"M54 36 Q66 30 68 42 Q70 54 58 52 Q50 50 54 36 Z\"/><path d=\"M64 30 Q58 16 68 6 Q70 18 80 20 Q82 32 70 34\"/></g>"}];
+  const FPS = 24, REV_S = 30;
+  const stage = document.getElementById("stage");
+  const ringG = document.getElementById("ring");
+  const wordsG = document.getElementById("words");
+  const NS = "http://www.w3.org/2000/svg";
+  const params = new URLSearchParams(location.search);
+  const still = params.has("still");
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+
+  // two layouts: the film's 16:9 card, and a stacked portrait card for phones
+  const LAYOUTS = {
+    wide: { w: 1920, h: 1080, cx: 960, cy: 530, rx: 760, ry: 300, size: 150, lines: [["Figma Sound", 530]] },
+    tall: { w: 1080, h: 1920, cx: 540, cy: 960, rx: 420, ry: 640, size: 170, lines: [["Figma", 880], ["Sound", 1060]] },
+  };
+  let L = null;
+
+  const icons = ICONS.map((ic) => {
+    const g = document.createElementNS(NS, "g");
+    g.innerHTML = ic.svg;
+    ringG.appendChild(g);
+    return { ...ic, g };
+  });
+
+  const layout = () => {
+    const next = innerWidth / innerHeight < 0.9 ? LAYOUTS.tall : LAYOUTS.wide;
+    if (next === L) return;
+    L = next;
+    stage.setAttribute("viewBox", `0 0 ${L.w} ${L.h}`);
+    wordsG.innerHTML = "";
+    const parts = L.lines.length === 1 ? L.lines[0][0].split(" ") : L.lines.map((l) => l[0]);
+    words = parts.map((w, i) => {
+      const t = document.createElementNS(NS, "text");
+      t.setAttribute("class", "word");
+      t.setAttribute("font-size", L.size);
+      t.setAttribute("dominant-baseline", "central");
+      t.textContent = w;
+      wordsG.appendChild(t);
+      return t;
+    });
+    placeWords();
+  };
+  let words = [];
+  const placeWords = () => {
+    // one line: "Figma Sound" centred as a whole, each word its own element (they fade up one after the other)
+    const adv = 0.6 * L.size;                               // JetBrains Mono's advance
+    if (L.lines.length === 1) {
+      const x0 = L.cx - ("Figma Sound".length * adv) / 2;
+      words[0].setAttribute("x", x0); words[0].setAttribute("y", L.lines[0][1]);
+      words[1].setAttribute("x", x0 + 6 * adv); words[1].setAttribute("y", L.lines[0][1]);
+    } else {
+      L.lines.forEach(([w, y], i) => {
+        words[i].setAttribute("x", L.cx - (w.length * adv) / 2);
+        words[i].setAttribute("y", y);
+      });
+    }
+  };
+
+  // the film's easings (end_card: motion.dev-like cubic-bezier ease-out / ease-in-out)
+  const bez = (p1x, p1y, p2x, p2y) => (x) => {
+    if (x <= 0) return 0; if (x >= 1) return 1;
+    let t = x;
+    for (let i = 0; i < 8; i++) {
+      const cx = 3 * p1x * t * (1 - t) ** 2 + 3 * p2x * t * t * (1 - t) + t ** 3 - x;
+      const dx = 3 * p1x * (1 - t) ** 2 + 6 * (p2x - p1x) * t * (1 - t) + 3 * (1 - p2x) * t * t;
+      if (Math.abs(dx) < 1e-6) break;
+      t -= cx / dx;
+    }
+    return 3 * p1y * t * (1 - t) ** 2 + 3 * p2y * t * t * (1 - t) + t ** 3;
+  };
+  const EASE_OUT = bez(0.16, 1, 0.3, 1), EASE_IO = bez(0.65, 0, 0.35, 1);
+  const clamp01 = (x) => Math.max(0, Math.min(1, x));
+
+  // the entrance clock (frames since the slide arrived); null = hidden, Infinity = settled
+  let arrived = null;
+  const ringOp = (f) => EASE_IO(clamp01(f / 7));
+  const fadeUp = (f, on) => { const e = EASE_OUT(clamp01((f - on) / 12)); return [e, (1 - e) * 10]; };
+
+  const t0 = performance.now();
+  const draw = (now) => {
+    const t = (now - t0) / 1000;                            // the orbit clock: always running
+    const f = arrived === null ? -1 : arrived === Infinity ? 1e9 : (now - arrived) / 1000 * FPS;
+    ringG.setAttribute("opacity", arrived === null ? 0 : ringOp(f).toFixed(4));
+    words.forEach((w, i) => {
+      const [o, dy] = arrived === null ? [0, 10] : fadeUp(f, 6 + 6 * i);
+      w.setAttribute("opacity", o.toFixed(4));
+      w.setAttribute("transform", `translate(0 ${dy.toFixed(2)})`);
+    });
+    const turn = (reduced.matches || still) ? 0 : t / REV_S;
+    icons.forEach((ic, k) => {
+      const a = ic.a0 + 2 * Math.PI * turn;
+      const depth = 0.5 + 0.5 * Math.sin(a);
+      const bob = (reduced.matches || still) ? 0 : 5 * Math.sin(2 * Math.PI * t / 5 + k);
+      const sway = (reduced.matches || still) ? 0 : 5 * Math.sin(2 * Math.PI * t / 6 + k);
+      const x = L.cx + L.rx * Math.cos(a), y = L.cy + L.ry * Math.sin(a) + bob;
+      ic.g.setAttribute("transform", `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${(ic.rot0 + sway).toFixed(2)}) scale(${(0.86 + 0.28 * depth).toFixed(4)})`);
+    });
+  };
+
+  let raf = 0, running = false;
+  const loop = (now) => { draw(now); raf = (running && !still && !reduced.matches) ? requestAnimationFrame(loop) : 0; };
+  const start = () => { if (!raf) raf = requestAnimationFrame(loop); };
+
+  const run = (on) => {
+    if (on === running) return;
+    running = on;
+    if (on) {
+      arrived = (still || reduced.matches) ? Infinity : performance.now();
+      if (still || reduced.matches) { draw(performance.now()); return; }
+      start();
+    } else {
+      arrived = null;
+      cancelAnimationFrame(raf); raf = 0;
+      draw(performance.now());
+    }
+  };
+
+  addEventListener("message", (event) => {
+    const data = event.data;
+    if (!data || data.type !== "sound-proto") return;
+    if (typeof data.run === "boolean") run(data.run);
+  });
+  addEventListener("resize", () => { layout(); draw(performance.now()); });
+  layout();
+  draw(performance.now());
+  // opened on its own (not inside the deck): play straight away
+  if (window.parent === window || still) run(true);
+})();
+    </script>
+  </body>
+</html>
