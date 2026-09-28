@@ -9,7 +9,9 @@
          film's end_card / wordmark_r2 move them); on each arrival the ring fades up as one, then "Figma", then "Sound"
          (the film's 7 f ring fade, 6 f steps, 12 f word fades). Icons exported from the film's source by
          x-projects figma-sound/kit/frames_d1v5/film/notes/n8/export_orbit_icons.py.
-         Driven by the deck like the prototypes: postMessage {type: "sound-proto", run, sound}. -->
+         Driven by the deck like the prototypes: postMessage {type: "sound-proto", run, sound}. With sound on, the
+         arrival plays the film's own ending (assets/audio/figma-orbit-nature.mp3: the last 4 s of the final mix -
+         the nature bed, birds and the warm shimmer fading out under the wordmark). -->
     <style>
       @font-face {
         font-family: "JetBrains Mono";
@@ -49,8 +51,13 @@
 
   // two layouts: the film's 16:9 card, and a stacked portrait card for phones
   const LAYOUTS = {
-    wide: { w: 1920, h: 1080, cx: 960, cy: 530, rx: 760, ry: 300, size: 150, lines: [["Figma Sound", 530]] },
-    tall: { w: 1080, h: 1920, cx: 540, cy: 960, rx: 420, ry: 640, size: 170, lines: [["Figma", 880], ["Sound", 1060]] },
+    wide: { w: 1920, h: 1080, cx: 960, cy: 530, rx: 760, ry: 300, tilt: 0, depthScale: [0.86, 0.28], backOpacity: 1,
+            size: 150, lines: [["Figma Sound", 530]] },
+    // phones: a 3D ring tilted 20 deg to the right (top leaning right), sized so no icon ever reaches the letters
+    // (>= 49 px clear of the words' box beyond the icon's own half-size + 8 px) or leaves the frame; its front
+    // (lower left) swells to 1.2x and its back shrinks to 0.8x and dims, for depth
+    tall: { w: 1080, h: 1920, cx: 540, cy: 970, rx: 420, ry: 740, tilt: 20, depthScale: [0.8, 0.4], backOpacity: 0.72,
+            size: 170, lines: [["Figma", 880], ["Sound", 1060]] },
   };
   let L = null;
 
@@ -131,8 +138,12 @@
       const depth = 0.5 + 0.5 * Math.sin(a);
       const bob = (reduced.matches || still) ? 0 : 5 * Math.sin(2 * Math.PI * t / 5 + k);
       const sway = (reduced.matches || still) ? 0 : 5 * Math.sin(2 * Math.PI * t / 6 + k);
-      const x = L.cx + L.rx * Math.cos(a), y = L.cy + L.ry * Math.sin(a) + bob;
-      ic.g.setAttribute("transform", `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${(ic.rot0 + sway).toFixed(2)}) scale(${(0.86 + 0.28 * depth).toFixed(4)})`);
+      const xl = L.rx * Math.cos(a), yl = L.ry * Math.sin(a);
+      const th = L.tilt * Math.PI / 180;
+      const x = L.cx + xl * Math.cos(th) - yl * Math.sin(th), y = L.cy + xl * Math.sin(th) + yl * Math.cos(th) + bob;
+      const sc = L.depthScale[0] + L.depthScale[1] * depth;
+      ic.g.setAttribute("transform", `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${(ic.rot0 + sway).toFixed(2)}) scale(${sc.toFixed(4)})`);
+      ic.g.setAttribute("opacity", (L.backOpacity + (1 - L.backOpacity) * depth).toFixed(3));
     });
   };
 
@@ -140,9 +151,19 @@
   const loop = (now) => { draw(now); raf = (running && !still && !reduced.matches) ? requestAnimationFrame(loop) : 0; };
   const start = () => { if (!raf) raf = requestAnimationFrame(loop); };
 
+  // the film's ending ambience: plays once per arrival while the deck's sound is on
+  const ambience = new Audio("./assets/audio/figma-orbit-nature.mp3");
+  ambience.preload = "auto";
+  ambience.volume = 0.8;
+  window.__orbitAmbience = ambience;   // (for QA)
+  let soundOn = false;
+  const stopAmbience = () => { ambience.pause(); try { ambience.currentTime = 0; } catch {} };
+  const playAmbience = () => { if (soundOn && !still) { try { ambience.currentTime = 0; } catch {} ambience.play().catch(() => {}); } };
+
   const run = (on) => {
     if (on === running) return;
     running = on;
+    if (on) playAmbience(); else stopAmbience();
     if (on) {
       arrived = (still || reduced.matches) ? Infinity : performance.now();
       if (still || reduced.matches) { draw(performance.now()); return; }
@@ -157,6 +178,7 @@
   addEventListener("message", (event) => {
     const data = event.data;
     if (!data || data.type !== "sound-proto") return;
+    if (typeof data.sound === "boolean") { soundOn = data.sound; if (!soundOn) stopAmbience(); }
     if (typeof data.run === "boolean") run(data.run);
   });
   addEventListener("resize", () => { layout(); draw(performance.now()); });

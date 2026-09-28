@@ -519,7 +519,7 @@
 
       <section class="slide sound-slide animation-slide" data-slide="17" aria-label="Figma Sound closing wordmark">
         <span class="folio" aria-hidden="true">06 / 06</span>
-        <iframe class="animation-frame" id="orbitFrame" src="../branding/sound-orbit.html" title="Figma Sound wordmark with the film's sound icons orbiting it" loading="eager"></iframe>
+        <iframe class="animation-frame" id="orbitFrame" src="../branding/sound-orbit.html" title="Figma Sound wordmark with the film's sound icons orbiting it" loading="eager" allow="autoplay"></iframe>
         <span class="concept-credit contact-credit credit-above-toggle"><a href="mailto:pranaviram2@gmail.com">pranaviram2@gmail.com</a></span>
       </section>
 
@@ -603,15 +603,11 @@
          per interface slide, and the felt piano key alone at the finale. */
       const CUE_SEMITONES = [0, 2, 4, 7, 9, 12];
       const cueRatio = (step) => Math.pow(2, CUE_SEMITONES[Math.max(0, Math.min(CUE_SEMITONES.length - 1, step))] / 12);
+      /* The chapter's sound: a deck about sound keeps its own chrome quiet. No line ticks, underline swipes or
+         slide-arrival cues - only sounds that mean something: the thesis pill's pop (with its visual pop), the
+         prototypes' own sound tokens (the product itself), and the closing orbit, which plays the film's ending. */
       const CHAPTER_CUES = {
-        "11": { kind: "felt", step: 0 },
-        "12": { kind: "lines", step: 1, swipe: 1 },
-        "13": { kind: "lines", step: 2, swipe: 0.707 },
-        "14": { kind: "voice", step: 3 },
-        "15": { kind: "voice", step: 4 },
-        "16": { kind: "voice", step: 5 },
-        "17": { kind: "lines", step: 3, swipe: 0.5 },
-        "18": { kind: "resolve" },
+        "12": { kind: "pop", at: 900 },          // = the .film-chip pop's delay (.9s)
       };
       const playTickCue = (mul, peak = 0.05) => {
         const ctx = audioReady();
@@ -629,6 +625,26 @@
         hiss.connect(band);
         toneEnv(ctx, band, t0, peak * 2.4, 0.001, 0.035).connect(bus);
         hiss.start(t0); hiss.stop(t0 + 0.08);
+      };
+      // the pill's pop: a short sine drop A5 -> A4 (the chapter's cues are all in A) with a soft air tick on top
+      const playPopCue = () => {
+        const ctx = audioReady();
+        if (!ctx) return;
+        const t0 = ctx.currentTime + 0.02;
+        const bus = toneBus(ctx, 0, 1, 0.16);
+        const osc = ctx.createOscillator();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(880, t0);
+        osc.frequency.exponentialRampToValueAtTime(440, t0 + 0.07);
+        toneEnv(ctx, osc, t0, 0.075, 0.003, 0.11).connect(bus);
+        osc.start(t0); osc.stop(t0 + 0.16);
+        const hiss = ctx.createBufferSource();
+        hiss.buffer = noiseBuffer;
+        const band = ctx.createBiquadFilter();
+        band.type = "bandpass"; band.frequency.value = 2600; band.Q.value = 1.2;
+        hiss.connect(band);
+        toneEnv(ctx, band, t0, 0.05, 0.001, 0.03).connect(bus);
+        hiss.start(t0); hiss.stop(t0 + 0.06);
       };
       const playFeltCue = (step) => {
         const ctx = audioReady();
@@ -741,7 +757,7 @@
         if (!soundEnabled || !audioUnlocked) return;
         lastCampaignCueIndex = index;
         const cue = CHAPTER_CUES[slide.dataset.slide];
-        if (!cue || cue.kind === "lines") return; // copy slides sound as their lines land
+        if (!cue || cue.kind === "lines" || cue.kind === "pop") return; // copy slides sound as their lines / pill land
         if (cue.kind === "felt") playFeltCue(cue.step);
         else if (cue.kind === "voice") playVoiceCue(cue.step);
         else if (cue.kind === "resolve") playAudioCue("resolve", { volume: .2, playbackRate: .94 });
@@ -1737,6 +1753,12 @@
       const lineTickTimers = new Map();
       const scheduleLineTicks = (slide) => {
         const cue = CHAPTER_CUES[slide.dataset.slide];
+        if (cue && cue.kind === "pop") {
+          lineTickTimers.set(slide, [window.setTimeout(() => {
+            if (slide.classList.contains("is-on") && soundEnabled && audioUnlocked) playPopCue();
+          }, cue.at)]);
+          return;
+        }
         const lines = slide.querySelectorAll(".reveal-line").length;
         if (!cue || cue.kind !== "lines" || !lines) return;
         const timers = [];
