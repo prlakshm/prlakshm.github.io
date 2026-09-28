@@ -61,13 +61,13 @@ const decks: Deck[] = [
     annotation: "Sound as a new design system material.",
     href: "/figma/",
     cta: "FIGMA REIMAGINED",
-    slideCount: 9,
-    /* 1: the dotted title already fills the frame — untouched, per the user.
-       9: closing photograph with the performer against the right edge — any
-       zoom pushes her off the crop. 7: the mock rides the left edge, so 1.1
-       is all it can take before the left arrow sits on it. 3/4/8: small
-       centred lines, zoomed hardest. 5/6: centred UI mocks. */
-    zooms: [1, 1.12, 1.45, 1.45, 1.35, 1.4, 1.1, 1.45, 1],
+    slideCount: 7,
+    /* 1: the film's closing wordmark + orbit already fills the frame. 2: the
+       watch page (still + link) rides both edges, so only a nudge. 3: the
+       12-frame storyboard is dense — untouched. 4: the thesis, a small
+       centred line, zoomed hardest. 5/6: centred UI mocks. 7: the Dev Mode
+       mock rides the left edge, so 1.1 is all it can take. */
+    zooms: [1, 1.08, 1, 1.45, 1.35, 1.4, 1.1],
   },
 ];
 

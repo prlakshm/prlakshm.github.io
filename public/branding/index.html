@@ -24,8 +24,8 @@
         --cursor-ground: #000;
         --cursor-ink: #fff;
         --cursor-muted: #737373;
-        --sound-ground: #052427;
-        --sound-ink: #82a6a6;
+        --sound-ground: #0D0C0F;
+        --sound-ink: #F4EDE0;
         --figma-ui: #2c2c2c;
         --figma-panel: #242424;
         --figma-line: #444;
@@ -135,6 +135,78 @@
          prefers-reduced-motion or print capture): copy slides rise line by
          line in step with their ticks, and the two artworks settle out of a
          slight zoom on one beat. */
+      /* The launch film. The slide is the film's own dotted canvas, so whatever shape the screen is, the space
+         around the 16:9 picture reads as more canvas, not a letterbox. */
+      .film-slide { padding: 0; }
+      .film-stage { aspect-ratio: 16 / 9; position: relative; width: min(100vw, calc(100svh * 16 / 9)); }
+      .film-video { background: transparent; cursor: pointer; display: block; height: 100%; object-fit: contain; width: 100%; }
+      .film-replay {
+        backdrop-filter: blur(12px);
+        background: rgba(13, 12, 15, .78);
+        border: 1px solid rgba(244, 237, 224, .32);
+        border-radius: 999px;
+        bottom: 50%;
+        color: #F4EDE0;
+        cursor: pointer;
+        font: 400 13px/1 "General Sans", "Helvetica Neue", Arial, sans-serif;
+        left: 50%;
+        letter-spacing: .02em;
+        padding: 10px 16px;
+        position: absolute;
+        transform: translate(-50%, 50%);
+      }
+      .film-replay[hidden] { display: none; }
+      .film-rotate-hint {
+        bottom: max(22px, env(safe-area-inset-bottom));
+        color: rgba(244, 237, 224, .55);
+        display: none;
+        font: 400 12px/1 "General Sans", "Helvetica Neue", Arial, sans-serif;
+        left: 50%;
+        letter-spacing: .02em;
+        position: absolute;
+        transform: translateX(-50%);
+        white-space: nowrap;
+      }
+      /* portrait phones: the film sits centred on the canvas, with a nudge to turn the phone */
+      @media (orientation: portrait) and (max-width: 700px) {
+        .film-rotate-hint { display: block; }
+      }
+      /* phone turned sideways: the film takes the whole screen (full height; phones are wider than 16:9, so the
+         dotted canvas carries the thin strips at the sides) and the slide chrome steps aside */
+      @media (orientation: landscape) and (max-height: 560px) {
+        .film-slide { height: 100svh; min-height: 100svh; }
+        .film-stage { aspect-ratio: auto; height: 100svh; width: 100vw; }
+      }
+      /* the film's type: its lines are cream JetBrains Mono, and the key word sits in the yellow "sound" pill
+         (d1_film_keys.wav_chip / the opening's "sound." pill), which swells in once its line has landed */
+      @font-face {
+        font-family: "JetBrains Mono";
+        src: url("../fonts/jetbrains-mono/JetBrainsMono-Variable.woff2") format("woff2");
+        font-weight: 100 800;
+        font-display: swap;
+      }
+      .sound-copy.film-type {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: clamp(17px, 2.9vw, 54px);
+        font-weight: 400;
+        letter-spacing: 0;
+        line-height: 1.6;
+        width: min(92vw, 30em);
+      }
+      .film-chip {
+        background: #FFE38A;
+        border-radius: 999px;
+        color: #0D0C0F;
+        display: inline-block;
+        line-height: 1.25;
+        padding: .08em .42em .1em;
+        white-space: nowrap;
+      }
+      html.anim-armed .film-chip { transform: scale(.82); }
+      html.anim-armed .is-on .film-chip {
+        transform: scale(1);
+        transition: transform .42s cubic-bezier(.34, 1.56, .64, 1) .9s;
+      }
       .sound-copy .reveal-line { display: block; overflow: hidden; padding-bottom: .1em; margin-bottom: -.1em; }
       .sound-copy .reveal-line > span { display: block; }
       .sound-art { overflow: hidden; }
@@ -154,13 +226,13 @@
       html.anim-armed .sound-art.is-on img { transform: scale(1); }
       /* key phrases: one tone brighter, with a selection-blue underline that
          draws in after their line lands (already drawn in static renders) */
-      .key-phrase { color: #b8d0cf; font-style: normal; position: relative; white-space: nowrap; }
+      .key-phrase { color: #FFE38A; font-style: normal; position: relative; white-space: nowrap; }
       .key-phrase::after {
         content: "";
         position: absolute;
         left: 0; right: 0; bottom: -.06em;
         height: 2px;
-        background: #0d99ff;
+        background: #FFE38A;
         transform: scaleX(1);
         transform-origin: 0 50%;
       }
@@ -172,11 +244,16 @@
 
       /* Figma Sound chapter */
       .sound-slide {
-        background: var(--sound-ground);
+        /* the film's canvas: near-black with a dot every ~2.5 % of the width (48 px at 1920) */
+        --dot-gap: max(20px, 2.5vw);
+        background-color: var(--sound-ground);
+        background-image: radial-gradient(circle at center, #34343A 0 calc(var(--dot-gap) * .046), transparent calc(var(--dot-gap) * .046 + .75px));
+        background-position: center;
+        background-size: var(--dot-gap) var(--dot-gap);
         color: var(--sound-ink);
         font-family: "General Sans", "Helvetica Neue", Arial, sans-serif;
       }
-      .sound-title { background: var(--sound-ground); isolation: isolate; }
+      .sound-title { isolation: isolate; }
       /* Particle title: the lockup is drawn as a dot grid on this canvas, so
          the DOM lockup stays only as the accessible name and the static
          reduced-motion fallback. */
@@ -247,11 +324,11 @@
       .sound-toggle {
         align-items: center;
         backdrop-filter: blur(12px);
-        background: rgba(5, 36, 39, .78);
-        border: 1px solid rgba(184, 208, 207, .44);
+        background: rgba(13, 12, 15, .78);
+        border: 1px solid rgba(244, 237, 224, .32);
         border-radius: 999px;
         bottom: max(18px, env(safe-area-inset-bottom));
-        color: #b8d0cf;
+        color: #F4EDE0;
         cursor: pointer;
         display: none;
         font-family: "General Sans", "Helvetica Neue", Arial, sans-serif;
@@ -267,7 +344,7 @@
       .sound-toggle.is-visible { display: inline-flex; }
       .sound-toggle:focus-visible { outline: 2px solid var(--sound-ink); outline-offset: 3px; }
       .sound-toggle-dot { background: currentColor; border-radius: 50%; height: 6px; opacity: .55; width: 6px; }
-      .sound-toggle[aria-pressed="true"] .sound-toggle-dot { box-shadow: 0 0 0 4px rgba(130,166,166,.18); opacity: 1; }
+      .sound-toggle[aria-pressed="true"] .sound-toggle-dot { box-shadow: 0 0 0 4px rgba(255,227,138,.22); opacity: 1; }
 
       .sound-copy {
         font-size: clamp(24px, 2.6vw, 42px);
@@ -439,75 +516,43 @@
         <span class="concept-credit contact-credit"><a href="mailto:pranaviram2@gmail.com">pranaviram2@gmail.com</a></span>
       </section>
 
-      <section class="slide sound-slide sound-title" data-slide="10" aria-label="Figma Sound">
-        <span class="concept-credit credit-above-toggle">Independent concept by Pranavi Ram</span>
-        <canvas class="title-particles" id="titleParticles" aria-hidden="true"></canvas>
-        <div class="title-lockup" aria-label="Figma Sound">
-          <span class="figma-title-word" aria-hidden="true">
-            <span class="title-letter" style="--letter-index:0">F</span><span class="title-letter" style="--letter-index:1">I</span><span class="title-letter" style="--letter-index:2">G</span><span class="title-letter" style="--letter-index:3">M</span><span class="title-letter" style="--letter-index:4">A</span>
-          </span>
-          <span class="sound-title-word" aria-hidden="true">
-            <span class="title-letter glyph-s" data-sound-glyph="S" style="--letter-index:0">S</span><span class="title-letter glyph-o" data-sound-glyph="O" style="--letter-index:1">O</span><span class="title-letter glyph-u" data-sound-glyph="U" style="--letter-index:2">U</span><span class="title-letter glyph-n" data-sound-glyph="N" style="--letter-index:3">N</span><span class="title-letter glyph-d" data-sound-glyph="D" style="--letter-index:4">D</span>
-          </span>
+      <section class="slide sound-slide sound-title film-slide" data-slide="10" aria-label="Figma Sound launch film">
+        <div class="film-stage">
+          <video class="film-video" id="figmaFilm" muted playsinline preload="metadata" poster="./assets/film/figma-sound-film-poster.jpg" aria-label="Figma Sound launch film, 27 seconds. Tap to play or pause.">
+            <source src="./assets/film/figma-sound-film.webm" type="video/webm" />
+            <source src="./assets/film/figma-sound-film.mp4" type="video/mp4" />
+          </video>
+          <button class="film-replay" id="filmReplay" type="button" hidden>Replay</button>
         </div>
-      </section>
-
-      <section class="slide sound-slide sound-art megaphone-art" data-slide="11" data-slide-audio="select" aria-label="Figma Sound megaphone campaign artwork">
-        <picture>
-          <source media="(max-width: 700px)" srcset="./assets/figma-sound-megaphone-mobile.png" />
-          <img src="./assets/figma-sound-megaphone-16x9.png" alt="A woman listening to a sculptural megaphone amid translucent blue fabric." />
-        </picture>
+        <span class="film-rotate-hint" aria-hidden="true">Rotate to watch full screen</span>
       </section>
 
       <section class="slide sound-slide" data-slide="12" data-slide-audio="select" aria-label="Figma Sound campaign thesis">
-        <span class="folio" aria-hidden="true">03 / 09</span>
-        <p class="sound-copy" data-reveal-lines aria-label="Figma Sound makes sound a design system material.">
-          <span class="reveal-line" style="--li:0" aria-hidden="true"><span>Figma Sound makes sound</span></span>
-          <span class="reveal-line" style="--li:1" aria-hidden="true"><span>a <em class="key-phrase">design system material</em>.</span></span>
-        </p>
-      </section>
-
-      <section class="slide sound-slide" data-slide="13" data-slide-audio="select" aria-label="Sonic behavior">
-        <span class="folio" aria-hidden="true">04 / 09</span>
-        <p class="sound-copy" data-reveal-lines aria-label="A component can have visual states and motion behavior. Now, it can have sonic behavior.">
-          <span class="reveal-line" style="--li:0" aria-hidden="true"><span>A component can have visual states</span></span>
-          <span class="reveal-line" style="--li:1" aria-hidden="true"><span>and motion behavior. Now, it can</span></span>
-          <span class="reveal-line" style="--li:2" aria-hidden="true"><span>have <em class="key-phrase">sonic behavior</em>.</span></span>
+        <span class="folio" aria-hidden="true">02 / 05</span>
+        <p class="sound-copy film-type" data-reveal-lines aria-label="Figma Sound makes sound a design system material.">
+          <span class="reveal-line" style="--li:0" aria-hidden="true"><span>Figma Sound makes <span class="film-chip">sound</span></span></span>
+          <span class="reveal-line" style="--li:1" aria-hidden="true"><span>a design system material.</span></span>
         </p>
       </section>
 
       <section class="slide sound-slide product-slide" data-slide="14" data-slide-audio="select" aria-label="Figma prototype Sound control">
         <span class="figma-mark" aria-hidden="true"><svg viewBox="0 0 38 57" width="17" height="25.5"><path fill="#f24e1e" d="M19 0H9.5a9.5 9.5 0 100 19H19V0z"/><path fill="#ff7262" d="M19 0h9.5a9.5 9.5 0 110 19H19V0z"/><path fill="#a259ff" d="M19 19H9.5a9.5 9.5 0 100 19H19V19z"/><circle fill="#1abcfe" cx="28.5" cy="28.5" r="9.5"/><path fill="#0acf83" d="M9.5 38H19v9.5A9.5 9.5 0 119.5 38z"/></svg></span>
-        <span class="folio" aria-hidden="true">05 / 09</span>
+        <span class="folio" aria-hidden="true">03 / 05</span>
         <iframe class="animation-frame" id="interactionProto" src="./interaction-proto.html" title="Animated Figma prototype: dragging an interaction and assigning a sound token" loading="lazy" allow="autoplay"></iframe>
       </section>
 
       <section class="slide sound-slide product-slide" data-slide="15" data-slide-audio="select" aria-label="Figma Sound tokens">
         <span class="figma-mark" aria-hidden="true"><svg viewBox="0 0 38 57" width="17" height="25.5"><path fill="#f24e1e" d="M19 0H9.5a9.5 9.5 0 100 19H19V0z"/><path fill="#ff7262" d="M19 0h9.5a9.5 9.5 0 110 19H19V0z"/><path fill="#a259ff" d="M19 19H9.5a9.5 9.5 0 100 19H19V19z"/><circle fill="#1abcfe" cx="28.5" cy="28.5" r="9.5"/><path fill="#0acf83" d="M9.5 38H19v9.5A9.5 9.5 0 119.5 38z"/></svg></span>
         <iframe class="animation-frame" id="variablesProto" src="./variables-proto.html" title="Animated Figma variables prototype playing each sound token" loading="lazy" allow="autoplay"></iframe>
-        <span class="folio" aria-hidden="true">06 / 09</span>
+        <span class="folio" aria-hidden="true">04 / 05</span>
       </section>
 
       <section class="slide sound-slide product-slide" data-slide="16" data-slide-audio="select" aria-label="Figma Dev Mode sound specification">
         <span class="figma-mark" aria-hidden="true"><svg viewBox="0 0 38 57" width="17" height="25.5"><path fill="#f24e1e" d="M19 0H9.5a9.5 9.5 0 100 19H19V0z"/><path fill="#ff7262" d="M19 0h9.5a9.5 9.5 0 110 19H19V0z"/><path fill="#a259ff" d="M19 19H9.5a9.5 9.5 0 100 19H19V19z"/><circle fill="#1abcfe" cx="28.5" cy="28.5" r="9.5"/><path fill="#0acf83" d="M9.5 38H19v9.5A9.5 9.5 0 119.5 38z"/></svg></span>
-        <span class="folio" aria-hidden="true">07 / 09</span>
+        <span class="folio" aria-hidden="true">05 / 05</span>
         <iframe class="animation-frame" id="devmodeProto" src="./devmode-proto.html" title="Animated Figma Dev Mode walkthrough of the Sound section" loading="lazy" allow="autoplay"></iframe>
       </section>
 
-      <section class="slide sound-slide" data-slide="17" data-slide-audio="select" aria-label="What does your interface sound like">
-        <span class="folio" aria-hidden="true">08 / 09</span>
-        <p class="sound-copy closing" data-reveal-lines aria-label="What will your interface sound like?">
-          <span class="reveal-line" style="--li:0" aria-hidden="true"><span>What will your interface <em class="key-phrase">sound</em> like?</span></span>
-        </p>
-      </section>
-
-      <section class="slide sound-slide sound-art piano-art" data-slide="18" data-slide-audio="resolve" aria-label="Ambient keyboard laboratory campaign artwork">
-        <span class="concept-credit contact-credit credit-above-toggle"><a href="mailto:pranaviram2@gmail.com">pranaviram2@gmail.com</a></span>
-        <picture>
-          <source media="(max-width: 700px)" srcset="./assets/figma-sound-piano-mobile.png" />
-          <img src="./assets/figma-sound-piano-16x9.png" alt="A musician in an experimental sound laboratory with a piano, speakers, chimes, and translucent fabric." />
-        </picture>
-      </section>
     </main>
 
     <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false" aria-label="Turn Figma Sound audio on">
@@ -1501,8 +1546,36 @@
         boot();
       }
 
+      /* The launch film is the chapter's hero: it plays while it is the slide in view (muted until the reader
+         turns sound on, as browsers require), pauses when they move on, and offers a replay at the end. */
+      const film = document.getElementById("figmaFilm");
+      const filmReplay = document.getElementById("filmReplay");
+      let filmPausedByReader = false;
+      const syncFilm = () => {
+        if (!film) return;
+        film.muted = !(soundEnabled && audioUnlocked);
+        const onFilm = currentIndex() === slides.indexOf(titleSlide);
+        if (onFilm && film.paused && !film.ended && !filmPausedByReader) film.play().catch(() => {});
+        else if (!onFilm && !film.paused) film.pause();
+        if (!onFilm) filmPausedByReader = false;
+      };
+      if (film) {
+        film.addEventListener("click", () => {
+          if (film.paused) { filmPausedByReader = false; film.play().catch(() => {}); }
+          else { filmPausedByReader = true; film.pause(); }
+        });
+        film.addEventListener("ended", () => { if (filmReplay) filmReplay.hidden = false; });
+        film.addEventListener("play", () => { if (filmReplay) filmReplay.hidden = true; });
+      }
+      if (filmReplay) filmReplay.addEventListener("click", () => {
+        film.currentTime = 0;
+        filmPausedByReader = false;
+        film.play().catch(() => {});
+      });
+
       const playTitleSequence = () => {
         clearTitleTimers();
+        if (film) { syncFilm(); return; }
         if (!particleTitle) {
           titleSlide.classList.remove("is-title-animated");
           if (reducedMotion.matches) {
@@ -1534,9 +1607,9 @@
         }, 0);
       };
       const protoFrames = [
-        { frame: document.getElementById("interactionProto"), index: 13 },
-        { frame: document.getElementById("variablesProto"), index: 14 },
-        { frame: document.getElementById("devmodeProto"), index: 15 },
+        { frame: document.getElementById("interactionProto"), index: 11 },
+        { frame: document.getElementById("variablesProto"), index: 12 },
+        { frame: document.getElementById("devmodeProto"), index: 13 },
       ];
       const syncProto = () => {
         const index = currentIndex();
@@ -1545,6 +1618,7 @@
           if (!win) continue;
           win.postMessage({ type: "sound-proto", run: index === own, sound: soundEnabled && audioUnlocked }, "*");
         }
+        syncFilm();
       };
       for (const { frame } of protoFrames) if (frame) frame.addEventListener("load", syncProto);
       const syncChapterControls = () => {
