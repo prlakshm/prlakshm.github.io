@@ -8,79 +8,79 @@
  },
  {
   "n": 2,
-  "frame": 78,
-  "t": 3.25,
+  "frame": 100,
+  "t": 4.17,
   "caption": "Now they have sound.",
-  "src": "storyboard/sb-02-f078.jpg"
+  "src": "storyboard/sb-02-f100.jpg"
  },
  {
   "n": 3,
-  "frame": 98,
-  "t": 4.08,
+  "frame": 154,
+  "t": 6.42,
   "caption": "Play sound \u00b7 the Sound list",
-  "src": "storyboard/sb-03-f098.jpg"
+  "src": "storyboard/sb-03-f154.jpg"
  },
  {
   "n": 4,
-  "frame": 130,
-  "t": 5.42,
+  "frame": 187,
+  "t": 7.79,
   "caption": "SLURP!",
-  "src": "storyboard/sb-04-f130.jpg"
+  "src": "storyboard/sb-04-f187.jpg"
  },
  {
   "n": 5,
-  "frame": 167,
-  "t": 6.96,
+  "frame": 224,
+  "t": 9.33,
   "caption": "FLICK!",
-  "src": "storyboard/sb-05-f167.jpg"
+  "src": "storyboard/sb-05-f224.jpg"
  },
  {
   "n": 6,
-  "frame": 213,
-  "t": 8.88,
+  "frame": 270,
+  "t": 11.25,
   "caption": "CRASH!",
-  "src": "storyboard/sb-06-f213.jpg"
+  "src": "storyboard/sb-06-f270.jpg"
  },
  {
   "n": 7,
-  "frame": 246,
-  "t": 10.25,
+  "frame": 303,
+  "t": 12.62,
   "caption": "BOUNCE!",
-  "src": "storyboard/sb-07-f246.jpg"
+  "src": "storyboard/sb-07-f303.jpg"
  },
  {
   "n": 8,
-  "frame": 315,
-  "t": 13.12,
+  "frame": 372,
+  "t": 15.5,
   "caption": "MEOW!",
-  "src": "storyboard/sb-08-f315.jpg"
+  "src": "storyboard/sb-08-f372.jpg"
  },
  {
   "n": 9,
-  "frame": 452,
-  "t": 18.83,
+  "frame": 509,
+  "t": 21.21,
   "caption": "Sunrise \u00b7 every sound selected",
-  "src": "storyboard/sb-09-f452.jpg"
+  "src": "storyboard/sb-09-f509.jpg"
  },
  {
   "n": 10,
-  "frame": 497,
-  "t": 20.71,
+  "frame": 554,
+  "t": 23.08,
   "caption": "Every sound, a clip in Motion",
-  "src": "storyboard/sb-10-f497.jpg"
+  "src": "storyboard/sb-10-f554.jpg"
  },
  {
   "n": 11,
-  "frame": 571,
-  "t": 23.79,
+  "frame": 628,
+  "t": 26.17,
   "caption": "What will your interface sound like?",
-  "src": "storyboard/sb-11-f571.jpg"
+  "src": "storyboard/sb-11-f628.jpg"
  },
  {
   "n": 12,
-  "frame": 616,
-  "t": 25.67,
+  "frame": 673,
+  "t": 28.04,
   "caption": "Figma Sound",
-  "src": "storyboard/sb-12-f616.jpg"
+  "src": "storyboard/sb-12-f673.jpg"
  }
 ]
