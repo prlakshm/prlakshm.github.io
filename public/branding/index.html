@@ -62,6 +62,7 @@
         padding: clamp(24px, 4vw, 64px);
       }
       .cursor-slide.animation-slide,
+      .sound-slide.animation-slide,
       .cursor-slide.image-slide { padding: 0; }
       .animation-frame { border: 0; height: 100%; inset: 0; position: absolute; width: 100%; }
       .brand-image { display: block; filter: grayscale(1); height: 100svh; object-fit: cover; width: 100%; }
@@ -202,11 +203,10 @@
         padding: .08em .42em .1em;
         white-space: nowrap;
       }
-      html.anim-armed .film-chip { transform: scale(.82); }
-      html.anim-armed .is-on .film-chip {
-        transform: scale(1);
-        transition: transform .42s cubic-bezier(.34, 1.56, .64, 1) .9s;
-      }
+      /* the pill arrives in its final shape and size with its line; once both lines have landed it pops like the
+         film's question pill: a gentle 5 % swell and back over 12 f (0.5 s) */
+      @keyframes film-chip-pop { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+      html.anim-armed .is-on .film-chip { animation: film-chip-pop .5s cubic-bezier(.65, 0, .35, 1) .9s both; }
       .sound-copy .reveal-line { display: block; overflow: hidden; padding-bottom: .1em; margin-bottom: -.1em; }
       .sound-copy .reveal-line > span { display: block; }
       .sound-art { overflow: hidden; }
@@ -528,29 +528,35 @@
       </section>
 
       <section class="slide sound-slide" data-slide="12" data-slide-audio="select" aria-label="Figma Sound campaign thesis">
-        <span class="folio" aria-hidden="true">02 / 05</span>
+        <span class="folio" aria-hidden="true">02 / 06</span>
         <p class="sound-copy film-type" data-reveal-lines aria-label="Figma Sound makes sound a design system material.">
           <span class="reveal-line" style="--li:0" aria-hidden="true"><span>Figma Sound makes <span class="film-chip">sound</span></span></span>
+          <audio id="pillPopSrc" src="./assets/audio/figma-pill-pop.mp3" preload="none" hidden></audio>
           <span class="reveal-line" style="--li:1" aria-hidden="true"><span>a design system material.</span></span>
         </p>
       </section>
 
       <section class="slide sound-slide product-slide" data-slide="14" data-slide-audio="select" aria-label="Figma prototype Sound control">
         <span class="figma-mark" aria-hidden="true"><svg viewBox="0 0 38 57" width="17" height="25.5"><path fill="#f24e1e" d="M19 0H9.5a9.5 9.5 0 100 19H19V0z"/><path fill="#ff7262" d="M19 0h9.5a9.5 9.5 0 110 19H19V0z"/><path fill="#a259ff" d="M19 19H9.5a9.5 9.5 0 100 19H19V19z"/><circle fill="#1abcfe" cx="28.5" cy="28.5" r="9.5"/><path fill="#0acf83" d="M9.5 38H19v9.5A9.5 9.5 0 119.5 38z"/></svg></span>
-        <span class="folio" aria-hidden="true">03 / 05</span>
+        <span class="folio" aria-hidden="true">03 / 06</span>
         <iframe class="animation-frame" id="interactionProto" src="./interaction-proto.html" title="Animated Figma prototype: dragging an interaction and assigning a sound token" loading="lazy" allow="autoplay"></iframe>
       </section>
 
       <section class="slide sound-slide product-slide" data-slide="15" data-slide-audio="select" aria-label="Figma Sound tokens">
         <span class="figma-mark" aria-hidden="true"><svg viewBox="0 0 38 57" width="17" height="25.5"><path fill="#f24e1e" d="M19 0H9.5a9.5 9.5 0 100 19H19V0z"/><path fill="#ff7262" d="M19 0h9.5a9.5 9.5 0 110 19H19V0z"/><path fill="#a259ff" d="M19 19H9.5a9.5 9.5 0 100 19H19V19z"/><circle fill="#1abcfe" cx="28.5" cy="28.5" r="9.5"/><path fill="#0acf83" d="M9.5 38H19v9.5A9.5 9.5 0 119.5 38z"/></svg></span>
         <iframe class="animation-frame" id="variablesProto" src="./variables-proto.html" title="Animated Figma variables prototype playing each sound token" loading="lazy" allow="autoplay"></iframe>
-        <span class="folio" aria-hidden="true">04 / 05</span>
+        <span class="folio" aria-hidden="true">04 / 06</span>
       </section>
 
       <section class="slide sound-slide product-slide" data-slide="16" data-slide-audio="select" aria-label="Figma Dev Mode sound specification">
         <span class="figma-mark" aria-hidden="true"><svg viewBox="0 0 38 57" width="17" height="25.5"><path fill="#f24e1e" d="M19 0H9.5a9.5 9.5 0 100 19H19V0z"/><path fill="#ff7262" d="M19 0h9.5a9.5 9.5 0 110 19H19V0z"/><path fill="#a259ff" d="M19 19H9.5a9.5 9.5 0 100 19H19V19z"/><circle fill="#1abcfe" cx="28.5" cy="28.5" r="9.5"/><path fill="#0acf83" d="M9.5 38H19v9.5A9.5 9.5 0 119.5 38z"/></svg></span>
-        <span class="folio" aria-hidden="true">05 / 05</span>
+        <span class="folio" aria-hidden="true">05 / 06</span>
         <iframe class="animation-frame" id="devmodeProto" src="./devmode-proto.html" title="Animated Figma Dev Mode walkthrough of the Sound section" loading="lazy" allow="autoplay"></iframe>
+      </section>
+
+      <section class="slide sound-slide animation-slide" data-slide="17" aria-label="Figma Sound closing wordmark">
+        <span class="folio" aria-hidden="true">06 / 06</span>
+        <iframe class="animation-frame" id="orbitFrame" src="./sound-orbit.html" title="Figma Sound wordmark with the film's sound icons orbiting it" loading="eager" allow="autoplay"></iframe>
       </section>
 
     </main>
@@ -600,6 +606,7 @@
           // never await resume: without user activation it hangs forever and
           // wedges the whole unlock; cues schedule with lookahead anyway
           if (meteorCtx && meteorCtx.state !== "running") meteorCtx.resume().catch(() => {});
+          if (meteorCtx) loadPop(meteorCtx);          // 9 KB: ready well before the pill pops
           audioUnlocked = true;
           updateSoundToggle();
           return true;
@@ -633,15 +640,11 @@
          per interface slide, and the felt piano key alone at the finale. */
       const CUE_SEMITONES = [0, 2, 4, 7, 9, 12];
       const cueRatio = (step) => Math.pow(2, CUE_SEMITONES[Math.max(0, Math.min(CUE_SEMITONES.length - 1, step))] / 12);
+      /* The chapter's sound: a deck about sound keeps its own chrome quiet. No line ticks, underline swipes or
+         slide-arrival cues - only sounds that mean something: the thesis pill's pop (with its visual pop), the
+         prototypes' own sound tokens (the product itself), and the closing orbit's marimba sting. */
       const CHAPTER_CUES = {
-        "11": { kind: "felt", step: 0 },
-        "12": { kind: "lines", step: 1, swipe: 1 },
-        "13": { kind: "lines", step: 2, swipe: 0.707 },
-        "14": { kind: "voice", step: 3 },
-        "15": { kind: "voice", step: 4 },
-        "16": { kind: "voice", step: 5 },
-        "17": { kind: "lines", step: 3, swipe: 0.5 },
-        "18": { kind: "resolve" },
+        "12": { kind: "pop", at: 900 },          // = the .film-chip pop's delay (.9s); the sound starts POP_LEAD early
       };
       const playTickCue = (mul, peak = 0.05) => {
         const ctx = audioReady();
@@ -659,6 +662,41 @@
         hiss.connect(band);
         toneEnv(ctx, band, t0, peak * 2.4, 0.001, 0.035).connect(bus);
         hiss.start(t0); hiss.stop(t0 + 0.08);
+      };
+      /* the pill's pop: a recorded mouth pop (ElevenLabs, levelled to peak -3.3 dBFS, the film's own loudness),
+         decoded once and played straight to the output at full gain - past the synth cues' 0.7 master and limiter -
+         so it lands as loud as the film. Its file comes from the page's <audio id="pillPopSrc"> so the /figma copy
+         resolves it too. POP_LEAD: the decoded file's attack sits 25 ms in, so it starts that much early. */
+      const POP_LEAD = 25;
+      let popBuffer = null;
+      let popLoading = null;
+      const loadPop = (ctx) => {
+        if (popBuffer || popLoading) return popLoading;
+        const el = document.getElementById("pillPopSrc");
+        if (!el) return null;
+        popLoading = fetch(el.currentSrc || el.src)
+          .then((r) => r.arrayBuffer())
+          .then((data) => new Promise((ok, fail) => ctx.decodeAudioData(data, ok, fail)))
+          .then((buf) => { popBuffer = buf; })
+          .catch(() => { popLoading = null; });
+        return popLoading;
+      };
+      // the sound-on button confirms with the same pop. Right after the unlock the context may still be resuming and
+      // the pop still loading, so wait for both (the resume capped: without activation it can hang)
+      const playTogglePop = async () => {
+        const ctx = ensureAudioContext();
+        if (!ctx) return;
+        await Promise.race([ctx.resume().catch(() => {}), new Promise((ok) => setTimeout(ok, 300))]);
+        await loadPop(ctx);
+        playPopCue();
+      };
+      const playPopCue = () => {
+        const ctx = audioReady();
+        if (!ctx || !popBuffer) return;
+        const src = ctx.createBufferSource();
+        src.buffer = popBuffer;
+        src.connect(ctx.destination);
+        src.start(ctx.currentTime + 0.005);
       };
       const playFeltCue = (step) => {
         const ctx = audioReady();
@@ -771,7 +809,7 @@
         if (!soundEnabled || !audioUnlocked) return;
         lastCampaignCueIndex = index;
         const cue = CHAPTER_CUES[slide.dataset.slide];
-        if (!cue || cue.kind === "lines") return; // copy slides sound as their lines land
+        if (!cue || cue.kind === "lines" || cue.kind === "pop") return; // copy slides sound as their lines / pill land
         if (cue.kind === "felt") playFeltCue(cue.step);
         else if (cue.kind === "voice") playVoiceCue(cue.step);
         else if (cue.kind === "resolve") playAudioCue("resolve", { volume: .2, playbackRate: .94 });
@@ -941,44 +979,6 @@
         body.stop(t0 + 0.5);
       };
 
-      /* The variables interface's feedback.success, note for note — thock,
-         four typing ticks, typewriter bell — used as the sound-on confirmation. */
-      const playSuccessCue = () => {
-        const ctx = audioReady();
-        if (!ctx) return;
-        const t0 = ctx.currentTime + 0.01;
-        const out = toneBus(ctx, 0, 0.5, 0.15);
-        const sine = (freq, at, a, d, peak, type) => {
-          const o = ctx.createOscillator();
-          o.type = type || "sine";
-          o.frequency.value = freq;
-          toneEnv(ctx, o, at, peak, a, a + d).connect(out);
-          o.start(at);
-          o.stop(at + a + d + 0.05);
-        };
-        const noiseHit = (at, a, d, peak, hp, bp, q) => {
-          const src = ctx.createBufferSource();
-          src.buffer = noiseBuffer;
-          const hpF = ctx.createBiquadFilter(); hpF.type = "highpass"; hpF.frequency.value = hp;
-          const bpF = ctx.createBiquadFilter(); bpF.type = "bandpass"; bpF.frequency.value = bp; bpF.Q.value = q;
-          src.connect(hpF).connect(bpF);
-          toneEnv(ctx, bpF, at, peak, a, a + d).connect(out);
-          src.start(at);
-          src.stop(at + a + d + 0.05);
-        };
-        sine(72, t0, .002, .1, .32);
-        sine(148, t0, .002, .055, .09, "triangle");
-        noiseHit(t0, .002, .048, .2, 350, 1600, .95);
-        for (let i = 0; i < 4; i += 1) {
-          const at = t0 + .04 + i * .016;
-          noiseHit(at, .001, .02, .3, 2800, 7200, 1.6);
-          sine(3400 + i * 137, at, .001, .016, .035);
-        }
-        const bell = t0 + .09;
-        sine(2093, bell, .003, .62, .15);
-        sine(2093 * 2.73, bell, .004, .2, .045);
-        sine(1568, bell, .005, .32, .05);
-      };
 
       const playSettleCue = (lead = 0) => {
         const ctx = audioReady();
@@ -1610,6 +1610,7 @@
         { frame: document.getElementById("interactionProto"), index: 11 },
         { frame: document.getElementById("variablesProto"), index: 12 },
         { frame: document.getElementById("devmodeProto"), index: 13 },
+        { frame: document.getElementById("orbitFrame"), index: 14 },   // the closing wordmark (runs its entrance on arrival)
       ];
       const syncProto = () => {
         const index = currentIndex();
@@ -1645,7 +1646,7 @@
         if (soundEnabled && !audioUnlocked) {
           if (await unlockTitleAudio()) {
             if (currentIndex() === 9) playTitleSequence();
-            else playSuccessCue();
+            else playTogglePop();
           }
           return;
         }
@@ -1654,7 +1655,7 @@
         if (soundEnabled) {
           if (await unlockTitleAudio()) {
             if (currentIndex() === 9) playTitleSequence();
-            else playSuccessCue();
+            else playTogglePop();
           }
         } else {
           clearTitleTimers();
@@ -1766,6 +1767,14 @@
       const lineTickTimers = new Map();
       const scheduleLineTicks = (slide) => {
         const cue = CHAPTER_CUES[slide.dataset.slide];
+        if (cue && cue.kind === "pop") {
+          const ctx = audioReady();
+          if (ctx) loadPop(ctx);
+          lineTickTimers.set(slide, [window.setTimeout(() => {
+            if (slide.classList.contains("is-on") && soundEnabled && audioUnlocked) playPopCue();
+          }, cue.at - POP_LEAD)]);
+          return;
+        }
         const lines = slide.querySelectorAll(".reveal-line").length;
         if (!cue || cue.kind !== "lines" || !lines) return;
         const timers = [];
