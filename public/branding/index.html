@@ -681,6 +681,15 @@
           .catch(() => { popLoading = null; });
         return popLoading;
       };
+      // the sound-on button confirms with the same pop. Right after the unlock the context may still be resuming and
+      // the pop still loading, so wait for both (the resume capped: without activation it can hang)
+      const playTogglePop = async () => {
+        const ctx = ensureAudioContext();
+        if (!ctx) return;
+        await Promise.race([ctx.resume().catch(() => {}), new Promise((ok) => setTimeout(ok, 300))]);
+        await loadPop(ctx);
+        playPopCue();
+      };
       const playPopCue = () => {
         const ctx = audioReady();
         if (!ctx || !popBuffer) return;
@@ -970,44 +979,6 @@
         body.stop(t0 + 0.5);
       };
 
-      /* The variables interface's feedback.success, note for note — thock,
-         four typing ticks, typewriter bell — used as the sound-on confirmation. */
-      const playSuccessCue = () => {
-        const ctx = audioReady();
-        if (!ctx) return;
-        const t0 = ctx.currentTime + 0.01;
-        const out = toneBus(ctx, 0, 0.5, 0.15);
-        const sine = (freq, at, a, d, peak, type) => {
-          const o = ctx.createOscillator();
-          o.type = type || "sine";
-          o.frequency.value = freq;
-          toneEnv(ctx, o, at, peak, a, a + d).connect(out);
-          o.start(at);
-          o.stop(at + a + d + 0.05);
-        };
-        const noiseHit = (at, a, d, peak, hp, bp, q) => {
-          const src = ctx.createBufferSource();
-          src.buffer = noiseBuffer;
-          const hpF = ctx.createBiquadFilter(); hpF.type = "highpass"; hpF.frequency.value = hp;
-          const bpF = ctx.createBiquadFilter(); bpF.type = "bandpass"; bpF.frequency.value = bp; bpF.Q.value = q;
-          src.connect(hpF).connect(bpF);
-          toneEnv(ctx, bpF, at, peak, a, a + d).connect(out);
-          src.start(at);
-          src.stop(at + a + d + 0.05);
-        };
-        sine(72, t0, .002, .1, .32);
-        sine(148, t0, .002, .055, .09, "triangle");
-        noiseHit(t0, .002, .048, .2, 350, 1600, .95);
-        for (let i = 0; i < 4; i += 1) {
-          const at = t0 + .04 + i * .016;
-          noiseHit(at, .001, .02, .3, 2800, 7200, 1.6);
-          sine(3400 + i * 137, at, .001, .016, .035);
-        }
-        const bell = t0 + .09;
-        sine(2093, bell, .003, .62, .15);
-        sine(2093 * 2.73, bell, .004, .2, .045);
-        sine(1568, bell, .005, .32, .05);
-      };
 
       const playSettleCue = (lead = 0) => {
         const ctx = audioReady();
@@ -1675,7 +1646,7 @@
         if (soundEnabled && !audioUnlocked) {
           if (await unlockTitleAudio()) {
             if (currentIndex() === 9) playTitleSequence();
-            else playSuccessCue();
+            else playTogglePop();
           }
           return;
         }
@@ -1684,7 +1655,7 @@
         if (soundEnabled) {
           if (await unlockTitleAudio()) {
             if (currentIndex() === 9) playTitleSequence();
-            else playSuccessCue();
+            else playTogglePop();
           }
         } else {
           clearTitleTimers();
