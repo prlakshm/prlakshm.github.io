@@ -531,6 +531,7 @@
         <span class="folio" aria-hidden="true">02 / 06</span>
         <p class="sound-copy film-type" data-reveal-lines aria-label="Figma Sound makes sound a design system material.">
           <span class="reveal-line" style="--li:0" aria-hidden="true"><span>Figma Sound makes <span class="film-chip">sound</span></span></span>
+          <audio id="pillPopSrc" src="./assets/audio/figma-pill-pop.mp3" preload="none" hidden></audio>
           <span class="reveal-line" style="--li:1" aria-hidden="true"><span>a design system material.</span></span>
         </p>
       </section>
@@ -605,6 +606,7 @@
           // never await resume: without user activation it hangs forever and
           // wedges the whole unlock; cues schedule with lookahead anyway
           if (meteorCtx && meteorCtx.state !== "running") meteorCtx.resume().catch(() => {});
+          if (meteorCtx) loadPop(meteorCtx);          // 9 KB: ready well before the pill pops
           audioUnlocked = true;
           updateSoundToggle();
           return true;
@@ -640,9 +642,9 @@
       const cueRatio = (step) => Math.pow(2, CUE_SEMITONES[Math.max(0, Math.min(CUE_SEMITONES.length - 1, step))] / 12);
       /* The chapter's sound: a deck about sound keeps its own chrome quiet. No line ticks, underline swipes or
          slide-arrival cues - only sounds that mean something: the thesis pill's pop (with its visual pop), the
-         prototypes' own sound tokens (the product itself), and the closing orbit, which plays the film's ending. */
+         prototypes' own sound tokens (the product itself), and the closing orbit's marimba sting. */
       const CHAPTER_CUES = {
-        "12": { kind: "pop", at: 900 },          // = the .film-chip pop's delay (.9s)
+        "12": { kind: "pop", at: 900 },          // = the .film-chip pop's delay (.9s); the sound starts POP_LEAD early
       };
       const playTickCue = (mul, peak = 0.05) => {
         const ctx = audioReady();
@@ -661,29 +663,31 @@
         toneEnv(ctx, band, t0, peak * 2.4, 0.001, 0.035).connect(bus);
         hiss.start(t0); hiss.stop(t0 + 0.08);
       };
-      // the pill's pop: a round sine drop A5 -> A4 (the chapter's cues are all in A), an octave-and-a-fifth partial for
-      // presence on small speakers, and an air tick for the snap. Level: above the old arrival cue (0.16 peak) since
-      // it is shorter - v1 at 0.075 was too quiet to hear on laptop speakers.
+      /* the pill's pop: a recorded mouth pop (ElevenLabs, levelled to peak -3.3 dBFS, the film's own loudness),
+         decoded once and played straight to the output at full gain - past the synth cues' 0.7 master and limiter -
+         so it lands as loud as the film. Its file comes from the page's <audio id="pillPopSrc"> so the /figma copy
+         resolves it too. POP_LEAD: the decoded file's attack sits 25 ms in, so it starts that much early. */
+      const POP_LEAD = 25;
+      let popBuffer = null;
+      let popLoading = null;
+      const loadPop = (ctx) => {
+        if (popBuffer || popLoading) return popLoading;
+        const el = document.getElementById("pillPopSrc");
+        if (!el) return null;
+        popLoading = fetch(el.currentSrc || el.src)
+          .then((r) => r.arrayBuffer())
+          .then((data) => new Promise((ok, fail) => ctx.decodeAudioData(data, ok, fail)))
+          .then((buf) => { popBuffer = buf; })
+          .catch(() => { popLoading = null; });
+        return popLoading;
+      };
       const playPopCue = () => {
         const ctx = audioReady();
-        if (!ctx) return;
-        const t0 = ctx.currentTime + 0.02;
-        const bus = toneBus(ctx, 0, 1, 0.14);
-        for (const [f0, f1, peak, dur] of [[880, 440, 0.24, 0.14], [2640, 1320, 0.05, 0.07]]) {
-          const osc = ctx.createOscillator();
-          osc.type = "sine";
-          osc.frequency.setValueAtTime(f0, t0);
-          osc.frequency.exponentialRampToValueAtTime(f1, t0 + 0.07);
-          toneEnv(ctx, osc, t0, peak, 0.003, dur).connect(bus);
-          osc.start(t0); osc.stop(t0 + dur + 0.05);
-        }
-        const hiss = ctx.createBufferSource();
-        hiss.buffer = noiseBuffer;
-        const band = ctx.createBiquadFilter();
-        band.type = "bandpass"; band.frequency.value = 3200; band.Q.value = 1.1;
-        hiss.connect(band);
-        toneEnv(ctx, band, t0, 0.12, 0.001, 0.03).connect(bus);
-        hiss.start(t0); hiss.stop(t0 + 0.06);
+        if (!ctx || !popBuffer) return;
+        const src = ctx.createBufferSource();
+        src.buffer = popBuffer;
+        src.connect(ctx.destination);
+        src.start(ctx.currentTime + 0.005);
       };
       const playFeltCue = (step) => {
         const ctx = audioReady();
@@ -1793,9 +1797,11 @@
       const scheduleLineTicks = (slide) => {
         const cue = CHAPTER_CUES[slide.dataset.slide];
         if (cue && cue.kind === "pop") {
+          const ctx = audioReady();
+          if (ctx) loadPop(ctx);
           lineTickTimers.set(slide, [window.setTimeout(() => {
             if (slide.classList.contains("is-on") && soundEnabled && audioUnlocked) playPopCue();
-          }, cue.at)]);
+          }, cue.at - POP_LEAD)]);
           return;
         }
         const lines = slide.querySelectorAll(".reveal-line").length;

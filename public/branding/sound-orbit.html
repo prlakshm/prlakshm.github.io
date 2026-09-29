@@ -10,8 +10,8 @@
          (the film's 7 f ring fade, 6 f steps, 12 f word fades). Icons exported from the film's source by
          x-projects figma-sound/kit/frames_d1v5/film/notes/n8/export_orbit_icons.py.
          Driven by the deck like the prototypes: postMessage {type: "sound-proto", run, sound}. With sound on, the
-         arrival plays the film's own ending (assets/audio/figma-orbit-nature.mp3: the last 4 s of the final mix -
-         the nature bed, birds and the warm shimmer fading out under the wordmark). -->
+         arrival plays the deck's closing sting (assets/audio/figma-orbit-marimba.mp3: three soft marimba notes rising
+         to a shimmer, landing on E5 - in the film's A major - levelled to peak -5.3 dBFS, the film's loudness). -->
     <style>
       @font-face {
         font-family: "JetBrains Mono";
@@ -151,10 +151,10 @@
   const loop = (now) => { draw(now); raf = (running && !still && !reduced.matches) ? requestAnimationFrame(loop) : 0; };
   const start = () => { if (!raf) raf = requestAnimationFrame(loop); };
 
-  // the film's ending ambience: plays once per arrival while the deck's sound is on
-  const ambience = new Audio("./assets/audio/figma-orbit-nature.mp3");
+  // the closing sting: plays once per arrival while the deck's sound is on, at full volume (like the film)
+  const ambience = new Audio("./assets/audio/figma-orbit-marimba.mp3");
   ambience.preload = "auto";
-  ambience.volume = 0.8;
+  ambience.volume = 1;
   window.__orbitAmbience = ambience;   // (for QA)
   let soundOn = false;
   const stopAmbience = () => { ambience.pause(); try { ambience.currentTime = 0; } catch {} };
