@@ -1,7 +1,8 @@
 /* ==========================================================================
    Sunroom — other hands.
 
-   Two alternative ways of drawing the same room, tried with `?hand=`:
+   How the room is drawn. `curly` is the room's hand; the others are kept
+   for comparison under `?hand=`:
 
      curly  a wandering dip pen: every edge is one flowing curve, corners loop
             round now and then, line ends flick off, and the room sprouts a
@@ -9,6 +10,7 @@
      line   two unbroken lines: one draws the wall, the doors and the curtains
             and runs off the page to the left; the other draws the table and
             the chairs and runs off to the right. The pen never lifts.
+     ink    the earlier ruled sketch (sketch.ts).
 
    Both return the same kind of SVG as renderSketch — `.sr-l` paths with the
    draw-in order on them, paper fills under the furniture — so the entrance
@@ -23,7 +25,7 @@ export type Hand = "ink" | "curly" | "line";
 
 export function readHand(): Hand {
   const q = new URLSearchParams(window.location.search).get("hand");
-  return q === "curly" || q === "line" ? q : "ink";
+  return q === "ink" || q === "line" ? q : "curly";
 }
 
 function mulberry(seed: number) {

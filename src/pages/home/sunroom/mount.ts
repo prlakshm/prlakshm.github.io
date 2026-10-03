@@ -81,7 +81,7 @@ export function mountSunroom(root: HTMLElement, initial: RoomVariant): Sunroom {
   }
 
   const wide = window.matchMedia(WIDE);
-  // `?hand=curly|line`: other ways of drawing the same room, under trial
+  // the room's hand is curly; `?hand=ink|line` tries the others
   const hand = readHand();
   const lightAt = hand === "line" ? LIGHT_AT_ONE_LINE : LIGHT_AT;
   const ENTRANCE = lightAt + LIGHT_FOR;
