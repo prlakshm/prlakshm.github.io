@@ -140,7 +140,7 @@ function farLight(light: LightStyle): [number, number, number] {
 }
 
 export const STYLES: Record<RoomVariant, RoomStyle> = {
-  golden: { label: "Clear glass", light: GOLDEN, mote: [255, 252, 240], sun: farLight(GOLDEN) },
+  golden: { label: "Golden hour", light: GOLDEN, mote: [255, 252, 240], sun: farLight(GOLDEN) },
   stained: { label: "Stained glass", light: STAINED, mote: [255, 255, 255], sun: farLight(STAINED) },
   moon: { label: "Moonlight", light: MOON, mote: [228, 238, 255], sun: farLight(MOON) },
 };
