@@ -233,7 +233,7 @@ export function joinShelf(id: string): ShelfHandle {
 export const __shelfState = () => ({ openId, pendingId, restIn: restAt - Date.now() });
 
 /* ── Pinned tooltips ────────────────────────────────────────────────────────
-   Both the fabric-strip labels and the pronunciation note are raised by hover
+   The pronunciation note (and any other pinned label) is raised by hover
    on a mouse and by a tap on touch. A tap has to pin, because there is no
    hover to hold them open — and a pin has to let go on its own, or the label
    just sits there. Shared so the two cannot end up with different rhythms. */

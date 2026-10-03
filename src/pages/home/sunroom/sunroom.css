@@ -1,0 +1,157 @@
+/* ==========================================================================
+   Sunroom — the sketched room and its light, behind the hero.
+
+   The layer is a direct child of .wt and deliberately NOT a stacking context
+   (z-index: auto): the light canvas multiplies against whatever is beneath
+   it, and that has to include the dot canvas in .wt-surface. Give this an
+   explicit z-index and the blend is isolated to the layer and goes flat.
+   ========================================================================== */
+
+.wt > .sunroom.sunroom {
+  position: absolute;
+  z-index: auto;
+  left: 0;
+  top: 0;
+  width: 100%;
+  display: none;
+  pointer-events: none;
+  /* Sheer curtain cloth, and the warmth it takes on beside the glass. */
+  --sr-cloth: rgb(255 255 255 / 0.8);
+  --sr-cloth-glow: rgb(255 249 236 / 0.95);
+  /* What the light does to white paper where it lands on the furniture.
+     mount.ts sets this from the glass in use, once the sun is out. */
+  --sr-sun: #fff;
+}
+
+.sunroom-light,
+.sunroom-sketch,
+.sunroom-motes {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.sunroom-light {
+  mix-blend-mode: multiply;
+}
+
+/* Held still (reduced motion, software WebGL, or a GPU that could not keep
+   up): the light is painted once, so the sun comes out as a plain fade. */
+.sunroom-light.is-still:not(.is-out) {
+  /* only on the way in: hiding it must be immediate */
+  transition: opacity 1.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sunroom-light.is-out {
+  opacity: 0;
+}
+
+.sunroom-sketch {
+  overflow: visible;
+}
+
+/* Every line is normalised to length 1, so one dash pattern draws them all.
+   Motion (mount.ts) runs the offset from 1 to 0. */
+.sr-l {
+  stroke-dasharray: 1;
+}
+
+/* Until the entrance starts, nothing of the sketch may flash. */
+.sunroom-sketch.is-waiting .sr-l {
+  stroke-dashoffset: 1;
+}
+.sunroom-sketch.is-waiting .sr-f {
+  opacity: 0;
+}
+
+/* Page-white under each piece of furniture, so it hides what is behind it. */
+.sr-paper {
+  fill: #fff;
+}
+
+/* --- Glass picker ---------------------------------------------------------
+   Three panes, the size of a caption. Lives in the hero so it can be clicked;
+   the room itself never takes the pointer. */
+.glass-picker {
+  display: none;
+}
+
+/* The room needs the hero's side margins, so it only appears on wide
+   screens. Below this the hero is exactly what it was. */
+@media (min-width: 1100px) {
+  .wt > .sunroom.sunroom {
+    display: block;
+  }
+
+  /* Lift the text a little and open a band of floor beneath it for the light
+     to cross before the notebooks begin. --sr-floor is measured by mount.ts:
+     how far the room reaches below the text. The picker's row sits under it. */
+  .wt--sunroom .hero {
+    position: relative;
+    padding-top: clamp(44px, 10vh, 108px);
+    padding-bottom: calc(var(--sr-floor, 160px) + 62px);
+  }
+
+  .glass-picker {
+    position: absolute;
+    /* Under the chairs, below the light, in line with the nav's right edge. */
+    right: clamp(22px, 3.2vw, 60px);
+    bottom: 18px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .glass-picker-label {
+    margin-right: 5px;
+    color: var(--mono-tertiary);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .glass-pane {
+    position: relative;
+    width: 14px;
+    height: 18px;
+    padding: 0;
+    border: 1px solid color-mix(in srgb, var(--espresso) 55%, transparent);
+    border-radius: 1px;
+    background: #fff;
+    cursor: pointer;
+    opacity: 0.55;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  /* A finger-sized target around a caption-sized mark. */
+  .glass-pane::after {
+    content: "";
+    position: absolute;
+    inset: -9px -5px;
+  }
+  .glass-pane:hover,
+  .glass-pane:focus-visible {
+    opacity: 1;
+  }
+  .glass-pane:focus-visible {
+    outline: 2px solid var(--espresso);
+    outline-offset: 3px;
+  }
+  .glass-pane[aria-pressed="true"] {
+    opacity: 1;
+    transform: translateY(-2px);
+    border-color: var(--espresso);
+  }
+
+  .glass-pane--golden {
+    background: linear-gradient(180deg, #eaf2ff 0%, #fff6e4 55%, #ffe3ad 100%);
+  }
+  .glass-pane--stained {
+    background: linear-gradient(180deg, #a9d3ff 0 33.4%, #ffbdd0 33.4% 66.7%, #ffdc94 66.7% 100%);
+  }
+  .glass-pane--moon {
+    background: linear-gradient(180deg, #2f3a6e 0%, #4a5a96 60%, #c9d6f5 100%);
+  }
+}

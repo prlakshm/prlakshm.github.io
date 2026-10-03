@@ -1,7 +1,7 @@
 /* ==========================================================================
    Worktable homepage
-   A cutting-mat surface holding three notebooks and a pocket of fabric.
-   Everything except the hero title is brown Berkeley Mono.
+   A dot-grid canvas holding three notebooks and the concept decks.
+   Everything except the hero title is grey Berkeley Mono.
    ========================================================================== */
 
 .wt {
@@ -15,33 +15,16 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* --- Cutting mat --------------------------------------------------------- */
-/* Inset past the viewport on every side so the parallax translation in
-   Home.tsx has bleed to move into and never exposes a bare edge. */
+/* --- Surface ------------------------------------------------------------- */
+/* Plain white now (the dots are gone). Kept as a layer, inset past the
+   viewport, because the parallax translation in Home.tsx still moves it and
+   the sunroom's light multiplies over it. */
 .wt-surface {
   position: fixed;
   inset: -80px;
   z-index: 0;
   pointer-events: none;
-  background-image:
-    linear-gradient(var(--grid-major) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-major) 1px, transparent 1px),
-    linear-gradient(var(--grid-minor) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-minor) 1px, transparent 1px);
-  background-size:
-    var(--grid-major-step) var(--grid-major-step),
-    var(--grid-major-step) var(--grid-major-step),
-    var(--grid-minor-step) var(--grid-minor-step),
-    var(--grid-minor-step) var(--grid-minor-step);
-}
-
-.wt-surface::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  opacity: 0.13;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)' opacity='0.32'/%3E%3C/svg%3E");
+  background: #fff;
 }
 
 .wt > *:not(.wt-surface) {
@@ -52,23 +35,15 @@
 /* --- Shared shells ------------------------------------------------------- */
 .hero,
 .shelf,
-.decks,
-.archive {
+.decks {
   max-width: var(--page-max);
   margin-inline: auto;
   padding-inline: var(--page-gutter);
 }
 
-/* The archive runs one minor grid column (32px) wider than its siblings — 16px
-   proud on each side. That whole 32px is handed to the gap between the denim
-   and the textiles (see .archive-stage), so the fabrics keep their size and
-   only the breathing room changes.
-   The shelf matches it so the outer notebooks land on exactly the line the
-   pocket starts from. On the narrower column they stopped 16px short of it at
-   both ends, which read as the row not quite reaching the page's edges.
-   The decks match too: their windows' outer edges sit on the same lines the
-   notebooks and the pocket answer to. */
-.archive,
+/* The shelf and the decks run one minor step (32px) wider than the hero —
+   16px proud on each side — so the outer notebooks and the deck windows share
+   the same outer lines. */
 .shelf,
 .decks {
   max-width: calc(var(--page-max) + var(--grid-minor-step));
@@ -133,7 +108,7 @@
 .wt-nav-links button {
   font-family: var(--font-mono);
   font-weight: 400;
-  font-size: 1.1rem;
+  font-size: 16px;
   letter-spacing: 0.12em;
   line-height: 1.6rem;
   color: var(--mono-secondary);
@@ -247,9 +222,10 @@
   margin: 0;
   width: max-content;
   max-width: 100%;
-  font-family: var(--font-display);
+  font-family: var(--font-hero);
   font-weight: var(--weight-display);
   font-size: var(--hero-size);
+  letter-spacing: -0.04em;
   line-height: 0.97;
   color: var(--espresso);
 }
@@ -257,7 +233,6 @@
 /* Shared tip plate — opaque parchment kills the cutting-mat grid underneath. */
 .hero-pron,
 .jr-tooltip,
-.scrap-tooltip,
 .deck-tooltip {
   background: var(--tooltip-fill);
   border: 1px solid color-mix(in srgb, var(--espresso) 12%, transparent);
@@ -310,7 +285,7 @@
   box-sizing: border-box;
   width: 0;
   min-width: 100%;
-  margin-top: clamp(34px, 5vh, 56px);
+  margin-top: clamp(22px, 3.2vh, 36px);
   text-align: left;
 }
 
@@ -370,7 +345,7 @@
 .line {
   margin: 0;
   font-family: var(--font-mono);
-  font-size: 15px;
+  font-size: 14.5px;
   line-height: 1.65;
   letter-spacing: 0.04em;
   color: var(--mono-secondary);
@@ -531,19 +506,19 @@
   /* One minor grid pull — two steps overlapped the hero contact tiles.
      The margin change alone clears ~28px; keep top pad modest. */
   margin-top: calc(-1 * var(--grid-minor-step));
-  /* Bottom pad owns notebooks → fabric breath (doubled). */
+  /* Bottom pad owns the breath between the notebooks and the decks (doubled). */
   padding-block: clamp(12px, 2vh, 24px) clamp(80px, 14vh, 176px);
 }
 
 /* Three books, three different anchors — which is why this is a grid and not a
    flex row handing out space evenly:
 
-     · Surprise Rail is flush to the LEFT edge, the line the denim pocket starts
+     · Surprise Rail is flush to the LEFT edge of the column
        from further down the page.
      · Mixr is centred on the SCREEN. The outer 1fr columns are equal and this
        container is symmetric in the viewport, so the middle column's centre is
        the viewport's centre.
-     · Pinnables is flush to the RIGHT edge, where the fabric row ends.
+     · Pinnables is flush to the RIGHT edge of the column.
 
    The gaps that fall out are therefore uneven, and that is the point: each book
    is answering to its own landmark rather than to its neighbours.
@@ -711,7 +686,7 @@
 .jr-annotation-kicker {
   padding-left: var(--label-indent);
   text-indent: calc(-1 * var(--label-indent));
-  font-family: var(--font-mono-system);
+  font-family: var(--font-mono);
   font-weight: 400;
   font-size: 14px;
   line-height: 1.9;
@@ -737,7 +712,7 @@
      without any of them running past the notebook below. */
   max-width: 21ch;
   padding-left: var(--label-indent);
-  font-family: var(--font-mono-system);
+  font-family: var(--font-mono);
   font-weight: 400;
   font-size: 14px;
   line-height: 1.9;
@@ -1126,9 +1101,9 @@
 
 /* --- Concept decks ------------------------------------------------------- */
 /* Two macOS windows playing the speculative decks, between the shelf and the
-   fabric. The breath above is exactly the shelf's bottom pad — walked up and
+   manifesto. The breath above is exactly the shelf's bottom pad — walked up and
    down by eye until it settled here (no extra pad, no negative pull); the
-   section's own bottom pad owns the breath down to the archive. */
+   section's own bottom pad owns the breath down to the manifesto. */
 .decks {
   /* One px above the zero-pad seat — asked for by eye. */
   margin-top: -1px;
@@ -1231,7 +1206,7 @@
 .deck-kicker {
   padding-left: var(--label-indent);
   text-indent: calc(-1 * var(--label-indent));
-  font-family: var(--font-mono-system);
+  font-family: var(--font-mono);
   font-weight: 400;
   font-size: 14px;
   line-height: 1.9;
@@ -1250,7 +1225,7 @@
 .deck-copy {
   max-width: 37ch;
   padding-left: var(--label-indent);
-  font-family: var(--font-mono-system);
+  font-family: var(--font-mono);
   font-weight: 400;
   font-size: 14px;
   line-height: 1.9;
@@ -1337,7 +1312,7 @@
   gap: 8px;
   height: var(--chrome-h);
   padding-inline: 12px;
-  background: linear-gradient(180deg, #eae6df, #dad5cc);
+  background: linear-gradient(180deg, #f2f2f2, #e4e4e4);
   border-bottom: 1px solid color-mix(in srgb, var(--espresso) 18%, transparent);
 }
 
@@ -1473,332 +1448,6 @@
   -webkit-text-stroke: 0.35px currentColor;
 }
 
-/* --- Fabric archive ------------------------------------------------------ */
-.archive {
-  /* Extra top room so fabric can stick up out of the pocket mouth.
-     Slight negative margin pulls the whole archive up toward the shelf. */
-  margin-top: calc(-1 * var(--grid-minor-step));
-  /* Top (after notebooks) doubled; bottom before manifesto nudged up a little. */
-  padding-block: clamp(64px, 10vh, 144px) clamp(56px, 10vh, 128px);
-}
-
-.archive-stage {
-  position: relative; /* offsetParent for the measured scrap offsets */
-  display: grid;
-  /* Pocket column ~2% over the prior 352px max; gap unchanged so the fabric
-     row keeps its measure and only the denim grows. */
-  grid-template-columns: minmax(228px, 359px) 1fr;
-  gap: clamp(24px, 3.3vw, 56px);
-  /* Bottoms share an edge; the scrap row then lifts via margin-bottom so
-     lined-up fabric sits 10% of pocket height above the denim hem. */
-  align-items: end;
-  /* Scrap-arc room; doubled with the notebooks → fabric breath. */
-  padding-block: clamp(48px, 7vh, 96px);
-}
-
-.pocket-wrap {
-  --pocket-thread: color-mix(in srgb, #c08c2c 68%, var(--parchment) 32%);
-  --pocket-thread-deep: color-mix(in srgb, #a87220 70%, var(--parchment) 30%);
-  --pocket-thread-hi: color-mix(in srgb, #e8c878 50%, var(--parchment) 50%);
-  position: relative; /* containing block for mat / stitch overlays */
-  width: 100%;
-  max-width: 359px; /* +2% over 352; spacing/gap unchanged */
-}
-
-/* --- Sewn on, not pasted on ---------------------------------------------- */
-
-/* Local mat dent + grid interruption: parchment plate under the denim kills
-   cutting-mat lines, with a soft espresso vignette for paper compression. */
-.pocket-mat {
-  position: absolute;
-  inset: -10% -8% -12% -8%;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(
-      ellipse 68% 62% at 50% 52%,
-      rgb(61 42 31 / 0.11) 0%,
-      rgb(61 42 31 / 0.05) 42%,
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 72% 68% at 50% 50%,
-      var(--parchment) 0%,
-      var(--parchment) 55%,
-      transparent 78%
-    );
-  -webkit-mask-image: url("/home/denim-pocket.webp");
-  mask-image: url("/home/denim-pocket.webp");
-  -webkit-mask-size: 92% 92%;
-  mask-size: 92% 92%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center 58%;
-  mask-position: center 58%;
-  filter: blur(10px);
-  opacity: 0.95;
-}
-
-/* Faint gather lines in the paper outside the sew. */
-.pocket-pucker {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  pointer-events: none;
-  overflow: visible;
-}
-
-.pocket-pucker path {
-  fill: none;
-  stroke: rgb(61 42 31 / 0.1);
-  stroke-width: 1.1;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.pocket {
-  position: relative;
-  z-index: 2; /* denim above the mat dent; scraps tuck behind via z-index */
-  display: block;
-  width: 100%;
-  height: auto;
-  /* 1px contact only — a larger soft shadow reads as floating/pasted. */
-  filter: drop-shadow(0 1px 0 var(--shadow-contact));
-}
-
-/* Paper grain multiplied onto the denim so it shares the mat's surface. */
-.pocket-grain {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  opacity: 0.07;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)' opacity='0.55'/%3E%3C/svg%3E");
-  -webkit-mask-image: url("/home/denim-pocket.webp");
-  mask-image: url("/home/denim-pocket.webp");
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-}
-
-/* `position` + size are load-bearing vs global `svg { width:0;height:0 }`. */
-.pocket-stitch {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 4;
-  pointer-events: none;
-  overflow: visible;
-}
-
-/* Soft inner shade along the sewn hem (sides + bottom), tucked under stitch. */
-.pocket-edge-shade {
-  fill: none;
-  stroke: rgb(28 18 12 / 0.42);
-  stroke-width: 7;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: blur(1.4px);
-}
-
-.pocket-stitch-thread,
-.pocket-stitch-holes,
-.pocket-stitch-highlight {
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 11 8 7 9;
-  stroke-dashoffset: 2;
-}
-
-.pocket-stitch-holes {
-  stroke: rgb(61 42 31 / 0.3);
-  stroke-width: 4.8;
-  transform: translate(0.6px, 1.8px);
-}
-
-.pocket-stitch-thread {
-  /* Gold bridged with parchment so thread isn't pure vector chrome. */
-  stroke: var(--pocket-thread);
-  stroke-width: 3.4;
-}
-
-/* Hairline light catch on the stitch crown. */
-.pocket-stitch-highlight {
-  stroke: var(--pocket-thread-hi);
-  stroke-width: 1.15;
-  transform: translate(-0.45px, -0.7px);
-  opacity: 0.75;
-}
-
-.pocket-stitch-thread--inner {
-  stroke: var(--pocket-thread-deep);
-  stroke-width: 2.6;
-  stroke-dasharray: 9 7 6 8;
-  stroke-dashoffset: 5;
-}
-
-.pocket-stitch-holes--inner {
-  stroke: rgb(61 42 31 / 0.2);
-  stroke-width: 3.6;
-  transform: translate(0.4px, 1.2px);
-}
-
-.pocket-stitch-highlight--inner {
-  stroke-width: 0.95;
-  stroke-dasharray: 9 7 6 8;
-  stroke-dashoffset: 5;
-  opacity: 0.65;
-}
-
-.pocket-stitch-thread--tack,
-.pocket-stitch-holes--tack,
-.pocket-stitch-highlight--tack {
-  stroke-dasharray: none;
-  stroke-dashoffset: 0;
-}
-
-.pocket-stitch-thread--tack {
-  stroke: var(--pocket-thread-deep);
-  stroke-width: 2.8;
-}
-
-.pocket-stitch-holes--tack {
-  stroke: rgb(61 42 31 / 0.28);
-  stroke-width: 4;
-  transform: translate(0.5px, 1.4px);
-}
-
-.pocket-stitch-highlight--tack {
-  stroke-width: 1;
-  opacity: 0.7;
-  transform: translate(-0.35px, -0.55px);
-}
-
-/* Deliberately NOT positioned. The scrap offsets are measured against
-   .archive-stage, and giving this row `position` would make it the scraps'
-   offsetParent instead — mixing two origins and short-changing every offset.
-   Stacking still works: .pocket is positioned with z-index 2, and positioned
-   descendants paint above non-positioned ones whatever the DOM order. */
-.scrap-row {
-  list-style: none;
-  /* Lined-up view: sit 10% of pocket height above the denim’s bottom line.
-     In-pocket start is unchanged — still measured to the pocket mouth in JS.
-     2px left margin scoots the whole row right on the desktop one-row view. */
-  margin: 0 0 calc(var(--pocket-h, 280px) * 0.1) 2px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  /* Span the full column: first scrap sits beside the pocket, last keeps the
-     right edge. The scraps reserve 4 x --scrap-gap of width between them (see
-     .scrap flex-basis), and space-between then distributes exactly that as
-     four even gaps — so they never overlap at any width. */
-  --scrap-gap: clamp(6px, 0.8vw, 12px);
-  justify-content: space-between;
-  width: 100%;
-  gap: 0;
-}
-
-/* Resting place is the row; the measured --dx/--dy shove each scrap back into
-   the pocket until the section scrolls into view. The --si term fans them out
-   in the pocket mouth so five scraps read as a stuffed handful, not one. */
-.scrap {
-  position: relative;
-  /* Clicking pins the label open, so the strip has to look like something you
-     can click. Hover alone used to be the only way in, which gave touch no
-     route to the labels at all. */
-  cursor: pointer;
-  /* Each textile takes a fixed share (--wf) of the row after gaps, and its
-     height falls out of its own aspect (--ar). Because the shares are derived
-     from aspect x reference-height, the rendered heights hold the reference
-     photograph's proportions at any container width, and the set always fits
-     without overlapping. Nothing is stretched: --ar is the textile's true
-     measured aspect. */
-  flex: 0 0 calc((100% - 4 * var(--scrap-gap, 16px)) * var(--wf, 0.2));
-  height: auto;
-  aspect-ratio: var(--ar, 0.5);
-  box-shadow: 0 3px 9px var(--shadow-object);
-  transform: translate(
-      calc(var(--dx, 0px) + (var(--si) - 2) * 17px),
-      var(--dy, 0px)
-    )
-    rotate(calc((var(--si) - 2) * 5deg)) scale(0.84);
-}
-
-/* .scrap.is-tip is still set by Home.tsx while a label is up, but deliberately
-   carries no styling — the label itself is the feedback, and brightening the
-   textile on top of it read as the strip lighting up rather than as a caption
-   appearing. Kept as a hook: it is the only state the tooltip exposes, since
-   the tip is reparented onto <body> and its opacity lives on Motion. */
-
-/* No negative margin any more: the textiles are sized as shares of the row,
-   so they fit side by side with a real gap instead of overlapping. */
-
-.scrap--photo {
-  background: transparent;
-  box-shadow: none;
-  overflow: visible;
-}
-
-/* No per-textile optical scales any more. The old --curtains 90% and --mesh
-   179% rules existed to undo transparent padding baked into the assets; the
-   assets are now trimmed to their alpha bounds, so every scrap fills its own
-   box exactly and the sizes come purely from --sh and --ar.
-
-   The mesh rule survives for material only: the kurti is sheer, so it
-   multiplies against the parchment instead of sitting on it. */
-.scrap--mesh .scrap-img {
-  mix-blend-mode: multiply;
-  filter: drop-shadow(0 2px 6px var(--shadow-soft));
-}
-
-.scrap-img {
-  display: block;
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center center;
-  pointer-events: none;
-  background: transparent;
-  /* Soft lift without a rectangular plate behind the textile. */
-  filter: drop-shadow(0 3px 8px var(--shadow-object));
-}
-
-/* Quieter paper slip than journal CTAs — follows the cursor from Home.tsx.
-   Parked on document.body while open so ancestor transforms don't steal
-   `position: fixed` from the viewport. Plate chrome shared above. */
-.scrap-tooltip {
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 40;
-  padding: 7px 11px;
-  color: var(--mono-secondary);
-  font-family: var(--font-mono);
-  font-weight: 400;
-  font-size: 12px;
-  letter-spacing: 0.03em;
-  text-transform: lowercase;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  box-shadow: 0 2px 8px var(--shadow-soft);
-  -webkit-text-stroke: 0.35px currentColor;
-}
-
-/* The transform above is only the pre-JS resting state. Once measured, Motion
-   (motion.dev) owns these transforms and writes them inline — see Home.tsx.
-   Deliberately no visibility gate: if measurement ever fails, --dx/--dy fall
-   back to 0 and the scraps simply rest in their row. Visible in the wrong
-   place is a far better failure than invisible. */
-
 /* --- Footer -------------------------------------------------------------- */
 .wt-foot {
   padding-block: clamp(32px, 6vh, 72px) 44px;
@@ -1850,56 +1499,6 @@
   }
   .jr-stage {
     height: 546px;
-  }
-}
-
-/* --- Fabric wraps to two rows -------------------------------------------- */
-/* 1249, not 1023: the single row only holds while it has room. Measured at
-   1280 the tallest strip is 1.02x the denim's height, at 1180 it is 0.90x and
-   by 1024 it has collapsed to 0.71x — weedy beside the pocket. So the archive
-   breaks to 3 + 2 as soon as one row stops earning its width.
-
-   The second row is not positioned by hand. Every strip is sized from the same
-   --wf3 basis, so the two remaining textiles come out to ~64% of the row and
-   centring them lands each within ~10px of the midpoint between two strips
-   above — they nest without a grid. One basis also means one height scale, so
-   all five stay in the reference photograph's proportions. */
-@media (max-width: 1249px) {
-  /* The base stage bottom-aligns its two columns, which is right when the
-     fabric is a single row of roughly the denim's height. Once it wraps to
-     two rows the block is far taller, so bottom-aligning shoved the whole
-     grid up above the pocket. Centre the two columns against each other so
-     the denim sits level with the middle of the fabric block. */
-  .archive-stage {
-    align-items: center;
-  }
-
-  .scrap-row {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    /* The base rule lifts the row by 10% of the denim height so a single row
-       sits on the hem line. Centring a box with that margin still on it puts
-       the fabric half the margin too high — measured 17px — so it goes here. */
-    margin-bottom: 0;
-    /* Capped, and that cap is load-bearing. Three strips sharing the full
-       column are far wider each than five sharing it, so an uncapped row made
-       the textiles GROW on wrapping — 1.48x the denim at 1180px against 1.17x
-       on desktop. 530px puts the tallest strip at ~1.16x, matching desktop. */
-    width: min(100%, 530px);
-    margin-inline: auto;
-    --scrap-gap: 18px;
-    gap: 22px var(--scrap-gap);
-  }
-
-  .scrap {
-    /* Was an EQUAL third-of-a-row slot for all five. With aspects from 0.308
-       to 0.555 that forced wildly unequal heights — the broken part. */
-    flex: 0 0 calc((100% - 2 * var(--scrap-gap, 18px)) * var(--wf3, 0.33));
-    width: auto;
-    height: auto;
-    aspect-ratio: var(--ar, 0.5);
   }
 }
 
@@ -2019,32 +1618,6 @@
     height: auto;
     aspect-ratio: 300 / 400;
   }
-
-  /* Fabric: pocket above, scraps stacked in a column below. */
-  .archive-stage {
-    grid-template-columns: 1fr;
-    gap: 36px;
-    justify-items: center;
-    padding-block: clamp(64px, 10vh, 128px);
-  }
-  .pocket-wrap {
-    max-width: min(330px, 72vw); /* +2%, gap unchanged */
-  }
-  /* Stacked: the row now spans the page rather than a grid column. Same 530px
-     cap as the wrap tier so the strips do not change size at this boundary. */
-  .scrap-row {
-    width: min(92vw, 530px);
-    /* Centred on the page once the fabric sits below the denim. The base rule
-       carries a 2px left margin for the desktop one-row view, which offsets
-       the block here — so both margins are reset rather than just the left. */
-    margin-inline: auto;
-    margin-bottom: 0;
-    justify-self: center;
-  }
-  .scrap:not(:first-child) {
-    margin-left: 0;
-    margin-top: 0;
-  }
 }
 
 @media (max-width: 767px) {
@@ -2120,11 +1693,6 @@
   .jr-img--open {
     display: none;
   }
-  /* .scrap-tooltip is NOT hidden here any more. It was grouped with the spill
-     suppression back when hover was the only way to raise it, which on a phone
-     meant never — so the five labels were simply unreachable on touch. Tapping
-     a strip now pins its label, so it has to be able to show. */
-
   /* The open image is display:none here, so the cross-fade must not run —
      otherwise tapping a journal fades the cover to nothing with no
      replacement behind it. */
@@ -2165,30 +1733,12 @@
   .deck-annotation {
     left: 0;
   }
-
-  /* Phone: single stacked column — no wrap, no overlap. */
-  .scrap-row {
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: center;
-    width: auto;
-    gap: 16px;
-  }
-
-  .scrap {
-    flex: 0 0 auto;
-    width: auto;
-    height: calc(var(--pocket-h, 280px) * 1.15 * var(--sh, 1));
-    max-height: none;
-    aspect-ratio: var(--ar, 0.5);
-  }
 }
 
 /* ==========================================================================
    Reduced motion — arrive in place, opacity only.
    ========================================================================== */
-/* Motion now owns the notebook and fabric choreography, so reduced motion for
+/* Motion now owns the notebook choreography, so reduced motion for
    those is enforced in JS (each animate() call drops to duration 0) rather than
    here — a CSS rule cannot cancel a JS-driven animation. What remains below is
    only the pre-JS resting state and the transitions CSS still owns. */
@@ -2197,10 +1747,5 @@
   .jr-shadow,
   .deck-nav {
     transition: none !important;
-  }
-
-  /* Scraps sit in the row from the start; Home.tsx also skips the timeline. */
-  .scrap {
-    transform: rotate(var(--sr));
   }
 }

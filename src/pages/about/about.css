@@ -1,9 +1,9 @@
 /* ==========================================================================
    About — Design Manifesto
-   Section lives on the homepage below the fabric archive; chrome comes from
+   Section lives on the homepage below the concept decks; chrome comes from
    home.css. This file only lays out the manifesto + portrait.
 
-   Cinematic role: quiet close-up after the fabric spectacle. Hero keeps the
+   Cinematic role: quiet close-up after the work. Hero keeps the
    Forma display climax; this section lets her own handwriting take the lead.
    ========================================================================== */
 
@@ -11,16 +11,16 @@
   --mf-title-u: clamp(1.206px, 0.1305vw + 0.72px, 1.8px);
   max-width: var(--page-max);
   margin-inline: auto;
-  /* Soft pull into the archive afterglow — intimate beat, not a new chapter. */
+  /* Soft pull up toward the decks — intimate beat, not a new chapter. */
   margin-top: calc(-1 * var(--grid-minor-step));
   padding-inline: var(--page-gutter);
-  /* Top pad owns fabric → manifesto breath (nudged up a little). */
+  /* Top pad owns the breath between the decks and the manifesto. */
   padding-block: clamp(56px, 8vh, 112px) clamp(48px, 8vh, 100px);
   /* Clear the sticky worktable nav when scrolled into via the ABOUT link. */
   scroll-margin-top: calc(var(--nav-height) + 12px);
 }
 
-/* Same table edge as shelf / archive — not a centered CMS island. */
+/* Same table edge as the shelf — not a centered CMS island. */
 .ab-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

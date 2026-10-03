@@ -4,7 +4,7 @@ import { animate } from "motion";
 import { SPRING_HEAVY, prefersReducedMotion } from "./interactions.js";
 
 /* Two speculative concept decks, each shown in a small macOS window sitting on
-   the worktable between the notebooks and the fabric. The window plays the
+   the worktable between the notebooks and the manifesto. The window plays the
    deck's PDF export as a slideshow — the slides are pre-rendered WebP frames in
    public/home/decks/<id>/ (regeneration: scripts/deck_slides/README.md) — and the whole window is the
    link into the full HTML deck. The traffic lights are decorative; only the
