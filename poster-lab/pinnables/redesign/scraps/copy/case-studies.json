@@ -1,0 +1,1128 @@
+{
+ "surprise-rail": [
+  [
+   "li",
+   "WORK"
+  ],
+  [
+   "li",
+   "ABOUT"
+  ],
+  [
+   "li",
+   "RESUME"
+  ],
+  [
+   "p",
+   "Case study"
+  ],
+  [
+   "h1",
+   "Designing Surprise Rail for HBO Max"
+  ],
+  [
+   "p",
+   "Curiosity didn’t kill the cat. It got more clicks. Surprise Rail is a new themed rail for HBO Max, built on tiles that hide the key art and sell the title in three words. A viewer with nothing in mind now has something to be curious about."
+  ],
+  [
+   "p",
+   "🔗 Figma | 🔗 Prototype"
+  ],
+  [
+   "p",
+   "Working prototype."
+  ],
+  [
+   "p",
+   "01 — Problem"
+  ],
+  [
+   "h2",
+   "Viewers want out of indecision."
+  ],
+  [
+   "p",
+   "Summer 2025 Findings"
+  ],
+  [
+   "li",
+   "2 min users spent looking for a title"
+  ],
+  [
+   "li",
+   "5 of 7 leave without playback"
+  ],
+  [
+   "p",
+   "HBO Max had plenty to watch, but viewers still struggled to choose. Key art or a synopsis alone wasn’t enough. There needed to be a better reason to get users to stop scrolling."
+  ],
+  [
+   "p",
+   "02 — Insights"
+  ],
+  [
+   "h2",
+   "Surprise works because there is the potential for something great."
+  ],
+  [
+   "p",
+   "I was walking through the Strand bookstore and saw a new display table: Blind Date with a Book. You don’t get the cover, but you get clues that let you say yes or no. I thought, “What if I could apply this idea to a rail?”"
+  ],
+  [
+   "p",
+   "03 — Decisions"
+  ],
+  [
+   "h2",
+   "Hidden tiles with clues on them. But what would they look like?"
+  ],
+  [
+   "h3",
+   "Scattered tiles or one dedicated rail?"
+  ],
+  [
+   "p",
+   "Rejected: Testing showed it broke people’s mental model. They couldn’t tell why titles were hidden. A skip-level review flagged the film-reel motif as overdone and not premium enough for HBO Max."
+  ],
+  [
+   "p",
+   "Chosen: One dedicated rail. One pattern to learn. Rest of browse stays familiar."
+  ],
+  [
+   "h3",
+   "Solid black or frosted glass?"
+  ],
+  [
+   "p",
+   "Rejected: Solid black. It was boring and gave no clue that anything was hidden."
+  ],
+  [
+   "p",
+   "Chosen: Frosted glass. Cause ya’ gotta tease a little. Testers could tell there was a title underneath. It was visually intriguing and borrowed design language of the HBO Max glass."
+  ],
+  [
+   "h3",
+   "Design Breakdown"
+  ],
+  [
+   "li",
+   "Original Key Art"
+  ],
+  [
+   "li",
+   "01 · Layer Blur"
+  ],
+  [
+   "li",
+   "02 · Black Opacity (54-75% depending on artwork)"
+  ],
+  [
+   "li",
+   "03 · Frosted Glass (angular + soft white light)"
+  ],
+  [
+   "p",
+   "Iridescent Gradient"
+  ],
+  [
+   "p",
+   "04 — Behavior"
+  ],
+  [
+   "h2",
+   "AI tailors clues to the page."
+  ],
+  [
+   "p",
+   "AI generates clues from three inputs: title metadata, the subpage it appears, and a copy guide with writing rules."
+  ],
+  [
+   "p",
+   "AI makes the idea scalable. Instead of writing every variation by hand, the system generates context-specific clues across the catalog."
+  ],
+  [
+   "p",
+   "The secret sauce is that the subpage indicates what the user wants. If the user is on the Comedy page, they want comedic themes. I adapted clues based on the user’s intent at time of browsing."
+  ],
+  [
+   "p",
+   "Chosen: 2-3 word thematic descriptors. Working with UX research, we found they were easiest to scan and had the greatest impact on decision-making."
+  ],
+  [
+   "p",
+   "05 — What changed"
+  ],
+  [
+   "h2",
+   "Testing killed the idea I liked."
+  ],
+  [
+   "p",
+   "Only titles within the subpage category can get recommended. I changed the rail heading based on the subpage so users know to expect something different."
+  ],
+  [
+   "p",
+   "“Blind Date with a [theme]” was a name I was attached to. It landed with 18–25s, but was misunderstood by older viewers. They read it literally and expected a movie with dating involved."
+  ],
+  [
+   "p",
+   "Rejected: “Blind Date with a [theme].” It didn’t land for all ages. It overran the title’s fixed width and took up two lines, which was atypical in the app."
+  ],
+  [
+   "p",
+   "Chosen: “Surprise [theme].” Short and sweet. If you were on the Home page, you would see this as a general “Surprise For Me” rail."
+  ],
+  [
+   "p",
+   "06 — Results"
+  ],
+  [
+   "h2",
+   "Not shipped. Still measurable."
+  ],
+  [
+   "p",
+   "Designed across TV, desktop, and mobile. The concept was tested and presented to product, but it wasn’t picked up. If it was shipped, here are the metrics I would measure:"
+  ],
+  [
+   "li",
+   "Reveal Rate # of clicks total tiles viewed Did the clue earn a click?"
+  ],
+  [
+   "li",
+   "Play After Reveal # of plays total tiles clicked Did the click earn a play?"
+  ],
+  [
+   "p",
+   "I’d work with engineering to collect data for both events. Then with product to determine if we should keep the rail, modify it, or retire it."
+  ],
+  [
+   "p",
+   "The Surprise Rail started as an idea. Research shaped it into a scalable, page-aware system that turned indecision into curiosity and curiosity into clicks."
+  ],
+  [
+   "p",
+   "🔗 Figma | 🔗 Prototype"
+  ]
+ ],
+ "mixr": [
+  [
+   "li",
+   "WORK"
+  ],
+  [
+   "li",
+   "ABOUT"
+  ],
+  [
+   "li",
+   "RESUME"
+  ],
+  [
+   "p",
+   "Case study"
+  ],
+  [
+   "h1",
+   "Building Mixr, a DJ app"
+  ],
+  [
+   "p",
+   "DJ software can be intimidating. Mixr makes remixing easy by using familiar patterns from video editing apps. Building the app was an experiment in designing by building: to see if I could close the design and engineering gap by designing as I go."
+  ],
+  [
+   "p",
+   "🔗 Read my Mixr journey on X"
+  ],
+  [
+   "p",
+   "Recorded on simulator device."
+  ],
+  [
+   "p",
+   "01 — Problem"
+  ],
+  [
+   "h2",
+   "DJing shouldn’t require you being a DJ."
+  ],
+  [
+   "p",
+   "I wanted to learn to DJ, but I never learned music theory, played an instrument, or remixed a song. I did know how to code. So instead of buying a controller, I started building an app."
+  ],
+  [
+   "h3",
+   "Question the Whole Project Answers"
+  ],
+  [
+   "p",
+   "Can coding agents help me design and build software for something I know nothing about?"
+  ],
+  [
+   "p",
+   "02 — Ideation"
+  ],
+  [
+   "h2",
+   "Choosing the right references."
+  ],
+  [
+   "h3",
+   "More people have used video editors than DJ software."
+  ],
+  [
+   "p",
+   "I wanted to give beginners a familiar place to start. The reference was video editors like CapCut, Final Cut Pro, Premiere Pro, and GarageBand."
+  ],
+  [
+   "p",
+   "These products share a familiar interaction model: import media, arrange clips on a timeline, edit them directly, preview, and undo."
+  ],
+  [
+   "p",
+   "“As simple as CapCut” was in the first prompt. It gave me actions like split, duplicate, and delete that I needed to incorporate into timeline editing."
+  ],
+  [
+   "p",
+   "With a background in video editing, this was the editor I knew best. Drag-and-drop and the SFX (sound effects) library were all inspired by Premiere Pro."
+  ],
+  [
+   "p",
+   "Taught me to use the music’s unit rather than the clock’s. Transitions are measured in beats rather than seconds so timing aligns with tempo."
+  ],
+  [
+   "h3",
+   "Asking AI for a starting point."
+  ],
+  [
+   "p",
+   "I started by asking ChatGPT for mocks. I find it has the best image generation capabilities and doesn’t return UI that looks AI-generated."
+  ],
+  [
+   "figcaption",
+   "Day 1. Everything below is a downstream of this image."
+  ],
+  [
+   "p",
+   "I knew what I wanted to change. “AI Suggestions” was a floating button and belonged in the effects tray. It should also be called “Auto” like iPhone photo editing. I had no idea what the “Mixr” button on the top would do, so it had to go."
+  ],
+  [
+   "p",
+   "But the layout was right, and I never looked back. Controls on the sides, timeline in the middle, effects along the bottom. It felt intuitive because it resembled video editing software, not a DJ’s."
+  ],
+  [
+   "p",
+   "The interface, today’s build"
+  ],
+  [
+   "p",
+   "Recorded on simulator device. Each waveform gets its own color from the brand palette."
+  ],
+  [
+   "p",
+   "03 — Behavior"
+  ],
+  [
+   "h2",
+   "Making it feel familiar."
+  ],
+  [
+   "h3",
+   "Trying not to get sued."
+  ],
+  [
+   "p",
+   "I considered copyright before designing anything. Mixr can’t stream from a library like Spotify, so the whole thing is built around import and export. You bring your own songs in and save your remix out."
+  ],
+  [
+   "h3",
+   "Clip editing takes effort to feel effortless."
+  ],
+  [
+   "p",
+   "Deciding how drag-and-drop behaves took two days and was the hardest design work in the project."
+  ],
+  [
+   "p",
+   "I took inspiration from Premiere Pro (thank you, competitive research). When a clip is dropped in the middle, it splits the existing clip and gets sandwiched inside. When it’s dropped within 10px of the start or end, it snaps to the edge."
+  ],
+  [
+   "p",
+   "Recorded on simulator device."
+  ],
+  [
+   "p",
+   "Rebuilt in CSS from MixrTimeline.swift."
+  ],
+  [
+   "p",
+   "04 — Design"
+  ],
+  [
+   "h2",
+   "Subtle nuances elevated the design."
+  ],
+  [
+   "h3",
+   "Tiny imperfections make the glass feel alive."
+  ],
+  [
+   "p",
+   "I varied bubble placement in the effects cards and let glow reflections spill onto neighboring cards. These subtle differences let the glass breathe and feel alive."
+  ],
+  [
+   "p",
+   "Rebuilt in CSS from EffectCard.swift. Auto has stronger colors to recommend it as a starting point."
+  ],
+  [
+   "h3",
+   "Optical alignment over mathematical, always."
+  ],
+  [
+   "p",
+   "Each card gets a different glow strength, because darker colors appear dimmer and I wanted visual cohesion. Icons in the clip-editing toolbar get different sizes and vertical offsets because their shapes carry different visual weight."
+  ],
+  [
+   "p",
+   "Each effect gets its own slider and/or preset option"
+  ],
+  [
+   "p",
+   "Recorded on simulator device."
+  ],
+  [
+   "li",
+   "Reverb Adds space as if in large room or hall."
+  ],
+  [
+   "li",
+   "Echo Repeats as if shouting into a canyon."
+  ],
+  [
+   "li",
+   "Pitch Sound higher like a chipmunk or lower like a man."
+  ],
+  [
+   "li",
+   "Flanger Adds a sweeping, whooshing sound."
+  ],
+  [
+   "li",
+   "Blur Soft and muffled, as if underwater."
+  ],
+  [
+   "p",
+   "Other effects I considered were Warmth, Chorus, and Bass Boost. I chose this set because they each had distinct impact on audio and allowed room for experimentation."
+  ],
+  [
+   "h3",
+   "Colors carry across components."
+  ],
+  [
+   "p",
+   "One color per track. The same color follows across the waveform, volume slider, transition settings, and segmented control. This helps users understand the components go together."
+  ],
+  [
+   "p",
+   "Waveform, Transition duration control, Volume slider"
+  ],
+  [
+   "p",
+   "Tip: Create a design system before anything else. Tokenize colors to reference them easily throughout building."
+  ],
+  [
+   "p",
+   "05 — Coding Agents"
+  ],
+  [
+   "h2",
+   "How I worked with coding agents."
+  ],
+  [
+   "h3",
+   "I religiously used Plan Mode."
+  ],
+  [
+   "p",
+   "For big tasks, I used Plan Mode. No code changes until I reviewed and approved the plan. I used this heavily for my last two phases: responsive layout and accessibility testing. Auditing stopped agents from undoing previous work and changing components I already finalized."
+  ],
+  [
+   "figcaption",
+   "iPad"
+  ],
+  [
+   "figcaption",
+   "Mac laptop"
+  ],
+  [
+   "h3",
+   "One focus per agent."
+  ],
+  [
+   "p",
+   "I started a new chat for each major component like effects cards, drag-and-drop, SFX, etc. Each agent had less to remember. It stayed focused and learned that component’s behavior in depth."
+  ],
+  [
+   "h3",
+   "Skills and lint rules."
+  ],
+  [
+   "p",
+   "An agent is a jack of all trades, master of none. Unless you use skills. Skills train agents to become experts at certain tasks. I used skills for SwiftUI and motion. I created a custom skill for Auto remixing so my agent has a DJ brain."
+  ],
+  [
+   "p",
+   "Lint rules are gates the agent must always pass. Everytime I corrected an agent or intervened its output, I turned it into a lint rule so it never made the same mistake again."
+  ],
+  [
+   "p",
+   "06 — Results"
+  ],
+  [
+   "h2",
+   "Finished building, waiting approval."
+  ],
+  [
+   "p",
+   "The app is fully built. I’m now waiting for approval from the Apple Developer Program to release TestFlight Beta. Everything so far reflects my own judgment. The real test is whether other people can use and understand Mixr."
+  ],
+  [
+   "p",
+   "The intimidating part of learning a new skill is the interface scaring you away. Building Mixr taught me anyone can do it: not just DJing, but building an app. So get on a coding agent and make something that excites you!"
+  ],
+  [
+   "p",
+   "🔗 Read my Mixr journey on X | 🎉 Fun Fact This is also my first time coding in Swift! Coding agents are just that cool."
+  ],
+  [
+   "h3",
+   "Get Mixr Beta"
+  ],
+  [
+   "p",
+   "Sign up for the mailing list to get Mixr Beta when it’s released."
+  ]
+ ],
+ "reasons-to-watch": [
+  [
+   "li",
+   "WORK"
+  ],
+  [
+   "li",
+   "ABOUT"
+  ],
+  [
+   "li",
+   "RESUME"
+  ],
+  [
+   "p",
+   "Case study"
+  ],
+  [
+   "h1",
+   "Designing personalized Reasons to Watch for HBO Max"
+  ],
+  [
+   "p",
+   "A synopsis tells you what a title is. It never tells you why it is for you. Reasons to Watch replaces the synopsis with a 135-character pitch written for one viewer — and the interesting part was never the model. It was deciding what the system was allowed to claim."
+  ],
+  [
+   "p",
+   "🔗 Agent guide | 🔗 Wireframes | 🔗 POC board"
+  ],
+  [
+   "p",
+   "The surface"
+  ],
+  [
+   "p",
+   "Succession"
+  ],
+  [
+   "p",
+   "Drama · Series"
+  ],
+  [
+   "p",
+   "0 / 135 characters"
+  ],
+  [
+   "p",
+   "Both strings are real, straight out of the POC. The personalized one is written for a viewer who liked The Righteous Gemstones — and it is the shorter of the two."
+  ],
+  [
+   "p",
+   "01 — Problem"
+  ],
+  [
+   "h2",
+   "One reason per segment scales. It cannot explain one person."
+  ],
+  [
+   "p",
+   "What we were working from"
+  ],
+  [
+   "li",
+   "+4% clarity on why a title was recommended"
+  ],
+  [
+   "li",
+   "17 affinity groups covering the whole audience"
+  ],
+  [
+   "p",
+   "Reasons to Watch appears when a viewer focuses on a title. Instead of repeating the synopsis, it argues for the title. Internal research had already shown the pattern helped: it lifted clarity around why something was being recommended by 4%."
+  ],
+  [
+   "p",
+   "The scalable version of that idea assigned every viewer to one of 17 affinity groups and wrote one piece of copy per group. It was practical for cost and for a catalog this size. It also flattened taste. The same person can want a prestige drama, a competitive cooking show and a comfort sitcom in one week, for three completely unrelated reasons."
+  ],
+  [
+   "p",
+   "Segmented copy · The Gilded Age"
+  ],
+  [
+   "p",
+   "From Julian Fellowes, this sprawling period drama chronicles the great conflict between old and new in New York's glittering Gilded Age."
+  ],
+  [
+   "p",
+   "A gripping portrayal of wealth, power, and the societal change in old New York through the lens of layered, elite families."
+  ],
+  [
+   "p",
+   "Ambitious women navigate intricate relationships and societal pressures in a fiercely stratified 19th-century New York."
+  ],
+  [
+   "p",
+   "Witness the sweeping transformation of New York through the eyes of powerful families during a dramatic social upheaval."
+  ],
+  [
+   "figcaption",
+   "Three segments, three angles on one title — and still one description per segment. Everyone inside a group gets the same sentence."
+  ],
+  [
+   "p",
+   "The brief I set myself: write for one viewer rather than their segment, without breaking the 135-character limit, Max's voice, or the spoiler rules."
+  ],
+  [
+   "p",
+   "02 — Insight"
+  ],
+  [
+   "h2",
+   "A name-drop looks personal. A connection has to be earned."
+  ],
+  [
+   "p",
+   "Two signals were available, and they are not interchangeable. Watch history is broad and behavioral — it shows what someone puts on. Explicit likes are narrow and endorsed — they show what someone would defend. The first model I built used history alone, and it name-dropped titles a viewer had merely watched, sometimes titles they had abandoned halfway."
+  ],
+  [
+   "p",
+   "That version tested worse than the generic copy. Not because the writing was weaker, but because a wrong name-drop is louder than no name-drop. It reads as a system claiming to know you and getting it wrong."
+  ],
+  [
+   "p",
+   "So: history infers the pattern, likes earn the reference. A previous title may be named only when the analyst scores the connection above 85 — a specific, defensible link, not \"both are dramas.\""
+  ],
+  [
+   "p",
+   "Personalization was never the name-drop. It was the explanation of fit."
+  ],
+  [
+   "p",
+   "03 — Decisions"
+  ],
+  [
+   "h2",
+   "Three decisions turned a prompt into a system."
+  ],
+  [
+   "h3",
+   "Write a pitch, not a summary."
+  ],
+  [
+   "p",
+   "The first prompts produced accurate plot summaries. They described the title correctly and gave no one a reason to choose it. I reframed the task three times before it landed — each reframing was a real rewrite of the brief, not a wording tweak."
+  ],
+  [
+   "li",
+   "135-character summary Read like the synopsis it was meant to replace."
+  ],
+  [
+   "li",
+   "Recommendation More directional, still too broad to be persuasive."
+  ],
+  [
+   "li",
+   "Reason they could like it Closer. Still hedged."
+  ],
+  [
+   "li",
+   "135-character pitch Chosen. \"Pitch\" is the only one of the four that implies you have to win someone over."
+  ],
+  [
+   "h3",
+   "Use history for patterns. Use likes for permission."
+  ],
+  [
+   "p",
+   "The threshold is a dial, not a law. Set it lower and the copy references familiar titles constantly and cheapens them; set it higher and it almost never earns one. 85 was where the references stopped feeling automatic in my test set."
+  ],
+  [
+   "h3",
+   "One agent was doing too many jobs."
+  ],
+  [
+   "p",
+   "A single prompt had to research the title, infer taste, write the copy, enforce the product rules and judge its own work. The output stayed generic and quietly missed specifications, and when it failed there was no way to tell which job had failed."
+  ],
+  [
+   "p",
+   "04 — Behavior"
+  ],
+  [
+   "h2",
+   "Every sentence traces back to the decision that made it."
+  ],
+  [
+   "p",
+   "Splitting the work was not about accuracy. It was about diagnosis. Once each stage returned a structured handoff, a weak sentence had an address: a bad connection is an analysis problem, flat language is a writing problem, a broken character count is an editing problem. Each one gets tuned without disturbing the others."
+  ],
+  [
+   "figcaption",
+   "Handoffs are structured, not prose. The two annotated paths are the constraints that took the longest to get right."
+  ],
+  [
+   "p",
+   "The four agents, in full"
+  ],
+  [
+   "p",
+   "Builds a picture of the viewer from how they actually watch, then finds the one connection it can defend."
+  ],
+  [
+   "li",
+   "Recommended title"
+  ],
+  [
+   "li",
+   "Watch history"
+  ],
+  [
+   "li",
+   "Liked list"
+  ],
+  [
+   "li",
+   "Title metadata — cast, creators, ratings"
+  ],
+  [
+   "li",
+   "Two biggest affinity groups"
+  ],
+  [
+   "li",
+   "Genre, theme, tone and structure overlap"
+  ],
+  [
+   "li",
+   "Notable differences"
+  ],
+  [
+   "li",
+   "One linked title + connection score"
+  ],
+  [
+   "p",
+   "You are a pattern analysis assistant for a personalized TV/movie blurb writer. Your job is to infer what types of content the user consistently enjoys, understand why they watch."
+  ],
+  [
+   "p",
+   "Writes the 135-character pitch, in the mood the viewer already reaches for."
+  ],
+  [
+   "li",
+   "Analysis from agent 01"
+  ],
+  [
+   "li",
+   "Mood and tone led, matched to the viewer"
+  ],
+  [
+   "li",
+   "Names a previous title only above a connection score of 85"
+  ],
+  [
+   "li",
+   "Three drafts, three different angles"
+  ],
+  [
+   "p",
+   "You are a friend who is really good at making recommendations. Based on the user's emotional taste and past favorites, craft a compelling 135-character recommendation for a show or film that fits their vibe."
+  ],
+  [
+   "p",
+   "Brings the draft inside the product rules, and changes nothing else."
+  ],
+  [
+   "li",
+   "Draft blurb"
+  ],
+  [
+   "li",
+   "Metadata for the recommended title"
+  ],
+  [
+   "li",
+   "135 characters, after editing"
+  ],
+  [
+   "li",
+   "Friendly and conversational"
+  ],
+  [
+   "li",
+   "No award or network names"
+  ],
+  [
+   "li",
+   "Never names the title directly"
+  ],
+  [
+   "li",
+   "No exclamation points"
+  ],
+  [
+   "p",
+   "You are a professional TV blurb editor. Your job is to make minor edits to the 135-character blurb to meet the rules. Do NOT make any other changes. If the blurb is already good, leave it as is."
+  ],
+  [
+   "p",
+   "Scores the three candidates and picks the one worth shipping."
+  ],
+  [
+   "li",
+   "Three edited blurbs"
+  ],
+  [
+   "li",
+   "Analysis from agent 01"
+  ],
+  [
+   "li",
+   "Creativity — would it stand out among similar recommendations?"
+  ],
+  [
+   "li",
+   "Informativeness — does it say what to expect?"
+  ],
+  [
+   "li",
+   "Creativity breaks a tie"
+  ],
+  [
+   "p",
+   "You are a professional TV blurb critic. Each blurb should be scored from 1 (lowest) to 5 (highest) on creativity and informativeness. If two are close, use creativity as a tiebreaker."
+  ],
+  [
+   "figcaption",
+   "Rebuilt from the agent guide. Each slide is the brief one agent works to — and the reason a failure has exactly one owner."
+  ],
+  [
+   "p",
+   "Design engineering prototype · trace one output"
+  ],
+  [
+   "p",
+   "Step through a real run for Succession, written for a viewer who liked The Righteous Gemstones."
+  ],
+  [
+   "li",
+   "01 Pattern Analyst Reads the history as family-power drama with a vicious comic streak, then looks for the one title it can defend naming. affinities Emmy-winning prestige drama · provocative, boundary-pushing comedy overlap family power struggle, vicious comedy, inheritance as weapon new corporate rather than religious setting linked The Righteous Gemstones — connection 91"
+  ],
+  [
+   "li",
+   "02 Blurb Writer 91 clears the gate, so The Righteous Gemstones may be named. Three drafts, deliberately different angles. A mood A family that mistakes cruelty for intimacy, and jokes for love. B connection Love the chaos of The Righteous Gemstones? Its corporate cousin is a vicious fight for Daddy's love… C image A birthday party staged as a hostile takeover."
+  ],
+  [
+   "li",
+   "03 Editor Applies the product rules. Draft B keeps its connection and gains the italic title reference; it was already inside 135. changes italicised The Righteous Gemstones ; no other change needed"
+  ],
+  [
+   "li",
+   "04 Critic Scores each on creativity and informativeness. B wins on informativeness — it is the only one that says what the show is as well as how it feels. A 4 / 2 B 4 / 5 C 5 / 2"
+  ],
+  [
+   "p",
+   "Final reason"
+  ],
+  [
+   "p",
+   "0 / 135 characters"
+  ],
+  [
+   "p",
+   "This walkthrough is a recorded run, replayed deterministically. A live one is at the end of the page."
+  ],
+  [
+   "h3",
+   "The editor is the design system"
+  ],
+  [
+   "p",
+   "Most of what makes the copy sound like Max lives in one agent. These are product rules, not style preferences — several exist because legal or brand would reject the alternative, and every one of them started as something the model kept doing wrong."
+  ],
+  [
+   "li",
+   "Length 135 characters, after editing"
+  ],
+  [
+   "li",
+   "Naming Never \"this show\", never the title itself"
+  ],
+  [
+   "li",
+   "Awards No Emmy, Golden Globe or HBO — use \"critically acclaimed\""
+  ],
+  [
+   "li",
+   "References Full title, italicised, one maximum"
+  ],
+  [
+   "li",
+   "Punctuation No exclamation points. No em dashes."
+  ],
+  [
+   "li",
+   "Presumption No \"If you enjoy…\", no \"You love…\""
+  ],
+  [
+   "li",
+   "Rhythm No three-adjective stacks. No one-to-three word sentences."
+  ],
+  [
+   "li",
+   "Banned words — with one exception Never \"grit\" or \"chess\". Never \"delicious\" unless the title is genuinely culinary."
+  ],
+  [
+   "p",
+   "That last exception is the one I point at when someone asks whether the rules are real. The pitch for Selena + Chef ends \"…all her sassy, competitive fire in a delicious 20-minute duel.\" The word survives editing because the show is about cooking. A rule with a working exception is a spec; a rule without one is a filter."
+  ],
+  [
+   "p",
+   "05 — What changed"
+  ],
+  [
+   "h2",
+   "\"Personalized\" was too easy a bar to clear."
+  ],
+  [
+   "p",
+   "Everything above could be true and the feature could still not be worth shipping. Personalized copy will always beat generic copy when the reader knows which is which. The only honest question was whether it beat the default when nobody knew which was which."
+  ],
+  [
+   "p",
+   "I worked with design technologist Travis Swan to build an internal evaluation tool. Participants entered their own watched and liked titles, then compared default copy against generated copy blind. After each choice the tool asked why — plot and theme balance, a familiar connection, attention, or a sense that the writer understood the title."
+  ],
+  [
+   "figcaption",
+   "01 · Participants supplied their own viewing context."
+  ],
+  [
+   "figcaption",
+   "02 · Source labels stayed hidden until after the choice."
+  ],
+  [
+   "p",
+   "Design engineering prototype · blind comparison"
+  ],
+  [
+   "p",
+   "Which would better help you decide whether to watch The Gilded Age ? Sources stay hidden until you pick."
+  ],
+  [
+   "p",
+   "From Julian Fellowes, this sprawling period drama chronicles the great conflict between old and new in New York's glittering Gilded Age."
+  ],
+  [
+   "p",
+   "Glamorous old vs. new money drama. Its character depth and social navigation echo Succession 's power plays, offering a compelling historical clash."
+  ],
+  [
+   "p",
+   "The real tool asked why before revealing either source. That order matters: reasons given after the reveal are rationalisations."
+  ],
+  [
+   "p",
+   "The tool took weeks to build, and I did not want to wait weeks for signal. While it was in development I ran the same comparison asynchronously in a spreadsheet — uglier, slower to analyze, and it answered the question a month earlier."
+  ],
+  [
+   "figcaption",
+   "The stopgap. Same question, no interface."
+  ],
+  [
+   "p",
+   "Personalized output · three real examples"
+  ],
+  [
+   "p",
+   "Talented chefs battle for the chance to take down Chef Bobby Flay."
+  ],
+  [
+   "p",
+   "As if Monica Geller from Friends got her own cooking show. All her sassy, competitive fire in a delicious 20-minute duel."
+  ],
+  [
+   "p",
+   "A bitingly funny drama series exploring themes of power and family through the eyes of an aging media mogul and his four grown children."
+  ],
+  [
+   "p",
+   "Love the chaos of The Righteous Gemstones ? Its corporate cousin is a vicious fight for Daddy's love where the jokes cut like glass."
+  ],
+  [
+   "p",
+   "The creators of Game of Thrones bring another epic series of power, politics, and family feuds. It's Succession with dragons."
+  ],
+  [
+   "figcaption",
+   "Counts are measured from the rendered text, not written by hand. Every generated line lands inside 135. The incumbent copy for Succession does not."
+  ],
+  [
+   "h3",
+   "What the prompts lost along the way"
+  ],
+  [
+   "p",
+   "The agent guide keeps every rejected phrasing, because each one failed for a reason worth remembering."
+  ],
+  [
+   "li",
+   "\"You are a blurb writer\" Accurate and impersonal. Produced catalog copy."
+  ],
+  [
+   "li",
+   "\"You are a friend of the user\" Personal, and it started using slang. Max does not use slang."
+  ],
+  [
+   "li",
+   "\"You are a friend who is really good at making recommendations\" Chosen. Warmth without the register slipping."
+  ],
+  [
+   "li",
+   "Critic scores \"Personalized\" and \"Emotional Appeal\" Killed. The writer produced three near-identical drafts, so the critic had nothing to choose between. Fixed upstream instead, by demanding three distinct angles."
+  ],
+  [
+   "li",
+   "Longer, more detailed agent prompts Killed. Past a certain length the copy reads as constrained — it sounds like something obeying rules."
+  ],
+  [
+   "p",
+   "06 — Results"
+  ],
+  [
+   "h2",
+   "It proved what useful looks like. Not that it moves anyone."
+  ],
+  [
+   "p",
+   "Qualitative feedback landed on three strengths, consistently: the copy matched a mood the viewer was already seeking, it was genuinely enjoyable to read, and the connection to a past favorite made the recommendation easier to believe. The work went on to inform the team's exploration of personalized copy in single-content promotions."
+  ],
+  [
+   "p",
+   "What participants said"
+  ],
+  [
+   "li",
+   "Mood \"Intriguing.\" \"Very me.\""
+  ],
+  [
+   "li",
+   "Voice \"Hilarious, fun to read, and fairly accurate.\""
+  ],
+  [
+   "li",
+   "Trust \"I like how it draws the connection.\""
+  ],
+  [
+   "h3",
+   "What stayed unproven"
+  ],
+  [
+   "p",
+   "This was an internal POC measuring copy preference and perceived relevance. It did not establish that personalized Reasons to Watch increase playback, shorten time to selection, or improve retention. Preference is not behavior, and I would not present it as such."
+  ],
+  [
+   "p",
+   "If it shipped, three metrics would settle it. I would build them with engineering before launch rather than after, since none of them can be reconstructed from a copy test."
+  ],
+  [
+   "li",
+   "Play Rate # of plays titles focused Did the reason earn a watch?"
+  ],
+  [
+   "li",
+   "Time to Selection seconds browsing sessions Did it help them decide faster?"
+  ],
+  [
+   "p",
+   "The third is the one I would watch hardest: the share of sessions that end without playback. It is the inverse of the first, and it is the only one that catches a reason that persuades someone to open a title and then disappoints them."
+  ],
+  [
+   "p",
+   "Mini prototype · live generation"
+  ],
+  [
+   "p",
+   "Pick at least one title you have watched. The four agents run for real against a random HBO Max title — the same pipeline, live."
+  ],
+  [
+   "p",
+   "Your watch history"
+  ],
+  [
+   "p",
+   "Titles you would actually defend (optional — these earn a name-drop)"
+  ],
+  [
+   "li",
+   "● Pattern Analyst"
+  ],
+  [
+   "li",
+   "● Blurb Writer"
+  ],
+  [
+   "li",
+   "● Editor"
+  ],
+  [
+   "li",
+   "● Critic"
+  ],
+  [
+   "p",
+   "Reason for"
+  ],
+  [
+   "p",
+   "0 / 135 characters"
+  ],
+  [
+   "p",
+   "Runs on Claude through a small Cloudflare Worker — four calls, one per agent, so each handoff appears the moment it exists. Rate limited, because it is a portfolio, not a service."
+  ],
+  [
+   "p",
+   "AI did not make the copy personal. The system did. Better output came from better product decisions: choosing signals I could defend, separating failure modes so each had one owner, writing the constraints down, and refusing to evaluate the result without hiding where it came from. The model supplied the language. The system supplied the judgment."
+  ],
+  [
+   "p",
+   "🔗 Agent guide | 🔗 Wireframes"
+  ]
+ ]
+}

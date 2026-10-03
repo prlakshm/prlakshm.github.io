@@ -1,0 +1,128 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Redesign · Type, colour, scraps, cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;800;900&family=Geist+Mono:wght@400;500&family=Inter+Tight:wght@500;800;900&family=Figtree:wght@500;800;900&family=Archivo:wdth,wght@125,800;125,900&family=Instrument+Serif:ital@1&family=Mrs+Saint+Delafield&family=Old+Standard+TT:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--canvas:#FBFBFA;--dot:#DCDCD8;--ink:#111;--mute:#6B6B6B;--line:#E8E8E5}
+*{box-sizing:border-box;margin:0}
+body{background:var(--canvas);color:var(--ink);font:15px/1.5 Geist,system-ui;padding:64px 48px 120px;
+ background-image:radial-gradient(var(--dot) 1.2px,transparent 1.3px);background-size:22px 22px}
+.label{font:500 11px/1 'Geist Mono';letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:0 0 14px}
+h2.sec{font:800 13px 'Geist Mono';letter-spacing:.1em;text-transform:uppercase;margin:96px 0 8px;padding-top:24px;border-top:1px solid var(--line)}
+.note{color:var(--mute);max-width:720px;margin-bottom:28px}
+.board{border-radius:14px;padding:56px 40px;margin-bottom:28px;position:relative;overflow:hidden}
+.tag{position:absolute;top:16px;left:18px;font:500 11px 'Geist Mono';letter-spacing:.06em;text-transform:uppercase;opacity:.6}
+/* palettes */
+/* scraps */
+.hero{display:grid;grid-template-columns:420px 1fr 120px;gap:32px;align-items:center;min-height:560px;background:#FBFBFA;
+ background-image:radial-gradient(var(--dot) 1.2px,transparent 1.3px);background-size:22px 22px;border-radius:14px;box-shadow:0 0 0 1px var(--line);padding:40px}
+.stack{position:relative;height:480px}
+.scrap{position:absolute;filter:drop-shadow(0 1px 1px #0002) drop-shadow(0 8px 18px #0000001f)}
+.paper{background:#EFEBE2;padding:22px 20px;font-family:'Old Standard TT';color:#1d1d1d;position:relative}
+.paper::after{content:"";position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .25 0 0 0 0 .2 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");mix-blend-mode:multiply;opacity:.55;pointer-events:none}
+.mast{font-weight:700;font-size:30px;text-align:center;border-bottom:3px double #222;padding-bottom:4px;letter-spacing:-.01em}
+.dateline{font-size:9px;display:flex;justify-content:space-between;border-bottom:1px solid #222;padding:3px 0;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em}
+.hl{font-weight:700;font-size:21px;line-height:1.05;margin:6px 0}
+.cols{columns:2;column-gap:12px;font-size:9.5px;line-height:1.35;text-align:justify}
+.lace{position:absolute;inset:0;background:#EFEBE2;-webkit-mask:url(img/lace1.png) center/contain no-repeat luminance;mask:url(img/lace1.png) center/contain no-repeat luminance;mask-mode:luminance}
+.logline h1{font:500 44px/1.08 Geist;letter-spacing:-.035em}
+.logline p{color:var(--mute);margin-top:18px;max-width:460px;font-size:16px}
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:36px 40px;max-width:980px}
+.card{display:flex;gap:20px;align-items:center}
+.thumb{width:200px;height:200px;border-radius:14px;flex:none;overflow:hidden;position:relative;background:#eee}
+.card small{font:500 11px 'Geist Mono';color:var(--mute)}
+.card b{display:block;font:600 19px/1.2 Geist;letter-spacing:-.02em;margin:10px 0 6px}
+.card span{color:var(--mute);font-size:14px}
+.story{display:grid;grid-template-columns:1.15fr 1fr;gap:56px;background:#FAF8F2;border-radius:14px;padding:12vh 56px}
+.lines p{font-family:Geist;font-weight:400;font-size:clamp(32px,3.4vw,52px);line-height:1.12;letter-spacing:-.035em;
+ padding:16vh 0;color:#141414;opacity:.16;transition:opacity .5s}
+.lines p.on{opacity:1}
+.lines .s{text-transform:none;font-family:'Mrs Saint Delafield';font-weight:400;font-size:1.3em;line-height:.5;
+ background:linear-gradient(180deg,#fff,#9a9a9a 38%,#2a2a2a 52%,#d8d8d8 70%,#6a6a6a);-webkit-background-clip:text;color:transparent;-webkit-text-stroke:.6px #222}
+.lines .g{display:inline-block;width:.62em;height:.62em;margin:0 .08em;vertical-align:-.02em}
+.side{position:sticky;top:12vh;height:76vh;display:flex;flex-direction:column;justify-content:center}
+.deck{position:relative;height:62vh}
+.deck img{position:absolute;inset:0;margin:auto;max-width:86%;max-height:100%;object-fit:contain;border-radius:8px;
+ box-shadow:0 1px 2px #0002,0 24px 50px -12px #0003;transition:transform .7s cubic-bezier(.2,.8,.2,1),opacity .5s}
+.cap{font:500 11px 'Geist Mono';letter-spacing:.06em;text-transform:uppercase;color:#6b6b6b;margin-top:18px;text-align:center}
+canvas{width:100%;height:100%;display:block}
+.mesh{position:absolute;inset:-30%;filter:blur(28px) saturate(1.2);animation:spin 18s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style></head><body>
+
+<p class="label">Pranavi · redesign lab · 01 Oct 2026</p>
+<h1 style="font:800 40px/1 Geist;letter-spacing:-.04em">Type, colour, scraps, cards</h1>
+
+<h2 class="sec">00 · Story: plain sentences left, examples right</h2>
+<p class="note">Scroll through. Each sentence lights up as it reaches the middle of the screen, and its examples come to the top of the stack on the right, large. Plain sentence case in Geist Regular, just set large. The images live only on the right.</p>
+<section class="story">
+ <div class="lines" id="lines"></div>
+ <div class="side"><div class="deck" id="deck"></div><div class="cap" id="cap"></div></div>
+</section>
+
+<h2 class="sec">01 · Hero: torn, layered scraps</h2>
+<p class="note">The edges are generated in code: random jagged polygons via clip-path, a fresh tear on every reload. Two scraps are layered on the left, with doily 1 masked over one of them; a small one sits on the right edge. Reload to re-tear.</p>
+<div class="hero">
+ <div class="stack" id="stack"></div>
+ <div class="logline"><p class="label">Product designer · engineer</p><h1>Your current hero logline sits here, unchanged, set in Geist Medium.</h1><p>Supporting line from the current site, in the mute grey.</p></div>
+ <div class="stack" id="edge" style="height:300px"></div>
+</div>
+
+<h2 class="sec">02 · Case-study cards: rndr layout, shader gradients</h2>
+<p class="note">Each square is a live WebGL gradient: domain-warped colour fields in Lovable-level saturation, with film grain, drifting slowly. No shapes, just colour. Each palette is pulled from its project. Hover to speed one up.</p>
+<div class="cards" style="grid-auto-flow:column;grid-template-rows:auto auto">
+ <a class="card"><div class="thumb"><canvas class="gl" data-p="rail"></canvas></div><div><small>Aug 2026 · Product</small><b>Surprise Rail</b><span>Your existing one-liner, unchanged…</span></div></a>
+ <a class="card"><div class="thumb"><canvas class="gl" data-p="mixr"></canvas></div><div><small>Aug 2026 · iOS · Audio</small><b>Mixr</b><span>Your existing one-liner, unchanged…</span></div></a>
+ <a class="card"><div class="thumb"><canvas class="gl" data-p="pin"></canvas></div><div><small>Jul 2026 · Devtool</small><b>Pinnables</b><span>Your existing one-liner, unchanged…</span></div></a>
+ <a class="card"><div class="thumb"><canvas class="gl" data-p="x"></canvas></div><div><small>Ongoing · Lab</small><b>@pranavibuilds ↗</b><span>Experiments, animations and posters on X.</span></div></a>
+</div>
+<script>
+/*imgs*/const IMG=['pinnables-poster-a','mixr-poster','sound','waves','pinnables-poster-b','mixr-d-cloud','pinnables-poster-c','mixr-b'];
+const flower=c=>`<svg class="g" viewBox="0 0 20 20"><g fill="${c}"><circle cx="10" cy="5" r="4.5"/><circle cx="15" cy="10" r="4.5"/><circle cx="10" cy="15" r="4.5"/><circle cx="5" cy="10" r="4.5"/></g></svg>`;
+const ball=c=>`<svg class="g" viewBox="0 0 20 20" fill="none" stroke="${c}" stroke-width="1.6"><circle cx="10" cy="10" r="9"/><ellipse cx="10" cy="10" rx="5" ry="9"/><ellipse cx="10" cy="10" rx="1.5" ry="9"/></svg>`;
+const STORY=[
+ [`I design products people actually use.`,['mixr-b','waves','sound'],'Product · Mixr, Figma Sound'],
+ [`I make posters that hang like glass.`,['pinnables-poster-a','pinnables-poster-b','mixr-poster'],'Graphic design · Pinnables, Mixr'],
+ [`I animate petals, shells and sound.`,['sound','mixr-d-cloud','pinnables-poster-c'],'Motion · Petal bloom, Seashells, Figma Sound'],
+ [`And I build it all in code.`,['pinnables-poster-c','mixr-b','pinnables-poster-a'],'Engineering · Surprise Rail, Pinnables'],
+];
+lines.innerHTML=STORY.map(s=>`<p>${s[0]}</p>`).join('');
+function show(i){[...lines.children].forEach((p,j)=>p.classList.toggle('on',j===i));
+ deck.innerHTML=STORY[i][1].map((f,k)=>`<img src="img/${f}.jpg" style="z-index:${3-k};transform:translate(${k*26}px,${k*-22}px) rotate(${[-2,3,-5][k]}deg) scale(${1-k*.07});opacity:${1-k*.25}">`).join('');cap.textContent=STORY[i][2]}
+show(0);const io=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&show([...lines.children].indexOf(e.target))),{rootMargin:'-45% 0px -45% 0px'});[...lines.children].forEach(p=>io.observe(p));
+// torn edge
+function torn(w,h,j=6){const p=[],seg=(a,b,n,f)=>{for(let i=0;i<n;i++)p.push(f(a+(b-a)*i/n))};const r=()=> (Math.random()*j);
+ seg(0,w,28,x=>`${x}px ${r()}px`);seg(0,h,34,y=>`${w-r()}px ${y}px`);seg(w,0,28,x=>`${x}px ${h-r()}px`);seg(h,0,34,y=>`${r()}px ${y}px`);return `polygon(${p.join(',')})`}
+const article=(hl,body,mast=true)=>`<div class="paper" style="height:100%">${mast?`<div class="mast">The Pranavi Times</div><div class="dateline"><span>Vol. 26</span><span>Late Edition</span><span>One coffee</span></div>`:''}<div class="hl">${hl}</div><div class="cols">${body}</div></div>`;
+const lorem='Placeholder column copy. Your real story lines go here, set in a newspaper serif, justified, in two narrow columns. Small caps for the byline. The grain is generated with feTurbulence and multiplied over the paper. '.repeat(4);
+function scrap(host,x,y,w,h,rot,html,z){const d=document.createElement('div');d.className='scrap';d.style.cssText=`left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:rotate(${rot}deg);z-index:${z}`;
+ d.innerHTML=`<div style="width:100%;height:100%;clip-path:${torn(w,h,9)}">${html}</div>`;host.appendChild(d)}
+scrap(stack,0,10,300,360,-5,article('Local Designer Ships Code; Engineers Ask How',lorem),1);
+scrap(stack,120,150,280,300,4,`<div style="height:100%;position:relative">${article('Sound Seen in Figma for First Time',lorem+lorem,false)}<div class="lace" style="background:#FFFDF8;filter:drop-shadow(0 1px 1px #0004)"></div></div>`,2);
+scrap(stack,40,330,200,140,-2,article('Petals Bloom at 60 FPS',lorem.slice(0,260),false),3);
+scrap(edge,10,40,130,180,6,article('Shells Found on Lavender Shore',lorem.slice(0,200),false),1);
+const PAL={rail:[[1,.36,.62],[1,.55,.18],[.55,.3,1],[1,.85,.55]],mixr:[[.62,.2,1],[1,.25,.6],[.15,.35,1],[1,.75,.2]],
+ pin:[[.12,.4,1],[.55,.75,1],[1,.4,.75],[.98,.95,1]],x:[[1,.2,.45],[1,.5,.1],[.3,.25,1],[.05,.03,.12]]};
+const FS=`precision highp float;uniform vec2 r;uniform float t;uniform vec3 c0,c1,c2,c3;
+float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+1.),f.x),f.y);}
+float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<3;i++){v+=a*n(p);p*=2.02;a*=.5;}return v;}
+void main(){vec2 uv=gl_FragCoord.xy/r;vec2 p=uv*1.1;
+ vec2 q=vec2(fbm(p+t*.05),fbm(p+vec2(5.2,1.3)-t*.04));
+ vec2 w=vec2(fbm(p+3.*q+vec2(1.7,9.2)+t*.03),fbm(p+3.*q+vec2(8.3,2.8)));
+ float f=fbm(p+2.5*w);
+ vec3 col=mix(c0,c1,smoothstep(.2,.8,f));col=mix(col,c2,smoothstep(.35,.9,length(w)));col=mix(col,c3,smoothstep(.55,1.,q.x*f*1.6));
+ float g=pow(max(0.,1.-length(uv-vec2(.5+.25*sin(t*.12),.62+.2*cos(t*.09)))*1.25),2.2);
+ col=mix(col*col*1.15,col,.55);col+=g*.55*mix(c3,vec3(1),.4);
+ col*=1.-.35*pow(length(uv-.5)*1.3,2.);
+ col=pow(col,vec3(.92));col+=(h(gl_FragCoord.xy+fract(t))-.5)*.07;gl_FragColor=vec4(col,1);}`;
+document.querySelectorAll('canvas.gl').forEach(c=>{const d=devicePixelRatio;c.width=c.height=200*d;const g=c.getContext('webgl');
+ const sh=(ty,src)=>{const s=g.createShader(ty);g.shaderSource(s,src);g.compileShader(s);return s};const pr=g.createProgram();
+ g.attachShader(pr,sh(g.VERTEX_SHADER,'attribute vec2 a;void main(){gl_Position=vec4(a,0,1);}'));g.attachShader(pr,sh(g.FRAGMENT_SHADER,FS));g.linkProgram(pr);g.useProgram(pr);
+ g.bindBuffer(g.ARRAY_BUFFER,g.createBuffer());g.bufferData(g.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),g.STATIC_DRAW);g.enableVertexAttribArray(0);g.vertexAttribPointer(0,2,g.FLOAT,false,0,0);
+ const P=PAL[c.dataset.p];['c0','c1','c2','c3'].forEach((k,i)=>g.uniform3fv(g.getUniformLocation(pr,k),P[i]));g.uniform2f(g.getUniformLocation(pr,'r'),c.width,c.height);
+ const ut=g.getUniformLocation(pr,'t');let T=Math.random()*50,sp=1;c.closest('.card').onmouseenter=()=>sp=4;c.closest('.card').onmouseleave=()=>sp=1;
+ (function f(){T+=.016*sp;g.uniform1f(ut,T);g.drawArrays(g.TRIANGLES,0,3);requestAnimationFrame(f)})()});
+</script>
+</body></html>

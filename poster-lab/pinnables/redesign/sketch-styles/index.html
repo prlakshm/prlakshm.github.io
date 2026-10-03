@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sunroom — five hands</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #171717; --mono: "Berkeley Mono", ui-monospace, Menlo, monospace; }
+  html, body { margin: 0; background: #e9e7e2; color: var(--ink); font-family: var(--mono); }
+  header { padding: 28px 40px 8px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #666; }
+  header b { color: var(--ink); font-weight: 500; }
+  .opt { margin: 26px 40px 10px; }
+  .opt h2 { font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; margin: 0 0 10px; color: #444; }
+  .opt h2 span { color: #999; margin-left: 12px; text-transform: none; letter-spacing: 0; }
+  .sheet { background: #fff; box-shadow: 0 1px 0 rgba(0,0,0,.06), 0 12px 40px rgba(0,0,0,.08); }
+  svg { display: block; width: 100%; height: auto; }
+  .hero-t { font: 700 100px "Libre Franklin", sans-serif; letter-spacing: -0.04em; fill: #171717; }
+  .hero-s { font: 14.5px var(--mono); letter-spacing: .06em; fill: #666; }
+  .zoom { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+  .zoom .sheet { overflow: hidden; }
+  .zoom svg { width: 100%; }
+</style>
+</head>
+<body>
+<header><b>Sunroom — five hands.</b> &nbsp; Same room, same geometry (the real model, projected), drawn five ways. Each sheet is 1440 wide; the pair below it is the door and the chairs at 2.4×.</header>
+<div id="root"></div>
+
+<script src="sketch-data.js"></script>
+<script>
+const D = window.SKETCH;
+const W = D.width, H = D.height;
+
+/* ------------------------------------------------------------ helpers */
+function mulberry(seed) { let a = seed >>> 0; return () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const f1 = n => n.toFixed(1);
+const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+
+// Catmull-Rom sampled to a polyline
+function sampleCurve(pts, closed, per = 10) {
+  const n = pts.length; if (n < 2) return pts.slice();
+  const at = i => closed ? pts[(i + n) % n] : pts[Math.max(0, Math.min(n - 1, i))];
+  const out = [pts[0]];
+  const last = closed ? n : n - 1;
+  for (let i = 0; i < last; i++) {
+    const p0 = at(i - 1), p1 = at(i), p2 = at(i + 1), p3 = at(i + 2);
+    for (let s = 1; s <= per; s++) {
+      const t = s / per, t2 = t * t, t3 = t2 * t;
+      out.push([
+        0.5 * ((2 * p1[0]) + (-p0[0] + p2[0]) * t + (2 * p0[0] - 5 * p1[0] + 4 * p2[0] - p3[0]) * t2 + (-p0[0] + 3 * p1[0] - 3 * p2[0] + p3[0]) * t3),
+        0.5 * ((2 * p1[1]) + (-p0[1] + p2[1]) * t + (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * t2 + (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * t3),
+      ]);
+    }
+  }
+  return out;
+}
+// a ruled segment with a hand: overshoot, jitter, bow; returned as samples
+function ruled(a, b, rnd, st) {
+  const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy);
+  if (len < 0.6) return null;
+  const ux = dx / len, uy = dy / len, nx = -uy, ny = ux;
+  const short = Math.min(1, len / 46);
+  const o = () => (st.over ? (st.over[0] + rnd() * (st.over[1] - st.over[0])) * short : 0);
+  const j = () => (rnd() - 0.5) * 2 * st.jitter * short;
+  const o0 = o(), o1 = o();
+  const p0 = [a[0] - ux * o0 + nx * j(), a[1] - uy * o0 + ny * j()];
+  const p1 = [b[0] + ux * o1 + nx * j(), b[1] + uy * o1 + ny * j()];
+  const bow = (rnd() - 0.5) * 2 * st.bow * Math.min(1, len / 160);
+  const b2 = bow * (0.4 + rnd() * 0.6);
+  const out = [];
+  const n = Math.max(3, Math.min(14, Math.round(len / 18)));
+  for (let i = 0; i <= n; i++) {
+    const t = i / n;
+    const bw = len < 90 ? Math.sin(t * Math.PI) * bow : (t < 0.5 ? Math.sin(t * Math.PI) * bow : Math.sin(t * Math.PI) * b2);
+    out.push([p0[0] + (p1[0] - p0[0]) * t + nx * bw, p0[1] + (p1[1] - p0[1]) * t + ny * bw]);
+  }
+  return out;
+}
+// low-frequency wobble along a polyline (a hand that is not quite steady)
+function wobble(pts, amp, rnd, freq = 0.045) {
+  if (amp <= 0) return pts;
+  const ph = rnd() * 100, ph2 = rnd() * 100;
+  let s = 0;
+  return pts.map((p, i) => {
+    if (i) s += dist(pts[i - 1], p);
+    const q = pts[Math.min(pts.length - 1, i + 1)], o = pts[Math.max(0, i - 1)];
+    const dx = q[0] - o[0], dy = q[1] - o[1], l = Math.hypot(dx, dy) || 1;
+    const w = amp * (Math.sin(s * freq + ph) * 0.7 + Math.sin(s * freq * 2.7 + ph2) * 0.3);
+    return [p[0] - dy / l * w, p[1] + dx / l * w];
+  });
+}
+const pathOf = (pts, close = false) => "M" + pts.map(p => f1(p[0]) + " " + f1(p[1])).join("L") + (close ? "Z" : "");
+const smoothPath = pts => pathOf(sampleCurve(pts, false, 6));
+
+// every item as a list of polylines ("strokes"), each with its weight
+function strokesOf(item, rnd, st) {
+  const out = [];
+  if (item.kind === "fill") return out;
+  if (item.curve) {
+    const pts = item.pts.map(p => [p[0] + (rnd() - 0.5) * st.jitter, p[1] + (rnd() - 0.5) * st.jitter]);
+    out.push({ pts: sampleCurve(pts, item.closed, 10), weight: item.weight, alpha: item.alpha, group: item.group });
+    return out;
+  }
+  for (let i = 0; i < item.pts.length - 1; i++) {
+    const r = ruled(item.pts[i], item.pts[i + 1], rnd, item.overshoot ? st : { ...st, over: null });
+    if (r) out.push({ pts: r, weight: item.weight, alpha: item.alpha, group: item.group });
+  }
+  return out;
+}
+
+// hatch a polygon: parallel lines at angle, spacing, clipped to it (even-odd)
+function hatch(poly, angle, spacing, rnd, opt = {}) {
+  const ca = Math.cos(angle), sa = Math.sin(angle);
+  // project polygon onto the normal to find the range
+  const proj = poly.map(p => -p[0] * sa + p[1] * ca);
+  const lo = Math.min(...proj), hi = Math.max(...proj);
+  const along = poly.map(p => p[0] * ca + p[1] * sa);
+  const alo = Math.min(...along) - 10, ahi = Math.max(...along) + 10;
+  const lines = [];
+  for (let d = lo + spacing * (0.3 + rnd() * 0.5); d < hi; d += spacing * (0.8 + rnd() * 0.4)) {
+    // line: points with -x sa + y ca = d, parametrised by t along (ca, sa)
+    const base = [-sa * d, ca * d];
+    const ts = [];
+    for (let i = 0; i < poly.length; i++) {
+      const a = poly[i], b = poly[(i + 1) % poly.length];
+      const fa = -a[0] * sa + a[1] * ca - d, fb = -b[0] * sa + b[1] * ca - d;
+      if ((fa < 0) !== (fb < 0)) {
+        const u = fa / (fa - fb);
+        const x = a[0] + (b[0] - a[0]) * u, y = a[1] + (b[1] - a[1]) * u;
+        ts.push(x * ca + y * sa);
+      }
+    }
+    ts.sort((p, q) => p - q);
+    for (let k = 0; k + 1 < ts.length; k += 2) {
+      let t0 = ts[k], t1 = ts[k + 1];
+      if (opt.inset) { t0 += opt.inset * (0.5 + rnd()); t1 -= opt.inset * (0.5 + rnd()); }
+      if (t1 - t0 < 3) continue;
+      if (opt.frac && rnd() > opt.frac) continue;
+      // broken into a few quick strokes, as a hand would
+      const pieces = opt.pieces ? Math.max(1, Math.round((t1 - t0) / opt.pieces)) : 1;
+      for (let p = 0; p < pieces; p++) {
+        const s0 = t0 + ((t1 - t0) * p) / pieces + (p ? rnd() * 3 : 0), s1 = t0 + ((t1 - t0) * (p + 1)) / pieces - (p < pieces - 1 ? rnd() * 3 : 0);
+        const pts = [];
+        const n = 4;
+        for (let i = 0; i <= n; i++) {
+          const t = s0 + (s1 - s0) * i / n;
+          const wob = (opt.wobble || 0) * Math.sin(i * 1.9 + rnd() * 2);
+          pts.push([base[0] + ca * t - sa * wob, base[1] + sa * t + ca * wob]);
+        }
+        lines.push(pts);
+      }
+    }
+  }
+  return lines;
+}
+// polygon helpers for shading regions
+function bbox(pts) { const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]); return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)]; }
+function ellipsePoly(cx, cy, rx, ry, n = 28, rnd) {
+  const out = []; for (let i = 0; i < n; i++) { const t = i / n * Math.PI * 2; const j = rnd ? 1 + (rnd() - 0.5) * 0.12 : 1; out.push([cx + Math.cos(t) * rx * j, cy + Math.sin(t) * ry * j]); } return out;
+}
+function groupBox(group) { const pts = D.items.filter(i => i.group === group).flatMap(i => i.pts); return bbox(pts); }
+// the chairs separately: split by x
+function chairBoxes() {
+  const items = D.items.filter(i => i.group === "chairs");
+  const b = bbox(items.flatMap(i => i.pts));
+  const mid = (b[0] + b[2]) / 2;
+  const a = bbox(items.flatMap(i => i.pts).filter(p => p[0] < mid)), c = bbox(items.flatMap(i => i.pts).filter(p => p[0] >= mid));
+  return [a, c];
+}
+const R = D.regions;
+// wall region minus the door: left piece, right piece, and the piece above
+function wallPieces() {
+  const [x0, y0, x1, y1] = bbox(R.backWall);
+  const [dx0, dy0, dx1, dy1] = bbox(R.door);
+  return {
+    left: [[x0, y0], [dx0, y0], [dx0, y1], [x0, y1]],
+    right: [[dx1, y0], [x1, y0], [x1, y1], [dx1, y1]],
+    over: [[dx0, y0], [dx1, y0], [dx1, dy0], [dx0, dy0]],
+  };
+}
+
+/* ------------------------------------------------------------ svg scaffolding */
+function hero() {
+  return `<g class="hero"><text class="hero-t" x="322" y="256">hi, i’m pranavi ram</text>
+  <text class="hero-s" x="327" y="310">DESIGN ENGINEER INVENTING 0 → 1 EXPERIENCES</text>
+  <text class="hero-s" x="327" y="341">BUILDING APPS + SHARING THE PROCESS ON X  @PRANAVIBUILDS</text>
+  <text class="hero-s" x="905" y="310">PREV:</text><text class="hero-s" x="905" y="341">PRODUCT DESIGN @ HBO MAX</text></g>`;
+}
+function sheet(id, defs, body, paper) {
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><defs>${defs}</defs>${paper || ""}${body}${hero()}</svg>`;
+}
+function zoomed(svgHTML, x, y, w, h) {
+  return svgHTML.replace(`viewBox="0 0 ${W} ${H}"`, `viewBox="${x} ${y} ${w} ${h}"`);
+}
+function mount(title, note, svgHTML) {
+  const el = document.createElement("section"); el.className = "opt";
+  el.innerHTML = `<h2>${title}<span>${note}</span></h2><div class="sheet">${svgHTML}</div>
+    <div class="zoom"><div class="sheet">${zoomed(svgHTML, 0, 90, 480, 400)}</div><div class="sheet">${zoomed(svgHTML, 1060, 270, 400, 333)}</div></div>`;
+  document.getElementById("root").appendChild(el);
+}
+// tone never ends in a hard edge: it is masked out toward the right of the
+// back wall and toward the bottom of the floor, and the page edge on the left
+function fadeDefs(id) {
+  const fb = bbox(R.backWall);
+  return `<linearGradient id="${id}-gx" gradientUnits="userSpaceOnUse" x1="${fb[2] - 150}" y1="0" x2="${fb[2] + 40}" y2="0"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></linearGradient>
+  <linearGradient id="${id}-gy" gradientUnits="userSpaceOnUse" x1="0" y1="${D.floorY + 20}" x2="0" y2="${H - 30}"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></linearGradient>
+  <linearGradient id="${id}-gt" gradientUnits="userSpaceOnUse" x1="0" y1="${fb[1] - 40}" x2="0" y2="${fb[1] + 60}"><stop offset="0" stop-color="#000"/><stop offset="1" stop-color="#fff"/></linearGradient>
+  <mask id="${id}-fade" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="url(#${id}-gx)"/><rect width="${W}" height="${H}" fill="url(#${id}-gy)" style="mix-blend-mode:multiply"/><rect width="${W}" height="${H}" fill="url(#${id}-gt)" style="mix-blend-mode:multiply"/></mask>`;
+}
+// the shaft of light from the doors across the floor, as a polygon
+function lightWedge() {
+  const d = bbox(R.door); const fy = D.floorY;
+  return [[d[0] + 6, fy - 2], [d[2] + 12, fy - 2], [W, fy + 120], [W, fy + 250], [d[0] - 90, fy + 80]];
+}
+const paperFills = (color = "#fff") => D.items.filter(i => i.kind === "fill").map(i => `<path d="${i.curve ? pathOf(sampleCurve(i.pts, true, 8), true) : pathOf(i.pts, true)}" fill="${color}"/>`).join("");
+
+/* ============================================================ 1 · GRAPHITE */
+(function graphite() {
+  const rnd = mulberry(7);
+  const st = { jitter: 1.1, bow: 2.2, over: [2, 9] };
+  const width = { bold: 1.6, main: 1.25, fine: 0.95, hair: 0.75 };
+  const tone = { bold: 0.82, main: 0.72, fine: 0.58, hair: 0.36 };
+  const defs = fadeDefs("g") + `
+    <filter id="g-grain" x="-2%" y="-2%" width="104%" height="104%">
+      <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="3" seed="4" result="n"/>
+      <feComponentTransfer in="n" result="a"><feFuncA type="linear" slope="2.2" intercept="-0.55"/></feComponentTransfer>
+      <feComposite in="SourceGraphic" in2="a" operator="in" result="g"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="9" result="w"/>
+      <feDisplacementMap in="g" in2="w" scale="1.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="g-smudge" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="2" result="n"/>
+      <feComponentTransfer in="n" result="a"><feFuncA type="linear" slope="1.4" intercept="-0.1"/></feComponentTransfer>
+      <feComposite in="SourceGraphic" in2="a" operator="in"/>
+    </filter>
+    <filter id="g-paper" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="4" seed="11" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.52  0 0 0 0 0.5  0 0 0 0 0.47  0 0 0 0.09 0"/>
+    </filter>`;
+  let b = `<rect width="${W}" height="${H}" fill="#fff"/><rect width="${W}" height="${H}" filter="url(#g-paper)"/>`;
+  // soft tone: the wall in shade (graphite rubbed with a finger), the floor
+  // in shade too except where the light crosses it, shadows under the chairs
+  const wp = wallPieces();
+  const fb = bbox(R.backWall);
+  b += `<g mask="url(#g-fade)"><g filter="url(#g-smudge)" fill="#55524c" opacity="0.62">`;
+  b += `<path d="${pathOf(R.leftWall, true)}" opacity="0.6"/><path d="${pathOf(wp.left, true)}" opacity="0.34"/><path d="${pathOf(wp.right, true)}" opacity="0.26"/><path d="${pathOf(wp.over, true)}" opacity="0.3"/>`;
+  b += `<path d="${pathOf([[0, D.floorY], [fb[2] + 300, D.floorY], [fb[2] + 200, H], [0, H]], true)}" opacity="0.42"/>`;
+  b += `<path d="${pathOf(lightWedge(), true)}" fill="#fff" opacity="1"/>`;
+  b += `</g></g>`;
+  b += `<g filter="url(#g-smudge)" fill="#55524c" opacity="0.5">`;
+  for (const cb of [...chairBoxes(), groupBox("table")]) b += `<path d="${pathOf(ellipsePoly((cb[0] + cb[2]) / 2, cb[3] - 4, (cb[2] - cb[0]) * 0.55, 10, 28, rnd), true)}" opacity="0.5"/>`;
+  b += `</g>`;
+  // hatching on the shaded wall, light and diagonal, the way a 2B lays tone
+  b += `<g stroke="#4a4844" stroke-width="0.6" stroke-linecap="round" fill="none" opacity="0.5" filter="url(#g-grain)" mask="url(#g-fade)">`;
+  for (const l of hatch([[0, D.floorY + 4], [fb[2] + 300, D.floorY + 4], [fb[2] + 200, H], [0, H]], 0.05, 7, rnd, { inset: 4, wobble: 0.5, pieces: 90, frac: 0.6 })) b += `<path d="${pathOf(l)}" opacity="0.5"/>`;
+  for (const l of hatch(R.leftWall, -1.15, 5.5, rnd, { inset: 4, wobble: 0.6, pieces: 60 })) b += `<path d="${pathOf(l)}"/>`;
+  for (const l of hatch(wp.left, -1.15, 7, rnd, { inset: 5, wobble: 0.6, pieces: 60, frac: 0.8 })) b += `<path d="${pathOf(l)}"/>`;
+  for (const l of hatch(wp.over, -1.15, 7, rnd, { inset: 4, wobble: 0.6 })) b += `<path d="${pathOf(l)}"/>`;
+  for (const l of hatch(wp.right, -1.15, 8, rnd, { inset: 5, wobble: 0.6, frac: 0.55 })) b += `<path d="${pathOf(l)}"/>`;
+  // the curtains: soft vertical strokes for the folds
+  for (const it of D.items.filter(i => i.kind === "fill" && i.paint === "cloth")) {
+    const poly = sampleCurve(it.pts, true, 6);
+    for (const l of hatch(poly, Math.PI / 2 + 0.02, 6.5, rnd, { inset: 3, wobble: 1.2, pieces: 70, frac: 0.7 })) b += `<path d="${pathOf(l)}" opacity="0.6"/>`;
+  }
+  b += `</g>`;
+  // the chairs and the cloth are hatched outside the fade
+  b += `<g stroke="#4a4844" stroke-width="0.6" stroke-linecap="round" fill="none" opacity="0.5" filter="url(#g-grain)">`;
+  for (const it of D.items.filter(i => i.kind === "fill" && i.group !== "curtain" && i.pts.length === 4)) {
+    for (const l of hatch(it.pts, 0.5, 4.2, rnd, { inset: 1.5, wobble: 0.4, frac: 0.7 })) b += `<path d="${pathOf(l)}" opacity="0.7"/>`;
+  }
+  b += `</g>`;
+  b += paperFills("rgba(255,255,255,0.92)");
+  // lines: a first light pass searching for the edge, then the committed one
+  b += `<g fill="none" stroke="#2b2a27" stroke-linecap="round" stroke-linejoin="round" filter="url(#g-grain)">`;
+  for (const it of D.items) {
+    for (const s of strokesOf(it, rnd, st)) {
+      const w = width[s.weight], a = tone[s.weight] * s.alpha;
+      if (s.weight !== "hair" && rnd() < 0.55) {
+        const ghost = wobble(s.pts.map(p => [p[0] + (rnd() - 0.5) * 2.4, p[1] + (rnd() - 0.5) * 2.4]), 0.8, rnd);
+        b += `<path d="${pathOf(ghost)}" stroke-width="${f1(w * 0.75)}" stroke-opacity="${f1(a * 0.38)}"/>`;
+      }
+      b += `<path d="${pathOf(wobble(s.pts, 0.55, rnd))}" stroke-width="${f1(w)}" stroke-opacity="${f1(a)}"/>`;
+    }
+  }
+  b += `</g>`;
+  mount("01 · Graphite", "2B pencil — a light searching pass under each line, tone rubbed in with a finger, diagonal hatching on the shaded wall, paper tooth breaking every stroke", sheet("g", defs, b));
+})();
+
+/* ============================================================ 2 · CHARCOAL */
+(function charcoal() {
+  const rnd = mulberry(23);
+  const st = { jitter: 1.6, bow: 3.2, over: [1, 6] };
+  const width = { bold: 3.4, main: 2.6, fine: 1.7, hair: 1.2 };
+  const tone = { bold: 0.95, main: 0.86, fine: 0.7, hair: 0.45 };
+  const defs = fadeDefs("c") + `
+    <mask id="c-floor" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="url(#c-gy)"/><path d="${pathOf(lightWedge(), true)}" fill="#000" filter="url(#c-rub)"/></mask>`;
+  const defs0 = `
+    <filter id="c-stick" x="-3%" y="-3%" width="106%" height="106%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="5" result="w"/>
+      <feDisplacementMap in="SourceGraphic" in2="w" scale="3.2" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feGaussianBlur in="d" stdDeviation="0.45" result="s"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" seed="7" result="n"/>
+      <feComponentTransfer in="n" result="a"><feFuncA type="linear" slope="2.6" intercept="-0.5"/></feComponentTransfer>
+      <feComposite in="s" in2="a" operator="in"/>
+    </filter>
+    <filter id="c-rub" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="11"/></filter>
+    <filter id="c-tooth" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="2" seed="21" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.55 0"/>
+    </filter>
+    <filter id="c-soft" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="2.2"/></filter>
+    <filter id="c-paper" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="4" seed="12" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.45  0 0 0 0 0.43  0 0 0 0 0.4  0 0 0 0.14 0"/>
+    </filter>
+    <radialGradient id="c-glow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>`;
+  const defsAll = defs + defs0;
+  let b = `<rect width="${W}" height="${H}" fill="#f4f2ec"/><rect width="${W}" height="${H}" filter="url(#c-paper)"/>`;
+  const wp = wallPieces();
+  const fb = bbox(R.backWall);
+  // the big tone, rubbed in: walls dark, the floor dark, and one shaft of
+  // light from the doors left as bare paper all the way to the chairs
+  b += `<g mask="url(#c-fade)"><g filter="url(#c-rub)" fill="#23221f">`;
+  b += `<path d="${pathOf(R.leftWall, true)}" opacity="0.92"/><path d="${pathOf(wp.left, true)}" opacity="0.78"/><path d="${pathOf(wp.over, true)}" opacity="0.7"/><path d="${pathOf(wp.right, true)}" opacity="0.58"/>`;
+  b += `</g></g>`;
+  b += `<g mask="url(#c-floor)"><path d="${pathOf([[0, D.floorY - 6], [W, D.floorY - 6], [W, H], [0, H]], true)}" fill="#23221f" opacity="0.46" filter="url(#c-rub)"/></g>`;
+  b += `<g filter="url(#c-rub)" fill="#23221f">`;
+  for (const cb of [...chairBoxes(), groupBox("table")]) b += `<path d="${pathOf(ellipsePoly((cb[0] + cb[2]) / 2, cb[3] - 2, (cb[2] - cb[0]) * 0.62, 14, 28, rnd), true)}" opacity="0.7"/>`;
+  b += `</g>`;
+  // the glass: bare paper, blazing
+  b += `<path d="${pathOf(R.glass, true)}" fill="#fff" filter="url(#c-soft)"/>`;
+  // the paper's tooth, over the tone
+  b += `<rect width="${W}" height="${H}" filter="url(#c-tooth)" style="mix-blend-mode:screen" opacity="0.35"/>`;
+  // heavy scribbled tone in the darkest places: the chair seats, the wall beside the door
+  b += `<g stroke="#1b1a18" stroke-linecap="round" fill="none" filter="url(#c-stick)" mask="url(#c-fade)">`;
+  for (const l of hatch(R.leftWall, -1.35, 7, rnd, { inset: 6, wobble: 1.4, pieces: 90, frac: 0.75 })) b += `<path d="${pathOf(l)}" stroke-width="2.2" stroke-opacity="0.5"/>`;
+  for (const l of hatch(wp.left, Math.PI / 2 + 0.08, 9, rnd, { inset: 6, wobble: 1.8, frac: 0.6 })) b += `<path d="${pathOf(l)}" stroke-width="2.4" stroke-opacity="0.42"/>`;
+  for (const l of hatch(wp.over, 0.1, 8, rnd, { inset: 4, wobble: 1.4 })) b += `<path d="${pathOf(l)}" stroke-width="2.2" stroke-opacity="0.4"/>`;
+  for (const l of hatch(wp.right, Math.PI / 2 + 0.08, 10, rnd, { inset: 6, wobble: 1.8, frac: 0.5, pieces: 70 })) b += `<path d="${pathOf(l)}" stroke-width="2.2" stroke-opacity="0.36"/>`;
+  // the floor, in long strokes that run with the boards, away from the light
+  b += `</g><g stroke="#1b1a18" stroke-linecap="round" fill="none" filter="url(#c-stick)" mask="url(#c-floor)">`;
+  const floorDark = [[0, D.floorY + 6], [W, D.floorY + 6], [W, H], [0, H]];
+  for (const l of hatch(floorDark, 0.04, 9, rnd, { inset: 6, wobble: 1.2, pieces: 140, frac: 0.5 })) b += `<path d="${pathOf(l)}" stroke-width="2.6" stroke-opacity="0.28"/>`;
+  b += `</g><g stroke="#1b1a18" stroke-linecap="round" fill="none" filter="url(#c-stick)">`;
+  for (const it of D.items.filter(i => i.kind === "fill" && i.paint === "cloth")) {
+    const poly = sampleCurve(it.pts, true, 6);
+    for (const l of hatch(poly, Math.PI / 2 + 0.03, 7.5, rnd, { inset: 2, wobble: 2.2, pieces: 80, frac: 0.8 })) b += `<path d="${pathOf(l)}" stroke-width="1.6" stroke-opacity="0.5"/>`;
+  }
+  for (const it of D.items.filter(i => i.kind === "fill" && i.group !== "curtain" && i.pts.length === 4)) {
+    for (const l of hatch(it.pts, 0.35, 3.6, rnd, { inset: 1, wobble: 0.8 })) b += `<path d="${pathOf(l)}" stroke-width="2.4" stroke-opacity="0.8"/>`;
+  }
+  b += `</g>`;
+  b += `<g fill="none" stroke="#141311" stroke-linecap="round" stroke-linejoin="round" filter="url(#c-stick)">`;
+  for (const it of D.items) {
+    for (const s of strokesOf(it, rnd, st)) {
+      const w = width[s.weight] * (0.85 + rnd() * 0.3), a = tone[s.weight] * s.alpha;
+      b += `<path d="${pathOf(wobble(s.pts, 1.1, rnd, 0.03))}" stroke-width="${f1(w)}" stroke-opacity="${f1(a)}"/>`;
+      if (s.weight === "bold" || (s.weight === "main" && rnd() < 0.4)) b += `<path d="${pathOf(wobble(s.pts.map(p => [p[0] + (rnd() - 0.5) * 3, p[1] + (rnd() - 0.5) * 3]), 1.4, rnd, 0.03))}" stroke-width="${f1(w * 0.7)}" stroke-opacity="${f1(a * 0.5)}"/>`;
+    }
+  }
+  b += `</g>`;
+  mount("02 · Charcoal", "willow charcoal — tone first, rubbed into the wall and the floor, one shaft of light from the doors left as bare paper, the glass blazing, then the drawing stated on top in heavy, broken strokes", sheet("c", defsAll, b));
+})();
+
+/* ============================================================ 3 · ONE LINE */
+(function oneLine() {
+  const rnd = mulberry(41);
+  const st = { jitter: 0.4, bow: 1.2, over: [0, 0] };
+  const defs = `<filter id="o-nib" x="-2%" y="-2%" width="104%" height="104%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="8" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="1.2" xChannelSelector="R" yChannelSelector="G"/></filter>`;
+  // all strokes, as polylines; the line then visits them nearest-first
+  const groups = ["wall", "door", "curtain", "table", "chairs"];
+  const pool = [];
+  for (const it of D.items) {
+    if (it.group === "wall" && it.weight === "hair") continue;
+    if (it.weight === "hair") continue; // a single line cannot afford every detail
+    // the curtain, in one line: its edges and hem, the tie, and one fold in three
+    if (it.group === "curtain" && it.weight === "fine" && rnd() < 0.5) continue;
+    if (it.alpha < 1) continue; // the head's trail off to the right would run into the title
+    for (const s of strokesOf(it, rnd, st)) pool.push(s);
+  }
+  // chain: left part (wall, door, curtain) then along the floor to the furniture
+  function chain(list, start) {
+    const left = list.slice(); const out = []; let cur = start;
+    while (left.length) {
+      let best = 0, bd = Infinity, rev = false;
+      for (let i = 0; i < left.length; i++) {
+        const p = left[i].pts; const d0 = dist(cur, p[0]), d1 = dist(cur, p[p.length - 1]);
+        if (d0 < bd) { bd = d0; best = i; rev = false; }
+        if (d1 < bd) { bd = d1; best = i; rev = true; }
+      }
+      const s = left.splice(best, 1)[0]; const pts = rev ? s.pts.slice().reverse() : s.pts;
+      out.push(pts); cur = pts[pts.length - 1];
+    }
+    return out;
+  }
+  // the wall and doors nearest-first; the curtains in the order they were
+  // drawn, so each falls as one sweep: edge, folds, frill, hem
+  // each curtain is drawn as one sweep: its strokes, in the order they were
+  // drawn, joined end to end — then it goes into the pool as a single stroke
+  const doorMid = (R.door[0][0] + R.door[3][0]) / 2;
+  const cur = pool.filter(s => s.group === "curtain" && s.pts.length > 2);
+  const sweep = (list) => { let pts = []; for (const s of list) { const p = pts.length && dist(pts[pts.length - 1], s.pts[s.pts.length - 1]) < dist(pts[pts.length - 1], s.pts[0]) ? s.pts.slice().reverse() : s.pts; pts = pts.length ? pts.concat(sampleCurve([pts[pts.length - 1], p[0]], false, 3).slice(1), p.slice(1)) : p.slice(); } return { pts, group: "curtain" }; };
+  const curtains = [sweep(cur.filter(s => s.pts[0][0] < doorMid)), sweep(cur.filter(s => s.pts[0][0] >= doorMid))];
+  const room = chain(pool.filter(s => groups.indexOf(s.group) < 2).concat(curtains), [0, 120]);
+  const furn = chain(pool.filter(s => groups.indexOf(s.group) >= 3), [1120, 470]);
+  // join with travel curves: a loop where the pen turns back on itself
+  let all = [];
+  const travel = (a, b) => {
+    const d = dist(a, b);
+    const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
+    const nx = -(b[1] - a[1]) / (d || 1), ny = (b[0] - a[0]) / (d || 1);
+    const k = 0.07 * Math.min(d, 80) * (rnd() < 0.5 ? 1 : -1);
+    return sampleCurve([a, [mx + nx * k, my + ny * k], b], false, 8);
+  };
+  const join = (seq) => { let out = []; for (const pts of seq) { if (out.length) out = out.concat(travel(out[out.length - 1], pts[0]).slice(1)); out = out.concat(out.length ? pts.slice(1) : pts); } return out; };
+  let left = join(room);
+  let right = join(furn);
+  // each runs off along the floor on its own side
+  const e = right[right.length - 1];
+  right = right.concat(sampleCurve([e, [e[0] + 30, e[1] + 30], [e[0] - 60, e[1] + 55], [e[0] + 90, e[1] + 70], [W + 10, e[1] + 60]], false, 8).slice(1));
+  const l = left[left.length - 1];
+  left = left.concat(sampleCurve([l, [l[0] - 40, l[1] + 30], [l[0] + 20, l[1] + 60], [-10, l[1] + 80]], false, 8).slice(1));
+  const line = pts => `<path d="${pathOf(wobble(pts, 0.35, rnd, 0.06))}" fill="none" stroke="#111" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" filter="url(#o-nib)"/>`;
+  const b = `<rect width="${W}" height="${H}" fill="#fff"/>` + line(left) + line(right);
+  mount("03 · One line", "two unbroken lines — one draws the wall, the doors and both curtains and runs off the page to the left; the other draws the table and the chairs and runs off to the right", sheet("o", defs, b));
+})();
+
+/* ============================================================ 4 · FINELINER */
+(function fineliner() {
+  const rnd = mulberry(59);
+  const st = { jitter: 0.7, bow: 1.4, over: [3, 14] };
+  const width = { bold: 1.0, main: 0.85, fine: 0.7, hair: 0.55 };
+  const defs = ``;
+  const wp = wallPieces();
+  let b = `<rect width="${W}" height="${H}" fill="#fff"/>`;
+  // construction: faint long guide lines, the way the reference finds the perspective first
+  b += `<g stroke="#111" stroke-width="0.4" stroke-opacity="0.22" fill="none" stroke-linecap="round">`;
+  const fb = bbox(R.backWall);
+  for (const y of [fb[1], D.floorY]) b += `<path d="${pathOf(ruled([-10, y + (rnd() - 0.5) * 3], [fb[2] + 260, y + (rnd() - 0.5) * 3], rnd, { jitter: 0.6, bow: 1.5, over: [0, 0] }))}"/>`;
+  b += `</g>`;
+  b += paperFills("#fff");
+  // hatching: crisp, parallel, quick — in bands, as a pen does it
+  b += `<g stroke="#111" stroke-linecap="round" fill="none" stroke-width="0.6">`;
+  for (const l of hatch(R.leftWall, Math.PI / 2 + 0.06, 4.6, rnd, { inset: 3, wobble: 0.4, pieces: 55, frac: 0.85 })) b += `<path d="${pathOf(l)}" stroke-opacity="0.55"/>`;
+  for (const l of hatch(wp.left, -0.8, 6, rnd, { inset: 4, wobble: 0.5, pieces: 45, frac: 0.5 })) b += `<path d="${pathOf(l)}" stroke-opacity="0.45"/>`;
+  for (const l of hatch(wp.over, -0.8, 6, rnd, { inset: 3, wobble: 0.5 })) b += `<path d="${pathOf(l)}" stroke-opacity="0.45"/>`;
+  for (const l of hatch(wp.right, -0.8, 7, rnd, { inset: 4, wobble: 0.5, pieces: 40, frac: 0.35 })) b += `<path d="${pathOf(l)}" stroke-opacity="0.4"/>`;
+  // the glass: the garden outside, as quick scribbles low in the panes
+  for (const l of hatch(R.glass, 0.25, 5, rnd, { inset: 2, wobble: 1.6, pieces: 22, frac: 0.35 })) b += `<path d="${pathOf(l)}" stroke-opacity="0.35"/>`;
+  for (const it of D.items.filter(i => i.kind === "fill" && i.paint === "cloth")) {
+    const poly = sampleCurve(it.pts, true, 6);
+    for (const l of hatch(poly, Math.PI / 2 + 0.02, 5, rnd, { inset: 2, wobble: 1.0, pieces: 50, frac: 0.75 })) b += `<path d="${pathOf(l)}" stroke-opacity="0.5"/>`;
+  }
+  for (const it of D.items.filter(i => i.kind === "fill" && i.group !== "curtain" && i.pts.length === 4)) {
+    for (const l of hatch(it.pts, 0.55, 3.4, rnd, { inset: 1, wobble: 0.3 })) b += `<path d="${pathOf(l)}" stroke-opacity="0.75"/>`;
+    for (const l of hatch(it.pts, 2.1, 5.5, rnd, { inset: 1, wobble: 0.3, frac: 0.5 })) b += `<path d="${pathOf(l)}" stroke-opacity="0.6"/>`;
+  }
+  for (const cb of [...chairBoxes(), groupBox("table")]) {
+    const e = ellipsePoly((cb[0] + cb[2]) / 2, cb[3] - 3, (cb[2] - cb[0]) * 0.52, 9, 24, rnd);
+    for (const l of hatch(e, 0.1, 3.2, rnd, { inset: 1, wobble: 0.4 })) b += `<path d="${pathOf(l)}" stroke-opacity="0.7"/>`;
+  }
+  b += `</g>`;
+  // the lines: two or three quick passes, not quite on top of each other, ends crossing
+  b += `<g fill="none" stroke="#111" stroke-linecap="round" stroke-linejoin="round">`;
+  for (const it of D.items) {
+    for (const s of strokesOf(it, rnd, st)) {
+      const w = width[s.weight], a = s.alpha;
+      b += `<path d="${pathOf(s.pts)}" stroke-width="${f1(w)}" stroke-opacity="${f1(0.92 * a)}"/>`;
+      if (s.weight !== "hair") {
+        const n = rnd() < 0.6 ? 1 : 2;
+        for (let k = 0; k < n; k++) {
+          const off = 1.2 + rnd() * 1.4, ang = rnd() * 6.28;
+          const p2 = s.pts.map(p => [p[0] + Math.cos(ang) * off, p[1] + Math.sin(ang) * off]);
+          b += `<path d="${pathOf(wobble(p2, 0.4, rnd))}" stroke-width="${f1(w * 0.8)}" stroke-opacity="${f1(0.55 * a)}"/>`;
+        }
+      }
+    }
+  }
+  b += `</g>`;
+  mount("04 · Fineliner", "0.3 pen — crisp black, every line gone over two or three times a hair off, ends crossing at the corners, faint construction lines left in, shading as quick parallel hatching", sheet("p", defs, b));
+})();
+
+/* ============================================================ 5 · CURLY INK */
+(function curly() {
+  const rnd = mulberry(83);
+  const defs = `<filter id="k-nib" x="-2%" y="-2%" width="104%" height="104%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="6" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="1.5" xChannelSelector="R" yChannelSelector="G"/></filter>`;
+  const width = { bold: 1.4, main: 1.15, fine: 0.95, hair: 0.75 };
+  // a small loop at a corner: the pen going round before it carries on
+  const loopAt = (p, inDir, r) => {
+    const out = []; const a0 = Math.atan2(inDir[1], inDir[0]);
+    const cx = p[0] - Math.sin(a0) * r, cy = p[1] + Math.cos(a0) * r;
+    for (let i = 1; i <= 10; i++) { const t = a0 - Math.PI / 2 + (i / 10) * Math.PI * 2 * (rnd() < 0.5 ? 1 : -1); out.push([cx + Math.cos(t) * r, cy + Math.sin(t) * r]); }
+    return out;
+  };
+  // every item becomes one continuous flowing curve through its points,
+  // ruled or not; corners get a curl now and then; ends get a flick
+  let b = `<rect width="${W}" height="${H}" fill="#fff"/>` + paperFills("#fff");
+  b += `<g fill="none" stroke="#141414" stroke-linecap="round" stroke-linejoin="round" filter="url(#k-nib)">`;
+  for (const it of D.items) {
+    if (it.kind === "fill") continue;
+    let pts = it.pts.slice();
+    if (!it.curve) {
+      // wave the straight runs gently and curl some corners
+      const dense = [];
+      for (let i = 0; i < pts.length - 1; i++) {
+        const a = pts[i], c = pts[i + 1]; const n = Math.max(2, Math.round(dist(a, c) / 14));
+        for (let s = 0; s < n; s++) dense.push([a[0] + (c[0] - a[0]) * s / n, a[1] + (c[1] - a[1]) * s / n]);
+        if (i < pts.length - 2 && rnd() < 0.35 && dist(a, c) > 24) dense.push(...loopAt(c, [c[0] - a[0], c[1] - a[1]], 2.2 + rnd() * 2.2));
+      }
+      dense.push(pts[pts.length - 1]);
+      pts = dense;
+    }
+    pts = sampleCurve(pts, it.closed, 6);
+    pts = wobble(pts, it.group === "curtain" ? 1.6 : 0.9, rnd, 0.05);
+    // a flick off the end
+    if (!it.closed && rnd() < 0.5) {
+      const e = pts[pts.length - 1], q = pts[Math.max(0, pts.length - 4)];
+      const dx = e[0] - q[0], dy = e[1] - q[1], l = Math.hypot(dx, dy) || 1;
+      const r = 3 + rnd() * 4, s = rnd() < 0.5 ? 1 : -1;
+      pts = pts.concat(sampleCurve([e, [e[0] + dx / l * r - dy / l * r * s, e[1] + dy / l * r + dx / l * r * s], [e[0] + dx / l * r * 0.4 - dy / l * r * 1.8 * s, e[1] + dy / l * r * 0.4 + dx / l * r * 1.8 * s]], false, 5).slice(1));
+    }
+    b += `<path d="${pathOf(pts, it.closed)}" stroke-width="${f1(width[it.weight])}" stroke-opacity="${f1(0.9 * it.alpha)}"/>`;
+  }
+  // and the room sprouts: tendrils off the curtain hems, the branch, the chair backs
+  const tendril = (p, ang, len, k) => {
+    const out = [p]; let a = ang, x = p[0], y = p[1];
+    for (let i = 0; i < 14; i++) { a += k * (0.16 + rnd() * 0.06); x += Math.cos(a) * len / 14; y += Math.sin(a) * len / 14; out.push([x, y]); }
+    return sampleCurve(out, false, 4);
+  };
+  const leaf = (p, ang, s) => {
+    const out = []; for (let i = 0; i <= 12; i++) { const t = i / 12; const along = s * t, across = s * 0.38 * Math.sin(t * Math.PI); out.push([p[0] + along * Math.cos(ang) - across * Math.sin(ang), p[1] + along * Math.sin(ang) + across * Math.cos(ang)]); }
+    for (let i = 12; i >= 0; i--) { const t = i / 12; const along = s * t, across = -s * 0.38 * Math.sin(t * Math.PI); out.push([p[0] + along * Math.cos(ang) - across * Math.sin(ang), p[1] + along * Math.sin(ang) + across * Math.cos(ang)]); }
+    return out;
+  };
+  const cloth = D.items.filter(i => i.kind === "fill" && i.paint === "cloth");
+  for (const c of cloth) {
+    const bb = bbox(c.pts); const hemY = bb[3]; const xs = [bb[0] + (bb[2] - bb[0]) * 0.3, bb[0] + (bb[2] - bb[0]) * 0.7];
+    for (const x of xs) {
+      const t = tendril([x, hemY - 2], Math.PI / 2 + (rnd() - 0.5), 26 + rnd() * 20, rnd() < 0.5 ? 1 : -1);
+      b += `<path d="${pathOf(t)}" stroke-width="0.9" stroke-opacity="0.85"/>`;
+      const e = t[t.length - 1]; b += `<path d="${pathOf(leaf(e, rnd() * 6.28, 7), true)}" stroke-width="0.8"/>`;
+    }
+  }
+  const tb = groupBox("table");
+  for (let i = 0; i < 5; i++) {
+    const p = [tb[0] + (tb[2] - tb[0]) * (0.35 + rnd() * 0.3), tb[1] + 6 + rnd() * 8];
+    const t = tendril(p, -Math.PI / 2 + (rnd() - 0.5) * 1.6, 18 + rnd() * 26, rnd() < 0.5 ? 1 : -1);
+    b += `<path d="${pathOf(t)}" stroke-width="0.85"/>`; const e = t[t.length - 1]; b += `<path d="${pathOf(leaf(e, rnd() * 6.28, 6), true)}" stroke-width="0.75"/>`;
+  }
+  // a few stars by the glass, the way the book doodles do
+  const g = bbox(R.glass);
+  for (let i = 0; i < 4; i++) {
+    const cx = g[0] + 10 + rnd() * (g[2] - g[0] - 20), cy = g[1] + 8 + rnd() * 50, r = 2.5 + rnd() * 2.5;
+    const s = []; for (let k = 0; k < 10; k++) { const t = k / 10 * Math.PI * 2 - Math.PI / 2; const rr = k % 2 ? r * 0.45 : r; s.push([cx + Math.cos(t) * rr, cy + Math.sin(t) * rr]); }
+    b += `<path d="${pathOf(s, true)}" stroke-width="0.7"/>`;
+  }
+  b += `</g>`;
+  mount("05 · Curly ink", "a wandering dip pen — every edge becomes one flowing curve, corners loop round, line ends flick off, and the room sprouts: tendrils from the curtain hems and the vase, a few stars in the glass", sheet("k", defs, b));
+})();
+</script>
+</body>
+</html>
