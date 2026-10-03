@@ -74,6 +74,10 @@ export interface LightStyle {
   leaf: number;
   /** Slow breathing of the light, as if thin cloud were passing. */
   drift: number;
+  /** How much of the glass's colour the beams in the air carry, 0–1. The
+      floor can be as deep as it likes; the air crosses the hero text, so it
+      is kept pale enough to read through. */
+  air: number;
 }
 
 /** A leaf, in the plane of the doors (x along the wall, y up): centre, unit
@@ -140,6 +144,7 @@ uniform float uLace;
 uniform float uStars;
 uniform float uLeaf;
 uniform float uDrift;
+uniform float uAir;
 
 uniform vec4 uStA[${MAX_STICKS}];
 uniform vec4 uStB[${MAX_STICKS}];
@@ -463,12 +468,9 @@ vec3 shadeWall(vec3 Wp) {
 
   vec3 m = mix(vec3(1.0), shade, fade * (1.0 - glass) * uIntro);
   vec3 g = mix(vec3(1.0), paneTint(vec2(x, y), vec2(0.003)) / max(glass, 1e-3), uIntro);
-  // a breath of the garden in the lower panes
-  float garden = smoothstep(0.42, 0.7, vnoise(vec2(x * 4.3 + 4.0, y * 3.1)) * 0.6 + vnoise(vec2(x * 9.1, y * 7.3 + 2.0)) * 0.4)
-               * (1.0 - smoothstep(0.7, 1.6, y));
-  g *= mix(vec3(1.0), vec3(0.9, 0.955, 0.88), garden * 0.75);
   // the olive branch, seen against the sky
-  if (uLeaf > 0.0) g *= mix(vec3(1.0), vec3(0.8, 0.86, 0.78), 0.5 * uLeaf * uIntro * leafShadow(vec2(x, y), 0.004));
+  // the olive branch, seen against the sky: a grey silhouette, no colour of its own
+  if (uLeaf > 0.0) g *= mix(vec3(1.0), vec3(0.84, 0.85, 0.87), 0.45 * uLeaf * uIntro * leafShadow(vec2(x, y), 0.004));
   // a night sky: a scatter of stars, each on its own slow twinkle
   if (uStars > 0.0) {
     vec2 sp = vec2(x, y) * 70.0;
@@ -576,12 +578,12 @@ void main() {
              + vnoise(vec2(u * 260.0 + uTime * 0.03, 5.0)) * 0.15;
     float streak = mix(1.0, smoothstep(0.2, 0.8, st) * 1.6, uStreak);
     float amt = 1.0 - exp(-uBeam * accC * len * phase * streak * weather());
-    vec3 tint = vec3(1.0) - accA / max(accC, 1e-4);
+    vec3 tint = vec3(1.0) - uAir * accA / max(accC, 1e-4);
     // in shade the beam lifts the page back toward lit paper; on bare white it
-    // can only warm it — and over the hero's text it goes easy, so the words
-    // stay crisp
-    vec2 hp = smoothstep(vec2(-40.0), vec2(30.0), px - uHero.xy) * smoothstep(vec2(-40.0), vec2(30.0), uHero.zw - px);
-    amt *= 1.0 - 0.6 * hp.x * hp.y;
+    // can only warm it — and over the hero's block (title, lines and icons)
+    // it all but stops, feathered out past the edges, so the words stay crisp
+    vec2 hp = smoothstep(vec2(-70.0), vec2(24.0), px - uHero.xy) * smoothstep(vec2(-70.0), vec2(24.0), uHero.zw - px);
+    amt *= 1.0 - 0.9 * hp.x * hp.y;
     m = mix(m, mix(vec3(1.0), tint, 0.7), amt);
   }
 
@@ -734,6 +736,7 @@ export function createLight(canvas: HTMLCanvasElement): LightRenderer | null {
       gl.uniform1f(U("uStars"), style.stars);
       gl.uniform1f(U("uLeaf"), style.leaf);
       gl.uniform1f(U("uDrift"), style.drift);
+      gl.uniform1f(U("uAir"), style.air);
     },
 
     setScene(layout, occ) {

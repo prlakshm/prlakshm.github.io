@@ -15,16 +15,21 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* --- Surface ------------------------------------------------------------- */
-/* Plain white now (the dots are gone). Kept as a layer, inset past the
-   viewport, because the parallax translation in Home.tsx still moves it and
-   the sunroom's light multiplies over it. */
+/* --- Dot canvas ---------------------------------------------------------- */
+/* Inset past the viewport on every side so the parallax translation in
+   Home.tsx has bleed to move into and never exposes a bare edge. */
 .wt-surface {
   position: fixed;
   inset: -80px;
   z-index: 0;
   pointer-events: none;
-  background: #fff;
+  background-color: #fff;
+  background-image: radial-gradient(
+    circle,
+    var(--dot) var(--dot-size),
+    transparent calc(var(--dot-size) + 0.5px)
+  );
+  background-size: var(--dot-step) var(--dot-step);
 }
 
 .wt > *:not(.wt-surface) {

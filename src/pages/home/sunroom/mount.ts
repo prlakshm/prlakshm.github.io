@@ -10,6 +10,7 @@ import { animate } from "motion";
 import { computeLayout, sunFrom, type Layout } from "./scene.js";
 import { buildModel, curtainsAt, type Model } from "./model.js";
 import { GROUP_ORDER, curtainPaths, renderSketch, type LineStyle } from "./sketch.js";
+import { readHand, renderHand } from "./hands.js";
 import { createLight, type LightRenderer, type LightStyle } from "./light.js";
 import { leavesAt } from "./leaves.js";
 import { createMotes, type Motes } from "./motes.js";
@@ -40,10 +41,14 @@ const DRAW: Record<number, [number, number]> = {
   [GROUP_ORDER.chairs]: [1.15, 0.6],
 };
 const LINE_FOR = 0.55;
+/** A single unbroken line takes its time. */
+const ONE_LINE_FOR = 2.8;
 const FILL_FOR = 0.6;
-const LIGHT_AT = 0.95;
+/* The sun comes out only once the doors are drawn: nothing of the glass
+   may show colour before there is a door to hold it. */
+const LIGHT_AT = 1.5;
+const LIGHT_AT_ONE_LINE = 3.1;
 const LIGHT_FOR = 2.4;
-const ENTRANCE = LIGHT_AT + LIGHT_FOR;
 /** How long to hold the entrance for the hero's web font before going anyway. */
 const FONT_WAIT_MS = 1200;
 
@@ -76,6 +81,10 @@ export function mountSunroom(root: HTMLElement, initial: RoomVariant): Sunroom {
   }
 
   const wide = window.matchMedia(WIDE);
+  // `?hand=curly|line`: other ways of drawing the same room, under trial
+  const hand = readHand();
+  const lightAt = hand === "line" ? LIGHT_AT_ONE_LINE : LIGHT_AT;
+  const ENTRANCE = lightAt + LIGHT_FOR;
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   let destroyed = false;
 
@@ -126,7 +135,7 @@ export function mountSunroom(root: HTMLElement, initial: RoomVariant): Sunroom {
   /** How far the sun has come out, 0–1. Held still, it is simply out or not,
       and the canvas fades between the two in CSS. */
   const intro = () =>
-    still ? (clock >= LIGHT_AT ? 1 : 0) : easeLight(clamp01((clock - LIGHT_AT) / LIGHT_FOR));
+    still ? (clock >= lightAt ? 1 : 0) : easeLight(clamp01((clock - lightAt) / LIGHT_FOR));
 
   const collect = () => {
     const lines = Array.from(svg.querySelectorAll<SVGPathElement>(".sr-l"));
@@ -150,7 +159,7 @@ export function mountSunroom(root: HTMLElement, initial: RoomVariant): Sunroom {
     if (sketchSettled) return;
     let done = true;
     for (const s of strokes) {
-      const u = clamp01((t - s.at) / LINE_FOR);
+      const u = clamp01((t - s.at) / (hand === "line" ? ONE_LINE_FOR : LINE_FOR));
       if (u < 1) done = false;
       s.el.style.strokeDashoffset = String(1 - easeLine(u));
     }
@@ -257,7 +266,7 @@ export function mountSunroom(root: HTMLElement, initial: RoomVariant): Sunroom {
       clock = t;
       drawSketch(t);
       // held still, nothing else will paint the moment the sun comes out
-      if (still && !out && t >= LIGHT_AT) {
+      if (still && !out && t >= lightAt) {
         out = true;
         paint(performance.now());
       }
@@ -313,7 +322,7 @@ export function mountSunroom(root: HTMLElement, initial: RoomVariant): Sunroom {
     const floor = Math.max(layout.bandBottom, model.bottom) - metrics.blockBottom;
     host.style.setProperty("--sr-floor", `${Math.round(floor)}px`);
     svg.setAttribute("viewBox", `0 0 ${layout.width} ${layout.height}`);
-    svg.innerHTML = renderSketch(layout, model, INK);
+    svg.innerHTML = hand === "ink" ? renderSketch(layout, model, INK) : renderHand(layout, model, INK, hand);
     curtains = Array.from(svg.querySelectorAll<SVGPathElement>("[data-c]"));
     // Nothing of the sketch shows until the entrance starts it.
     svg.classList.toggle("is-waiting", clock < 0);

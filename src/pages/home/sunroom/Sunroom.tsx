@@ -7,7 +7,7 @@ const STORE = "sunroom-glass";
 
 /** Which glass to start with: `?room=` wins, then the last one chosen. */
 export function readRoom(): RoomVariant {
-  if (typeof window === "undefined") return "golden";
+  if (typeof window === "undefined") return "stained";
   const q = new URLSearchParams(window.location.search).get("room");
   if (VARIANTS.includes(q as RoomVariant)) return q as RoomVariant;
   try {
@@ -16,7 +16,7 @@ export function readRoom(): RoomVariant {
   } catch {
     /* private mode: no memory, no problem */
   }
-  return "golden";
+  return "stained";
 }
 
 export function rememberRoom(variant: RoomVariant) {

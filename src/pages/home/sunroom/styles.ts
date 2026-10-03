@@ -9,7 +9,7 @@ import { PANE_COLS, PANE_ROWS, type LightStyle } from "./light.js";
 import type { V3 } from "./scene.js";
 
 export type RoomVariant = "golden" | "stained" | "moon";
-export const VARIANTS: RoomVariant[] = ["golden", "stained", "moon"];
+export const VARIANTS: RoomVariant[] = ["stained", "golden", "moon"];
 
 export interface RoomStyle {
   /** Shown beside the picker. */
@@ -41,7 +41,9 @@ const CLEAR_GLASS: V3[] = [
 ];
 
 const GOLDEN: LightStyle = {
-  paneLight: grid(() => [1.0, 0.89, 0.69]),
+  // deep gold: more blue out than yellow, a little green out so it is warm
+  // without turning orange; the far end goes amber
+  paneLight: grid((_, r) => [1.0, 0.8 + r * 0.01, 0.42 + r * 0.02]),
   paneGlass: grid((_, r) => CLEAR_GLASS[r]),
   wall: [0.94, 0.94, 0.962],
   shade: [0.9, 0.906, 0.948],
@@ -54,10 +56,11 @@ const GOLDEN: LightStyle = {
   chroma: 0.001,
   bloom: 0.2,
   gloss: 0.85,
-  grade: [0.6, 0.25],
+  grade: [0.45, 0.3],
   lace: 0,
   stars: 0,
   leaf: 1,
+  air: 0.55,
   drift: 0.1,
 };
 
@@ -68,12 +71,12 @@ const GOLDEN: LightStyle = {
    chairs arrive gold, apricot, rose and lilac, side by side.
    Every colour is a multiplier: what that pane's light does to white paper. */
 const DUSK: V3[] = [
-  [1.0, 0.86, 0.55], // gold
-  [1.0, 0.77, 0.6], // apricot
-  [1.0, 0.69, 0.77], // rose
-  [0.86, 0.74, 1.0], // lilac
-  [0.74, 0.78, 1.0], // periwinkle
-  [0.64, 0.83, 1.0], // sky
+  [1.0, 0.84, 0.48], // gold
+  [1.0, 0.73, 0.54], // apricot
+  [1.0, 0.64, 0.74], // rose
+  [0.82, 0.69, 1.0], // lilac
+  [0.69, 0.74, 1.0], // periwinkle
+  [0.58, 0.8, 1.0], // sky
 ];
 const DUSK_GLASS: V3[] = [
   [1.0, 0.89, 0.62],
@@ -103,6 +106,8 @@ const STAINED: LightStyle = {
   // the colours are the point: let them stay themselves across the room
   grade: [0.06, 0.03],
   leaf: 0,
+  // as it was: the colours are the point, in the air as on the floor
+  air: 1,
 };
 
 /* The same doors at night. The room is deep blue; what comes through the
@@ -110,11 +115,11 @@ const STAINED: LightStyle = {
    room that is not blue. The glass itself holds the night sky. */
 const MOON: LightStyle = {
   ...GOLDEN,
-  paneLight: grid((_, r) => [0.86 + r * 0.01, 0.92 + r * 0.008, 1.0]),
+  paneLight: grid((_, r) => [0.7 + r * 0.015, 0.82 + r * 0.01, 1.0]),
   paneGlass: grid((_, r) => [0.4 - r * 0.02, 0.48 - r * 0.02, 0.74 - r * 0.01]),
   // the walls are left alone; the floor falls into night around the light,
   // which is what makes the pale moonlight read as light at all
-  shade: [0.5, 0.56, 0.8],
+  shade: [0.42, 0.5, 0.8],
   room: 1,
   stars: 1,
   beam: 1.0,
@@ -127,6 +132,7 @@ const MOON: LightStyle = {
   gloss: 0.95,
   grade: [0, 0],
   leaf: 1,
+  air: 0.7,
   drift: 0.16,
 };
 
@@ -171,6 +177,7 @@ export function mixLight(a: LightStyle, b: LightStyle, t: number): LightStyle {
     stars: mix(a.stars, b.stars, t),
     leaf: mix(a.leaf, b.leaf, t),
     drift: mix(a.drift, b.drift, t),
+    air: mix(a.air, b.air, t),
   };
 }
 
