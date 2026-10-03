@@ -285,7 +285,7 @@ const DESIGN = {
   /** px per metre for the furniture. */
   furn: 160,
   /** The light gives out this far past the nearest chair's feet. */
-  past: 20,
+  past: 56,
 };
 /** The eye's distance from the back wall. */
 const DEPTH = 5;
