@@ -67,7 +67,7 @@ function About() {
       const out: Step[] = [];
       if (heading) out.push({ el: heading, beats: lineCount(heading) });
       out.push({ el: q(".ab-body .line"), rows: true });
-      if (beside && portrait) out.push({ el: portrait });
+      if (beside && portrait) out.push({ el: portrait, large: true });
       out.push({ el: q(".ab-exp-h, .ab-exp-row"), rows: true });
       return out;
     };
@@ -77,7 +77,7 @@ function About() {
       );
     const stops = [enterOnView(text ?? about, steps, ready)];
     if (portrait && !beside)
-      stops.push(enterOnView(portrait, () => [{ el: portrait }], () => decoded(q(".ab-portrait img") as HTMLImageElement[])));
+      stops.push(enterOnView(portrait, () => [{ el: portrait, large: true }], () => decoded(q(".ab-portrait img") as HTMLImageElement[])));
     return () => stops.forEach((stop) => stop());
   }, []);
 
