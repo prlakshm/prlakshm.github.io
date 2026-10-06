@@ -15,6 +15,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://pranaviram.com/codex/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://pranaviram.com/mixr/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
