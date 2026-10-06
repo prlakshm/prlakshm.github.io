@@ -105,7 +105,7 @@ function ribbon(st: Ribbon, N: number) {
 
 const COLS: Record<string, string> = {
   bblush: "#ff9ccc", blilac: "#c9a6ff", bsky: "#8fd3ff", bchart: "#d6f07a", bpeach: "#ffc48a", baqua: "#84ecd0",
-  oeblush: "#ffb0d2", oelilac: "#d4c2ff", oesky: "#b2dcff", oechart: "#e9f09c", oepeach: "#fec79a", oeaqua: "#ade9cf",
+  oeblush: "#ffb0d2", oelilac: "#d4c2ff", oesky: "#b2dcff", oechart: "#e9f09c", oepeach: "#ffc98f", oeaqua: "#ade9cf",
 };
 const tint = (hex: string, f: number) => {
   const n = (i: number) => Math.round(Math.min(255, parseInt(hex.slice(i, i + 2), 16) * f));

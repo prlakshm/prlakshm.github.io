@@ -273,7 +273,7 @@ export default function PosterGallery({ groups }: { groups: GalleryGroup[] }) {
                       className="gl-print"
                       style={item.tint ? ({ "--t1": item.tint[0], "--t2": item.tint[1] } as React.CSSProperties) : undefined}
                     >
-                      <img src={`${ASSET}${item.id}-poster.webp`} alt={item.posterAlt} loading="lazy" decoding="async" />
+                      <img src={`${ASSET}${item.id}-poster.webp`} alt={item.posterAlt} loading="eager" {...{ fetchpriority: "high" }} decoding="async" />
                       {/* Glass, in order: UV varnish, print stock, the shine
                           under the cursor, the pane's edge. */}
                       <span className="gl-uv" aria-hidden="true" />

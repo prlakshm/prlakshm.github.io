@@ -49,7 +49,7 @@ uniform vec4 uShine;     // a light catching the leaf: centre x, y (CSS px), hal
 uniform vec4 uShineDir;  // its direction of travel (x, y), and how far it reaches along its length (CSS px)
 uniform sampler2D uCloud; // the sky's own cloud layer: R = cloud (0.5 = none), G = how much is sky (half size)
 uniform float uCloudOn;
-uniform float uCloudShift; // how far the clouds have drifted, as a fraction of the painting's width
+uniform vec4 uCloudMotion; // primary x, secondary x, vertical y (UV), colour gain
 uniform vec3 uCloudRGB;   // what one unit of cloud does to the sky's colour (sRGB)
 
 float hash12(vec2 p) {
@@ -127,14 +127,17 @@ void main() {
   vec3 col = texture2D(uPaint, uv).rgb;
   vec4 fx = texture2D(uFx, uv);
 
-  // a sky that drifts: the painting's own clouds slide slowly sideways behind
-  // the city and loop (the field tiles across the width). Only the sky moves.
+  // Two broad cloud currents cross at different speeds, with just a few
+  // painting pixels of vertical meander. The original sample is subtracted so
+  // this changes the sky without brightening it continuously; towers stay put.
   if (uCloudOn > 0.5) {
     vec4 c0 = texture2D(uCloud, uv);
     if (c0.g > 0.01) {
       float here = c0.r - 0.5;
-      float there = texture2D(uCloud, vec2(fract(uv.x - uCloudShift), uv.y)).r - 0.5;
-      col += (there - here) * 8.0 * uCloudRGB * c0.g;
+      float primary = texture2D(uCloud, vec2(fract(uv.x - uCloudMotion.x), clamp(uv.y + uCloudMotion.z, 0.0, 1.0))).r - 0.5;
+      float secondary = texture2D(uCloud, vec2(fract(uv.x - uCloudMotion.y), clamp(uv.y - uCloudMotion.z * 0.55, 0.0, 1.0))).r - 0.5;
+      float there = mix(primary, secondary, 0.28);
+      col += (there - here) * 8.0 * uCloudRGB * c0.g * uCloudMotion.w;
     }
   }
 
@@ -248,7 +251,14 @@ export type PaintOptions = {
   flowers?: [number, number, number, number][]; // up to 5 lilies: left, top, right, base (painting px)
   sway?: number[]; // how much each lily sways (1 = full); used by the footer
   swell?: number; // the whole surface's slow drift, painting px (default 2.2: the pond breathes; 0 for a city)
-  clouds?: { src: string; rgb: [number, number, number]; speed: number }; // a drifting sky: its cloud layer (R cloud, G sky), the colour of one unit of cloud, painting px per second
+  clouds?: {
+    src: string;
+    rgb: [number, number, number];
+    speed: number;
+    secondarySpeed?: number;
+    vertical?: number;
+    gain?: number;
+  }; // drifting sky: cloud layer (R cloud, G sky), two speeds and a small vertical meander in painting px
 };
 
 export async function createPaintGL(canvas: HTMLCanvasElement, paintSrc: string, fxSrc: string, opts: PaintOptions = {}): Promise<PaintGL | null> {
@@ -367,7 +377,12 @@ export async function createPaintGL(canvas: HTMLCanvasElement, paintSrc: string,
       if (gl.isContextLost()) return;
       bind();
       gl.uniform1f(u("uTime"), t);
-      if (opts.clouds) gl.uniform1f(u("uCloudShift"), ((t * opts.clouds.speed) / paint.width) % 1);
+      if (opts.clouds) {
+        const primary = ((t * opts.clouds.speed) / paint.width) % 1;
+        const secondary = ((t * (opts.clouds.secondarySpeed ?? opts.clouds.speed * 0.4)) / paint.width) % 1;
+        const vertical = Math.sin((t * 2 * Math.PI) / 24) * (opts.clouds.vertical ?? 0) / paint.height;
+        gl.uniform4f(u("uCloudMotion"), primary, secondary, vertical, opts.clouds.gain ?? 1);
+      }
       const sh = shine ?? [0, 0, 1, 0, 1, 0, 1];
       gl.uniform4f(u("uShine"), sh[0], sh[1], sh[2], sh[3]);
       gl.uniform4f(u("uShineDir"), sh[4], sh[5], sh[6], 0);

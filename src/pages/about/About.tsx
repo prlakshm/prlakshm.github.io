@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
-import { decoded, enterOnView, fontsReady, lineCount, type Step } from "../../motion/entrance.js";
+import { BEAT, decoded, enterOnView, fontsReady, lineCount, type Step } from "../../motion/entrance.js";
 import "../../styles/tokens.css";
 import "../home/home.css";
 import "./about.css";
@@ -9,6 +9,8 @@ import { earn } from "../../components/badges/badgeStore.js";
 import { mountPortraitPop } from "./portraitPop.js";
 import { mountPortraitGlass } from "./portraitGlass.js";
 import { prefersReducedMotion } from "../home/interactions.js";
+import { mountTitleGoldLight } from "../home/titleGoldLight.js";
+import { DEFAULT_ORANGE_PREVIEW, orangePreviewFromSearch } from "./orangePreview.js";
 
 // public/about/"Profile picture.webp" — space encoded for the URL.
 const PORTRAIT = "/about/Profile%20picture.webp";
@@ -30,6 +32,12 @@ function About() {
     window.scrollTo(0, 0);
   }, []);
 
+  useEffect(() => {
+    const heading = aboutRef.current?.querySelector<HTMLElement>(".ab-heading");
+    if (!heading) return;
+    return mountTitleGoldLight(heading, { firstDelay: 1.9, interval: [7, 10] });
+  }, []);
+
   /* The experience table runs exactly as wide as the title's longest line
      (the h1 box itself is wider than its words). */
   useLayoutEffect(() => {
@@ -37,8 +45,10 @@ function About() {
     const text = h?.closest<HTMLElement>(".ab-text");
     if (!h || !text) return;
     const fit = () => {
+      const titleText = h.firstChild;
+      if (!titleText) return;
       const range = document.createRange();
-      range.selectNodeContents(h);
+      range.selectNodeContents(titleText);
       const w = Math.max(...Array.from(range.getClientRects()).map((r) => r.width));
       text.style.setProperty("--ab-title-w", `${Math.ceil(w)}px`);
     };
@@ -50,8 +60,8 @@ function About() {
   }, []);
 
   /* Entrance, in groups, in the site's rhythm (src/motion/entrance.ts): the
-     title (a beat per line it wraps to, so the body always waits for its last
-     line), the body, the photo, then the table. Stacked under the table
+     title (a beat per line it wraps to), with the beside photo joining on its
+     final line, then the body and table. Stacked under the table
      (phones) the photo comes in when it scrolls into view. Waits for the
      fonts, so the lines are counted and the table sized before anything
      moves. */
@@ -64,10 +74,11 @@ function About() {
     const beside = !!portrait && !!text && portrait.getBoundingClientRect().top < text.getBoundingClientRect().bottom;
     const steps = (): Step[] => {
       const heading = q(".ab-heading")[0];
+      const portraitAt = heading ? BEAT * Math.max(0, lineCount(heading) - 1) + 0.05 : 0;
       const out: Step[] = [];
       if (heading) out.push({ el: heading, beats: lineCount(heading) });
       out.push({ el: q(".ab-body .line"), rows: true });
-      if (beside && portrait) out.push({ el: portrait, large: true });
+      if (beside && portrait) out.push({ el: portrait, large: true, weight: "heavy", at: portraitAt });
       out.push({ el: q(".ab-exp-h, .ab-exp-row"), rows: true });
       return out;
     };
@@ -77,7 +88,7 @@ function About() {
       );
     const stops = [enterOnView(text ?? about, steps, ready)];
     if (portrait && !beside)
-      stops.push(enterOnView(portrait, () => [{ el: portrait, large: true }], () => decoded(q(".ab-portrait img") as HTMLImageElement[])));
+      stops.push(enterOnView(portrait, () => [{ el: portrait, large: true, weight: "heavy" }], () => decoded(q(".ab-portrait img") as HTMLImageElement[])));
     return () => stops.forEach((stop) => stop());
   }, []);
 
@@ -89,7 +100,8 @@ function About() {
     const pane = fig?.querySelector<HTMLElement>(".ab-pane");
     const glassEl = fig?.querySelector<HTMLElement>(".ab-glass");
     if (!fig || !pane || !glassEl) return;
-    const pop = mountPortraitPop(fig, pane, prefersReducedMotion());
+    const orangePreview = orangePreviewFromSearch(window.location.search) ?? DEFAULT_ORANGE_PREVIEW;
+    const pop = mountPortraitPop(fig, pane, prefersReducedMotion(), orangePreview);
     const glass = mountPortraitGlass(fig, glassEl, prefersReducedMotion());
     let touch = false;
     const celebrate = (e: PointerEvent | MouseEvent) => earn("celebrate", { x: e.clientX, y: e.clientY });
@@ -147,6 +159,8 @@ function About() {
               {/* "designer" takes the second line when the two don't fit */}
               <h1 className="ab-heading" id="ab-title">
                 an&nbsp;interdisciplinary designer
+                <span className="ab-heading-gold ab-heading-gold--auto" aria-hidden="true">an&nbsp;interdisciplinary designer</span>
+                <span className="ab-heading-gold ab-heading-gold--pointer" aria-hidden="true">an&nbsp;interdisciplinary designer</span>
               </h1>
               <div className="ab-body">
                 <p className="line">

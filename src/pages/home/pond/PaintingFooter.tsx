@@ -1,6 +1,7 @@
 import { useEffect, useRef, type CSSProperties } from "react";
 import { cancelFrame, frame } from "motion";
 import { prefersReducedMotion } from "../interactions.js";
+import { createGoldShine, stepGoldLamp } from "../goldLight.js";
 import { createPaintGL, type PaintGL, type PaintOptions } from "./paintGL.js";
 import "./pond.css";
 
@@ -143,7 +144,7 @@ const PAINTINGS: Record<string, Painting> = {
     pos: "50% 0",
     phone: "75% 0",
     ...FRAME_SKYLINE,
-    live: { swell: 0, clouds: { src: "/home/footer/skyline-d-clouds.webp", rgb: SKYLINE_CLOUD_RGB, speed: 14 } },
+    live: { swell: 0, clouds: { src: "/home/footer/skyline-d-clouds.webp", rgb: SKYLINE_CLOUD_RGB, speed: 24, secondarySpeed: 9, vertical: 3, gain: 1.65 } },
   },
   "skyline-b": {
     src: "/home/footer/skyline-b.webp",
@@ -152,7 +153,7 @@ const PAINTINGS: Record<string, Painting> = {
     phone: "75% 0",
     ...FRAME_SKYLINE,
     size: [3376, 704],
-    live: { swell: 0, clouds: { src: "/home/footer/skyline-b-clouds.webp", rgb: SKYLINE_CLOUD_RGB, speed: 14 } },
+    live: { swell: 0, clouds: { src: "/home/footer/skyline-b-clouds.webp", rgb: SKYLINE_CLOUD_RGB, speed: 24, secondarySpeed: 9, vertical: 3, gain: 1.65 } },
   },
 };
 const DEFAULT = "5b-smooth";
@@ -262,39 +263,9 @@ export default function PaintingFooter({ painting }: { painting?: string } = {})
     // on hover only the gold responds.
     const ambient = { x: 0, y: 0 };
 
-    // Now and then, somewhere random, a light catches the leaf: a soft streak
-    // glides a few hundred px across the painting and the gold sparkles as it
-    // passes, the way gold leaf catches the light as you walk past a painting.
-    // The first comes a second after the pond comes into view; then every 4-9s.
-    const shine = { start: 0, dur: 0, x: 0, y: 0, dx: 1, dy: 0, len: 0, on: false };
-    let nextShine = 1.2;
-    const shineNow = (t: number): [number, number, number, number, number, number, number] | undefined => {
-      if (!shine.on && t >= nextShine && size.w > 0) {
-        const ltr = Math.random() < 0.7; // mostly left to right, like a passing glance
-        const a = (Math.random() - 0.5) * 0.6; // a slight tilt
-        shine.len = Math.min(size.w * 0.5, 240 + Math.random() * 220);
-        shine.dx = Math.cos(a) * (ltr ? 1 : -1);
-        shine.dy = Math.sin(a);
-        const lo = ltr ? 0.04 * size.w : 0.04 * size.w + shine.len;
-        const hi = ltr ? 0.96 * size.w - shine.len : 0.96 * size.w;
-        shine.x = lo + Math.random() * Math.max(0, hi - lo);
-        shine.y = size.h * (0.3 + Math.random() * 0.4);
-        shine.start = t;
-        shine.dur = shine.len / (230 + Math.random() * 70);
-        shine.on = true;
-      }
-      if (!shine.on) return undefined;
-      const q = (t - shine.start) / shine.dur;
-      if (q >= 1) {
-        shine.on = false;
-        nextShine = t + 4 + Math.random() * 5;
-        return undefined;
-      }
-      const e = q * q * (3 - 2 * q); // eased travel
-      const fade = Math.min(1, q / 0.25) * Math.min(1, (1 - q) / 0.3);
-      const reach = size.h * 0.55; // how far the streak reaches along its length
-      return [shine.x + shine.dx * shine.len * e, shine.y + shine.dy * shine.len * e, 44, fade, shine.dx, shine.dy, reach];
-    };
+    // The footer and painted titles share one gold-leaf light model. Only the
+    // cadence differs by surface.
+    const goldShine = createGoldShine({ firstDelay: 1.2, interval: [4, 9] });
 
     const paint = () => {
       if (!gl) return;
@@ -313,15 +284,12 @@ export default function PaintingFooter({ painting }: { painting?: string } = {})
         : held
           ? { x: lamp.x, y: lamp.y, on: 1, k: 7 }
           : { ...drift, on: 0.45, k: 1.1 };
-      const a = 1 - Math.exp(-dt * target.k);
-      lamp.x += (target.x - lamp.x) * a;
-      lamp.y += (target.y - lamp.y) * a;
-      lamp.on += (target.on - lamp.on) * (1 - Math.exp(-dt * 3));
+      stepGoldLamp(lamp, target, dt);
       const ka = 1 - Math.exp(-dt * 1.1);
       ambient.x += (drift.x - ambient.x) * ka;
       ambient.y += (drift.y - ambient.y) * ka;
       stepLilies(t);
-      gl.render(t, [lamp.x, lamp.y, lamp.z, lamp.on], moves, [ambient.x, ambient.y, lamp.z, 0.6], shineNow(t));
+      gl.render(t, [lamp.x, lamp.y, lamp.z, lamp.on], moves, [ambient.x, ambient.y, lamp.z, 0.6], goldShine.sample(t, size));
       if (!root.dataset.live) root.dataset.live = "1"; // fades the canvas in over the still
     };
 
@@ -330,8 +298,7 @@ export default function PaintingFooter({ painting }: { painting?: string } = {})
       running = true;
       last = performance.now();
       // the light first catches the leaf a moment after the pond comes into view
-      shine.on = false;
-      nextShine = Math.max(nextShine, (last - t0) / 1000 + 1);
+      goldShine.reset((last - t0) / 1000, 1);
       frame.render(paint, true);
     };
     const stop = () => {

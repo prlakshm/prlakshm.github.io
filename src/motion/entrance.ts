@@ -12,11 +12,23 @@ const SETTLE = { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const };
 
 /** A unit in the queue: an element (or a group that comes in as one) and how many beats it holds (a two-line
     title holds two, so what follows waits for its second line). */
-export type Step = { el: HTMLElement | HTMLElement[]; beats?: number; rows?: boolean | number; large?: boolean };
+export type Step = {
+  el: HTMLElement | HTMLElement[];
+  beats?: number;
+  rows?: boolean | number;
+  large?: boolean;
+  weight?: "heavy";
+  /** Optional offset from this sequence's start, allowing related groups to overlap. */
+  at?: number;
+};
 // Large dark blocks (the posters) are a big jump in brightness on the light
 // page: a text-speed fade flashes them in. They fade slower and settle longer.
-const FADE_LARGE = { duration: 0.9, ease: [0.33, 0, 0.2, 1] as const };
-const SETTLE_LARGE = { duration: 1.1, ease: [0.16, 1, 0.3, 1] as const };
+const FADE_LARGE = { duration: 0.5, ease: [0.33, 0, 0.2, 1] as const };
+const SETTLE_LARGE = { duration: 0.7, ease: [0.16, 1, 0.3, 1] as const };
+// A single large focal object needs slightly more time than a repeating card
+// rail, but keeps the same decisive easing and entrance distance.
+const FADE_HEAVY = { duration: 0.65, ease: [0.33, 0, 0.2, 1] as const };
+const SETTLE_HEAVY = { duration: 0.9, ease: [0.16, 1, 0.3, 1] as const };
 // Rows inside a group (the hero's sub lines, About's paragraphs and table
 // rows) ripple in this close behind one another: close enough to read as one
 // block arriving, apart enough to feel it cascade. The next group waits for
@@ -54,13 +66,16 @@ export function show(els: HTMLElement[]) {
 
 /** Plays the steps in the queue; returns a stop that jumps them to rest. */
 export function play(steps: Step[]) {
-  let at = Math.max(now(), nextFree);
+  const sequenceStart = Math.max(now(), nextFree);
+  let cursor = sequenceStart;
   const controls = steps.flatMap((s) => {
     const els = Array.isArray(s.el) ? s.el : [s.el];
     const ripple = typeof s.rows === "number" ? s.rows : s.rows ? ROW : 0;
-    const fade = s.large ? FADE_LARGE : FADE, settle = s.large ? SETTLE_LARGE : SETTLE;
-    const start = at - now();
-    at += BEAT * (s.beats ?? 1) + ripple * Math.max(0, els.length - 1);
+    const fade = s.weight === "heavy" ? FADE_HEAVY : s.large ? FADE_LARGE : FADE;
+    const settle = s.weight === "heavy" ? SETTLE_HEAVY : s.large ? SETTLE_LARGE : SETTLE;
+    const stepAt = s.at == null ? cursor : sequenceStart + s.at;
+    const start = stepAt - now();
+    cursor = Math.max(cursor, stepAt + BEAT * (s.beats ?? 1) + ripple * Math.max(0, els.length - 1));
     // explicit from-values: Motion otherwise starts from a remembered value.
     // The delay goes inside each value's transition: a per-value transition
     // replaces the shared one, delay included.
@@ -69,7 +84,7 @@ export function play(steps: Step[]) {
       return animate(el, { opacity: [0, 1], y: [RISE, 0] }, { opacity: { ...fade, delay }, y: { ...settle, delay } });
     });
   });
-  nextFree = at;
+  nextFree = cursor;
   const els = flat(steps);
   Promise.all(controls.map((c) => c.finished)).then(() => show(els), () => show(els));
   return () => {

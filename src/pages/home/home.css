@@ -117,6 +117,14 @@
 }
 
 .hero-title {
+  --title-light-x: 50%;
+  --title-light-y: 50%;
+  --title-light-a: 0;
+  --title-shine-x: -20%;
+  --title-shine-y: 50%;
+  --title-shine-w: 44px;
+  --title-shine-reach: 54px;
+  --title-shine-a: 0;
   position: relative;
   isolation: isolate;
   margin: 0;
@@ -149,6 +157,52 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* The title and footer share one gold material. These duplicate text layers
+   carry light only where the skyline's baked gold mask says leaf exists: the
+   first is the occasional passing glint, the second follows the cursor. */
+.hero-title-gold {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: block;
+  box-sizing: border-box;
+  padding-block: 0.04em 0.2em;
+  color: transparent;
+  pointer-events: none;
+  white-space: normal;
+  -webkit-background-clip: text;
+  background-clip: text;
+  mask-image: url("/home/footer/skyline-d-gold.webp");
+  mask-repeat: no-repeat;
+  mask-size: 150% auto;
+  mask-position: 11.9% 92.2%;
+  -webkit-mask-image: url("/home/footer/skyline-d-gold.webp");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 150% auto;
+  -webkit-mask-position: 11.9% 92.2%;
+}
+
+.hero-title-gold--auto {
+  opacity: var(--title-shine-a);
+  background-image: radial-gradient(
+    ellipse var(--title-shine-w) var(--title-shine-reach) at var(--title-shine-x) var(--title-shine-y),
+    rgba(255, 248, 220, 0.96) 0%,
+    rgba(255, 231, 166, 0.5) 34%,
+    rgba(255, 222, 139, 0.2) 62%,
+    transparent 100%
+  );
+}
+
+.hero-title-gold--pointer {
+  opacity: var(--title-light-a);
+  background-image: radial-gradient(
+    ellipse clamp(76px, 11vw, 150px) clamp(52px, 8vw, 112px) at var(--title-light-x) var(--title-light-y),
+    rgba(255, 248, 218, 0.95) 0%,
+    rgba(255, 224, 149, 0.42) 42%,
+    transparent 76%
+  );
 }
 
 /* Tips on this page (.hero-pron, .deck-tooltip, .jr-tooltip) all wear the
@@ -1482,6 +1536,10 @@
    here — a CSS rule cannot cancel a JS-driven animation. What remains below is
    only the pre-JS resting state and the transitions CSS still owns. */
 @media (prefers-reduced-motion: reduce) {
+  .hero-title-gold {
+    display: none;
+  }
+
   .jr-stage,
   .jr-shadow,
   .deck-nav {
@@ -1497,5 +1555,12 @@
   .hero-title {
     background-size: auto 250%;
     background-position: 22% 92%; /* no letter lands wholly in a white facade */
+  }
+
+  .hero-title-gold {
+    mask-size: auto 250%;
+    mask-position: 22% 92%;
+    -webkit-mask-size: auto 250%;
+    -webkit-mask-position: 22% 92%;
   }
 }

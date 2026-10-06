@@ -10,6 +10,7 @@ import WorkGrid from "./WorkGrid.js";
 import SiteFooter from "./SiteFooter.js";
 import { badgesArmed, earn } from "../../components/badges/badgeStore.js";
 import { attachUnderlineWipe, prefersReducedMotion, PIN_MS, PIN_SLOP } from "./interactions.js";
+import { mountTitleGoldLight } from "./titleGoldLight.js";
 
 /* The homepage is the work: a plain centred hero, then the grid. The sketched
    sunroom, the notebooks, the concept decks and the fabric archive are no
@@ -28,34 +29,35 @@ function Home() {
     if (wantsWork) scrollToId("work");
   }, [pathname, state]);
 
-  /* Entrance, in groups: the title, then the sub (its lines together), then the
-     contact row, then the whole poster wall, one
-     beat apiece in the site's rhythm (src/motion/entrance.ts). Each wall
-     section starts when its prints scroll into view and their art has
-     decoded, so one below the fold plays when it is seen and no print fades
-     in empty. Hidden before paint; cleanup always leaves everything at rest. */
+  /* The hero reads as one composed reveal: copy begins first, the above-fold
+     poster rail joins while the second subheading line is arriving, and the
+     contact row closes the sequence. A wall below the fold still waits until
+     it is seen. Hidden before paint; cleanup always leaves everything at rest. */
   useLayoutEffect(() => {
     const hero = heroRef.current;
     if (!hero || prefersReducedMotion()) return;
 
     const title = hero.querySelector<HTMLElement>(".hero-title");
+    const sub = Array.from(hero.querySelectorAll<HTMLElement>(".line"));
+    const contacts = Array.from(hero.querySelectorAll<HTMLElement>(".wt-tiles--hero"));
+    const wall = Array.from(document.querySelectorAll<HTMLElement>(".gl-placard, .gl-card"));
+    const wallRoot = wall[0]?.closest<HTMLElement>(".gl-wall") ?? null;
+    const aboveFold = !!wallRoot && wallRoot.getBoundingClientRect().top < window.innerHeight * 0.9;
     const heroSteps = (): Step[] => {
       const out: Step[] = [];
-      if (title) out.push({ el: title, beats: lineCount(title) });
-      const sub = Array.from(hero.querySelectorAll<HTMLElement>(".line"));
-      if (sub.length) out.push({ el: sub, rows: true });
-      hero.querySelectorAll<HTMLElement>(".wt-tiles--hero").forEach((el) => out.push({ el }));
+      if (title) out.push({ el: title, beats: lineCount(title), at: 0 });
+      if (sub.length) out.push({ el: sub, rows: true, at: 0.14 });
+      if (aboveFold && wall.length) out.push({ el: wall, rows: 0.04, large: true, at: 0.26 });
+      if (contacts.length) out.push({ el: contacts, at: 0.4 });
       return out;
     };
     const stops = [enterOnView(hero, heroSteps, () => fontsReady())];
 
-    // the whole poster wall, both sections, as one group (.gl-group has no
-    // box on the one-row wall, so the placards and prints move, not it)
-    const wall = Array.from(document.querySelectorAll<HTMLElement>(".gl-placard, .gl-card"));
-    if (wall.length)
+    // If the rail begins below the opening composition, reveal it on view.
+    if (wall.length && !aboveFold)
       stops.push(
-        enterOnView(wall[0].closest(".gl-wall") ?? wall[0], () => [{ el: Array.from(document.querySelectorAll<HTMLElement>(".gl-placard, .gl-card")), rows: 0.09, large: true }], () =>
-          decoded(Array.from(document.querySelectorAll<HTMLImageElement>(".gl-print img")))
+        enterOnView(wallRoot ?? wall[0], () => [{ el: wall, rows: 0.04, large: true }], () =>
+          decoded(Array.from(document.querySelectorAll<HTMLImageElement>(".gl-print img")), 250)
         )
       );
 
@@ -75,6 +77,7 @@ function Home() {
     // Pronunciation note: follows the cursor, opacity only (no y/scale — those
     // would fight left/top placement).
     const title = heroRef.current?.querySelector<HTMLElement>(".hero-title");
+    if (title) cleanups.push(mountTitleGoldLight(title, { firstDelay: 1.6, interval: [6, 9] }));
     const pron = title?.querySelector<HTMLElement>(".hero-pron");
     if (title && pron) {
       const reduced = prefersReducedMotion();
@@ -223,6 +226,8 @@ function Home() {
           <div className="hero-block">
             <h1 className="hero-title">
               hi, i&rsquo;m pranavi ram
+              <span className="hero-title-gold hero-title-gold--auto" aria-hidden="true">hi, i&rsquo;m pranavi ram</span>
+              <span className="hero-title-gold hero-title-gold--pointer" aria-hidden="true">hi, i&rsquo;m pranavi ram</span>
               <span className="hero-pron wt-tip" aria-hidden="true">
                 Pronounced <em>Pren-Uh-Vi Ram</em> (Like Palm)
               </span>
