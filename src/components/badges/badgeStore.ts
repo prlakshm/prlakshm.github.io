@@ -44,7 +44,10 @@ let found: BadgeId[] = typeof window === "undefined" ? [] : load();
 
 const listeners = new Set<() => void>();
 
-export type EarnEvent = { id: BadgeId; from: { x: number; y: number } | null };
+export type EarnEvent = { id: BadgeId; from: { x: number; y: number } | null; deferred?: boolean };
+
+// The page a badge was earned on: it lands there, when the visitor comes back.
+const here = () => location.pathname + (location.hash || "#/");
 const earnListeners = new Set<(e: EarnEvent) => void>();
 
 function save() {
@@ -105,24 +108,32 @@ export function earn(
   save();
   if (opts.defer) {
     try {
-      sessionStorage.setItem(PENDING, id);
+      sessionStorage.setItem(PENDING, JSON.stringify({ id, at: here() }));
     } catch {
       /* no-op */
     }
   }
   // Flight listeners first: the card marks the badge as in flight before the
   // state listeners re-render it, so the slot stays empty until the stamp lands.
-  if (!opts.defer) earnListeners.forEach((fn) => fn({ id, from }));
+  earnListeners.forEach((fn) => fn({ id, from, deferred: opts.defer }));
   listeners.forEach((fn) => fn());
   return true;
 }
 
-/** Returns (and clears) a badge earned on the way out of the page. */
-export function takePending(): BadgeId | null {
+/** A badge earned on the way out of a page, still waiting to land there:
+    `home` is true back on that page, where it is cleared and should land.
+    Elsewhere (the case study it led to) it stays hidden and waits. */
+export function takePending(): { id: BadgeId; home: boolean } | null {
   try {
-    const id = sessionStorage.getItem(PENDING);
-    sessionStorage.removeItem(PENDING);
-    return isBadge(id) && found.includes(id) ? id : null;
+    const raw = JSON.parse(sessionStorage.getItem(PENDING) || "null");
+    const id = raw?.id;
+    if (!isBadge(id) || !found.includes(id)) {
+      sessionStorage.removeItem(PENDING);
+      return null;
+    }
+    const home = raw.at === here();
+    if (home) sessionStorage.removeItem(PENDING);
+    return { id, home };
   } catch {
     return null;
   }

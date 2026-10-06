@@ -63,6 +63,9 @@
   color: inherit;
   text-decoration: none;
   outline: none;
+  /* app.css gives every link a 0.5s transition on everything; on a card it
+     made the entrance's hide fade the print out from visible (a flash) */
+  transition: none;
 }
 
 /* The print: a pane of glass. Motion owns its transform (the hover lean).

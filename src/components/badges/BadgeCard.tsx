@@ -54,7 +54,10 @@ const isKeyboardFocus = (el: Element) => {
 /* Captured once per page load, before React renders. Under Strict Mode effects
    run twice; reading the pending badge inside an effect would consume it on
    the first pass and lose the celebration on the second. */
-let bootPending: BadgeId | null = typeof window === "undefined" ? null : takePending();
+const bootTake = typeof window === "undefined" ? null : takePending();
+// hidden until it lands; it lands only back on the page it was earned on
+const bootHidden: BadgeId | null = bootTake?.id ?? null;
+let bootPending: BadgeId | null = bootTake?.home ? bootTake.id : null;
 
 /* Berkeley Mono Trial draws "/" as a backslash; the slash comes from the
    fallback mono instead. */
@@ -264,7 +267,7 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
   /* `landed` is what the card shows. It trails the store by the length of a
      flight: a badge is in the store the moment it is earned, but its slot only
      fills when the stamp arrives. */
-  const inFlight = useRef<Set<BadgeId>>(new Set(bootPending ? [bootPending] : []));
+  const inFlight = useRef<Set<BadgeId>>(new Set(bootHidden ? [bootHidden] : []));
   const [landed, setLanded] = useState<BadgeId[]>(() =>
     getFound().filter((id) => !inFlight.current.has(id))
   );
@@ -530,7 +533,15 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
     [sync]
   );
 
-  useEffect(() => onEarn(({ id, from }) => celebrate(id, from)), [celebrate]);
+  useEffect(
+    () =>
+      onEarn(({ id, from, deferred }) => {
+        // earned on the way out: keep its slot empty; it lands on return
+        if (deferred) inFlight.current.add(id);
+        else celebrate(id, from);
+      }),
+    [celebrate]
+  );
 
   /* A stamp just landed: its star's tooltip names what was found, so the
      visitor knows what they did, then card and tip go together. */
@@ -596,6 +607,26 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
       celebrate(id, null);
     }, 900);
     return () => window.clearTimeout(t);
+  }, [celebrate]);
+
+  /* Back from the case study via the browser's back button, the page may be
+     restored as it was left (no reload), and an in-app route never reloads: land the waiting badge then. */
+  useEffect(() => {
+    let t = 0;
+    const show = (e: Event) => {
+      if (e instanceof PageTransitionEvent && !e.persisted) return;
+      const p = takePending();
+      if (!p?.home) return;
+      t = window.setTimeout(() => celebrate(p.id, null), 900);
+    };
+    window.addEventListener("pageshow", show);
+    // in-app routes (#/codex) come back without a reload at all
+    window.addEventListener("hashchange", show);
+    return () => {
+      window.removeEventListener("pageshow", show);
+      window.removeEventListener("hashchange", show);
+      window.clearTimeout(t);
+    };
   }, [celebrate]);
 
   /* --- first-visit intro --------------------------------------------------- */

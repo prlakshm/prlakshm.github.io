@@ -274,7 +274,11 @@ function goldAccents(seed: number, at: [number, number | "curl", number][]): Pie
 let cache: Piece[] | null = null;
 export function framePieces(): Piece[] {
   cache ??= [
-    ...collar(547, 3, AIRY),
+    // the top edge was short of pink: its orange sheets (a heart and the
+    // triangle reaching out) are dyed blossom instead
+    ...collar(547, 3, AIRY).map((p) =>
+      p.kind === "tissue" && p.y < 0 && p.s?.includes("-oepeach") ? { ...p, s: p.s.replace("-oepeach", "-oeblush") } : p
+    ),
     ...goldAccents(551, [[0.07, 1, 24], [0.38, "curl", 3.2], [0.575, 2, 19], [0.77, 3, 16], [0.975, "curl", 3.0]]),
   ];
   return cache;

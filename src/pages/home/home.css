@@ -1489,13 +1489,6 @@
   }
 }
 
-/* The poster wall waits for its entrance (Home.tsx), continuing the hero's
-   steps; reduced motion never sets the flag. */
-.wk[data-enter="pending"] .gl-group {
-  opacity: 0;
-  transform: translateY(9px);
-}
-
 /* Phones: the title wraps to two lines, so a width-sized fill came out too
    short and the top line landed in the pale sky. Size the city by the
    title's height instead, so both lines sit in the dense, brick-and-gold

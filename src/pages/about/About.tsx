@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
-import { animate, inView } from "motion";
+import { decoded, enterOnView, fontsReady, lineCount, type Step } from "../../motion/entrance.js";
 import "../../styles/tokens.css";
 import "../home/home.css";
 import "./about.css";
@@ -49,51 +49,36 @@ function About() {
     return () => ro.disconnect();
   }, []);
 
-  /* One soft settle in 0.15s steps (0.3 felt slow, 0.06 too fast to see):
-     the title, then the copy and the portrait together, then the experience
-     table one step after. */
+  /* Entrance, in groups, in the site's rhythm (src/motion/entrance.ts): the
+     title (a beat per line it wraps to, so the body always waits for its last
+     line), the body, the photo, then the table. Stacked under the table
+     (phones) the photo comes in when it scrolls into view. Waits for the
+     fonts, so the lines are counted and the table sized before anything
+     moves. */
   useLayoutEffect(() => {
     const about = aboutRef.current;
-    if (!about) return;
-    const targets = [
-      about.querySelector<HTMLElement>(".ab-heading"),
-      about.querySelector<HTMLElement>(".ab-body"),
-      about.querySelector<HTMLElement>(".ab-portrait"),
-      about.querySelector<HTMLElement>(".ab-exp"),
-    ].filter((el): el is HTMLElement => el !== null);
-
-    const applyVisible = () =>
-      targets.forEach((el) => {
-        el.style.opacity = "1";
-        el.style.transform = "none";
-      });
-    if (prefersReducedMotion()) {
-      applyVisible();
-      return;
-    }
-    targets.forEach((el) => {
-      el.style.opacity = "0";
-      el.style.transform = "translateY(9px)";
-    });
-
-    let controls: ReturnType<typeof animate> | undefined;
-    const stop = inView(
-      about,
-      () => {
-        controls = animate(
-          targets,
-          { opacity: 1, y: 0 },
-          { duration: 0.7, delay: (i: number) => [0, 0.15, 0.15, 0.3][i] ?? 0, ease: [0.22, 0.61, 0.36, 1] }
-        );
-        controls.finished.then(applyVisible).catch(applyVisible);
-      },
-      { amount: 0.1 }
-    );
-    return () => {
-      stop();
-      if (controls) controls.complete();
-      applyVisible();
+    if (!about || prefersReducedMotion()) return;
+    const q = (sel: string) => Array.from(about.querySelectorAll<HTMLElement>(sel));
+    const portrait = q(".ab-portrait")[0];
+    const text = q(".ab-text")[0];
+    const beside = !!portrait && !!text && portrait.getBoundingClientRect().top < text.getBoundingClientRect().bottom;
+    const steps = (): Step[] => {
+      const heading = q(".ab-heading")[0];
+      const out: Step[] = [];
+      if (heading) out.push({ el: heading, beats: lineCount(heading) });
+      out.push({ el: q(".ab-body .line"), rows: true });
+      if (beside && portrait) out.push({ el: portrait });
+      out.push({ el: q(".ab-exp-h, .ab-exp-row"), rows: true });
+      return out;
     };
+    const ready = () =>
+      fontsReady().then(
+        () => new Promise((r) => requestAnimationFrame(() => r(null)))
+      );
+    const stops = [enterOnView(text ?? about, steps, ready)];
+    if (portrait && !beside)
+      stops.push(enterOnView(portrait, () => [{ el: portrait }], () => decoded(q(".ab-portrait img") as HTMLImageElement[])));
+    return () => stops.forEach((stop) => stop());
   }, []);
 
   /* Celebrate design: the portrait tilts up and the party frame tucked under

@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
-import { animate, inView, stagger } from "motion";
+import { animate } from "motion";
+import { decoded, enterOnView, fontsReady, lineCount, type Step } from "../../motion/entrance.js";
 import "../../styles/tokens.css";
 import "./home.css";
 import ContactIcons from "./ContactIcons.js";
@@ -27,132 +28,38 @@ function Home() {
     if (wantsWork) scrollToId("work");
   }, [pathname, state]);
 
-  /* Hero entrance. Hidden before paint (useLayoutEffect), then revealed once
-     when the hero is in view. A mount-only animate() was easy to interrupt
-     (Strict Mode stop(), route remount while scrolled down) and never retried,
-     so scrolling back up could find the hero stuck at opacity 0. inView fires
-     once; after that we keep the resting styles and never re-hide. */
-  const heroEnteredRef = useRef(false);
+  /* Entrance, in groups: the title, then the sub (its lines together), then the
+     contact row, then the whole poster wall, one
+     beat apiece in the site's rhythm (src/motion/entrance.ts). Each wall
+     section starts when its prints scroll into view and their art has
+     decoded, so one below the fold plays when it is seen and no print fades
+     in empty. Hidden before paint; cleanup always leaves everything at rest. */
   useLayoutEffect(() => {
     const hero = heroRef.current;
-    if (!hero) return;
+    if (!hero || prefersReducedMotion()) return;
 
     const title = hero.querySelector<HTMLElement>(".hero-title");
-    const lines = Array.from(hero.querySelectorAll<HTMLElement>(".line"));
-    const tiles = hero.querySelector<HTMLElement>(".wt-tiles--hero");
-    const targets = [title, ...lines, tiles].filter(
-      (el): el is HTMLElement => el !== null
-    );
-    if (targets.length === 0) return;
-
-    const applyVisible = () => {
-      targets.forEach((el) => {
-        el.style.opacity = "1";
-        el.style.transform = "none";
-      });
+    const heroSteps = (): Step[] => {
+      const out: Step[] = [];
+      if (title) out.push({ el: title, beats: lineCount(title) });
+      const sub = Array.from(hero.querySelectorAll<HTMLElement>(".line"));
+      if (sub.length) out.push({ el: sub, rows: true });
+      hero.querySelectorAll<HTMLElement>(".wt-tiles--hero").forEach((el) => out.push({ el }));
+      return out;
     };
+    const stops = [enterOnView(hero, heroSteps, () => fontsReady())];
 
-    if (heroEnteredRef.current) {
-      applyVisible();
-      return;
-    }
-
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) {
-      heroEnteredRef.current = true;
-      applyVisible();
-      return;
-    }
-
-    targets.forEach((el) => {
-      el.style.opacity = "0";
-      el.style.transform = "translateY(9px)";
-    });
-
-    /* The poster wall comes in the same way, continuing the hero's steps: each
-       section (its placard and its prints together) is one step. (.gl-group
-       carries no transform of its own; the lean lives on .gl-print.) */
-    const STEP = 0.06;
-    // the sections step slower than the hero's lines, so each reads as its own beat (as About's 0.15s steps)
-    const SECTION_STEP = 0.15;
-    const wall = document.querySelector<HTMLElement>(".wk");
-    // Held hidden by CSS until it comes in (home.css: .wk[data-enter]); the
-    // cards are found when it starts, as the gallery may re-render them.
-    if (wall) wall.dataset.enter = "pending";
-    let wallTargets: HTMLElement[] = [];
-    const showWall = () => {
-      if (wall) delete wall.dataset.enter;
-      wallTargets.forEach((el) => {
-        el.style.opacity = "1";
-        el.style.transform = "none";
-      });
-    };
-    let heroAt = 0;
-    let wallControls: ReturnType<typeof animate> | undefined;
-    // registered after the hero's, so the hero's start is known when it fires
-    let stopWall = () => {};
-    const startWall = () => {
-      stopWall = wall
-      ? inView(
-          wall,
-          () => {
-            wallTargets = Array.from(wall.querySelectorAll<HTMLElement>(".gl-group"));
-            wallTargets.forEach((el) => {
-              el.style.opacity = "0";
-              el.style.transform = "translateY(9px)";
-            });
-            delete wall.dataset.enter;
-            // right after the hero's last step, if the hero is still coming in
-            // (both fire in the same frame, in no set order: if the hero hasn't
-            // started yet, it is starting now)
-            const after = Math.max(0, (heroAt || performance.now() / 1000) + STEP * targets.length - performance.now() / 1000);
-            // explicit from-values: Motion remembers each card's last value
-            // (a Strict Mode first pass), which would start them near 1
-            wallControls = animate(
-              wallTargets,
-              { opacity: [0, 1], y: [9, 0] },
-              { duration: 0.7, delay: stagger(SECTION_STEP, { startDelay: after + SECTION_STEP }), ease: [0.22, 0.61, 0.36, 1] }
-            );
-            wallControls.finished.then(showWall).catch(showWall);
-          },
-          { margin: "0px 0px -8% 0px" }
+    // the whole poster wall, both sections, as one group (.gl-group has no
+    // box on the one-row wall, so the placards and prints move, not it)
+    const wall = Array.from(document.querySelectorAll<HTMLElement>(".gl-placard, .gl-card"));
+    if (wall.length)
+      stops.push(
+        enterOnView(wall[0].closest(".gl-wall") ?? wall[0], () => [{ el: Array.from(document.querySelectorAll<HTMLElement>(".gl-placard, .gl-card")), rows: 0.09, large: true }], () =>
+          decoded(Array.from(document.querySelectorAll<HTMLImageElement>(".gl-print img")))
         )
-      : () => {};
-    };
+      );
 
-    let controls: ReturnType<typeof animate> | undefined;
-    const stopInView = inView(
-      hero,
-      () => {
-        heroAt = performance.now() / 1000;
-        controls = animate(
-          targets,
-          { opacity: 1, y: 0 },
-          { duration: 0.7, delay: stagger(STEP), ease: [0.22, 0.61, 0.36, 1] }
-        );
-        const commit = () => {
-          heroEnteredRef.current = true;
-          applyVisible();
-        };
-        controls.finished.then(commit).catch(commit);
-      },
-      { margin: "0px 0px -8% 0px" }
-    );
-    startWall();
-
-    return () => {
-      stopInView();
-      stopWall();
-      // complete() jumps to the end instead of stop()'s mid-hide freeze, so a
-      // Strict Mode remount never inherits a half-hidden hero.
-      if (controls) {
-        controls.complete();
-        heroEnteredRef.current = true;
-        applyVisible();
-      }
-      wallControls?.complete();
-      showWall();
-    };
+    return () => stops.forEach((stop) => stop());
   }, []);
 
   /* Underline wipes (nav links + the @handle) and the pronunciation tooltip.
