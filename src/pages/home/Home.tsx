@@ -1,65 +1,31 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
-import { animate, inView, scroll, stagger } from "motion";
+import { animate, inView, stagger } from "motion";
 import "../../styles/tokens.css";
 import "./home.css";
-import "../about/about.css";
-import Journal from "./Journal.js";
-import Decks from "./Decks.js";
 import ContactIcons from "./ContactIcons.js";
-import Manifesto from "../about/Manifesto.js";
-import Sunroom, { GlassPicker, readRoom, rememberRoom } from "./sunroom/Sunroom.js";
-import type { RoomVariant } from "./sunroom/styles.js";
+import WtNav, { scrollToId } from "./WtNav.js";
+import WorkGrid from "./WorkGrid.js";
+import SiteFooter from "./SiteFooter.js";
+import { earn } from "../../components/badges/badgeStore.js";
 import { attachUnderlineWipe, prefersReducedMotion, PIN_MS, PIN_SLOP } from "./interactions.js";
-import { journals } from "./journals.js";
 
-// Matches the link the global Header already uses. public/docs also holds
-const RESUME_URL = "/docs/Pranavi_Ram_Resume_2026.pdf";
-
-// public/about/"Profile picture.png" — space encoded for the URL.
-const PORTRAIT = "/about/Profile%20picture.webp";
-
-function ExternalArrow() {
-  return (
-    <svg className="ext-arrow" viewBox="0 0 10 10" aria-hidden="true" focusable="false">
-      <path
-        d="M2.5 7.5 L7.5 2.5 M3.6 2.5 H7.5 V6.4"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.4"
-        strokeLinecap="square"
-      />
-    </svg>
-  );
-}
+/* The homepage is the work: a plain centred hero, then the grid. The sketched
+   sunroom, the notebooks, the concept decks and the fabric archive are no
+   longer mounted here (their components are kept); About is its own page. */
 
 function Home() {
-  const { pathname } = useLocation();
-  /* The sketched room behind the hero, and which glass its light comes
-     through. */
-  const [room, setRoom] = useState<RoomVariant>(readRoom);
-  const chooseRoom = (variant: RoomVariant) => {
-    setRoom(variant);
-    rememberRoom(variant);
-  };
-  const shelfRef = useRef<HTMLUListElement>(null);
+  const { pathname, state } = useLocation();
   const heroRef = useRef<HTMLElement>(null);
-  const aboutRef = useRef<HTMLElement>(null);
-  const surfaceRef = useRef<HTMLDivElement>(null);
 
-  const scrollToSection = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({
-      behavior: prefersReducedMotion() ? "auto" : "smooth",
-      block: "start",
-    });
-  };
-
-  /* Deep links (#/about, #/projects) land on this page and scroll to the
-     matching section once it is in the tree. */
+  /* #/projects, and WORK pressed on another page, land here and scroll to the
+     grid once it is in the tree. */
   useEffect(() => {
-    if (pathname === "/about") scrollToSection("about");
-    if (pathname === "/projects") scrollToSection("work");
-  }, [pathname]);
+    const wantsWork =
+      pathname === "/projects" ||
+      (state as { scrollTo?: string } | null)?.scrollTo === "work";
+    if (wantsWork) scrollToId("work");
+  }, [pathname, state]);
 
   /* Hero entrance. Hidden before paint (useLayoutEffect), then revealed once
      when the hero is in view. A mount-only animate() was easy to interrupt
@@ -73,7 +39,7 @@ function Home() {
 
     const title = hero.querySelector<HTMLElement>(".hero-title");
     const lines = Array.from(hero.querySelectorAll<HTMLElement>(".line"));
-    const tiles = hero.querySelector<HTMLElement>(".tiles--hero");
+    const tiles = hero.querySelector<HTMLElement>(".wt-tiles--hero");
     const targets = [title, ...lines, tiles].filter(
       (el): el is HTMLElement => el !== null
     );
@@ -103,14 +69,66 @@ function Home() {
       el.style.transform = "translateY(9px)";
     });
 
+    /* The poster wall comes in the same way, continuing the hero's steps: each
+       section (its placard and its prints together) is one step. (.gl-group
+       carries no transform of its own; the lean lives on .gl-print.) */
+    const STEP = 0.06;
+    // the sections step slower than the hero's lines, so each reads as its own beat (as About's 0.15s steps)
+    const SECTION_STEP = 0.15;
+    const wall = document.querySelector<HTMLElement>(".wk");
+    // Held hidden by CSS until it comes in (home.css: .wk[data-enter]); the
+    // cards are found when it starts, as the gallery may re-render them.
+    if (wall) wall.dataset.enter = "pending";
+    let wallTargets: HTMLElement[] = [];
+    const showWall = () => {
+      if (wall) delete wall.dataset.enter;
+      wallTargets.forEach((el) => {
+        el.style.opacity = "1";
+        el.style.transform = "none";
+      });
+    };
+    let heroAt = 0;
+    let wallControls: ReturnType<typeof animate> | undefined;
+    // registered after the hero's, so the hero's start is known when it fires
+    let stopWall = () => {};
+    const startWall = () => {
+      stopWall = wall
+      ? inView(
+          wall,
+          () => {
+            wallTargets = Array.from(wall.querySelectorAll<HTMLElement>(".gl-group"));
+            wallTargets.forEach((el) => {
+              el.style.opacity = "0";
+              el.style.transform = "translateY(9px)";
+            });
+            delete wall.dataset.enter;
+            // right after the hero's last step, if the hero is still coming in
+            // (both fire in the same frame, in no set order: if the hero hasn't
+            // started yet, it is starting now)
+            const after = Math.max(0, (heroAt || performance.now() / 1000) + STEP * targets.length - performance.now() / 1000);
+            // explicit from-values: Motion remembers each card's last value
+            // (a Strict Mode first pass), which would start them near 1
+            wallControls = animate(
+              wallTargets,
+              { opacity: [0, 1], y: [9, 0] },
+              { duration: 0.7, delay: stagger(SECTION_STEP, { startDelay: after + SECTION_STEP }), ease: [0.22, 0.61, 0.36, 1] }
+            );
+            wallControls.finished.then(showWall).catch(showWall);
+          },
+          { margin: "0px 0px -8% 0px" }
+        )
+      : () => {};
+    };
+
     let controls: ReturnType<typeof animate> | undefined;
     const stopInView = inView(
       hero,
       () => {
+        heroAt = performance.now() / 1000;
         controls = animate(
           targets,
           { opacity: 1, y: 0 },
-          { duration: 0.7, delay: stagger(0.06), ease: [0.22, 0.61, 0.36, 1] }
+          { duration: 0.7, delay: stagger(STEP), ease: [0.22, 0.61, 0.36, 1] }
         );
         const commit = () => {
           heroEnteredRef.current = true;
@@ -120,9 +138,11 @@ function Home() {
       },
       { margin: "0px 0px -8% 0px" }
     );
+    startWall();
 
     return () => {
       stopInView();
+      stopWall();
       // complete() jumps to the end instead of stop()'s mid-hide freeze, so a
       // Strict Mode remount never inherits a half-hidden hero.
       if (controls) {
@@ -130,6 +150,8 @@ function Home() {
         heroEnteredRef.current = true;
         applyVisible();
       }
+      wallControls?.complete();
+      showWall();
     };
   }, []);
 
@@ -138,41 +160,10 @@ function Home() {
   useEffect(() => {
     const cleanups: Array<() => void> = [];
 
-    document
-      .querySelectorAll<HTMLElement>(
-        ".wt-nav-links a, .wt-nav-links button, .line a"
-      )
-      .forEach((link) => {
-        const rule = link.querySelector<HTMLElement>(".nav-rule, .line-rule");
-        if (rule) cleanups.push(attachUnderlineWipe(link, rule));
-      });
-
-    // The RESUME arrow nudges along its own diagonal on hover.
-    const resume = document.querySelector<HTMLElement>(
-      ".wt-nav-links a[target='_blank']"
-    );
-    const arrow = resume?.querySelector<HTMLElement>(".ext-arrow");
-    if (resume && arrow) {
-      const reduced = prefersReducedMotion();
-      const nudge = (on: boolean) =>
-        animate(
-          arrow,
-          { x: on ? 1.5 : 0, y: on ? -1.5 : 0 },
-          reduced ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 24 }
-        );
-      const on = () => nudge(true);
-      const off = () => nudge(false);
-      resume.addEventListener("pointerenter", on);
-      resume.addEventListener("pointerleave", off);
-      resume.addEventListener("focusin", on);
-      resume.addEventListener("focusout", off);
-      cleanups.push(() => {
-        resume.removeEventListener("pointerenter", on);
-        resume.removeEventListener("pointerleave", off);
-        resume.removeEventListener("focusin", on);
-        resume.removeEventListener("focusout", off);
-      });
-    }
+    heroRef.current?.querySelectorAll<HTMLElement>(".line a").forEach((link) => {
+      const rule = link.querySelector<HTMLElement>(".line-rule");
+      if (rule) cleanups.push(attachUnderlineWipe(link, rule));
+    });
 
     // Pronunciation note: follows the cursor, opacity only (no y/scale — those
     // would fight left/top placement).
@@ -203,8 +194,19 @@ function Home() {
         pron.style.left = `${vx - rect.left}px`;
         pron.style.top = `${vy - rect.top}px`;
       };
+      /* Hidden interaction: reading the note long enough to learn her name. */
+      let learnTimer = 0;
+      let lastX = 0;
+      let lastY = 0;
+      const learnSoon = (x: number, y: number) => {
+        lastX = x;
+        lastY = y;
+        window.clearTimeout(learnTimer);
+        learnTimer = window.setTimeout(() => earn("name", { x: lastX, y: lastY }), 700);
+      };
       const show = (on: boolean) => {
         title.classList.toggle("is-pron", on);
+        if (!on) window.clearTimeout(learnTimer);
         return animate(
           pron,
           { opacity: on ? 1 : 0 },
@@ -230,11 +232,14 @@ function Home() {
         measure();
         place(e.clientX, e.clientY);
         show(true);
+        learnSoon(e.clientX, e.clientY);
       };
       const move = (e: PointerEvent) => {
         if (pinned) return; // a pinned note stays where it was put
         byTouch = e.pointerType === "touch";
         place(e.clientX, e.clientY);
+        lastX = e.clientX;
+        lastY = e.clientY;
         if (!title.classList.contains("is-pron")) show(true);
       };
       const leave = () => {
@@ -254,6 +259,7 @@ function Home() {
         measure();
         place(e.clientX, e.clientY);
         show(true);
+        learnSoon(e.clientX, e.clientY);
         pinned = true;
         pinX = e.clientX;
         pinY = e.clientY;
@@ -285,201 +291,16 @@ function Home() {
         title.removeEventListener("click", click);
         document.removeEventListener("pointermove", drift);
         if (pinTimer) window.clearTimeout(pinTimer);
+        window.clearTimeout(learnTimer);
       });
     }
 
     return () => cleanups.forEach((fn) => fn());
   }, []);
 
-  /* Cutting-mat parallax. The fixed grid drifts slightly slower than the page,
-     so the mat reads as a surface the content sits on rather than wallpaper
-     locked to the viewport. .wt-surface is inset past the viewport edges in CSS
-     precisely so this translation has bleed to move into. */
-  useEffect(() => {
-    const surface = surfaceRef.current;
-    if (!surface) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    return scroll(animate(surface, { y: [0, -48] }, { ease: "linear" }));
-  }, []);
-
-  /* Reveal on scroll. The observer only toggles a class; all motion lives in
-     CSS so prefers-reduced-motion is handled in one place. */
-  useEffect(() => {
-    const shelf = shelfRef.current;
-
-    if (typeof IntersectionObserver === "undefined") {
-      shelf?.classList.add("is-in");
-      return;
-    }
-
-    /* The shelf reveals once and stays.
-       Triggered on the shelf's top edge crossing a line two thirds down the
-       viewport — NOT on a fraction of the shelf being visible. A ratio
-       threshold is unsatisfiable whenever the element is taller than the
-       viewport, and on a phone the row stacks into a ~1700px column: at
-       390x640 the most of it that can ever be on screen at once is 35.0%
-       against a 0.35 threshold, so the observer never fired and all three
-       notebooks stayed at opacity 0. The rootMargin below reproduces the old
-       desktop trigger point, where the shelf is shorter than the viewport and
-       the ratio was never the binding constraint. */
-    const shelfObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add("is-in");
-          shelfObserver.unobserve(entry.target);
-        });
-      },
-      { threshold: 0, rootMargin: "0px 0px -34% 0px" }
-    );
-    if (shelf) shelfObserver.observe(shelf);
-
-    return () => shelfObserver.disconnect();
-  }, []);
-
-  /* Manifesto: one soft settle — no stagger, no scrub. */
-  const aboutEnteredRef = useRef(false);
-  useLayoutEffect(() => {
-    const about = aboutRef.current;
-    if (!about) return;
-
-    /* The manifesto and the portrait arrive as separate parts rather than as
-       one block — .ab-grid animating whole was the odd one out on the page.
-       Two beats: the title lands on its own, then the body copy and the
-       portrait together 0.3s later, each moving for 0.7s like the hero.
-
-       The body is the exception. It is a tall block of handwriting, and fading
-       it at one opacity made the last rows arrive with the first, so its words
-       are split into three chunks in reading order and faded top to bottom.
-       Opacity only — .mf-line--body .mf-word-wrap carries a translateY and a
-       skewX that position each word, and animating transform here would
-       replace both. */
-    const targets = [
-      about.querySelector<HTMLElement>(".mf-line--title"),
-      about.querySelector<HTMLElement>(".mf-line--body"),
-      about.querySelector<HTMLElement>(".ab-portrait"),
-    ].filter((el): el is HTMLElement => el !== null);
-    if (targets.length === 0) return;
-
-    /* Three chunks of body words, in reading order, so the split runs down the
-       block rather than across it. */
-    const bodyWords = Array.from(
-      about.querySelectorAll<HTMLElement>(".mf-line--body .mf-word-wrap")
-    );
-    const CHUNKS = 3;
-    const per = Math.ceil(bodyWords.length / CHUNKS) || 1;
-    const chunks = Array.from({ length: CHUNKS }, (_, i) =>
-      bodyWords.slice(i * per, (i + 1) * per)
-    ).filter((c) => c.length > 0);
-
-    const applyVisible = () => {
-      targets.forEach((el) => {
-        el.style.opacity = "1";
-        el.style.transform = "none";
-      });
-      bodyWords.forEach((el) => (el.style.opacity = "1"));
-    };
-
-    if (aboutEnteredRef.current) {
-      applyVisible();
-      return;
-    }
-
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) {
-      aboutEnteredRef.current = true;
-      applyVisible();
-      return;
-    }
-
-    targets.forEach((el) => {
-      el.style.opacity = "0";
-      el.style.transform = "translateY(9px)";
-    });
-    bodyWords.forEach((el) => (el.style.opacity = "0"));
-
-    let controls: ReturnType<typeof animate> | undefined;
-    const stopInView = inView(
-      about,
-      () => {
-        controls = animate(
-          targets,
-          { opacity: 1, y: 0 },
-          {
-            duration: 0.7,
-            // title first; body and portrait share the second beat
-            delay: (i: number) => [0, 0.3, 0.3][i] ?? 0,
-            ease: [0.22, 0.61, 0.36, 1],
-          }
-        );
-        /* Chunks ride the body's own 0.3s beat and then step down it at 0.15s.
-           The step compounds, so the last chunk gains twice whatever the step
-           loses. Their parent line still lifts as one; this only controls when
-           each third appears. */
-        chunks.forEach((chunk, i) =>
-          animate(
-            chunk,
-            { opacity: 1 },
-            { duration: 0.55, delay: 0.3 + i * 0.15, ease: [0.22, 0.61, 0.36, 1] }
-          )
-        );
-        const commit = () => {
-          aboutEnteredRef.current = true;
-          applyVisible();
-        };
-        controls.finished.then(commit).catch(commit);
-      },
-      { margin: "0px 0px -12% 0px", amount: 0.2 }
-    );
-
-    return () => {
-      stopInView();
-      if (controls) {
-        controls.complete();
-        aboutEnteredRef.current = true;
-        applyVisible();
-      }
-    };
-  }, []);
-
   return (
-    <div className="wt wt--sunroom">
-      <div className="wt-surface" aria-hidden="true" ref={surfaceRef} />
-      <Sunroom variant={room} />
-
-      <header className="wt-nav">
-        <div className="wt-nav-inner">
-          <a className="wt-wordmark" href="#/">
-            PRANAVI RAM
-          </a>
-          <nav aria-label="Primary">
-            <ul className="wt-nav-links">
-              {/* Buttons, not <a href="#…">. This is a HashRouter, so the hash
-                  is the route: an in-page anchor would navigate away. */}
-              <li>
-                <button type="button" onClick={() => scrollToSection("work")}>
-                  WORK
-                  <span className="nav-rule" aria-hidden="true" />
-                </button>
-              </li>
-              <li>
-                <button type="button" onClick={() => scrollToSection("about")}>
-                  ABOUT
-                  <span className="nav-rule" aria-hidden="true" />
-                </button>
-              </li>
-              <li>
-                <a href={RESUME_URL} target="_blank" rel="noreferrer">
-                  RESUME
-                  <ExternalArrow />
-                  <span className="nav-rule" aria-hidden="true" />
-                </a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </header>
+    <div className="wt wt--home">
+      <WtNav />
 
       <main>
         <section className="hero" ref={heroRef}>
@@ -489,18 +310,16 @@ function Home() {
           <div className="hero-block">
             <h1 className="hero-title">
               hi, i&rsquo;m pranavi ram
-              <span className="hero-pron" aria-hidden="true">
-                pronounced <em>pren-uh-vi ram</em> (like palm)
+              <span className="hero-pron wt-tip" aria-hidden="true">
+                Pronounced <em>Pren-Uh-Vi Ram</em> (Like Palm)
               </span>
             </h1>
 
             <div className="hero-intro">
               <div className="hero-col hero-col--copy">
+                <p className="line">Product Designer reimagining the interfaces people love</p>
                 <p className="line">
-                Design Engineer inventing 0 → 1 experiences
-                </p>
-                <p className="line">
-                  Building apps + sharing the process on X{" "}
+                  Building, animating, and sharing on X{" "}
                   <a href="https://x.com/pranavibuilds" target="_blank" rel="noreferrer">
                     @pranavibuilds
                     <span className="line-rule" aria-hidden="true" />
@@ -510,59 +329,19 @@ function Home() {
 
               <div className="hero-col hero-col--prev">
                 <p className="line line--label">Prev:</p>
-                <p className="line">Product Design @ hbo max</p>
+                <p className="line">Design @ hbo max</p>
               </div>
 
               {/* Desktop: under copy. Stacked: below all text (copy → PREV → tiles). */}
-              <ContactIcons className="tiles--hero" />
+              <ContactIcons className="wt-tiles--hero" />
             </div>
           </div>
-          <GlassPicker value={room} onChange={chooseRoom} />
         </section>
 
-        <section className="shelf" id="work" aria-label="Selected work">
-          <ul className="shelf-row" ref={shelfRef}>
-            {journals.map((journal, i) => (
-              <Journal key={journal.id} journal={journal} index={i} />
-            ))}
-          </ul>
-        </section>
-
-        <Decks shelfRef={shelfRef} />
-
-        <section
-          className="ab"
-          id="about"
-          ref={aboutRef}
-          aria-labelledby="ab-title"
-        >
-          <div className="ab-grid">
-            <div className="ab-text">
-              <Manifesto />
-            </div>
-
-            <figure className="ab-portrait">
-              <img
-                src={PORTRAIT}
-                alt="Pranavi Ram, smiling, on the Brown University campus green."
-                decoding="async"
-              />
-            </figure>
-          </div>
-        </section>
+        <WorkGrid />
       </main>
 
-      <footer className="wt-foot">
-        <div className="wt-foot-inner">
-          <p className="foot-name">
-            <span className="foot-copy" aria-hidden="true">
-              &copy;
-            </span>{" "}
-            2026 PRANAVI RAM
-          </p>
-          <ContactIcons className="tiles--foot" />
-        </div>
-      </footer>
+      <SiteFooter painting="skyline" />
     </div>
   );
 }

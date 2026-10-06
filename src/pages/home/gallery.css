@@ -1,0 +1,289 @@
+/* ==========================================================================
+   Poster gallery (PosterGallery.tsx)
+   All five posters on one wall, grouped under mono placards, each with a
+   museum label. Sharp-cornered glass prints that lean toward the cursor; the
+   white cursor chip says where a click goes. Below 1100px each group takes its own row.
+   ========================================================================== */
+
+.gl-wall {
+  --gl-g: clamp(12px, 1.25vw, 20px); /* between prints: the rail's gap */
+  --gl-split: clamp(6px, 1vw, 16px); /* plus two gaps = the air between groups */
+  --gl-col: minmax(0, 1fr);
+  display: grid;
+  grid-template-columns: var(--gl-cols);
+  column-gap: var(--gl-g);
+  row-gap: clamp(14px, 1.4vw, 20px);
+}
+
+/* On the one-row wall the groups don't exist as boxes: their placards and
+   prints sit straight on the wall's grid. */
+.gl-group {
+  display: contents;
+}
+
+/* --- Placards: index, group title, and a rule to the end of the group ----- */
+.gl-placard {
+  grid-row: 1;
+  grid-column: var(--c);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 1.45;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--espresso);
+  -webkit-text-stroke: 0.4px currentColor;
+  white-space: nowrap;
+}
+
+.gl-index {
+  color: var(--mono-tertiary);
+  -webkit-text-stroke: 0.3px currentColor;
+}
+
+.gl-placard::after {
+  content: "";
+  flex: 1;
+  min-width: 24px;
+  height: 1px;
+  background: color-mix(in srgb, var(--espresso) 16%, transparent);
+}
+
+/* --- Prints --------------------------------------------------------------- */
+.gl-card {
+  grid-row: 2;
+  grid-column: var(--c);
+  display: block;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  outline: none;
+}
+
+/* The print: a pane of glass. Motion owns its transform (the hover lean).
+   isolation, not preserve-3d, so the blend layers composite against the
+   artwork instead of the page (preserve-3d greys a white print). */
+.gl-print {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  isolation: isolate;
+  background: #0b0b0f;
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.12),
+    0 2px 4px rgba(0, 0, 0, 0.08),
+    0 18px 30px -20px rgba(0, 0, 0, 0.4);
+  transition: box-shadow 520ms var(--ease-settle);
+  backface-visibility: hidden;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gl-card:hover .gl-print {
+    box-shadow:
+      0 2px 3px rgba(0, 0, 0, 0.12),
+      0 6px 12px rgba(0, 0, 0, 0.08),
+      0 30px 46px -24px rgba(0, 0, 0, 0.5);
+  }
+}
+
+.gl-print > img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(1.06) contrast(1.03);
+}
+
+.gl-uv,
+.gl-tex,
+.gl-glare,
+.gl-rim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* The moving light travels by transform only (no repaints), so its layers
+   are oversized: room to travel without an edge showing. JS writes the
+   varnish and the shine every frame while a print is live. */
+.gl-uv {
+  inset: 0 auto 0 0;
+  width: 250%;
+}
+
+.gl-glare {
+  inset: -50%; /* 2 × the pane, centred */
+}
+
+.gl-print.is-live,
+.gl-print.is-live .gl-uv,
+.gl-print.is-live .gl-glare {
+  will-change: transform, opacity;
+}
+
+/* UV varnish: an iridescent film in the poster's own inks. At rest its band
+   waits off the left edge (only its faint tail shows); as the glass lights
+   it slides in and drifts against the cursor. */
+.gl-uv {
+  mix-blend-mode: screen;
+  opacity: 0.14;
+  transform: translate3d(-72%, 0, 0);
+  background: linear-gradient(
+    105deg,
+    transparent 18%,
+    color-mix(in srgb, var(--t1, #fff) 45%, transparent) 33%,
+    rgba(255, 255, 255, 0.42) 43%,
+    color-mix(in srgb, var(--t2, #fff) 32%, transparent) 52%,
+    transparent 76%
+  );
+}
+
+/* Print stock, so the poster reads as printed rather than on screen. */
+.gl-tex {
+  mix-blend-mode: overlay;
+  opacity: 0.22;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23p)' opacity='0.42'/%3E%3C/svg%3E");
+}
+
+/* The shine: a soft pool of light under the cursor. */
+.gl-glare {
+  mix-blend-mode: screen;
+  opacity: 0;
+  background: radial-gradient(
+    circle closest-side,
+    rgba(255, 255, 255, 0.28),
+    rgba(255, 255, 255, 0.06) 25.6%,
+    transparent 46.4%
+  );
+}
+
+/* The pane's edge: a lit top, a shaded bottom, and a hairline so the light
+   posters (Pinnables) still have an edge on white. */
+.gl-rim {
+  z-index: 3;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.16),
+    inset 0 0 0 0.5px rgba(23, 23, 23, 0.12);
+}
+
+.gl-card:focus-visible .gl-print {
+  outline: 2px solid var(--espresso);
+  outline-offset: 3px;
+}
+
+/* --- Museum label: name, what and when, one line on what it is ------------ */
+.gl-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 12px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.45;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.gl-name {
+  color: var(--espresso);
+  -webkit-text-stroke: 0.4px currentColor;
+}
+
+.gl-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--mono-tertiary);
+  -webkit-text-stroke: 0.3px currentColor;
+}
+
+.gl-meta .ext-arrow {
+  width: 10px;
+  height: 10px;
+}
+
+.gl-desc {
+  margin-top: 8px;
+  color: var(--mono-secondary);
+  -webkit-text-stroke: 0.3px currentColor;
+  text-wrap: pretty;
+}
+
+/* --- Narrower than five good-sized prints: two rows -----------------------
+   Case studies on the first, concepts on the second, on the same columns, so
+   the concepts stay left-aligned and the last slot is simply left empty. */
+@media (max-width: 1099px) {
+  .gl-wall {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(36px, 6vw, 56px);
+  }
+
+  .gl-group {
+    display: grid;
+    grid-template-columns: repeat(var(--gl-max), minmax(0, 1fr));
+    column-gap: var(--gl-g);
+    row-gap: clamp(14px, 1.4vw, 20px);
+  }
+
+  .gl-placard {
+    grid-row: 1;
+    grid-column: 1 / span var(--n);
+  }
+
+  .gl-card {
+    grid-row: 2;
+    grid-column: auto;
+  }
+}
+
+/* Phones: three across would be thumbnails, so each row swipes instead, the
+   next print peeking in. Still two rows, case studies first. */
+@media (max-width: 767px) {
+  .gl-group {
+    grid-template-columns: repeat(var(--n), 62vw);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    margin-inline: calc(-1 * var(--wk-pad, 16px));
+    padding-inline: var(--wk-pad, 16px);
+    scroll-padding-inline: var(--wk-pad, 16px);
+    scrollbar-width: none;
+  }
+
+  .gl-group::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gl-card {
+    scroll-snap-align: start;
+  }
+
+  /* The placard stays put while its row swipes. */
+  .gl-placard {
+    position: sticky;
+    left: 0;
+    width: calc(100vw - 2 * var(--wk-pad, 16px));
+  }
+
+  .gl-label,
+  .gl-placard {
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-print {
+    transition: none;
+  }
+}

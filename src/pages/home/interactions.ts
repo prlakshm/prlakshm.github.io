@@ -52,12 +52,12 @@ export function attachUnderlineWipe(trigger: HTMLElement, rule: HTMLElement) {
 /**
  * Lifts a tile on hover/focus and presses it down on pointerdown, so it reads
  * as a physical button rather than a rectangle that changes colour.
- * Gear tiles also rotate clockwise on lift (see .tile--gear).
+ * Gear tiles also rotate clockwise on lift (see .wt-tile--gear).
  */
 export function attachTilePress(tile: HTMLElement) {
   const reduced = prefersReducedMotion();
   const opts = reduced ? { duration: 0 } : SPRING;
-  const isGear = tile.classList.contains("tile--gear");
+  const isGear = tile.classList.contains("wt-tile--gear");
   const hoverRotate = isGear ? 18 : 0;
 
   const lift = () =>

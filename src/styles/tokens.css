@@ -7,8 +7,6 @@
    changed, so every consumer picked the new palette up without edits.
    ========================================================================== */
 
-@import url("https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@700&display=swap");
-
 /* Berkeley Mono Trial — ASCII only (95 glyphs), Regular only (no bold/italic).
    It has no · — ’ ↗ ↓ ⇄, so those fall through to the next mono in the stack.
    Keep a metrics-compatible mono next in line. Swap src for a licensed woff2
@@ -23,9 +21,10 @@
 
 :root {
   /* --- Type ------------------------------------------------------------- */
-  /* Homepage hero title only: Libre Franklin (the free Franklin Gothic). The
-     older routes still set their headings in --font-display (Forma). */
-  --font-hero: "Libre Franklin", system-ui, sans-serif;
+  /* Homepage display face: General Sans (Fontshare; its @font-face is in
+     home.css). The older routes still set their headings in --font-display
+     (Forma). */
+  --font-hero: "General Sans", system-ui, sans-serif;
   --font-display: "forma-djr-display", "Forma DJR Display", system-ui, sans-serif;
   --font-text: "forma-djr-text", "Forma DJR Text", system-ui, sans-serif;
   --font-mono: "Berkeley Mono", "Berkeley Mono Trial", ui-monospace, "SF Mono",
@@ -43,15 +42,17 @@
   --section-size: clamp(34px, 4.6vw, 58px);
 
   /* --- Core ------------------------------------------------------------- */
-  --parchment: #ffffff;
-  /* Journal notecard / slip paper — tips + artifacts share this so they match. */
-  --paper: #f6f0dd;
+  --parchment: #f8fafc; /* the page ground: a bright, cool gallery white */
+  /* Journal notecard / slip paper — tips + artifacts share this so they match.
+     Not "--paper": the static case studies define their own --paper and now
+     load these tokens too (src/static-chrome.tsx). */
+  --paper-slip: #f6f0dd;
   /* Primary ink. */
   --espresso: #171717;
   /* Slightly cooler paper for photo prints on the table. */
-  --paper-photo: color-mix(in srgb, var(--paper) 90%, var(--espresso) 10%);
+  --paper-photo: color-mix(in srgb, var(--paper-slip) 90%, var(--espresso) 10%);
   /* Polaroid border stock — paper lifted toward white. */
-  --paper-polaroid: color-mix(in srgb, var(--paper) 82%, #ffffff 18%);
+  --paper-polaroid: color-mix(in srgb, var(--paper-slip) 82%, #ffffff 18%);
   /* Tips: opaque canvas white — kills the dots under the chip. */
   --tooltip-fill: var(--parchment);
   /* Object shadows — one family (the ink), not a second raw RGB. */

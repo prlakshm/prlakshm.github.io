@@ -1,0 +1,591 @@
+/* ==========================================================================
+   The star card (BadgeCard.tsx)
+   A thin white card like a transit ticket: dotted star slots that fill with
+   gold-leaf stamps, a count, and a hint bulb. Always open in the nav as a
+   compact strip; the full card grows out of it with the welcome note.
+   Every SVG here sets its own size and position: older route stylesheets
+   declare an unscoped `svg { position:absolute; width:0; height:0 }`.
+   ========================================================================== */
+
+.bc {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* --- Card stock: one recipe for both sizes --------------------------------
+   Matte white with a breath of paper tooth, and a letterpressed edge: a lit
+   top edge, a faint shaded bevel at the bottom, a soft contact shadow. --k
+   scales the shadow and bevel with the card (1 = full card, ~.55 = compact),
+   so the compact card is a true miniature of the full one. */
+.bc-compact,
+.bc-card {
+  --k: 1;
+  /* the bulb and the popper share one palette: --bc-glow is the bulb's glass
+     and the popper's cone, so the two always read as a pair */
+  --bc-glow: #fadb85;
+  --bc-glow-deep: #eec361; /* the popper's band */
+  --bc-glow-lit: #f7cd60; /* the bulb, lit */
+  --bc-ray: #eebd4b;
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(180deg, #ffffff 0%, #f6f8fb 100%);
+  /* The ticket (2026-10-06, her reference: a classic admission ticket): a
+     quarter circle bitten out of each corner, a semicircle out of each side, and a dashed tear line inset at each end that
+     stops short of the edges. The bites are a mask, so the card's edge and
+     its contact shadow live on the element around it (.bc-mini-anchor,
+     .bc-pop, .bc-intro-card), where a drop-shadow follows the bites too. The
+     border stays, transparent, so the box keeps its size. */
+  --notch: calc(12px * var(--k));
+  --corner: calc(12px * var(--k)); /* a quarter circle out of each corner */
+  --cut: calc(14px * var(--k)); /* how far short of the top and bottom the tear lines stop */
+  border: 1px solid transparent;
+  border-radius: 0 !important;
+  box-shadow:
+    inset 0 1px 0 #ffffff,
+    inset 0 calc(-1px * var(--k)) calc(2px * var(--k)) rgba(15, 23, 42, 0.06);
+  -webkit-mask-image:
+    radial-gradient(circle at 0 0, transparent var(--corner), #000 calc(var(--corner) + 0.6px)),
+    radial-gradient(circle at 100% 0, transparent var(--corner), #000 calc(var(--corner) + 0.6px)),
+    radial-gradient(circle at 0 100%, transparent var(--corner), #000 calc(var(--corner) + 0.6px)),
+    radial-gradient(circle at 100% 100%, transparent var(--corner), #000 calc(var(--corner) + 0.6px)),
+    radial-gradient(circle at 0 50%, transparent var(--notch), #000 calc(var(--notch) + 0.6px)),
+    radial-gradient(circle at 100% 50%, transparent var(--notch), #000 calc(var(--notch) + 0.6px));
+  -webkit-mask-composite: source-in;
+  mask-image:
+    radial-gradient(circle at 0 0, transparent var(--corner), #000 calc(var(--corner) + 0.6px)),
+    radial-gradient(circle at 100% 0, transparent var(--corner), #000 calc(var(--corner) + 0.6px)),
+    radial-gradient(circle at 0 100%, transparent var(--corner), #000 calc(var(--corner) + 0.6px)),
+    radial-gradient(circle at 100% 100%, transparent var(--corner), #000 calc(var(--corner) + 0.6px)),
+    radial-gradient(circle at 0 50%, transparent var(--notch), #000 calc(var(--notch) + 0.6px)),
+    radial-gradient(circle at 100% 50%, transparent var(--notch), #000 calc(var(--notch) + 0.6px));
+  mask-composite: intersect;
+  font-family: var(--font-mono);
+  color: var(--mono-secondary);
+  text-align: left;
+  user-select: none;
+}
+
+/* the tear lines: dashed, one stub (--stub) in from each end */
+.bc-compact::before,
+.bc-card::before {
+  content: "";
+  position: absolute;
+  inset: var(--cut) 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(15, 23, 42, 0.2) 0 55%, transparent 55%) var(--stub) 0 / 1px calc(7px * var(--k)) repeat-y,
+    linear-gradient(rgba(15, 23, 42, 0.2) 0 55%, transparent 55%) calc(100% - var(--stub)) 0 / 1px calc(7px * var(--k)) repeat-y;
+}
+
+/* The edge and the contact shadow, on what holds each card: a hairline that
+   follows the bites, and the soft lift the card always had. */
+.bc-mini-anchor,
+.bc-pop,
+.bc-intro-card {
+  filter:
+    drop-shadow(0 0 0.55px rgba(15, 23, 42, 0.42))
+    drop-shadow(0 1px 1px rgba(15, 23, 42, 0.05))
+    drop-shadow(0 4px 7px rgba(15, 23, 42, 0.1));
+}
+
+.bc-compact::after,
+.bc-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.55 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* --- Compact card (always in the nav) ------------------------------------ */
+/* A link: the card is the way home, as the wordmark it replaced was. */
+.bc-mini {
+  appearance: none;
+  display: inline-flex;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.bc-mini:focus-visible {
+  outline: 2px solid var(--espresso);
+  outline-offset: 4px;
+  border-radius: 0;
+}
+
+.bc-mini-anchor {
+  display: block;
+}
+
+.bc-compact {
+  --k: 0.55;
+  --slot: 19px;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  --stub: calc(var(--slot) * 0.8);
+  padding: 11px calc(11px + var(--stub)) 7px calc(12px + var(--stub)); /* a little more air above the stars */
+}
+
+.bc-compact .bc-slots {
+  gap: 5px;
+}
+
+.bc-compact .bc-count {
+  font-size: 11px;
+}
+
+.bc-compact .bc-foot {
+  gap: 5px;
+}
+
+/* the bulb is cropped to its glyph (10 x 16 units) */
+.bc-compact .bc-bulb {
+  width: 7.5px !important;
+  height: 12px !important;
+}
+
+/* the popper is drawn bigger than the bulb (16px) but takes about the same
+   room: its ink starts the same distance from the count, and ends at the
+   card's content edge */
+.bc-compact .bc-popper {
+  width: 16px !important;
+  height: 16px !important;
+  margin: -2px -0.85px -2px -1px;
+}
+
+/* --- Shared parts -------------------------------------------------------- */
+.bc-slots {
+  position: relative; /* the light layer is laid out against the row */
+  display: flex;
+  align-items: center;
+}
+
+/* The light on the stamps (stampLight.ts): a WebGL layer over the row, a
+   little larger than it so tilted corners are lit, screen-blended so it only
+   ever lifts the gold toward its highlight (as the painting's shader does).
+   Its inset matches LIGHT_PAD in BadgeCard.tsx. */
+.bc-light {
+  position: absolute;
+  left: -6px;
+  top: -6px;
+  width: calc(100% + 12px);
+  height: calc(100% + 12px);
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+/* with the light layer running, the baked cross-fade steps aside (the stamps
+   keep their resting gold: Pranavi didn't want them dimmed for the light) */
+.bc-gl .bc-lit {
+  display: none;
+}
+
+.bc-slot {
+  position: relative;
+  display: block;
+  width: var(--slot);
+  height: var(--slot);
+  color: #b6bcc6; /* the dotted outline */
+}
+
+.bc-slot-star {
+  position: static !important;
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: visible;
+}
+
+.bc-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px; /* ~9px from the count to the bulb's glass, ~5px to its rays */
+}
+
+.bc-count {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: var(--mono-secondary);
+  white-space: nowrap;
+}
+
+/* Berkeley Mono Trial draws "/" as a backslash; the slash comes from the
+   fallback mono instead. */
+.bc-slash {
+  font-family: var(--font-mono-system);
+}
+
+/* The hint bulb: plain pale gold, no outline, cropped to its glyph (10 x 16
+   units) so it sits close to the count. Once all five are found it becomes a
+   party popper (.bc-popper), drawn bigger (21px) in the same colours. */
+.bc-bulb,
+.bc-popper {
+  position: static !important;
+  display: block;
+  overflow: visible;
+}
+
+.bc-bulb {
+  width: 10px !important;
+  height: 16px !important;
+}
+
+.bc-popper {
+  width: 21px !important;
+  height: 21px !important;
+  /* the same room as the bulb: ink starts ~9px from the count, ends at the
+     card's content edge, and it overhangs the row's height evenly */
+  margin: -2.5px -1.1px -2.5px -1.3px;
+}
+
+.bc-bulb-glass,
+.bc-pop-body {
+  fill: var(--bc-glow);
+  transition: fill 160ms ease;
+}
+
+.bc-pop-band {
+  fill: var(--bc-glow-deep);
+}
+
+.bc-bulb-base {
+  stroke: #9aa0a8;
+}
+
+/* the rays: hidden, tucked toward the glass; on hover they fan out */
+.bc-bulb-rays {
+  stroke: var(--bc-ray);
+  opacity: 0;
+  transform-box: view-box;
+  transform-origin: 8px 6px; /* the glass's centre */
+  transform: scale(0.55);
+  transition: opacity 140ms ease, transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* --- Gold-leaf stamps -------------------------------------------------------
+   Real leaf, not a gradient: stamps.webp holds the five stars (columns), gently
+   rounded crinkled gold leaf in true gold, baked at rest and lit from the upper
+   left, above, and the upper right (rows). A stamp is its rest leaf with the
+   three lit bakes on top; their opacities are where the light is. The cursor
+   sets them over the card (--wl, --wc, --wr, from BadgeCard.tsx); otherwise a
+   light drifts across the card every few seconds, stamp by stamp, left to
+   right, so the leaf's facets flash in turn. */
+.bc-stamp,
+.bc-lit {
+  background-image: url("/home/card/stamps.webp");
+  background-size: 500% 400%;
+  background-repeat: no-repeat;
+}
+
+.bc-stamp {
+  --x: calc(var(--i, 0) * 25%);
+  position: absolute;
+  inset: 0;
+  display: block;
+  rotate: var(--tilt, 0deg);
+  background-position: var(--x) 0;
+  /* pressed into the stock: a tight contact shadow on the low side */
+  filter: drop-shadow(0 0.6px 0.5px rgba(96, 60, 14, 0.38));
+}
+
+.bc-lit {
+  position: absolute;
+  inset: 0;
+  display: block;
+  opacity: 0;
+  animation: bc-pass 9s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 0.22s + var(--lag, 0s));
+}
+
+.bc-lit--l { background-position: var(--x) 33.333%; --lag: 0s; }
+.bc-lit--c { background-position: var(--x) 66.667%; --lag: 0.32s; }
+.bc-lit--r { background-position: var(--x) 100%; --lag: 0.64s; }
+
+/* the idle drift: each lit bake swells and fades in turn, so a light crosses
+   each star and then the next one, about every nine seconds */
+@keyframes bc-pass {
+  0% { opacity: 0; }
+  7% { opacity: 0.9; }
+  15% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* the cursor holds the light */
+.is-lit .bc-lit {
+  animation: none;
+  transition: opacity 140ms linear;
+}
+
+.is-lit .bc-lit--l { opacity: var(--wl, 0); }
+.is-lit .bc-lit--c { opacity: var(--wc, 0); }
+.is-lit .bc-lit--r { opacity: var(--wr, 0); }
+
+/* a stamp that just landed catches the light once */
+.bc-stamp.is-landing .bc-lit--c {
+  animation: bc-land 1s 120ms ease-out both;
+}
+
+@keyframes bc-land {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* --- Popover: the full card grows out of the compact one ------------------ */
+.bc-pop {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 40;
+  transform-origin: 0 0;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  perspective: 900px;
+}
+
+/* --- The full card --------------------------------------------------------- */
+/* Open, it covers the compact card, so it is the home link too. */
+.bc-pop .bc-card {
+  cursor: pointer;
+}
+
+.bc-card {
+  --slot: 43px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  --stub: 28px;
+  width: 356px; /* 300 + a stub at each end */
+  box-sizing: border-box;
+  padding: 18px calc(18px + var(--stub)) 14px;
+}
+
+/* the row runs the full width, so the last star ends where the bulb does */
+.bc-card .bc-slots {
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.bc-note p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mono-secondary);
+}
+
+.bc-note .bc-note-lead {
+  color: var(--espresso);
+  -webkit-text-stroke: 0.35px currentColor;
+}
+
+/* The bulb's button: padding gives a comfortable hit area and the negative
+   margins cancel it, so nothing moves. No background on hover: the bulb itself
+   lights up, and stays lit while its hint is open. */
+.bc-hint {
+  appearance: none;
+  display: grid;
+  place-items: center;
+  margin: -5px -6px;
+  padding: 5px 6px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+}
+
+.bc-hint:hover .bc-bulb-glass,
+.bc-hint:focus-visible .bc-bulb-glass,
+.bc-hint[aria-expanded="true"] .bc-bulb-glass {
+  fill: var(--bc-glow-lit);
+}
+
+.bc-hint:hover .bc-bulb-rays,
+.bc-hint:focus-visible .bc-bulb-rays,
+.bc-hint[aria-expanded="true"] .bc-bulb-rays {
+  opacity: 1;
+  transform: none;
+}
+
+.bc-hint:focus-visible {
+  outline: 2px solid var(--espresso);
+  outline-offset: 1px;
+}
+
+.bc-hint--still,
+.bc-hint--pop {
+  cursor: default;
+}
+
+/* Tooltips: the bulb's hint and each star's own tip. Their look is the
+   site's one tooltip (.wt-tip, chrome.css): no tails. Both fade like the nav's
+   "Coming soon" tip (BadgeCard.tsx); here is only where they sit. */
+.bc-tip,
+.bc-star-tip {
+  position: absolute;
+  z-index: 5;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* The hint hangs under the bulb (its centre: the card's width, less the
+   border, the padding and half the bulb), as far below as "Coming soon"
+   hangs under GALLERY. */
+.bc-tip {
+  left: calc(356px - 1px - 18px - 28px - 5px);
+  top: calc(100% + 10px);
+  translate: -50% 0;
+}
+
+/* A star's tip sits above its star. The two end stars align the tip to their
+   own edge instead of centring it, so it never runs off a phone screen. */
+.bc-star-tip {
+  left: 50%;
+  bottom: calc(100% + 10px);
+  translate: -50% 0;
+}
+
+.bc-slot:first-child .bc-star-tip {
+  left: 0;
+  translate: none;
+}
+
+.bc-slot:last-child .bc-star-tip {
+  left: auto;
+  right: 0;
+  translate: none;
+}
+
+/* --- First-visit intro ----------------------------------------------------- */
+.bc-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  pointer-events: none;
+  perspective: 1000px;
+}
+
+.bc-intro-veil {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  /* A moment, not a modal: the page stays visible but recedes. */
+  background: rgba(248, 250, 252, 0.8);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.bc-intro-card {
+  opacity: 0;
+  will-change: transform;
+}
+
+/* --- A stamp in flight ------------------------------------------------------ */
+.bc-fly {
+  position: fixed;
+  z-index: 120;
+  width: 30px;
+  height: 30px;
+  pointer-events: none;
+}
+
+.bc-fly .bc-stamp {
+  rotate: 0deg; /* the flight animates the tilt */
+}
+
+.bc-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+/* The open card must clear the nav links beside it (all of the bar's children
+   share z-index 1, and the links come later in the DOM). */
+.wt-nav-inner > .bc {
+  z-index: 2;
+}
+
+/* Phones: a smaller compact card so four nav items still fit beside it. */
+@media (max-width: 767px) {
+  .bc-compact {
+    --slot: 14.5px;
+    gap: 5px;
+    /* a slimmer stub and bite: on a phone the nav has ~12px to spare */
+    --stub: 6px;
+    --notch: 4px;
+    --corner: 4px;
+    padding: 8.5px calc(4px + var(--stub)) 6px calc(4.5px + var(--stub));
+  }
+  .bc-compact .bc-slots {
+    gap: 3px;
+  }
+  .bc-compact .bc-count {
+    font-size: 10px;
+  }
+  .bc-compact .bc-foot {
+    gap: 4px;
+  }
+  .bc-compact .bc-bulb {
+    width: 6.25px !important;
+    height: 10px !important;
+  }
+  .bc-compact .bc-popper {
+    width: 13px !important;
+    height: 13px !important;
+    margin: -1.5px -0.7px -1.5px -0.8px;
+  }
+}
+
+/* Narrow phones keep smaller stars: below ~380px the nav links would
+   otherwise be pushed into the right margin, and at 320px there is only ~12px
+   to spare beside the card. */
+@media (max-width: 380px) {
+  .bc-compact {
+    --slot: 13.5px;
+  }
+}
+
+@media (max-width: 340px) {
+  .bc-compact {
+    --slot: 13px;
+    padding: 8.5px calc(3.5px + var(--stub)) 6px calc(4px + var(--stub)); /* back for the nav links at 320px */
+  }
+}
+
+@media (max-width: 380px) {
+  .bc-card {
+    --slot: 40px;
+    --stub: 18px;
+    width: 288px;
+  }
+  .bc-tip {
+    left: calc(288px - 1px - 18px - 18px - 5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bc-lit {
+    animation: none;
+  }
+}
