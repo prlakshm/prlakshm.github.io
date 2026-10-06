@@ -1,0 +1,20 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:'OpenAI Sans';font-weight:500;src:url(../fonts/oai/OpenAISans-Medium-B7nJY_kG.woff2)}
+*{margin:0}html,body{width:1080px;height:1350px;overflow:hidden;background:#fff}
+svg{display:block;width:1080px;height:1350px}
+</style></head><body>
+<svg id="p" viewBox="0 0 1080 1350" xmlns="http://www.w3.org/2000/svg"></svg>
+<script src="kit.js"></script>
+<script>
+const {C,title,mascot,mascotDefs,sticker,pinkDefs,dotgrid}=CX;
+p.innerHTML=`<defs>${mascotDefs('m')}${pinkDefs('pk')}${sticker('st',{r:14,dy:22,blur:22,sop:.18})}${dotgrid('dg','#D6E0FF','#BFCDFF',40,3)}</defs>
+<rect width="1080" height="1350" fill="url(#dg)"/>
+<g filter="url(#st)">
+  ${mascot('m',{x:540,y:1110,s:.92})}
+  <path d="M276 -60 H804 V1010 L540 892 L276 1010Z" fill="url(#pk-g)" filter="url(#pk-f)"/>
+</g>
+<path d="M300 -60 V986 M780 -60 V986" stroke="#fff" stroke-opacity=".6" stroke-width="5" stroke-dasharray="1 16" stroke-linecap="round"/>
+${title(['Codex','Bookmarks'],{y:300,size:92,lh:1.04,fill:'#fff',bold:6})}`;
+</script>
+</body></html>

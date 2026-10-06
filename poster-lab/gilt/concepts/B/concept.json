@@ -1,0 +1,360 @@
+{
+ "name": "Glitter Path",
+ "id": "B",
+ "pitch": "A quiet Monet until the light moves. About a thousand gilded impasto dabs lie on the water in perspective rows as dark bronze flecks; each is a tiny wave-facet mirror at its own tilt, so a sun-glitter path flares down the middle of the pond and a second path follows your cursor. Four painted far pads and one lily cluster keep it Giverny.",
+ "assets": {
+  "print": "atlas_print.png",
+  "fx": "atlas_fx.png",
+  "layout": "layout.json",
+  "under": {
+   "desktop": "under_d.png",
+   "mobile": "under_m.png"
+  },
+  "atlas_print": "RGBA8 straight alpha; RGB sRGB print, A coverage; upload with UNPACK_PREMULTIPLY_ALPHA_WEBGL",
+  "atlas_fx": "RGB8 lossless (opaque); R foil, G pearl, B height (0.08 paper .. 0.59 plateau, stamen domes to ~0.72)",
+  "texels_per_css_px": 2,
+  "height_blend": "B = mix(max(B_dst, B_src), B_src, A): one MAX-blend draw (EXT_blend_minmax) then one over-by-A draw; keeps each piece's own emboss profile (the plan's over-by-max(A, shoulder) squares the shoulder and draws an outline)",
+  "breakpoint_css": 900,
+  "relief_scale": "none (tested): scaling a minified piece's relief by its draw size flattens it twice (mipmaps already blur the crinkle), so pads turn into single glare sheets; unscaled, mobile rims are only a little steeper (rim ~0 vs interior, no outline)"
+ },
+ "lighting": {
+  "RELIEF": 1.6,
+  "FLOOR": 0.48,
+  "PERSP": 0.5,
+  "EYE_Z": 900,
+  "LAMP_Z_K": 1.6,
+  "LAMP_Z_MIN": 290,
+  "LAMP_Z_MAX": 540,
+  "ambient": 0.25,
+  "key": {
+   "strength": 2.0,
+   "centre": [
+    -0.2,
+    0.46
+   ],
+   "half": [
+    0.3,
+    0.12
+   ],
+   "soft": 0.12,
+   "falloff": 0.45,
+   "kclamp": 1.4
+  },
+  "strip": {
+   "strength": 3.5,
+   "centre": [
+    0.045,
+    -0.02
+   ],
+   "half": [
+    0.022,
+    0.5
+   ],
+   "soft": 0.025,
+   "drift": 0.06,
+   "period": 75
+  },
+  "bounce": {
+   "strength": 0.7,
+   "centre": [
+    0.0,
+    -0.5
+   ],
+   "half": [
+    0.9,
+    0.06
+   ],
+   "soft": 0.18
+  },
+  "caught": [
+   0.35,
+   2.4
+  ],
+  "HOT_EXP": 220,
+  "HOT_K": 2.4,
+  "GLOW_EXP": 40,
+  "GLOW_K": 1.3,
+  "TINT": [
+   1.0,
+   0.72,
+   0.3
+  ],
+  "PAPER": [
+   0.8,
+   0.26
+  ],
+  "PAPER_GLOW": 0.03,
+  "LKEY": [
+   -0.45,
+   0.55,
+   0.7
+  ],
+  "TOOTH": 0.05,
+  "TOOTH_PERIODS": [
+   [
+    1.3,
+    3.5
+   ],
+   [
+    3.5,
+    1.3
+   ]
+  ],
+  "POOL": 0.15,
+  "POOL_COLOR": "#5C7DB8",
+  "POOL_NOISE": 0.4,
+  "NEAR_R": 2.0,
+  "NEAR_G": 8.0,
+  "CONTACT": 0.1,
+  "CONTACT_OFFSET": 3.0,
+  "HALO": 0.2,
+  "HALO_T": 1.3,
+  "GRAIN": 0.02,
+  "GRAIN_HZ": 24,
+  "PEARL": {
+   "mix": 0.35,
+   "hot": 0.7,
+   "glow": 0.22,
+   "caught": 0.12
+  },
+  "environment": "achromatic (no blue/teal light on the gold: it turns olive)",
+  "lab_ab": {
+   "note": "bake-side finding: with the plan key the key-side lit rim measures ~+0.02 over the interior (target +0.08..0.15); key centre [-0.26, 0.22] half [0.34, 0.26] gives ~+0.05 with fewer glints (181 vs 221 per 1000 CSS px^2); Ann's own key gives +0.06 but darkens the band centre",
+   "key.centre": [
+    -0.26,
+    0.22
+   ],
+   "key.half": [
+    0.34,
+    0.26
+   ],
+   "metal": "champagne as an A/B only: TINT [1.0, 0.86, 0.62] with the print warmed down"
+  },
+  "NORMAL_TAP": 1.15,
+  "POOL_SCALE": 9,
+  "SWELL_AMP": 0.035,
+  "dome": {
+   "strength": 0.6
+  },
+  "CAUGHT3_K": 2.2
+ },
+ "motion": {
+  "water": {
+   "DRIFT": 3.5,
+   "FIELD_TIME": 42,
+   "START_T": 31834
+  },
+  "sway": {
+   "yaw": [
+    [
+     0.07,
+     7.0
+    ],
+    [
+     0.018,
+     2.7
+    ]
+   ],
+   "pitch": [
+    [
+     0.035,
+     8.6
+    ]
+   ],
+   "applies_to": "uShift (moves the lights, not the band)"
+  },
+  "pointer_shift": {
+   "k": [
+    0.14,
+    0.09
+   ],
+   "rate": 4
+  },
+  "lamp_hover": {
+   "follow": 9,
+   "on": 1.0,
+   "on_rate": 4
+  },
+  "idle": {
+   "x": [
+    0.5,
+    0.36,
+    25.0,
+    0.0
+   ],
+   "y": [
+    0.4,
+    0.25,
+    17.0,
+    1.3
+   ],
+   "on": 0.5,
+   "follow": 3,
+   "form": "x = W*(x0 + ax*sin(2*pi*t/px + phx)), y = H*(y0 + ay*sin(2*pi*t/py + phy))",
+   "park": "start over layout.hero"
+  },
+  "sun": {
+   "drift": 0.06,
+   "period": 75
+  },
+  "arrival_sweep": {
+   "visible": 0.3,
+   "duration": 2.2,
+   "on": 1.0,
+   "ease": "in-out",
+   "once": true
+  },
+  "breathe": {
+   "amp": 0.021,
+   "source": "waterWob swell slope at the piece centre; per-piece phase/breathe from layout"
+  },
+  "ripple": {
+   "trigger": "pointerdown only",
+   "speed": 60,
+   "tilt": 0.026,
+   "life": 2.5
+  },
+  "touch": {
+   "tap_hold": 3.0
+  },
+  "grain_hz": 24,
+  "reduced_motion": "one still frame: water painted once, lamp parked over the hero at 0.7, no sway, static grain, pointer inert",
+  "offscreen": {
+   "margin": 120,
+   "stop": true,
+   "visibilitychange": true
+  },
+  "pacing": {
+   "finish_hz": 60,
+   "paint_hz": 30
+  },
+  "SWAY_YAW": [
+   0.03,
+   7.0,
+   0.012,
+   2.7
+  ],
+  "BREATHE": 0.035
+ },
+ "flags": {
+  "FOIL_WARP": false,
+  "SWELL_TILT": true,
+  "INVERT_RELIEF": false
+ },
+ "water": {
+  "base": "#6FB6EE",
+  "dark": "#7FA3E2",
+  "light": "#A9C4F0",
+  "sunTint": "#CFE3F1",
+  "under": {
+   "cloud": {
+    "strength": 0.55,
+    "colours": [
+     "#E4EAF2",
+     "#BFD5EA"
+    ]
+   },
+   "willow": {
+    "strength": 1.0,
+    "colours": [
+     "#5A7FC0",
+     "#46689F"
+    ]
+   },
+   "lavender": {
+    "strength": 0.75,
+    "colours": [
+     "#BCA9DB",
+     "#D3B7DD"
+    ]
+   },
+   "sun": {
+    "strength": 0.45,
+    "colour": "#CFE3F1",
+    "note": "pale sky blue, hue 247: the old #C6E7EC (hue 212, C* 11) drifts under hue 190 with stroke jitter (mint)"
+   },
+   "order": [
+    "lavender",
+    "cloud",
+    "willow",
+    "sun"
+   ],
+   "mix": "col = mix(col, target, clamp(map * strength, 0, 1)) per channel in this order; a two-colour target varies by a slow noise",
+   "upload": "RGBA with premultiplication OFF (createImageBitmap premultiplyAlpha:'none'); A is ~0 almost everywhere, a premultiplied upload or a lossy/non-exact webp wipes R/G/B there"
+  },
+  "flow": {
+   "angle_noise": 0.15,
+   "curl": 0.25
+  },
+  "strokes": {
+   "SW": 18,
+   "STEP": 5
+  },
+  "dither": {
+   "levels": 16,
+   "amount": 0.3,
+   "fade_near_foil": [
+    0.05,
+    0.4
+   ]
+  },
+  "no_green": "CIELAB hue 115-190 with C* > 10 banned on the ground",
+  "BROKEN": [
+   0,
+   90,
+   2.4,
+   0.6
+  ],
+  "DAB_BROKEN": [
+   0.9,
+   0.55,
+   0.55,
+   0.45
+  ],
+  "WILLOW_VERT": [
+   1,
+   0.75
+  ],
+  "BRISTLE": 0.85,
+  "SPECKLE": 1.5,
+  "ACCENTS": [
+   "#B9A6DA",
+   "#E8DEEF",
+   "#6E92C8"
+  ]
+ },
+ "coverage": [
+  0.08,
+  0.12
+ ],
+ "bake": {
+  "desktop": {
+   "foil_coverage": 0.0854,
+   "piece_coverage": 0.12,
+   "pieces": 1235,
+   "pads": 2,
+   "lilies": 1,
+   "dabs": 1227,
+   "top_rows_clear": true
+  },
+  "mobile": {
+   "foil_coverage": 0.1038,
+   "piece_coverage": 0.1552,
+   "pieces": 254,
+   "pads": 2,
+   "lilies": 1,
+   "dabs": 248,
+   "top_rows_clear": true
+  },
+  "atlas": {
+   "w": 1024,
+   "h": 512
+  },
+  "bytes": {
+   "print_png": 127730,
+   "fx_png": 45031,
+   "print_webp_q85": 28304,
+   "fx_webp_lossless": 37544
+  }
+ }
+}

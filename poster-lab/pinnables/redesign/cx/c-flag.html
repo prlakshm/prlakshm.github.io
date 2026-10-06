@@ -1,0 +1,28 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:'OpenAI Sans';font-weight:500;src:url(../fonts/oai/OpenAISans-Medium-B7nJY_kG.woff2)}
+*{margin:0}html,body{width:1080px;height:1350px;overflow:hidden;background:#fff}
+svg{display:block;width:1080px;height:1350px}
+</style></head><body>
+<svg id="p" viewBox="0 0 1080 1350" xmlns="http://www.w3.org/2000/svg"></svg>
+<script src="kit.js"></script>
+<script>
+const {C,title,mascot,mascotDefs,sticker,pinkDefs,whiteDefs,pennant,skyCloud,lobes}=CX;
+const T=(o)=>title(['Codex','Bookmarks'],Object.assign({y:226,size:100,lh:1.04,bold:6},o));
+// a small cloud with a speech tail: the chat, drifting by
+const chatCloud=(x,y,s)=>`<g data-name="Chat cloud" transform="translate(${x} ${y}) scale(${s})"><path data-name="Chat tail" d="M-70 60 Q-96 118 -132 132 Q-62 128 -24 84Z" fill="#EEF2FF"/>${skyCloud(0,0,1)}</g>`;
+p.innerHTML=`<defs>${mascotDefs('m')}${pinkDefs('pk')}${whiteDefs('wh')}${sticker('st',{r:14,dy:20,blur:20,scol:'#2A36E4',sop:.22})}
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4F6BFF"/><stop offset=".5" stop-color="#86A0FF"/><stop offset="1" stop-color="#CAD7FF"/></linearGradient>
+  <radialGradient id="sun" cx="170" cy="40" r="760" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".45" stop-color="#fff" stop-opacity=".12"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+</defs>
+<rect data-name="Sky" width="1080" height="1350" fill="url(#sky)"/><rect data-name="Sun glow" width="1080" height="1350" fill="url(#sun)"/>
+<g data-name="Far clouds" opacity=".55">${skyCloud(80,1150,1.1)}${skyCloud(1000,1110,1.0)}</g>
+${chatCloud(160,640,.44)}${skyCloud(930,500,.3)}${skyCloud(965,836,.2)}
+<g data-name="Title shadow" opacity=".35">${T({fill:'#2F45E6',extra:'transform="translate(0 7)"'})}</g>
+${T({fill:'#fff'})}
+<g data-name="Sticker · mascot + flag" filter="url(#st)">${pennant('pk',{x:612,y:760,h:330,fw:250,fh:140,shine:false})}${mascot('m',{x:540,y:915,s:1.12})}</g>
+<path data-name="Bookmark mark" d="M701 486 h42 v60 l-21 -16 l-21 16z" fill="#fff" stroke="#fff" stroke-width="9" stroke-linejoin="round" transform="rotate(-3 722 515)"/>
+<g data-name="Cloud bank">${skyCloud(110,1290,1.4)}${skyCloud(980,1270,1.4)}${skyCloud(540,1350,1.8)}</g>
+`;
+</script>
+</body></html>

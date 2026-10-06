@@ -1,0 +1,344 @@
+{
+ "name": "Willow Gilt",
+ "id": "C",
+ "pitch": "The willows' reflections hang from the clean top edge as long strokes of stamped gold leaf, broken by ripple gaps and shimmering sideways like liquid metal; a loose band of painted pads and two small lilies with gold stamens keeps it Nymph\u00e9as.",
+ "assets": {
+  "print": "atlas_print.png",
+  "fx": "atlas_fx.png",
+  "layout": "layout.json",
+  "under": {
+   "desktop": "under_d.png",
+   "mobile": "under_m.png"
+  },
+  "atlas_print": "RGBA8 straight alpha; RGB sRGB print, A coverage; upload with UNPACK_PREMULTIPLY_ALPHA_WEBGL",
+  "atlas_fx": "RGB8 lossless (opaque); R foil, G pearl, B height (0.08 paper .. 0.59 plateau, stamen domes to ~0.72)",
+  "texels_per_css_px": 2,
+  "height_blend": "B = mix(max(B_dst, B_src), B_src, A): one MAX-blend draw (EXT_blend_minmax) then one over-by-A draw; keeps each piece's own emboss profile (the plan's over-by-max(A, shoulder) squares the shoulder and draws an outline)",
+  "breakpoint_css": 900,
+  "relief_scale": "none (tested): scaling a minified piece's relief by its draw size flattens it twice (mipmaps already blur the crinkle), so pads turn into single glare sheets; unscaled, mobile rims are only a little steeper (rim ~0 vs interior, no outline)"
+ },
+ "lighting": {
+  "RELIEF": 1.55,
+  "FLOOR": 0.45,
+  "PERSP": 0.25,
+  "EYE_Z": 900,
+  "LAMP_Z_K": 1.6,
+  "LAMP_Z_MIN": 290,
+  "LAMP_Z_MAX": 540,
+  "ambient": 0.25,
+  "key": {
+   "strength": 2.2,
+   "centre": [
+    -0.15,
+    0.18
+   ],
+   "half": [
+    0.3,
+    0.17
+   ],
+   "soft": 0.12,
+   "falloff": 0.45,
+   "kclamp": 1.4
+  },
+  "strip": {
+   "strength": 1.9,
+   "centre": [
+    0.4,
+    -0.02
+   ],
+   "half": [
+    0.045,
+    0.55
+   ],
+   "soft": 0.06,
+   "drift": 0.06,
+   "period": 75
+  },
+  "bounce": {
+   "strength": 0.7,
+   "centre": [
+    0.0,
+    -0.5
+   ],
+   "half": [
+    0.9,
+    0.06
+   ],
+   "soft": 0.18
+  },
+  "caught": [
+   0.35,
+   2.6
+  ],
+  "HOT_EXP": 220,
+  "HOT_K": 2.4,
+  "GLOW_EXP": 40,
+  "GLOW_K": 0.8,
+  "TINT": [
+   1.0,
+   0.72,
+   0.3
+  ],
+  "PAPER": [
+   0.8,
+   0.26
+  ],
+  "PAPER_GLOW": 0.03,
+  "LKEY": [
+   -0.45,
+   0.55,
+   0.7
+  ],
+  "TOOTH": 0.05,
+  "TOOTH_PERIODS": [
+   [
+    1.3,
+    3.5
+   ],
+   [
+    3.5,
+    1.3
+   ]
+  ],
+  "POOL": 0.32,
+  "POOL_COLOR": "#5C7DB8",
+  "POOL_NOISE": 0.4,
+  "NEAR_R": 2.0,
+  "NEAR_G": 8.0,
+  "CONTACT": 0.45,
+  "CONTACT_OFFSET": 3.0,
+  "HALO": 0.2,
+  "HALO_T": 1.3,
+  "GRAIN": 0.02,
+  "GRAIN_HZ": 24,
+  "PEARL": {
+   "mix": 0.35,
+   "hot": 0.7,
+   "glow": 0.22,
+   "caught": 0.12
+  },
+  "environment": "achromatic (no blue/teal light on the gold: it turns olive)",
+  "NORMAL_TAP": 1.15,
+  "POOL_SCALE": 9
+ },
+ "motion": {
+  "water": {
+   "DRIFT": 3.5,
+   "FIELD_TIME": 42,
+   "START_T": 31834
+  },
+  "sway": {
+   "yaw": [
+    [
+     0.07,
+     7.0
+    ],
+    [
+     0.018,
+     2.7
+    ]
+   ],
+   "pitch": [
+    [
+     0.035,
+     8.6
+    ]
+   ],
+   "applies_to": "uShift (moves the lights, not the band)"
+  },
+  "pointer_shift": {
+   "k": [
+    0.14,
+    0.09
+   ],
+   "rate": 4
+  },
+  "lamp_hover": {
+   "follow": 9,
+   "on": 1.0,
+   "on_rate": 4
+  },
+  "idle": {
+   "x": [
+    0.5,
+    0.36,
+    25.0,
+    0.0
+   ],
+   "y": [
+    0.4,
+    0.25,
+    17.0,
+    1.3
+   ],
+   "on": 0.4,
+   "follow": 3,
+   "form": "x = W*(x0 + ax*sin(2*pi*t/px + phx)), y = H*(y0 + ay*sin(2*pi*t/py + phy))",
+   "park": "start over layout.hero"
+  },
+  "sun": {
+   "drift": 0.06,
+   "period": 75
+  },
+  "arrival_sweep": {
+   "visible": 0.3,
+   "duration": 2.2,
+   "on": 1.0,
+   "ease": "in-out",
+   "once": true
+  },
+  "breathe": {
+   "amp": 0.021,
+   "source": "waterWob swell slope at the piece centre; per-piece phase/breathe from layout"
+  },
+  "ripple": {
+   "trigger": "pointerdown only",
+   "speed": 60,
+   "tilt": 0.026,
+   "life": 2.5
+  },
+  "touch": {
+   "tap_hold": 3.0
+  },
+  "grain_hz": 24,
+  "reduced_motion": "one still frame: water painted once, lamp parked over the hero at 0.7, no sway, static grain, pointer inert",
+  "offscreen": {
+   "margin": 120,
+   "stop": true,
+   "visibilitychange": true
+  },
+  "pacing": {
+   "finish_hz": 60,
+   "paint_hz": 30
+  },
+  "WARP_AMP": 1.25,
+  "WARP_LEN": 140,
+  "WARP_PERIOD": 7.5,
+  "LAMP_IDLE_ON": 0.4
+ },
+ "flags": {
+  "FOIL_WARP": true,
+  "SWELL_TILT": false,
+  "INVERT_RELIEF": false
+ },
+ "water": {
+  "base": "#6FB6EE",
+  "dark": "#7FA3E2",
+  "light": "#A9C4F0",
+  "sunTint": "#CFE3F1",
+  "under": {
+   "cloud": {
+    "strength": 0.55,
+    "colours": [
+     "#E4EAF2",
+     "#BFD5EA"
+    ]
+   },
+   "willow": {
+    "strength": 1.0,
+    "colours": [
+     "#5A7FC0",
+     "#46689F"
+    ]
+   },
+   "lavender": {
+    "strength": 0.75,
+    "colours": [
+     "#BCA9DB",
+     "#D3B7DD"
+    ]
+   },
+   "sun": {
+    "strength": 0.45,
+    "colour": "#CFE3F1",
+    "note": "pale sky blue, hue 247: the old #C6E7EC (hue 212, C* 11) drifts under hue 190 with stroke jitter (mint)"
+   },
+   "order": [
+    "lavender",
+    "cloud",
+    "willow",
+    "sun"
+   ],
+   "mix": "col = mix(col, target, clamp(map * strength, 0, 1)) per channel in this order; a two-colour target varies by a slow noise",
+   "upload": "RGBA with premultiplication OFF (createImageBitmap premultiplyAlpha:'none'); A is ~0 almost everywhere, a premultiplied upload or a lossy/non-exact webp wipes R/G/B there"
+  },
+  "flow": {
+   "angle_noise": 0.15,
+   "curl": 0.25
+  },
+  "strokes": {
+   "SW": 8,
+   "STEP": 1.8
+  },
+  "dither": {
+   "levels": 16,
+   "amount": 0.3,
+   "fade_near_foil": [
+    0.05,
+    0.4
+   ]
+  },
+  "no_green": "CIELAB hue 115-190 with C* > 10 banned on the ground",
+  "BROKEN": [
+   0,
+   90,
+   2.4,
+   0.6
+  ],
+  "DAB_BROKEN": [
+   0.9,
+   0.55,
+   0.55,
+   0.45
+  ],
+  "WILLOW_VERT": [
+   1,
+   0.8
+  ],
+  "BRISTLE": 0.85,
+  "SPECKLE": 1.5,
+  "ACCENTS": [
+   "#B9A6DA",
+   "#E8DEEF",
+   "#6E92C8"
+  ]
+ },
+ "coverage": [
+  0.15,
+  0.2
+ ],
+ "coverage_mobile": [
+  0.15,
+  0.2
+ ],
+ "bake": {
+  "desktop": {
+   "foil_coverage": 0.1497,
+   "piece_coverage": 0.1914,
+   "pieces": 60,
+   "pads": 0,
+   "lilies": 2,
+   "dabs": 0,
+   "top_rows_clear": true
+  },
+  "mobile": {
+   "foil_coverage": 0.1512,
+   "piece_coverage": 0.2153,
+   "pieces": 21,
+   "pads": 0,
+   "lilies": 2,
+   "dabs": 0,
+   "top_rows_clear": true
+  },
+  "atlas": {
+   "w": 2048,
+   "h": 2048
+  },
+  "bytes": {
+   "print_png": 1236395,
+   "fx_png": 528554,
+   "print_webp_q85": 234960,
+   "fx_webp_lossless": 422280
+  }
+ }
+}

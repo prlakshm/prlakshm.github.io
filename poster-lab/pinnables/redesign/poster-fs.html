@@ -1,0 +1,17 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Figma Sound poster 4:5</title>
+<style>
+@font-face{font-family:JBM;src:url(fonts/JetBrainsMono-Variable.woff2)}
+*{margin:0;box-sizing:border-box}
+html,body{width:1080px;height:1350px;overflow:hidden}
+body{background:#0E0F11 radial-gradient(#2A2B2F 1.6px,transparent 1.8px) 24px 24px/48px 48px;position:relative;font-family:Inter,system-ui,sans-serif}
+h1{position:absolute;left:0;right:0;top:470px;text-align:center;font:500 214px/1.02 JBM;color:#F3EEE4;letter-spacing:-.01em}
+.d{position:absolute;transform:translate(-50%,-50%)}
+.by{position:absolute;left:0;right:0;bottom:62px;text-align:center;color:#9A9A9A;font-size:26px;letter-spacing:.01em}
+</style></head><body>
+<h1>Figma<br>Sound</h1>
+<script>
+const P=[[1,250,250,1.35,-6],[0,560,195,1.35,4],[2,840,280,1.35,0],[3,130,500,1.35,0],[5,125,975,1.3,-4],[7,920,560,1.35,0],[4,945,815,1.35,0],[9,265,1110,1.35,0],[11,470,1100,1.35,0],[10,730,1070,1.3,0],[6,930,1035,1.25,-2],[8,800,1190,0,0]];
+P.forEach(([i,x,y,s,r])=>{if(!s)return;const im=new Image();im.src=`img/src/dd${i}.png`;im.className='d';im.onload=()=>{im.style.width=im.naturalWidth*s+'px'};im.style.left=x+'px';im.style.top=y+'px';im.style.transform+=` rotate(${r}deg)`;document.body.appendChild(im)});
+</script>
+<p class="by">Independent concept by Pranavi Ram</p>
+</body></html>

@@ -1,0 +1,1077 @@
+{
+ "atlas": {
+  "w": 2048,
+  "h": 1024,
+  "texels_per_css_px": 2,
+  "gutter": 4,
+  "margin": 6,
+  "print": "atlas_print.png",
+  "fx": "atlas_fx.png"
+ },
+ "concept": "D",
+ "version": 1,
+ "units": {
+  "atlas": "texels, 2 per CSS px",
+  "band": "x,y fractions of the band, y down; h = rect height in band heights"
+ },
+ "hero": {
+  "desktop": [
+   0.34,
+   0.26
+  ],
+  "mobile": [
+   0.36,
+   0.26
+  ]
+ },
+ "sun": {
+  "desktop": 0.585,
+  "mobile": 0.56
+ },
+ "pieces": [
+  {
+   "id": "gold_r",
+   "kind": "leaf",
+   "tier": "leaf",
+   "rect": [
+    4,
+    324,
+    859,
+    223
+   ],
+   "anchor": [
+    0.50233,
+    0.5
+   ],
+   "desktop": {
+    "x": 0.7901,
+    "y": 0.31631,
+    "h": 0.39964,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 0,
+   "keep": 1.0,
+   "phase": 0.6251,
+   "tilt": [
+    -0.025,
+    0.015
+   ],
+   "breathe": 1.0,
+   "cut": "",
+   "css": [
+    429.5,
+    111.5
+   ]
+  },
+  {
+   "id": "gold_l",
+   "kind": "leaf",
+   "tier": "leaf",
+   "rect": [
+    4,
+    4,
+    1386,
+    312
+   ],
+   "anchor": [
+    0.49856,
+    0.5
+   ],
+   "desktop": {
+    "x": 0.35243,
+    "y": 0.36022,
+    "h": 0.55914,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 1,
+   "keep": 1.0,
+   "phase": 0.8972,
+   "tilt": [
+    0.02,
+    -0.01
+   ],
+   "breathe": 1.0,
+   "cut": "",
+   "css": [
+    693.0,
+    156.0
+   ]
+  },
+  {
+   "id": "gold_n",
+   "kind": "leaf",
+   "tier": "leaf",
+   "rect": [
+    1141,
+    324,
+    704,
+    121
+   ],
+   "anchor": [
+    0.50142,
+    0.5
+   ],
+   "desktop": {
+    "x": 0.46979,
+    "y": 0.76971,
+    "h": 0.21685,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 2,
+   "keep": 1.0,
+   "phase": 0.7757,
+   "tilt": [
+    0.01,
+    0.02
+   ],
+   "breathe": 1.0,
+   "cut": "",
+   "css": [
+    352.0,
+    60.5
+   ]
+  },
+  {
+   "id": "pp_far_c",
+   "kind": "ppad",
+   "tier": "ppad",
+   "rect": [
+    538,
+    738,
+    118,
+    24
+   ],
+   "anchor": [
+    0.21017,
+    0.57205
+   ],
+   "desktop": {
+    "x": 0.61486,
+    "y": 0.06941,
+    "h": 0.04301,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 3,
+   "keep": 0.8,
+   "phase": 0.8736,
+   "tilt": [
+    -0.0178,
+    -0.0091
+   ],
+   "breathe": 0.0,
+   "cut": "",
+   "css": [
+    59.0,
+    12.0
+   ]
+  },
+  {
+   "id": "pp_far_l",
+   "kind": "ppad",
+   "tier": "ppad",
+   "rect": [
+    72,
+    738,
+    221,
+    35
+   ],
+   "anchor": [
+    0.48941,
+    0.38856
+   ],
+   "desktop": {
+    "x": 0.06186,
+    "y": 0.0871,
+    "h": 0.06272,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 4,
+   "keep": 0.8,
+   "phase": 0.7971,
+   "tilt": [
+    0.0012,
+    0.0268
+   ],
+   "breathe": 0.0,
+   "cut": "",
+   "css": [
+    110.5,
+    17.5
+   ]
+  },
+  {
+   "id": "pp_gold_l",
+   "kind": "ppad",
+   "tier": "ppad",
+   "rect": [
+    1518,
+    664,
+    306,
+    50
+   ],
+   "anchor": [
+    0.15752,
+    0.57359
+   ],
+   "desktop": {
+    "x": 0.37194,
+    "y": 0.42416,
+    "h": 0.08961,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 5,
+   "keep": 0.8,
+   "phase": 0.2784,
+   "tilt": [
+    -0.0124,
+    0.0098
+   ],
+   "breathe": 0.0,
+   "cut": "",
+   "css": [
+    153.0,
+    25.0
+   ]
+  },
+  {
+   "id": "pp_gold_r",
+   "kind": "ppad",
+   "tier": "ppad",
+   "rect": [
+    4,
+    664,
+    266,
+    66
+   ],
+   "anchor": [
+    0.75564,
+    0.60225
+   ],
+   "desktop": {
+    "x": 0.81493,
+    "y": 0.50493,
+    "h": 0.11828,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 6,
+   "keep": 0.8,
+   "phase": 0.7927,
+   "tilt": [
+    0.0139,
+    -0.0269
+   ],
+   "breathe": 0.0,
+   "cut": "",
+   "css": [
+    133.0,
+    33.0
+   ]
+  },
+  {
+   "id": "lily_r",
+   "kind": "lily",
+   "tier": "lily",
+   "rect": [
+    1832,
+    664,
+    76,
+    45
+   ],
+   "anchor": [
+    0.50659,
+    0.76889
+   ],
+   "desktop": {
+    "x": 0.81788,
+    "y": 0.49928,
+    "h": 0.08065,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 7,
+   "keep": 0.95,
+   "phase": 0.5045,
+   "tilt": [
+    0.0021,
+    -0.0186
+   ],
+   "breathe": 0.5,
+   "cut": "",
+   "css": [
+    38.0,
+    22.5
+   ]
+  },
+  {
+   "id": "pp_mid_r",
+   "kind": "ppad",
+   "tier": "ppad",
+   "rect": [
+    1357,
+    555,
+    306,
+    78
+   ],
+   "anchor": [
+    0.75542,
+    0.62692
+   ],
+   "desktop": {
+    "x": 0.96186,
+    "y": 0.59839,
+    "h": 0.13978,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 8,
+   "keep": 0.8,
+   "phase": 0.2153,
+   "tilt": [
+    -0.038,
+    -0.0258
+   ],
+   "breathe": 0.0,
+   "cut": "",
+   "css": [
+    153.0,
+    39.0
+   ]
+  },
+  {
+   "id": "pp_mid_l",
+   "kind": "ppad",
+   "tier": "ppad",
+   "rect": [
+    547,
+    664,
+    215,
+    60
+   ],
+   "anchor": [
+    0.23442,
+    0.36102
+   ],
+   "desktop": {
+    "x": 0.04493,
+    "y": 0.59975,
+    "h": 0.10753,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 9,
+   "keep": 0.8,
+   "phase": 0.0439,
+   "tilt": [
+    -0.0047,
+    -0.0253
+   ],
+   "breathe": 0.0,
+   "cut": "",
+   "css": [
+    107.5,
+    30.0
+   ]
+  },
+  {
+   "id": "pp_open",
+   "kind": "ppad",
+   "tier": "ppad",
+   "rect": [
+    1012,
+    664,
+    274,
+    55
+   ],
+   "anchor": [
+    0.39474,
+    0.40889
+   ],
+   "desktop": {
+    "x": 0.65492,
+    "y": 0.6998,
+    "h": 0.09857,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 10,
+   "keep": 0.8,
+   "phase": 0.4662,
+   "tilt": [
+    0.0031,
+    -0.0037
+   ],
+   "breathe": 0.0,
+   "cut": "",
+   "css": [
+    137.0,
+    27.5
+   ]
+  },
+  {
+   "id": "pp_near_l2",
+   "kind": "ppad",
+   "tier": "ppad",
+   "rect": [
+    867,
+    555,
+    228,
+    99
+   ],
+   "anchor": [
+    0.49912,
+    0.49963
+   ],
+   "desktop": {
+    "x": 0.135,
+    "y": 0.77861,
+    "h": 0.17742,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 11,
+   "keep": 0.8,
+   "phase": 0.1924,
+   "tilt": [
+    -0.0306,
+    -0.0096
+   ],
+   "breathe": 0.0,
+   "cut": "",
+   "css": [
+    114.0,
+    49.5
+   ]
+  },
+  {
+   "id": "lily_hero",
+   "kind": "lily",
+   "tier": "lily",
+   "rect": [
+    1893,
+    4,
+    126,
+    68
+   ],
+   "anchor": [
+    0.4825,
+    0.81235
+   ],
+   "desktop": {
+    "x": 0.13986,
+    "y": 0.78358,
+    "h": 0.12186,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 12,
+   "keep": 0.95,
+   "phase": 0.5141,
+   "tilt": [
+    -0.0108,
+    -0.001
+   ],
+   "breathe": 0.5,
+   "cut": "",
+   "css": [
+    63.0,
+    34.0
+   ]
+  },
+  {
+   "id": "pp_near_l1",
+   "kind": "ppad",
+   "tier": "ppad",
+   "rect": [
+    871,
+    324,
+    262,
+    134
+   ],
+   "anchor": [
+    0.43893,
+    0.50093
+   ],
+   "desktop": {
+    "x": 0.03993,
+    "y": 0.85865,
+    "h": 0.24014,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 13,
+   "keep": 0.8,
+   "phase": 0.3695,
+   "tilt": [
+    -0.0162,
+    0.0212
+   ],
+   "breathe": 0.0,
+   "cut": "l",
+   "css": [
+    131.0,
+    67.0
+   ]
+  },
+  {
+   "id": "pp_near_c",
+   "kind": "ppad",
+   "tier": "ppad",
+   "rect": [
+    1671,
+    555,
+    233,
+    68
+   ],
+   "anchor": [
+    0.25837,
+    0.60194
+   ],
+   "desktop": {
+    "x": 0.49,
+    "y": 0.89952,
+    "h": 0.12186,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 14,
+   "keep": 0.8,
+   "phase": 0.5098,
+   "tilt": [
+    -0.0022,
+    0.0022
+   ],
+   "breathe": 0.0,
+   "cut": "",
+   "css": [
+    116.5,
+    34.0
+   ]
+  },
+  {
+   "id": "lily_c",
+   "kind": "lily",
+   "tier": "lily",
+   "rect": [
+    1916,
+    664,
+    69,
+    42
+   ],
+   "anchor": [
+    0.48369,
+    0.76476
+   ],
+   "desktop": {
+    "x": 0.4918,
+    "y": 0.90344,
+    "h": 0.07527,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 15,
+   "keep": 0.95,
+   "phase": 0.1545,
+   "tilt": [
+    -0.0007,
+    0.0177
+   ],
+   "breathe": 0.5,
+   "cut": "",
+   "css": [
+    34.5,
+    21.0
+   ]
+  },
+  {
+   "id": "pp_near_l4",
+   "kind": "ppad",
+   "tier": "ppad",
+   "rect": [
+    1853,
+    324,
+    157,
+    72
+   ],
+   "anchor": [
+    0.49809,
+    0.49914
+   ],
+   "desktop": {
+    "x": 0.215,
+    "y": 0.89953,
+    "h": 0.12903,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 16,
+   "keep": 0.8,
+   "phase": 0.7418,
+   "tilt": [
+    -0.0245,
+    0.0015
+   ],
+   "breathe": 0.0,
+   "cut": "",
+   "css": [
+    78.5,
+    36.0
+   ]
+  },
+  {
+   "id": "pp_near_r",
+   "kind": "ppad",
+   "tier": "ppad",
+   "rect": [
+    393,
+    555,
+    466,
+    99
+   ],
+   "anchor": [
+    0.28927,
+    0.60283
+   ],
+   "desktop": {
+    "x": 0.885,
+    "y": 0.92953,
+    "h": 0.17742,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 17,
+   "keep": 0.8,
+   "phase": 0.5078,
+   "tilt": [
+    -0.0309,
+    0.0172
+   ],
+   "breathe": 0.0,
+   "cut": "rb",
+   "css": [
+    233.0,
+    49.5
+   ]
+  },
+  {
+   "id": "pp_near_l3",
+   "kind": "ppad",
+   "tier": "ppad",
+   "rect": [
+    278,
+    664,
+    261,
+    60
+   ],
+   "anchor": [
+    0.50345,
+    0.99009
+   ],
+   "desktop": {
+    "x": 0.10465,
+    "y": 0.99893,
+    "h": 0.10753,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 18,
+   "keep": 0.8,
+   "phase": 0.5982,
+   "tilt": [
+    -0.0128,
+    0.04
+   ],
+   "breathe": 0.0,
+   "cut": "b",
+   "css": [
+    130.5,
+    30.0
+   ]
+  },
+  {
+   "id": "m_gold_l",
+   "kind": "leaf",
+   "tier": "leaf",
+   "rect": [
+    1398,
+    4,
+    487,
+    170
+   ],
+   "anchor": [
+    0.50924,
+    0.5
+   ],
+   "desktop": null,
+   "mobile": {
+    "x": 0.36533,
+    "y": 0.30833,
+    "h": 0.47222,
+    "rot": 0.0,
+    "flip": false
+   },
+   "z": 19,
+   "keep": 1.0,
+   "phase": 0.0593,
+   "tilt": [
+    0.02,
+    -0.01
+   ],
+   "breathe": 1.0,
+   "cut": "",
+   "css": [
+    243.5,
+    85.0
+   ]
+  },
+  {
+   "id": "m_gold_s",
+   "kind": "leaf",
+   "tier": "leaf",
+   "rect": [
+    770,
+    664,
+    234,
+    59
+   ],
+   "anchor": [
+    0.46154,
+    0.5
+   ],
+   "desktop": null,
+   "mobile": {
+    "x": 0.22933,
+    "y": 0.59861,
+    "h": 0.16389,
+    "rot": 0.0,
+    "flip": false
+   },
+   "z": 20,
+   "keep": 1.0,
+   "phase": 0.3876,
+   "tilt": [
+    0.01,
+    0.02
+   ],
+   "breathe": 1.0,
+   "cut": "",
+   "css": [
+    117.0,
+    29.5
+   ]
+  },
+  {
+   "id": "m_gold_r",
+   "kind": "leaf",
+   "tier": "leaf",
+   "rect": [
+    4,
+    555,
+    381,
+    101
+   ],
+   "anchor": [
+    0.47244,
+    0.5
+   ],
+   "desktop": null,
+   "mobile": {
+    "x": 0.732,
+    "y": 0.65972,
+    "h": 0.28056,
+    "rot": 0.0,
+    "flip": false
+   },
+   "z": 21,
+   "keep": 1.0,
+   "phase": 0.323,
+   "tilt": [
+    -0.02,
+    0.015
+   ],
+   "breathe": 1.0,
+   "cut": "r",
+   "css": [
+    190.5,
+    50.5
+   ]
+  },
+  {
+   "id": "m_pp_far",
+   "kind": "ppad",
+   "tier": "ppad",
+   "rect": [
+    301,
+    738,
+    126,
+    32
+   ],
+   "anchor": [
+    0.50397,
+    0.38329
+   ],
+   "desktop": null,
+   "mobile": {
+    "x": 0.83933,
+    "y": 0.09796,
+    "h": 0.08889,
+    "rot": 0.0,
+    "flip": false
+   },
+   "z": 22,
+   "keep": 0.8,
+   "phase": 0.3794,
+   "tilt": [
+    -0.0038,
+    0.0137
+   ],
+   "breathe": 0.0,
+   "cut": "",
+   "css": [
+    63.0,
+    16.0
+   ]
+  },
+  {
+   "id": "m_pp_gold",
+   "kind": "ppad",
+   "tier": "ppad",
+   "rect": [
+    435,
+    738,
+    95,
+    31
+   ],
+   "anchor": [
+    0.34316,
+    0.54689
+   ],
+   "desktop": null,
+   "mobile": {
+    "x": 0.45947,
+    "y": 0.3582,
+    "h": 0.08611,
+    "rot": 0.0,
+    "flip": false
+   },
+   "z": 23,
+   "keep": 0.8,
+   "phase": 0.6051,
+   "tilt": [
+    0.0133,
+    0.0288
+   ],
+   "breathe": 0.0,
+   "cut": "",
+   "css": [
+    47.5,
+    15.5
+   ]
+  },
+  {
+   "id": "m_pp_near_r",
+   "kind": "ppad",
+   "tier": "ppad",
+   "rect": [
+    1294,
+    664,
+    117,
+    54
+   ],
+   "anchor": [
+    0.49744,
+    0.50003
+   ],
+   "desktop": null,
+   "mobile": {
+    "x": 0.79893,
+    "y": 0.85834,
+    "h": 0.15,
+    "rot": 0.0,
+    "flip": false
+   },
+   "z": 24,
+   "keep": 0.8,
+   "phase": 0.215,
+   "tilt": [
+    0.018,
+    0.0229
+   ],
+   "breathe": 0.0,
+   "cut": "",
+   "css": [
+    58.5,
+    27.0
+   ]
+  },
+  {
+   "id": "m_lily_c",
+   "kind": "lily",
+   "tier": "lily",
+   "rect": [
+    4,
+    738,
+    60,
+    37
+   ],
+   "anchor": [
+    0.49118,
+    0.74703
+   ],
+   "desktop": null,
+   "mobile": {
+    "x": 0.79929,
+    "y": 0.86289,
+    "h": 0.10278,
+    "rot": 0.0,
+    "flip": false
+   },
+   "z": 25,
+   "keep": 0.95,
+   "phase": 0.4025,
+   "tilt": [
+    -0.0237,
+    -0.0116
+   ],
+   "breathe": 0.5,
+   "cut": "",
+   "css": [
+    30.0,
+    18.5
+   ]
+  },
+  {
+   "id": "m_pp_near_l",
+   "kind": "ppad",
+   "tier": "ppad",
+   "rect": [
+    1103,
+    555,
+    246,
+    92
+   ],
+   "anchor": [
+    0.21138,
+    0.44643
+   ],
+   "desktop": null,
+   "mobile": {
+    "x": 0.06933,
+    "y": 0.85853,
+    "h": 0.25556,
+    "rot": 0.0,
+    "flip": false
+   },
+   "z": 26,
+   "keep": 0.8,
+   "phase": 0.8741,
+   "tilt": [
+    -0.0159,
+    0.0129
+   ],
+   "breathe": 0.0,
+   "cut": "lb",
+   "css": [
+    123.0,
+    46.0
+   ]
+  },
+  {
+   "id": "m_lily_hero",
+   "kind": "lily",
+   "tier": "lily",
+   "rect": [
+    1419,
+    664,
+    91,
+    51
+   ],
+   "anchor": [
+    0.48027,
+    0.79059
+   ],
+   "desktop": null,
+   "mobile": {
+    "x": 0.07427,
+    "y": 0.85922,
+    "h": 0.14167,
+    "rot": 0.0,
+    "flip": false
+   },
+   "z": 27,
+   "keep": 0.95,
+   "phase": 0.1508,
+   "tilt": [
+    0.0041,
+    -0.0093
+   ],
+   "breathe": 0.5,
+   "cut": "",
+   "css": [
+    45.5,
+    25.5
+   ]
+  },
+  {
+   "id": "m_pp_near_r2",
+   "kind": "ppad",
+   "tier": "ppad",
+   "rect": [
+    1912,
+    555,
+    125,
+    56
+   ],
+   "anchor": [
+    0.5744,
+    0.67069
+   ],
+   "desktop": null,
+   "mobile": {
+    "x": 0.92907,
+    "y": 0.94877,
+    "h": 0.15556,
+    "rot": 0.0,
+    "flip": false
+   },
+   "z": 28,
+   "keep": 0.8,
+   "phase": 0.8451,
+   "tilt": [
+    -0.0093,
+    -0.0019
+   ],
+   "breathe": 0.0,
+   "cut": "rb",
+   "css": [
+    62.5,
+    28.0
+   ]
+  }
+ ]
+}

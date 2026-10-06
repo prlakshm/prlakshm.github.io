@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
-import { decoded, enterOnView, fontsReady, lineCount, type Step } from "../../motion/entrance.js";
+import { BEAT, decoded, enterOnView, fontsReady, lineCount, type Step } from "../../motion/entrance.js";
 import "../../styles/tokens.css";
 import "../home/home.css";
 import "./about.css";
@@ -67,7 +67,7 @@ function About() {
       const out: Step[] = [];
       if (heading) out.push({ el: heading, beats: lineCount(heading) });
       out.push({ el: q(".ab-body .line"), rows: true });
-      if (beside && portrait) out.push({ el: portrait, large: true });
+      if (beside && portrait) out.push({ el: portrait, large: true, lead: BEAT });
       out.push({ el: q(".ab-exp-h, .ab-exp-row"), rows: true });
       return out;
     };
@@ -77,7 +77,7 @@ function About() {
       );
     const stops = [enterOnView(text ?? about, steps, ready)];
     if (portrait && !beside)
-      stops.push(enterOnView(portrait, () => [{ el: portrait, large: true }], () => decoded(q(".ab-portrait img") as HTMLImageElement[])));
+      stops.push(enterOnView(portrait, () => [{ el: portrait, large: true, lead: BEAT }], () => decoded(q(".ab-portrait img") as HTMLImageElement[])));
     return () => stops.forEach((stop) => stop());
   }, []);
 

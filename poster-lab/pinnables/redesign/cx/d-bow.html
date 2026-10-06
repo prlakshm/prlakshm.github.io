@@ -1,0 +1,16 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:'OpenAI Sans';font-weight:500;src:url(../fonts/oai/OpenAISans-Medium-B7nJY_kG.woff2)}
+*{margin:0}html,body{width:1080px;height:1350px;overflow:hidden;background:#fff}
+svg{display:block;width:1080px;height:1350px}
+</style></head><body>
+<svg id="p" viewBox="0 0 1080 1350" xmlns="http://www.w3.org/2000/svg"></svg>
+<script src="kit.js"></script>
+<script>
+const {C,title,mascot,mascotDefs,sticker,pinkDefs,bow,wallpaper}=CX;
+p.innerHTML=`<defs>${mascotDefs('m')}${pinkDefs('pk')}${sticker('st',{r:16,dy:24,blur:22,sop:.18})}${wallpaper('wp','#DAE3FF','#CAD6FF',150)}</defs>
+<rect width="1080" height="1350" fill="url(#wp)"/>
+<g filter="url(#st)">${mascot('m',{x:540,y:640,s:1.1})}${bow('pk',{x:668,y:452,s:.72,rot:16})}</g>
+${title(['Codex','Bookmarks'],{y:1030,size:104,lh:1.02,fill:C.ink,bold:6})}`;
+</script>
+</body></html>

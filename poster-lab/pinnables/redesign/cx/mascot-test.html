@@ -1,0 +1,12 @@
+<!doctype html><html><head><meta charset="utf-8"><title>mascot test</title>
+<style>*{margin:0}html,body{width:1080px;height:1350px;overflow:hidden}svg{display:block;width:1080px;height:1350px}</style></head><body>
+<svg id="p" viewBox="0 0 1080 1350"></svg><script src="kit.js"></script>
+<script>
+const {C}=CX;
+p.innerHTML=`<defs>${CX.mascotDefs('m')}${CX.shadow('sh')}</defs>
+<rect width="1080" height="1350" fill="#DCE5FF"/>
+<g filter="url(#sh)">${CX.mascot('m',{x:540,y:560,s:1.5,sticker:16})}</g>
+<g>${CX.mascot('m',{x:200,y:1150,s:.3,sticker:16})}</g>
+<g>${CX.mascot('m',{x:420,y:1150,s:.5})}</g>
+<path d="${CX.cloudD()}" transform="translate(800 1150) scale(.6)" fill="none" stroke="#000" stroke-width="3"/>`;
+</script></body></html>

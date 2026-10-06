@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Figma Sound poster 4:5</title>
+    <!-- The Figma Sound poster: the deck's closing slide (public/branding/sound-orbit.html on main) reframed at 4:5.
+         Same twelve icons, ring maths, colours and type. The wordmark is stacked like the slide's portrait card and
+         centred on the sheet; the ring is tilted 20 deg with the same depth (front swells, back shrinks and dims),
+         frozen at one moment of the orbit. No credit line.
+         Params: ?turn= (orbit phase, 0-1)  ?rx= ?ry= ?tilt= ?size= (overrides)  ?guides (centre lines) -->
+    <style>
+      @font-face {
+        font-family: "JetBrains Mono";
+        src: url("fonts/JetBrainsMono-Variable.woff2") format("woff2");
+        font-weight: 100 800;
+      }
+      html, body { margin: 0; width: 1000px; height: 1250px; overflow: hidden; }
+      body {
+        --dot-gap: 25px; /* the slide's max(20px, 2.5vw) at this width */
+        background-color: #0D0C0F;
+        background-image: radial-gradient(circle at center, #34343A 0 calc(var(--dot-gap) * .046), transparent calc(var(--dot-gap) * .046 + .75px));
+        background-position: center;
+        background-size: var(--dot-gap) var(--dot-gap);
+      }
+      svg { display: block; position: absolute; inset: 0; width: 100%; height: 100%; }
+      .word { fill: #F4EDE0; font-family: "JetBrains Mono", ui-monospace, monospace; font-weight: 400; }
+    </style>
+  </head>
+  <body>
+    <svg id="stage" viewBox="0 0 1000 1250" role="img" aria-label="Figma Sound, with sound icons orbiting the wordmark">
+      <g id="ring"></g>
+      <g id="words"></g>
+    </svg>
+    <script>
+(() => {
+  const ICONS = [{"a0":-1.570796,"rot0":0.0,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(1.0000) translate(-50,-50)\" fill=\"none\" stroke=\"#F59AB0\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M28 32 L72 32 L66 90 L34 90 Z\"/><path d=\"M24 32 L76 32\"/><path d=\"M30 32 Q50 14 70 32\"/><path d=\"M52 24 L60 4 L72 4\"/><path d=\"M38 56 L62 56\"/></g>"},{"a0":-1.047198,"rot0":3.3495,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(1.1190) translate(-50,-50)\" fill=\"none\" stroke=\"#98CB4C\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 82 Q18 24 82 18 Q78 78 20 82 Z\"/><path d=\"M20 82 L66 34\"/><path d=\"M40 62 L36 46\"/><path d=\"M52 50 L62 56\"/></g>"},{"a0":-0.523599,"rot0":-6.5044,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(0.9693) translate(-50,-50)\" fill=\"none\" stroke=\"#5BB5EC\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M50 16 A30 30 0 1 1 49.9 16 Z\"/><path d=\"M24 32 Q50 52 78 36\"/><path d=\"M20 52 Q48 70 80 54\"/><path d=\"M36 18 Q28 46 40 74\"/><path d=\"M60 17 Q74 44 64 75\"/><path d=\"M28 70 Q14 92 2 84\"/></g>"},{"a0":0.0,"rot0":9.2816,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(0.8889) translate(-50,-50)\" fill=\"none\" stroke=\"#FFC53D\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M42 78 L42 22 L78 14 L78 68\"/><path d=\"M42 34 L78 26\"/><path d=\"M42 78 A10 8 0 1 1 41.9 78 Z\"/><path d=\"M78 68 A10 8 0 1 1 77.9 68 Z\"/></g>"},{"a0":0.523599,"rot0":-11.5196,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(1.0593) translate(-50,-50)\" fill=\"none\" stroke=\"#5BB5EC\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M16 60 Q32 38 58 46 Q68 36 80 38 L90 42 L80 46 Q72 66 46 70 Q28 70 16 60 Z\"/><path d=\"M74 42 L74 43\"/><path d=\"M38 54 Q52 44 62 56\"/><path d=\"M46 70 L44 80\"/><path d=\"M54 69 L54 80\"/></g>"},{"a0":1.047198,"rot0":13.0885,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(1.0958) translate(-50,-50)\" fill=\"none\" stroke=\"#F1DF6E\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M50 34 A16 16 0 1 1 49.9 34 Z\"/><path d=\"M74.0 50.0 L86.0 50.0\"/><path d=\"M67.0 67.0 L75.5 75.5\"/><path d=\"M50.0 74.0 L50.0 86.0\"/><path d=\"M33.0 67.0 L24.5 75.5\"/><path d=\"M26.0 50.0 L14.0 50.0\"/><path d=\"M33.0 33.0 L24.5 24.5\"/><path d=\"M50.0 26.0 L50.0 14.0\"/><path d=\"M67.0 33.0 L75.5 24.5\"/></g>"},{"a0":1.570796,"rot0":-13.8972,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(0.9160) translate(-50,-50)\" fill=\"none\" stroke=\"#F2A65A\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M22 42 L27 12 L44 29 Q50 27 56 29 L73 12 L78 42\"/><path d=\"M22 42 Q17 82 50 86 Q83 82 78 42\"/><path d=\"M36 50 L36 54\"/><path d=\"M64 50 L64 54\"/><path d=\"M46 61 L54 61 L50 65 Z\"/><path d=\"M50 65 Q50 73 44 73 Q39 73 39 68\"/><path d=\"M50 65 Q50 73 56 73 Q61 73 61 68\"/><path d=\"M30 64 L10 60\"/><path d=\"M30 69 L11 71\"/><path d=\"M70 64 L90 60\"/><path d=\"M70 69 L89 71\"/></g>"},{"a0":2.094395,"rot0":13.8987,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(0.842)\"><g id=\"orbit-chip\"><rect x=\"-59.4\" y=\"-29.7\" width=\"118.8\" height=\"59.4\" rx=\"29.7\" fill=\"#FFE38A\"/><g><path d=\"M-34.6 16.1 -38.4 -8.1H-34.4L-32.1 7.9Q-31.9 9 -31.8 10.3Q-31.6 11.7 -31.5 12.5Q-31.5 11.7 -31.3 10.3Q-31.1 9 -30.9 7.9L-28.4 -8.1H-24.4L-21.9 7.9Q-21.7 9 -21.5 10.4Q-21.3 11.7 -21.3 12.6Q-21.2 11.7 -21 10.3Q-20.8 9 -20.6 7.9L-18.3 -8.1H-14.4L-18.3 16.1H-23.3L-25.7 0.3Q-25.9 -0.9 -26.1 -2.3Q-26.3 -3.7 -26.4 -4.5Q-26.5 -3.7 -26.7 -2.3Q-26.9 -0.9 -27.1 0.3L-29.6 16.1ZM-2.4 16.5Q-6.2 16.5 -8.4 14.6Q-10.6 12.6 -10.6 9.2Q-10.6 5.8 -8.3 3.8Q-5.9 1.9 -1.9 1.9H4.8V-0.4Q4.8 -2.3 3.6 -3.4Q2.4 -4.5 0.1 -4.5Q-1.8 -4.5 -3.2 -3.7Q-4.5 -2.8 -4.7 -1.4H-9.4Q-9 -4.7 -6.4 -6.6Q-3.7 -8.5 0.3 -8.5Q4.6 -8.5 7.1 -6.4Q9.6 -4.2 9.6 -0.4V16.1H5V11.7H4.2L5 10.8Q5 13.4 2.9 15Q0.9 16.5 -2.4 16.5ZM-1 12.9Q1.5 12.9 3.2 11.6Q4.8 10.3 4.8 8.3V5.1H-1.8Q-3.7 5.1 -4.7 6.1Q-5.8 7.1 -5.8 8.9Q-5.8 10.7 -4.5 11.8Q-3.3 12.9 -1 12.9ZM23.3 16.1 15.3 -8.1H20.1L25.1 7.4Q25.6 8.8 25.9 10.1Q26.3 11.5 26.5 12.3Q26.7 11.5 27.1 10.1Q27.5 8.8 27.9 7.4L32.7 -8.1H37.5L29.5 16.1Z\" fill=\"#0E0E10\"/></g></g></g>"},{"a0":2.617994,"rot0":-13.0929,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(1.1031) translate(-50,-50)\" fill=\"none\" stroke=\"#F79BC6\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M50 12 Q54 46 88 50 Q54 54 50 88 Q46 54 12 50 Q46 46 50 12 Z\"/></g>"},{"a0":3.141593,"rot0":11.5267,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(1.0476) translate(-50,-50)\" fill=\"none\" stroke=\"#F1DF6E\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 50 Q50 36 96 50 Q50 60 4 50 Z\"/><path d=\"M40 44 Q50 30 60 44\"/><path d=\"M50 56 L50 92\"/><path d=\"M34 92 L66 92\"/><path d=\"M14 30 L6 20\"/><path d=\"M86 30 L94 20\"/><path d=\"M50 24 L50 12\"/></g>"},{"a0":3.665191,"rot0":-9.2909,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(0.8846) translate(-50,-50)\" fill=\"none\" stroke=\"#6CC4FF\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M18 42 L18 58\"/><path d=\"M28 30 L28 70\"/><path d=\"M38 18 L38 82\"/><path d=\"M48 36 L48 64\"/><path d=\"M58 22 L58 78\"/><path d=\"M68 32 L68 68\"/><path d=\"M78 40 L78 60\"/><path d=\"M88 46 L88 54\"/></g>"},{"a0":4.18879,"rot0":6.5154,"svg":"<g transform=\"translate(0.0,0.0) rotate(0.0) scale(0.9821) translate(-50,-50)\" fill=\"none\" stroke=\"#E0474C\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M14 90 L58 46\"/><path d=\"M54 36 Q66 30 68 42 Q70 54 58 52 Q50 50 54 36 Z\"/><path d=\"M64 30 Q58 16 68 6 Q70 18 80 20 Q82 32 70 34\"/></g>"}];
+  const q = new URLSearchParams(location.search);
+  const num = (k, d) => (q.has(k) ? +q.get(k) : d);
+  // The slide's portrait card, refitted to 1000 x 1250: same proportions of ring to frame.
+  const P = { w: 1000, h: 1250, cx: 500, cy: 625, rx: num("rx", 405), ry: num("ry", 505), tilt: num("tilt", 20),
+              depthScale: [0.8, 0.4], backOpacity: 0.72, size: num("size", 184) };
+  const NS = "http://www.w3.org/2000/svg";
+  const ringG = document.getElementById("ring");
+  const wordsG = document.getElementById("words");
+
+  // Words: "central" puts y at the middle of JetBrains Mono's cap box (cap top 0.37 em above, baseline 0.36 below),
+  // so two lines at cy -/+ d centre the wordmark, cap of "Figma" to baseline of "Sound", on the sheet.
+  const adv = 0.6 * P.size, d = 0.53 * P.size;
+  [["Figma", P.cy - d], ["Sound", P.cy + d]].forEach(([w, y]) => {
+    const t = document.createElementNS(NS, "text");
+    t.setAttribute("class", "word");
+    t.setAttribute("font-size", P.size);
+    t.setAttribute("dominant-baseline", "central");
+    t.setAttribute("x", P.cx - (w.length * adv) / 2);
+    t.setAttribute("y", y);
+    t.textContent = w;
+    wordsG.appendChild(t);
+  });
+
+  // Icons: the slide's orbit at one instant (no bob or sway), so the poster is one frame of the slide.
+  // 0.7292 of a turn: the sound icons (cymbal, sparkle, wav, waveform) swing to the front, colours evenly spread,
+  // every icon >= 52 px clear of the letters and >= 48 px inside the sheet.
+  const turn = num("turn", 0.7292);
+  const th = P.tilt * Math.PI / 180;
+  ICONS.forEach((ic) => {
+    const g = document.createElementNS(NS, "g");
+    g.innerHTML = ic.svg;
+    ringG.appendChild(g);
+    const a = ic.a0 + 2 * Math.PI * turn;
+    const depth = 0.5 + 0.5 * Math.sin(a);
+    const xl = P.rx * Math.cos(a), yl = P.ry * Math.sin(a);
+    const x = P.cx + xl * Math.cos(th) - yl * Math.sin(th), y = P.cy + xl * Math.sin(th) + yl * Math.cos(th);
+    const sc = P.depthScale[0] + P.depthScale[1] * depth;
+    g.setAttribute("transform", `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${ic.rot0.toFixed(2)}) scale(${sc.toFixed(4)})`);
+    g.setAttribute("opacity", (P.backOpacity + (1 - P.backOpacity) * depth).toFixed(3));
+  });
+
+  if (q.has("guides")) {
+    const s = document.getElementById("stage");
+    s.insertAdjacentHTML("beforeend", `<path d="M500 0V1250M0 625H1000" stroke="#ff2d55" stroke-width="1" opacity=".6"/>`);
+  }
+  document.fonts.ready.then(() => document.documentElement.setAttribute("data-ready", "1"));
+})();
+    </script>
+  </body>
+</html>

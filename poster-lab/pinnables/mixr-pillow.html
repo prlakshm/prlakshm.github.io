@@ -1,0 +1,233 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Mixr — pillow glass</title>
+<style>
+  html,body{margin:0;background:#17181C;display:grid;place-items:center;min-height:100vh;font:12px/1.4 ui-monospace,Menlo,monospace;color:#9CA3AF}
+  canvas{height:min(96vh,1200px);width:auto;box-shadow:0 30px 90px rgba(0,0,0,.55)}
+  body.export canvas{height:2000px;box-shadow:none}
+  .hud{position:fixed;left:16px;bottom:14px;letter-spacing:.06em}
+  .hud a{color:#C9B9F4;margin-right:10px;text-decoration:none}
+  .hud a.on{color:#fff;text-decoration:underline}
+  body.export .hud{display:none}
+</style>
+</head>
+<body>
+<canvas id="c" width="1600" height="2000"></canvas>
+<div class="hud" id="hud"></div>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   MIXR — PILLOW GLASS   (colour round: gradient only, no object, no type)
+
+   The sheet is one gradient picture. Over it lies a grid of glass pillows —
+   the same cylinder lens both ways, as in designminis' Refract — and EVERY
+   cell refracts: a cylinder bends light little at its crown and hard at its
+   edges, so each cell shows the picture nearly straight in the middle and
+   drags it outward at the rim, with the three channels bent by different
+   amounts (dispersion) and a sheen where the crown faces the light.
+
+   ?o=A..E  colour ramp         ?grid=CxR  cells (default 5x4)
+   ?depth=  bend (default 1)    ?relief=   how sharp the edge is (default 1)
+   ═══════════════════════════════════════════════════════════════════════ */
+const W = 1600, H = 2000;
+const qs = new URLSearchParams(location.search);
+const [COLS, ROWS] = (qs.get('grid') || '5x4').split('x').map(Number);
+const DEPTH = +(qs.get('depth') || 1), RELIEF = +(qs.get('relief') || 1);
+const cv = document.getElementById('c');
+const gl = cv.getContext('webgl', { antialias: false, preserveDrawingBuffer: true });
+
+const MX = {
+  black: '050816', navy: '1A1830', deep: '0B0B16',
+  purple: '7231DD', purple2: '9873EB', pink: 'FF5FA2', pinkHi: 'FF7FB8',
+  blue: '0EA5E9', blueHi: '38BDF8', yellow: 'EAB308', yellowHi: 'FACC15', red: 'EF4444',
+  lavender: 'C9B9F4', lilac: 'E4DBFA', glow: 'B8A8FF', violet: 'C084FC', white: 'FFFFFF',
+};
+const rgb = h => [parseInt(h.slice(0, 2), 16) / 255, parseInt(h.slice(2, 4), 16) / 255, parseInt(h.slice(4, 6), 16) / 255];
+
+/* Five ramps, lavender forward. Lavender / lilac / glow are zones now, not
+   just the bright end; the vivid pink, blue and yellow still carry the heat. */
+const OPTS = {
+  A: { name: 'Lavender · pink · blue', stops: [[0, 'black'], [0.12, 'navy'], [0.26, 'purple'], [0.38, 'blue'], [0.46, 'yellowHi'], [0.5, 'pink'], [0.62, 'lavender'], [0.78, 'lilac'], [0.9, 'glow'], [1, 'white']], seed: 5, streak: 10, scale: 2.2 },
+  B: { name: 'Lilac field · hot seams', stops: [[0, 'navy'], [0.14, 'purple'], [0.3, 'violet'], [0.44, 'lavender'], [0.5, 'pink'], [0.54, 'yellow'], [0.6, 'blueHi'], [0.72, 'lilac'], [0.9, 'lavender'], [1, 'white']], seed: 17, streak: 12, scale: 2.0 },
+  C: { name: 'Violet heat', stops: [[0, 'black'], [0.12, 'deep'], [0.26, 'purple'], [0.4, 'violet'], [0.48, 'red'], [0.53, 'yellowHi'], [0.6, 'pink'], [0.72, 'glow'], [0.86, 'lilac'], [1, 'white']], seed: 31, streak: 9, scale: 2.4 },
+  D: { name: 'Blue hour', stops: [[0, 'black'], [0.14, 'navy'], [0.3, 'blue'], [0.44, 'blueHi'], [0.52, 'lavender'], [0.6, 'pink'], [0.7, 'violet'], [0.84, 'lilac'], [1, 'white']], seed: 47, streak: 11, scale: 2.1 },
+  E: { name: 'Full rack · lavender', stops: [[0, 'black'], [0.12, 'navy'], [0.26, 'blue'], [0.36, 'yellow'], [0.4, 'red'], [0.46, 'pink'], [0.56, 'purple2'], [0.66, 'lavender'], [0.76, 'blueHi'], [0.86, 'lilac'], [1, 'white']], seed: 71, streak: 9, scale: 2.3 },
+};
+const opt = qs.get('o') || 'A';
+const O = OPTS[opt] || OPTS.A;
+
+function compile(type, src) {
+  const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+  return s;
+}
+const VERT = `attribute vec2 p; varying vec2 v; void main(){ v = p * 0.5 + 0.5; gl_Position = vec4(p, 0.0, 1.0); }`;
+function program(frag) {
+  const pr = gl.createProgram();
+  gl.attachShader(pr, compile(gl.VERTEX_SHADER, VERT));
+  gl.attachShader(pr, compile(gl.FRAGMENT_SHADER, frag));
+  gl.linkProgram(pr);
+  if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(pr));
+  return pr;
+}
+const buf = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+function useProg(pr) {
+  gl.useProgram(pr);
+  const a = gl.getAttribLocation(pr, 'p');
+  gl.enableVertexAttribArray(a);
+  gl.vertexAttribPointer(a, 2, gl.FLOAT, false, 0, 0);
+  return n => gl.getUniformLocation(pr, n);
+}
+function tex2d(w, h, data) {
+  const t = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, t);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  return t;
+}
+function rampTexture(stops) {
+  const n = 256, data = new Uint8Array(n * 4);
+  for (let i = 0; i < n; i++) {
+    const t = i / (n - 1);
+    let k = 0;
+    while (k < stops.length - 2 && stops[k + 1][0] < t) k++;
+    const [t0, c0] = stops[k], [t1, c1] = stops[k + 1];
+    const u = Math.max(0, Math.min(1, (t - t0) / Math.max(1e-5, t1 - t0)));
+    const s = u * u * (3 - 2 * u);
+    const a = rgb(MX[c0]), b = rgb(MX[c1]);
+    for (let c = 0; c < 3; c++) data[i * 4 + c] = Math.round(255 * (a[c] + (b[c] - a[c]) * s));
+    data[i * 4 + 3] = 255;
+  }
+  return tex2d(n, 1, data);
+}
+
+const FIELD = `
+precision highp float;
+varying vec2 v;
+uniform sampler2D uRamp;
+uniform float uSeed, uStreak, uScale;
+float hash(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+float vnoise(vec2 p){
+  vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y);
+}
+float fbm(vec2 p){
+  float s = 0.0, a = 0.55;
+  for (int i = 0; i < 4; i++){ s += a * vnoise(p); p = p * 2.1 + 17.1; a *= 0.46; }
+  return s / 1.0;
+}
+void main(){
+  vec2 q = vec2(v.x, 1.0 - v.y) * vec2(1.0, 1.25);
+  // finer than the glass poster's field: every cell needs an edge or two
+  // inside it for the lens to bend, or it is just a coloured tile
+  vec2 p = vec2(q.x * uScale, q.y * uScale / uStreak * 2.4) * 1.9 + uSeed;
+  vec2 w = vec2(fbm(p * 0.8 + 3.0), fbm(p * 0.8 + 9.0)) - 0.5;
+  p += w * 1.3;
+  float f = fbm(p * 1.0);
+  f += 0.05 * sin(q.y * 30.0 + fbm(p * 3.0) * 6.0);
+  vec2 hc = vec2(0.5, 0.42);
+  float halo = exp(-dot((q - hc) * vec2(1.1, 0.9), (q - hc) * vec2(1.1, 0.9)) * 2.6);
+  f = f * 0.78 + 0.07 + halo * 0.2 - 0.16 * smoothstep(0.75, 1.25, q.y);
+  f = smoothstep(0.24, 0.84, f);
+  gl_FragColor = vec4(texture2D(uRamp, vec2(f, 0.5)).rgb, 1.0);
+}`;
+
+const GLASS = `
+precision highp float;
+varying vec2 v;
+uniform vec2 uRes, uGrid;
+uniform sampler2D uPlate;
+uniform float uDepth, uRelief, uSeed;
+uniform vec2 uMargin;
+float ign(vec2 p){ return fract(52.9829189 * fract(dot(p, vec2(0.06711056, 0.00583715)))); }
+
+// A cylinder lens along one axis: c in -1..1 across the cell. The surface is
+// a circular arc of radius R (relief: smaller = steeper edges); the slope of
+// that arc is what bends the light. Returns the slope.
+float cyl(float c, float R){
+  float x = clamp(c, -0.999, 0.999);
+  return -x / sqrt(max(R * R - x * x, 1e-3));
+}
+
+void main(){
+  vec2 px = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y);
+  vec2 inner = uRes - 2.0 * uMargin;
+  vec2 cell = inner / uGrid;
+  vec2 rel = px - uMargin;
+  vec3 col = vec3(0.02, 0.025, 0.06);
+  if (rel.x >= 0.0 && rel.y >= 0.0 && rel.x < inner.x && rel.y < inner.y){
+    vec2 id = floor(rel / cell);
+    vec2 q = fract(rel / cell);               // 0..1 in the cell
+    vec2 c = q * 2.0 - 1.0;                   // -1..1
+    float R = 1.0 + 0.18 / uRelief;           // a fat cylinder: steep right at the edge
+    vec2 slope = vec2(cyl(c.x, R), cyl(c.y, R));
+    // how far the picture is dragged, in sheet uv: proportional to the slope,
+    // scaled by the cell so bigger cells bend further. At the rim this is
+    // more than half a cell, which is what folds the picture back on itself.
+    vec2 bend = slope * uDepth * 0.5 * (cell / uRes);
+    vec2 uv = vec2(px.x / uRes.x, 1.0 - px.y / uRes.y);
+    bend.y = -bend.y;
+    // dispersion: red bends least, blue most
+    vec3 cr = texture2D(uPlate, uv + bend * 0.86).rgb;
+    vec3 cg = texture2D(uPlate, uv + bend).rgb;
+    vec3 cb = texture2D(uPlate, uv + bend * 1.16).rgb;
+    vec3 colr = vec3(cr.r, cg.g, cb.b);
+    // the surface normal of the pillow, for the light on it. The crown is
+    // clear glass and shows nothing of itself; only the slopes near the rim
+    // catch the light — bright where they face it, dark where they turn away
+    vec3 n = normalize(vec3(-slope.x, -slope.y, 1.0));
+    vec3 L = normalize(vec3(-0.6, -0.7, 0.6));      // top-left, in page terms
+    float facing = dot(normalize(vec2(-slope.x, -slope.y) + 1e-5), normalize(L.xy));
+    float onSlope = smoothstep(0.15, 1.4, length(slope));
+    colr *= 1.0 + onSlope * (0.42 * max(facing, 0.0) - 0.45 * max(-facing, 0.0));
+    float spec = pow(max(dot(normalize(L + vec3(0.0, 0.0, 1.0)), n), 0.0), 60.0);
+    colr += spec * 0.35 * onSlope * onSlope;
+    // the fine bright line where two cells meet
+    float seam = smoothstep(0.985, 1.0, max(abs(c.x), abs(c.y)));
+    colr = mix(colr, colr * 0.55 + 0.25, seam);
+    col = colr;
+  }
+  float g = ign(gl_FragCoord.xy + uSeed) - 0.5, g2 = ign(gl_FragCoord.yx * 1.3 + uSeed) - 0.5;
+  col += vec3(g, g * 0.8 + g2 * 0.2, g2) * 0.04;
+  gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+}`;
+
+const plate = tex2d(W, H, null);
+const fbo = gl.createFramebuffer();
+gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, plate, 0);
+gl.viewport(0, 0, W, H);
+let U = useProg(program(FIELD));
+gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, rampTexture(O.stops));
+gl.uniform1i(U('uRamp'), 0);
+gl.uniform1f(U('uSeed'), O.seed);
+gl.uniform1f(U('uStreak'), O.streak);
+gl.uniform1f(U('uScale'), O.scale);
+gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+gl.viewport(0, 0, W, H);
+U = useProg(program(GLASS));
+gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, plate); gl.uniform1i(U('uPlate'), 0);
+gl.uniform2f(U('uRes'), W, H);
+gl.uniform2f(U('uGrid'), COLS, ROWS);
+gl.uniform2f(U('uMargin'), 70, 70);
+gl.uniform1f(U('uDepth'), DEPTH);
+gl.uniform1f(U('uRelief'), RELIEF);
+gl.uniform1f(U('uSeed'), O.seed);
+gl.drawArrays(gl.TRIANGLES, 0, 3);
+document.body.dataset.done = '1';
+
+document.getElementById('hud').innerHTML =
+  Object.keys(OPTS).map(k => `<a href="?o=${k}&grid=${COLS}x${ROWS}" class="${k === opt ? 'on' : ''}">${k} · ${OPTS[k].name}</a>`).join('') +
+  `&nbsp; grid ${COLS}×${ROWS} · depth ${DEPTH} · relief ${RELIEF}`;
+if (qs.has('export')) document.body.classList.add('export');
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:'OpenAI Sans';font-weight:500;src:url(../fonts/oai/OpenAISans-Medium-B7nJY_kG.woff2)}
+*{margin:0}html,body{width:1080px;height:1350px;overflow:hidden;background:#fff}
+svg{display:block;width:1080px;height:1350px}
+</style></head><body>
+<svg id="p" viewBox="0 0 1080 1350" xmlns="http://www.w3.org/2000/svg"></svg>
+<script src="kit.js"></script>
+<script>
+const {C,title,mascot,mascotDefs,sticker,sunburst,pinkDefs}=CX;
+const hand=(x,y,r=30)=>`<g data-name="Hand"><circle cx="${x}" cy="${y}" r="${r}" fill="url(#m-g)" filter="url(#m-f)"/><ellipse cx="${x-9}" cy="${y-11}" rx="8" ry="5" fill="#fff" opacity=".65"/></g>`;
+const L=272,R=808,T=548,B=1240,N=1120,r=44;
+const bm=`M${L} ${T+r} Q${L} ${T} ${L+r} ${T} H${R-r} Q${R} ${T} ${R} ${T+r} V${B} L540 ${N} L${L} ${B}Z`;
+const stitch=`M${L+22} ${B-30} V${T+r} Q${L+22} ${T+22} ${L+r} ${T+22} H${R-r} Q${R-22} ${T+22} ${R-22} ${T+r} V${B-30}`;
+p.innerHTML=`<defs>${mascotDefs('m')}${pinkDefs('pk')}${sticker('st',{r:16,dy:26,blur:24,sop:.2})}
+  <radialGradient id="glow" cx="540" cy="420" r="620" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".45" stop-color="#fff" stop-opacity=".25"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+${sunburst(540,420,30,'#C7D4FF','#B6C6FF')}
+<rect data-name="Glow" width="1080" height="1350" fill="url(#glow)"/>
+<g data-name="Sticker · mascot + bookmark" filter="url(#st)">
+  ${mascot('m',{x:540,y:430,s:.92})}
+  <path data-name="Bookmark" d="${bm}" fill="url(#pk-g)" filter="url(#pk-f)"/>
+  <path data-name="Stitch" d="${stitch}" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="5" stroke-dasharray="1 16" stroke-linecap="round"/>
+  ${hand(400,T+6)}${hand(680,T+6)}
+</g>
+${title(['Codex','Bookmarks'],{y:800,size:88,lh:1.08,fill:'#fff',bold:6})}`;
+</script>
+</body></html>

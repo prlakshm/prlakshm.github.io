@@ -1,0 +1,25 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:'OpenAI Sans';font-weight:500;src:url(../fonts/oai/OpenAISans-Medium-B7nJY_kG.woff2)}
+*{margin:0}html,body{width:1080px;height:1350px;overflow:hidden;background:#fff}
+svg{display:block;width:1080px;height:1350px}
+</style></head><body>
+<svg id="p" viewBox="0 0 1080 1350" xmlns="http://www.w3.org/2000/svg"></svg>
+<script src="kit.js"></script>
+<script>
+const {C,title,mascot,mascotDefs,sticker,gingham,flag,label}=CX;
+const mx=500,my=850,s=1.12;
+p.innerHTML=`<defs>${mascotDefs('m')}${sticker('st',{r:15,dy:22,blur:22,sop:.18})}${sticker('lb',{r:0.1,dy:14,blur:18,sop:.14})}${gingham('gg','#EDF1FF','#D2DCFF',64,.6)}</defs>
+<rect data-name="Gingham" width="1080" height="1350" fill="url(#gg)"/>
+<g data-name="Label card" filter="url(#lb)">${label({y:150,w:700,h:270})}</g>
+${title(['Codex','Bookmarks'],{y:270,size:100,lh:1.04,fill:C.ink,bold:6})}
+<g data-name="Sticker · mascot + tabs" filter="url(#st)">
+  ${flag({x:mx+178*s,y:my-80,c:'purple',len:150,rot:-4})}
+  ${flag({x:mx+200*s,y:my-8,c:'pink',len:170,rot:2})}
+  ${flag({x:mx+178*s,y:my+66,c:'green',len:140,rot:-2})}
+  ${flag({x:mx-40,y:my-170*s,c:'yellow',len:120,dir:'u',rot:-5})}
+  ${flag({x:mx+50,y:my-190*s,c:'blue',len:105,dir:'u',rot:4})}
+  ${mascot('m',{x:mx,y:my,s})}
+</g>`;
+</script>
+</body></html>

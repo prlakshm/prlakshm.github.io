@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>MIXR — wordmark faces</title>
+<link href="fonts-google/fonts.css" rel="stylesheet">
+
+<style>
+  html,body{margin:0;background:#050816;color:#9CA3AF;font:12px/1.4 ui-monospace,Menlo,monospace}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:24px}
+  .card{background:#0B0B16;border:1px solid #1A1830;padding:22px 20px 16px;display:flex;flex-direction:column;justify-content:space-between;min-height:220px}
+  .word{color:#fff;font-size:118px;line-height:1;letter-spacing:-0.02em;white-space:nowrap;margin-bottom:12px}
+  .meta{letter-spacing:.06em;text-transform:uppercase;color:#C9B9F4;font-size:11px}
+  .meta b{display:block;color:#fff;font-weight:500;font-size:13px;letter-spacing:.02em;text-transform:none;margin-bottom:3px}
+</style>
+</head>
+<body>
+<div class="grid" id="g"></div>
+<script>
+const faces = [
+  ['Inter Tight 900', "'Inter Tight'", 'font-weight:900;letter-spacing:-0.04em', 'what we have — the heaviest'],
+  ['Inter 700', "'Inter'", 'font-weight:700;letter-spacing:-0.03em', 'the UI standard, bold'],
+  ['Geist 700', "'Geist'", 'font-weight:700;letter-spacing:-0.03em', 'Vercel\'s own'],
+  ['Manrope 800', "'Manrope'", 'font-weight:800;letter-spacing:-0.03em', 'geometric, soft'],
+  ['Plus Jakarta Sans 800', "'Plus Jakarta Sans'", 'font-weight:800;letter-spacing:-0.03em', 'rounded geometric'],
+  ['Outfit 700', "'Outfit'", 'font-weight:700;letter-spacing:-0.02em', 'clean geometric'],
+  ['Sora 700', "'Sora'", 'font-weight:700;letter-spacing:-0.03em', 'wide geometric, techy'],
+  ['Urbanist 800', "'Urbanist'", 'font-weight:800;letter-spacing:-0.02em', 'low-contrast geometric'],
+  ['Instrument Sans 700', "'Instrument Sans'", 'font-weight:700;letter-spacing:-0.03em', 'editorial grotesque'],
+  ['Figtree 800', "'Figtree'", 'font-weight:800;letter-spacing:-0.03em', 'friendly, even'],
+  ['Onest 800', "'Onest'", 'font-weight:800;letter-spacing:-0.03em', 'neutral grotesque'],
+  ['Schibsted Grotesk 700', "'Schibsted Grotesk'", 'font-weight:700;letter-spacing:-0.03em', 'newspaper grotesque'],
+  ['Hanken Grotesk 800', "'Hanken Grotesk'", 'font-weight:800;letter-spacing:-0.03em', 'crisp grotesque'],
+  ['Public Sans 800', "'Public Sans'", 'font-weight:800;letter-spacing:-0.03em', 'plain, civic'],
+  ['Albert Sans 800', "'Albert Sans'", 'font-weight:800;letter-spacing:-0.03em', 'geometric grotesque'],
+  ['Red Hat Display 800', "'Red Hat Display'", 'font-weight:800;letter-spacing:-0.03em', 'display geometric'],
+];
+document.fonts.ready.then(() => { document.body.dataset.ready = '1'; });
+document.getElementById('g').innerHTML = faces.map(([n, f, st, note], i) =>
+  `<div class="card"><div class="word" style="font-family:${f};${st}">MIXR</div><div class="meta"><b>${String(i + 1).padStart(2, '0')} · ${n}</b>${note}</div></div>`).join('');
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+ "name": "Test pond",
+ "pitch": "Engine placeholder: crinkled gold-leaf pads, one painted lily with gold stamens, three gilded dabs.",
+ "lighting": {},
+ "motion": {},
+ "flags": {
+  "FOIL_WARP": false,
+  "SWELL_TILT": false,
+  "INVERT_RELIEF": false
+ },
+ "water": {},
+ "coverage": [
+  0.1,
+  0.18
+ ],
+ "hero": "hero"
+}

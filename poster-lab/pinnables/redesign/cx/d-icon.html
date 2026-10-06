@@ -1,0 +1,34 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:'OpenAI Sans';font-weight:500;src:url(../fonts/oai/OpenAISans-Medium-B7nJY_kG.woff2)}
+*{margin:0}html,body{width:1080px;height:1350px;overflow:hidden;background:#fff}
+svg{display:block;width:1080px;height:1350px}
+</style></head><body>
+<svg id="p" viewBox="0 0 1080 1350" xmlns="http://www.w3.org/2000/svg"></svg>
+<script src="kit.js"></script>
+<script>
+const {C,title,mascot,mascotDefs,whiteDefs,pinkDefs,shadow,ribbonPath,cubic,skyCloud,soft}=CX;
+const ix=540,iy=540,S=460,R=118;
+const rib=ribbonPath(cubic({x:668,y:680},{x:676,y:860},{x:628,y:900},{x:690,y:1010}),84,.55);
+p.innerHTML=`<defs>${mascotDefs('m')}${whiteDefs('wh')}${pinkDefs('pk')}${shadow('sh',{dy:34,blur:34,color:'#1E2BC4',op:.3})}
+  <filter id="petal" filterUnits="userSpaceOnUse" x="-200" y="-200" width="1480" height="1750"><feGaussianBlur stdDeviation="26"/></filter>
+  <linearGradient id="bg" x1="0" y1="0" x2=".35" y2="1"><stop offset="0" stop-color="#9DAFFF"/><stop offset=".5" stop-color="#6880FF"/><stop offset="1" stop-color="#3D4BF0"/></linearGradient>
+  <radialGradient id="l1" cx="210" cy="110" r="760" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset=".4" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  <linearGradient id="satin" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#D93683"/><stop offset=".4" stop-color="#FF8CC1"/><stop offset=".62" stop-color="#FF64A9"/><stop offset="1" stop-color="#D93683"/></linearGradient>
+</defs>
+<rect data-name="Ground" width="1080" height="1350" fill="url(#bg)"/>
+<g data-name="Petal light" filter="url(#petal)">
+  <path d="M-120 380 C180 160 520 120 1200 -40 L1200 160 C640 300 260 420 -120 640Z" fill="#fff" opacity=".22"/>
+  <path d="M-160 1010 C200 760 620 700 1240 520 L1240 650 C700 820 300 930 -160 1180Z" fill="#B9B0FF" opacity=".3"/>
+  <path d="M600 1400 C760 1180 940 1080 1260 1020 L1260 1400Z" fill="#2F3BE6" opacity=".45"/>
+</g>
+<rect data-name="Sun glow" width="1080" height="1350" fill="url(#l1)"/>
+${skyCloud(860,300,.32)}${skyCloud(196,840,.24)}
+<g data-name="App icon" filter="url(#sh)">
+  <path data-name="Ribbon bookmark" d="${rib}" fill="url(#satin)"/>
+  <rect data-name="Tile" x="${ix-S/2}" y="${iy-S/2}" width="${S}" height="${S}" rx="${R}" fill="url(#wh-g)" filter="url(#wh-f)"/>
+</g>
+${mascot('m',{x:ix,y:iy+6,s:.74})}
+${title(['Codex Bookmarks'],{y:1150,size:84,fill:'#fff',bold:5})}`;
+</script>
+</body></html>

@@ -1,0 +1,222 @@
+GILT ENGINE: USAGE NOTE FOR CONCEPT AGENTS
+==========================================
+(poster-lab/gilt/engine; last calibrated on concept A, 2026-10-04)
+
+Concept agents do NOT edit anything in engine/ or tools/. A concept is data:
+it lives in concepts/<id>/ and every number below can be set from concept.json.
+If you need behaviour the engine cannot express, report it; do not patch the engine.
+
+---------------------------------------------------------------------------
+1. ADD A CONCEPT
+---------------------------------------------------------------------------
+Folder: poster-lab/gilt/concepts/<id>/
+  atlas_print.png  RGBA8, STRAIGHT alpha (not premultiplied), power of two
+                   (1024x1024, 2048x1024 or 2048x512). RGB = printed colour, sRGB
+                   (gold baked to look like photographed leaf under soft light;
+                   watercolour ink for the printed parts). A = coverage.
+                   Baked at 2 texels per CSS px. Keep crinkle periods >= 3.5 texels.
+  atlas_fx.png     RGB8, lossless, same size. R = foil 0..1, G = pearl/satin 0..1,
+                   B = height (0.08 paper .. ~0.59 foil plateau; the shoulder spills
+                   ~2 CSS px past the coverage edge). A = 255.
+  layout.json      { "atlas": {"w","h"},
+                     "hero": "<piece id>" | {"desktop":[x,y], "mobile":[x,y]} (optional),
+                     "pieces": [ {
+                        "id", "rect": [x,y,w,h]   atlas px, incl. a 6-texel margin
+                        "anchor": [ax,ay]          fraction of rect (default .5,.5)
+                        "desktop": {"x","y" (band fractions, y down), "h" (rect height in
+                                    BAND HEIGHTS), "rot" (rad), "flip" (bool)}
+                        "mobile":  same, or null = hidden below the breakpoint
+                        "z" draw order (low first), "keep" 0..1, "phase" 0..1,
+                        "breathe" 0..1 (scales the swell tilt; default 1),
+                        "tilt": [tx,ty] base tilt of the normal, rad (+x right, +y up)
+                        "warp" 0..1 (FOIL_WARP only; default 1),
+                        "warpAnchor" 0..1 (FOIL_WARP only; 1 = top pinned, bend grows
+                                   down the piece, for strands hung from the top edge) } ] }
+  under_d.png      RGBA8 band-space composition map, 512x100 (desktop)
+  under_m.png      RGBA8, 256x124 (mobile). R = cloud reflection (pale),
+                   G = willow reflection (cobalt; also turns brush VERTICAL if
+                   water.WILLOW_VERT > 0), B = lavender shadow, A = sun path.
+                   Write PNG (or webp with -exact): A is ~0 almost everywhere and any
+                   premultiplying encoder/resizer wipes R,G,B. The engine uploads
+                   them with premultiplication OFF.
+  concept.json     { "name", "pitch", "lighting":{..}, "motion":{..}, "water":{..},
+                     "flags":{..}, "coverage":[lo,hi], "layers":{..} (optional) }
+                   Anything left out uses the engine default. Unknown keys are
+                   ignored; wrongly-typed values fall back to the default and are
+                   listed in the page's warnings (shown on the lab page).
+                   Optional "layers": {"print","fx","under_d","under_m"} = other
+                   filenames in the folder.
+
+Coordinates everywhere: CSS px, x right, y DOWN, band 1440x279 desktop
+(h = clamp(180, 0.194 w, 340)), 375x180 on phones; breakpoint 900 CSS px.
+Never put foil, shoulder or shade in the top 3 device rows (clean top edge).
+
+The concept A bake is a working template:
+  scratchpad/redo/gilt/bake/  (pieces.py, layout_A.py, atlas.py, under.py,
+  concept_A.py + concept_A_tuned.json, preview.py, measure.py; bake_A.sh runs it all)
+pieces.py defaults now include a burnished stamped edge (env GILT_ROUND_TO=12,
+GILT_SPLIT=0.4, GILT_BURN=1,10): the crinkle dies out over the round-over so the
+rim reads as a glossy bevel. This is what moved the lit-rim check into range;
+reuse it for any foil shape with an interior.
+
+---------------------------------------------------------------------------
+2. VIEW / TRY VALUES
+---------------------------------------------------------------------------
+Dev server already running (do not start/stop it):
+  http://localhost:5173/poster-lab/gilt/index.html?c=<id>
+    &t=<s>         frozen time (default 0)          &live   real clock + cursor
+    &lamp=idle|off|hero|water|far|smallest|x,y     (x,y CSS px or fractions)
+    &w=<css px>  &h=<css px>  &dpr=<n>  &arrive  &noHalf
+    &debug=caught|hot|glow|height|near|coverage|normal|env
+    &ab=RELIEF:1.6,key.c:[-0.2,0.2],water.SW:20,flags.SWELL_TILT:true
+        (unqualified names are searched in lighting, motion, water, flags;
+         arrays as [a,b]; a single number into an array fills every element;
+         name[i]:v sets one element)
+  window.__gilt: ready, frame(dt), at(t), setPointer(x,y), setLamp(mode),
+    setDebug(name), stats(), pieces(), spots(), snapshot() (exact pixels, data URL),
+    bench(n), measure(), loseContext().   Errors (incl. shader logs) -> window.__error.
+  stats().scene.lamp.on is the scene's idle value; stats().lampOnRendered is what
+  is drawn (0 with &lamp=off).
+
+---------------------------------------------------------------------------
+3. CAPTURE AND MEASURE
+---------------------------------------------------------------------------
+Full capture (~90-120 s; all plan 4.2 frames, perf, off-screen, reduced motion,
+context loss, no-half, contact sheet, metrics.json):
+  node poster-lab/gilt/tools/capture.cjs <id> [outDir] [--ab=...] \
+       --ref=<scratchpad>/redo/gap
+  -> <scratchpad>/redo/gilt/caps/<id>/ (cs.png, zooms.png, film.png, metrics.json ...)
+Do not edit engine files while a capture runs (Vite reloads the page).
+
+Fast loop (~5 s; rest, lamp-on-hero, masks, optional 8 s idle film, then the bake's
+measure.py with every 4.3 check):
+  python3 <scratchpad>/redo/gilt/int/qm.py <tag> "<ab string>" [--film] [--w=375] [--c=<id>]
+  -> <scratchpad>/redo/gilt/int/q/<tag>/   (qm.py defaults to --c=A)
+  python3 <scratchpad>/redo/gilt/int/breathe.py <tag>   per-piece idle swing (needs --film)
+  python3 <scratchpad>/redo/gilt/int/z3.py out.png <tag> ...   hero 3x vs her crops
+    (z3 crops at the A hero position; change cx,cy for your hero)
+Or by hand:
+  python3 <scratchpad>/redo/gilt/bake/measure.py --rest r.png --foil foil.png \
+    --cov cov.png --lamp l.png --lamp-xy X,Y --idle f0.png ... --coverage lo,hi
+  (foil = R and cov = G of a &debug=coverage snapshot)
+
+Use the shared off-screen Chrome (scratchpad/lab/ws.txt), never the in-app browser.
+
+---------------------------------------------------------------------------
+4. FLAGS (concept.json "flags"; compiled in as #defines)
+---------------------------------------------------------------------------
+FOIL_WARP      (C) pieces bend sideways with a wave travelling down them; FA/FX are
+               redrawn every frame, NEAR on paint ticks. Knobs: motion.WARP_AMP 1.25
+               CSS px, WARP_LEN 140 CSS px, WARP_PERIOD 7.5 s; per piece "warp" and
+               "warpAnchor" in layout.json. Gold position changes, so the plan's
+               "gold moves <= 1.5 px" check applies.
+SWELL_TILT     (B) adds the water swell's slope at each pixel to the foil normals
+               (glitter path shimmers and travels). Knob: lighting.SWELL_AMP 0.06 rad.
+INVERT_RELIEF  (D) the leaf sits low, the paint around it is raised impasto whose
+               ridges follow the painted ground's value. Knobs: lighting.INV_PAINT 0.32
+               (paint plateau), INV_K 0.5 (leaf depth), IMPASTO 0.35. Costs 18 texture
+               reads in FINISH (budget 14): report it, it is a known overrun.
+All three compile and render together (smoke-tested on A, 2026-10-04).
+
+---------------------------------------------------------------------------
+5. EVERY concept.json KNOB, WITH ENGINE DEFAULTS
+   (A's calibrated values in [brackets] where they differ)
+---------------------------------------------------------------------------
+lighting
+  RELIEF 2.1 [1.7]       slope gain per CSS px of FX height. Lower = calmer crinkle,
+                         fewer glints, brighter rim (A: 2.1 gave 224 glints/1000 px2).
+  NORMAL_TAP 1           normal from +-N device px; 1.15-1.3 low-passes the crinkle
+                         (fewer, larger glints; finer-scale share drops). A keeps 1.
+  FLOOR 0.42             gold at rest = print x FLOOR (linear). 0.48 = brighter bronze.
+  PERSP 0.25             view perspective; 1 = true (dead zones at the band ends).
+  EYE_Z 900              CSS px.
+  LAMP_Z_K 1.6, LAMP_Z_MIN 290, LAMP_Z_MAX 540   lamp height = clamp(K*H, MIN, MAX).
+  AMBIENT 0.25
+  key   {strength 2.4 [2.1], c [-0.22,0.16] [-0.15,0.18], hs [0.30,0.17], soft 0.12,
+         fall 0.45}   the "sky window" in reflection-angle space (az, el rad).
+         Moving c toward 0 az and lowering strength balanced left vs right gold and
+         let the lamp lift >= 80% of the hero.
+  strip {strength 1.9, c [0.40,-0.02], hs [0.045,0.55], soft 0.06}   the sun strip.
+  bounce{strength 0.7, c [0,-0.5], hs [0.9,0.06], soft 0.18}
+  dome  {strength 1.6, dir [-0.45,0.55], range [0.32,1.0]}   soft sky seen only by
+         steep facets: gives the lit rim up-left / dark rim down-right. 0 = plan studio.
+  CAUGHT [0.35,2.4]      smoothstep range of studio radiance -> "caught".
+  TINT [1.0,0.72,0.30]   highlight colour (champagne A/B: [1.0,0.86,0.62]).
+  GLOW_K 0.95 [1.0]  CAUGHT3_K 0.6  HOT_K 2.4  PAPER_GLOW 0.03
+  HOT_EXP 220            lamp hotspot (~70 CSS px).   GLOW_EXP 28 [22]  lamp pool.
+  TOOTH 0.08 [0.05]      paper tooth slope (ground only).
+  PAPER [0.8,0.26]       ground shading a + b*N.Lkey (normalised).
+  KEY_DIR [-0.45,0.55,0.7]   the paper's key light (y up).
+  NEAR_R 2, NEAR_G 8     blurred-coverage sigmas, CSS px (tight / wide).
+  POOL 0.32 [A: 0.3]     pooled periwinkle shade strength; POOL_K 0.8 (tight blur
+                         subtracted, keeps it off the very edge); POOL_COL "#6F86C6";
+                         POOL_NOISE 0.4 (width variation); POOL_SCALE 9 CSS px.
+  CONTACT 0.6 [A: 0.15]  contact step on the shadow side; CONTACT_OFF 1.2 CSS px [A 2.4].
+  PEARL 1.0, PEARL_MIX 0.35   satin on G-channel pieces (lily petals).
+  GRAIN 0.03 [0.02]      film grain after sRGB; GRAIN_HZ 24.
+  SWELL_AMP 0.06, INV_PAINT 0.32, INV_K 0.5, IMPASTO 0.35   (flags, see 4)
+  Not built: HALO / bloom (plan v2). A's "HALO" key is ignored.
+motion
+  T0 31834               water clock start (balanced teal/blue). Keep.
+  DRIFT 3.5, FIELD_TIME 42   water speed: Pranavi's numbers. Do NOT change.
+  SWAY_YAW [0.07,7.0,0.018,2.7]  SWAY_PITCH [0.035,8.6]  (rad, s; moves the lights)
+  POINTER_SHIFT [0.14,0.09], SHIFT_RATE 4
+  LAMP_HOVER_RATE 9, LAMP_IDLE_RATE 3, LAMP_ON_RATE 4
+  LAMP_IDLE_ON 0.7 [0.5]  idle lamp level. At 0.7 the hero sits almost as lit as
+                         under the cursor, so the dark->bright swing is lost.
+  LAMP_HOVER_ON 1.0
+  IDLE_PATH [0.5,0.36,25, 0.4,0.25,17, 1.3]   x0,xA,xT, y0,yA,yT, yPhase
+  IDLE_FROM_HERO true    idle path starts over the hero.
+  SUN_DRIFT 0.06, SUN_PERIOD 75
+  ARRIVAL 2.2, ARRIVAL_VIS 0.3   one-time left->right sweep.
+  BREATHE 0.021          rad per-piece tilt from the swell.
+  RIPPLE_TILT 0.026, RIPPLE_SPEED 60, RIPPLE_LIFE 2.5   (click only)
+  TAP_HOLD 3
+  WARP_AMP 1.25, WARP_LEN 140, WARP_PERIOD 7.5   (FOIL_WARP)
+  FINISH_HZ 60, PAINT_HZ 30
+water (all colours "#RRGGBB")
+  SEED 10
+  BASE "#87C1F0" ["#7DB8EE"]  DARK "#9CB3EA"  LIGHT "#A1D6DF" ["#94D0E4"]  SUN_TINT "#C6E7EC"
+  CLOUD ["#E4EAF2","#BFD5EA"]  WILLOW ["#5D85BD","#4F7398"] [["#5A7FC0","#46689F"]]
+  LAVENDER ["#BCA9DB","#D3B7DD"]  SUN "#C6E7EC"
+  UNDER_K [0.75,0.5,0.55,0.4]    cloud, willow, lavender, sun-path strengths
+                                 [A: 0.55, 1.0, 0.8, 0.45]
+  WILLOW_VERT [0, 0.6] [A: [1, 0.75]]   strength, fade-out y (band fraction): where
+                         under G is strong near the top, the brush turns vertical
+                         (Monet's hanging willow reflections). New, 2026-10-04.
+  BROKEN [0.12,90,2.4,0.6] [A: strength 0]   broken colour IN THE FIELD. Leave at 0:
+                         its sharp patches get dragged by the strokes into 1-px
+                         horizontal hairlines (reads as brushed metal / scanlines) and
+                         it alone pushed ground grain from 0.0099 to 0.0143.
+  DAB_BROKEN [0.65,0.45,0.4,0.35] [A: 0.7,0.6,0.4,0.3]   broken colour per whole dab:
+                         share of dabs, strength, lavender share, pale share (rest
+                         cobalt). This is the Monet flicker; use it instead of BROKEN.
+  ACCENTS ["#B9A6DA","#DCE6F2","#6E92C8"]   lavender, pale sky, cobalt (dab accents)
+  SPECKLE 1.5 [1.0]      dry-brush flecks in COMPOSITE. New knob.
+  LEVELS 16, DITHER_AMT 0.6 [0.3], DITHER_NEAR [0.05,0.4]
+  SW 16, STEP 4.5        dab size / stroke step, CSS px at the bottom edge. A's file
+                         sets them via water.strokes {SW,STEP}. 40/8 paints 150 px bars.
+  BRISTLE 1 [0.5]        fine bristle jitter inside dabs.
+  PERSP_TOP 0.6          dab size at the top edge relative to the bottom.
+  FLOW_ANGLE 0.15, FLOW_CURL 0.25
+coverage [0.13,0.20]     the concept's stated range (measure uses it).
+breakpoint 900
+
+Aliases: the loader also accepts the plan/bake's longer names (lighting.key.centre,
+water.strokes.SW, motion.water.DRIFT, water.under.<x>.strength ...); see ALIASES in
+concept.ts. An explicit engine name in the same file wins.
+
+---------------------------------------------------------------------------
+6. RULES THAT ARE EASY TO BREAK
+---------------------------------------------------------------------------
+- No green: ground CIELAB hue 115-190 with C* > 10 must stay <= 0.5% of the band.
+  Teal-ish LIGHT/SUN colours drift into it once strokes jitter them; keep hue >= 210.
+- Environment stays achromatic. Never put blue/teal into TINT or the studio: gold
+  goes olive. Gold check: no foil px with L* < 70 at hue > 105.
+- No drawn outline: edges come from emboss lighting only. If a ring reads dark,
+  lower POOL / CONTACT before anything else; never bake a dark contour into the print.
+- Light water (Pranavi's standing rule): lighter than the Monet overall.
+- One metal: yellow gold.
+- Copyright: nothing from Ann Nguyen's files in the repo; no live bubbbly loads
+  (use the saved crops in scratchpad/redo/gap, anatomy/crops, foiltex/ref).
+- Mobile: do not scale relief by draw size (mipmaps already soften it).

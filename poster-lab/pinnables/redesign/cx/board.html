@@ -1,0 +1,38 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Codex Bookmarks · variations</title>
+<style>
+@font-face{font-family:'OpenAI Sans';font-weight:500;src:url(../fonts/oai/OpenAISans-Medium-B7nJY_kG.woff2)}
+:root{--bg:#F5F5F7;--ink:#171717;--mute:#666}
+*{margin:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 14px/1.45 ui-monospace,Menlo,monospace;padding:40px 40px 56px}
+h1{font:500 28px 'OpenAI Sans',system-ui;letter-spacing:-.01em;margin-bottom:6px}
+p.lede{color:var(--mute);margin-bottom:32px}
+.row{display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+.card .frame{aspect-ratio:4/5;overflow:hidden;border-radius:6px;box-shadow:0 1px 0 rgba(0,0,0,.04),0 12px 32px rgba(23,23,23,.08);background:#ddd;position:relative}
+.card iframe{position:absolute;left:0;top:0;width:1080px;height:1350px;border:0;transform-origin:0 0;pointer-events:none}
+.card h2{font:500 13px ui-monospace,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;margin:16px 0 4px}
+.card .score{color:var(--mute)}
+.card p{color:var(--mute);margin-top:6px;font-size:13px}
+.pick h2::after{content:"  · my pick";color:#E23E8A}
+h3{font:500 13px ui-monospace,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;margin:56px 0 16px}
+.small{display:flex;gap:16px}
+.small .frame{width:248px}
+</style></head><body>
+<h1>Codex Bookmarks · four directions</h1>
+<p class="lede">Same mascot, type and palette; each one turns the bookmark into a different idea. Bottom row is the real gallery size.</p>
+<div class="row" id="big"></div>
+<h3>At gallery size (248 px)</h3>
+<div class="small" id="small"></div>
+<script>
+const V=[
+ ['c-flag','Flag','The cloud plants a bookmark flag on its spot. A sky is the cloud\'s home; a chat-bubble cloud drifts by.',1],
+ ['e-peek','Peekaboo','The cloud peeks over a giant stitched bookmark that carries the title. Boldest at small sizes; the most pink.',0],
+ ['b-tabs','Tabs','The cloud is stuffed with sticky page flags in the product\'s own bookmark colours, under a stationery label, on gingham.',0],
+ ['d-icon','App icon','Your reference lockup: the mascot as the app tile, a satin ribbon hanging out like a hardcover\'s bookmark, petal light.',0],
+];
+const fit=(f)=>{const s=f.parentElement.clientWidth/1080;f.style.transform=`scale(${s})`};
+for(const [id,name,desc,pick] of V){
+  big.insertAdjacentHTML('beforeend',`<div class="card ${pick?'pick':''}"><div class="frame"><iframe src="${id}.html" scrolling="no"></iframe></div><h2>${name}</h2><p>${desc}</p></div>`);
+  small.insertAdjacentHTML('beforeend',`<div class="card"><div class="frame"><iframe src="${id}.html" scrolling="no"></iframe></div></div>`);
+}
+const all=()=>document.querySelectorAll('iframe').forEach(fit);all();addEventListener('resize',all);
+</script></body></html>

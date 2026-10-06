@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Star card mock</title>
+<link rel="stylesheet" href="/src/styles/tokens.css" />
+<style>
+  :root { --wall: #f8fafc; --ink: #171717; --mute: #666; --tert: #9aa1ab; }
+  * { box-sizing: border-box; }
+  body { margin: 0; width: 1500px !important; background: var(--wall); color: var(--ink); font-family: var(--font-mono); -webkit-font-smoothing: antialiased; padding: 44px 56px; width: 1360px; }
+  h2 { font-weight: 400; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); margin: 0 0 16px; }
+  .row { display: flex; gap: 56px; align-items: flex-start; margin-bottom: 52px; }
+  .cap { margin-top: 12px; font-size: 12px; letter-spacing: .04em; color: var(--mute); max-width: 34ch; line-height: 1.5; }
+  /* the card: thin, matte, printed white stock like a transit card. No holo. */
+  .card {
+    position: relative; background: #fff; border-radius: 7px;
+    border: 1px solid rgba(15, 23, 42, .09);
+    box-shadow: 0 1px 1px rgba(15, 23, 42, .05), 0 6px 14px -8px rgba(15, 23, 42, .18), inset 0 0 0 1px rgba(255, 255, 255, .9);
+    background-image: linear-gradient(180deg, rgba(255,255,255,1), rgba(246,248,251,1));
+  }
+  .card::after { /* paper tooth */
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: .5;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.55 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .slots { display: flex; align-items: center; }
+  .slot { position: relative; display: block; }
+  .slot svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  .count { display: flex; align-items: center; gap: 6px; font-size: 12px; letter-spacing: .04em; color: var(--mute); white-space: nowrap; }
+  .count svg { width: 14px; height: 14px; }
+  .note { font-size: 12px; letter-spacing: .05em; text-transform: uppercase; line-height: 1.45; color: var(--ink); }
+  .note span { color: var(--mute); }
+  /* compact: one strip in the nav */
+  .compact { display: flex; align-items: center; gap: 12px; padding: 8px 10px 8px 12px; }
+  .compact .slots { gap: 5px; }
+  .compact .slot { width: 18px; height: 18px; }
+  .compact .count { padding-left: 10px; border-left: 1px dashed rgba(15, 23, 42, .18); }
+  /* full card */
+  .full { width: 312px; height: 196px; padding: 16px 18px; display: flex; flex-direction: column; justify-content: space-between; }
+  .full .slots { gap: 12px; }
+  .full .slot { width: 40px; height: 40px; }
+  .full .foot { display: flex; justify-content: space-between; align-items: flex-end; }
+  .full .count { font-size: 13px; }
+  .full .count svg { width: 16px; height: 16px; }
+  .brand { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--tert); }
+  .strip { position: absolute; left: 0; right: 0; bottom: 34px; height: 9px; background: repeating-linear-gradient(90deg, rgba(15,23,42,.08) 0 2px, transparent 2px 5px); opacity: .0; }
+  .nav { display: flex; align-items: center; justify-content: space-between; width: 600px; padding: 14px 18px; background: color-mix(in srgb, var(--wall) 84%, transparent); border: 1px dashed rgba(15,23,42,.08); }
+  .nav .links { display: flex; gap: 26px; font-size: 13px; letter-spacing: .07em; text-transform: uppercase; color: var(--mute); }
+  .zoom { display: inline-block; zoom: 2; }
+  .compact2 { display: inline-flex; flex-direction: column; gap: 6px; padding: 9px 11px 7px 12px; border-radius: 12px !important; }
+  .compact2 .slots { gap: 5px; }
+  .compact2 .slot { width: 17px; height: 17px; }
+  .compact2 .foot, .full2 .foot { display: flex; justify-content: flex-end; }
+  .compact2 .count { font-size: 11px; gap: 4px; }
+  .compact2 .count svg { width: 12px; height: 12px; }
+  .full2 { border-radius: 18px !important; width: 300px; padding: 18px 18px 14px; display: flex; flex-direction: column; gap: 16px; }
+  .full2 .note { font-size: 12px; letter-spacing: .04em; line-height: 1.55; text-transform: uppercase; color: var(--mute); }
+  .full2 .note p { margin: 0; }
+  .full2 .note b { font-weight: 400; color: var(--ink); -webkit-text-stroke: .35px currentColor; }
+  .full2 .slots { gap: 12px; }
+  .full2 .slot { width: 38px; height: 38px; }
+  .full2 .count { font-size: 13px; }
+  .full2 .count svg { width: 16px; height: 16px; }
+  /* textures */
+  .tx-smooth::after { display: none; }
+  .tx-tooth::after { opacity: .5; }
+  .tx-linen::after { opacity: 1; background-image:
+      repeating-linear-gradient(0deg, rgba(15,23,42,.035) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(90deg, rgba(15,23,42,.03) 0 1px, transparent 1px 3px); }
+  .tx-laid::after { opacity: 1; background-image:
+      repeating-linear-gradient(0deg, rgba(15,23,42,.045) 0 1px, transparent 1px 4px),
+      repeating-linear-gradient(90deg, rgba(15,23,42,.035) 0 1px, transparent 1px 38px); }
+  .tx-fleck::after { opacity: 1; background-image:
+      radial-gradient(circle at 12% 30%, rgba(120,110,95,.35) 0 .6px, transparent 1px),
+      radial-gradient(circle at 63% 72%, rgba(90,110,140,.3) 0 .5px, transparent 1px),
+      radial-gradient(circle at 38% 84%, rgba(120,110,95,.3) 0 .5px, transparent 1px),
+      radial-gradient(circle at 82% 18%, rgba(120,110,95,.3) 0 .6px, transparent 1px),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.55 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 37px 41px, 53px 47px, 61px 59px, 43px 67px, 90px 90px; }
+  .tx-satin { background-image: linear-gradient(160deg, #ffffff 0%, #f4f6f9 45%, #ffffff 62%, #f3f5f8 100%) !important; }
+  .tx-satin::after { display: none; }
+  .tx-pressed { box-shadow: 0 1px 1px rgba(15,23,42,.05), 0 6px 14px -8px rgba(15,23,42,.18), inset 0 1px 0 #fff, inset 0 -1px 2px rgba(15,23,42,.06) !important; }
+  .tx-pressed::after { opacity: .35; }
+  .tex { display: flex; flex-wrap: wrap; gap: 36px 40px; }
+  /* 7 · letterpressed edge, one recipe for both sizes: --k scales the shadow
+     and bevel with the card (1 = expanded, ~0.55 = compact in the nav) */
+  .tx7 { --k: 1;
+    border: 1px solid rgba(15, 23, 42, .09) !important;
+    box-shadow:
+      0 calc(1px * var(--k)) calc(1px * var(--k)) rgba(15, 23, 42, .05),
+      0 calc(6px * var(--k)) calc(14px * var(--k)) calc(-8px * var(--k)) rgba(15, 23, 42, .18),
+      inset 0 1px 0 #fff,
+      inset 0 calc(-1px * var(--k)) calc(2px * var(--k)) rgba(15, 23, 42, .06) !important; }
+  .tx7::after { opacity: .35; }
+  .tx7.compact2 { --k: .55; }
+  .pair { display: flex; gap: 40px; align-items: flex-start; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f3dc9c" /><stop offset=".35" stop-color="#d4a94e" /><stop offset=".6" stop-color="#f6e4a8" /><stop offset="1" stop-color="#a87a2e" />
+    </linearGradient>
+    <filter id="leaf" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="4" result="n" />
+      <feColorMatrix in="n" values="0 0 0 0 1  0 0 0 0 .9  0 0 0 0 .6  0 0 0 .55 0" result="g" />
+      <feComposite in="g" in2="SourceGraphic" operator="in" result="gg" />
+      <feBlend in="SourceGraphic" in2="gg" mode="soft-light" />
+    </filter>
+    <path id="star" d="M12 2.6l2.75 5.75 6.3.8-4.62 4.37 1.2 6.25L12 16.7l-5.63 3.07 1.2-6.25L2.95 9.15l6.3-.8z" />
+  </defs>
+</svg>
+<div id="v"></div>
+<script type="module">
+const rot = [-7, 5, -3, 8, -5];
+const slot = (on, i) => on
+  ? `<span class="slot" style="transform:rotate(${rot[i]}deg) translate(${[0.5,-0.5,0.4,-0.3,0.2][i]}px,${[0.3,-0.4,0,0.5,-0.2][i]}px)"><svg viewBox="0 0 24 24"><use href="#star" fill="url(#gold)" stroke="url(#gold)" stroke-width="2.6" stroke-linejoin="round" filter="url(#leaf)"/><use href="#star" fill="none" stroke="rgba(120,80,20,.35)" stroke-width=".5" stroke-linejoin="round"/></svg></span>`
+  : `<span class="slot"><svg viewBox="0 0 24 24"><use href="#star" fill="none" stroke="#b6bcc6" stroke-width="1.1" stroke-dasharray="1.2 1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+const slots = (n) => `<div class="slots">${[0,1,2,3,4].map((i) => slot(i < n, i)).join('')}</div>`;
+const G = 'M8 1.8a4.2 4.2 0 0 0-2.4 7.65c.4.3.65.75.65 1.25v.6h3.5v-.6c0-.5.25-.95.65-1.25A4.2 4.2 0 0 0 8 1.8z';
+const base = '<path d="M6.4 13.3h3.2M7 14.8h2" stroke="#9aa0a8" stroke-width="1.1" stroke-linecap="round" fill="none"/>';
+const BULBS = {
+  A: { name: 'A · grey line (unfilled)', svg: `<path d="${G}" fill="none" stroke="#7b818a" stroke-width="1.1" stroke-linejoin="round"/>${base}` },
+  B: { name: 'B · pale yellow, no outline', svg: `<path d="${G}" fill="#fbe7a1"/>${base}` },
+  C: { name: 'C · deeper butter, no outline', svg: `<path d="${G}" fill="#f6d77a"/>${base}` },
+  D: { name: 'D · pale yellow + soft glow', svg: `<circle cx="8" cy="6" r="6.5" fill="#fbe7a1" opacity=".35"/><path d="${G}" fill="#fbe7a1"/>${base}` },
+  E: { name: 'E · yellow line (unfilled)', svg: `<path d="${G}" fill="none" stroke="#e2b83f" stroke-width="1.2" stroke-linejoin="round"/>${base}` },
+  F: { name: 'F · gold foil, like the stars', svg: `<path d="${G}" fill="url(#gold)" filter="url(#leaf)"/>${base}` },
+};
+const bulb = (k) => `<svg viewBox="0 0 16 16">${BULBS[k].svg}</svg>`;
+const count = (n, b) => `<span class="count">${n}<span style="font-family:var(--font-mono-system)">/</span>5 ${bulb(b)}</span>`;
+const compact = (n, b = 'B') => `<div class="card compact2">${slots(n)}<div class="foot">${count(n, b)}</div></div>`;
+const full = (n, lines, b = 'B') => `<div class="card full2"><div class="note">${lines.map((l, i) => `<p>${i === 0 ? `<b>${l}</b>` : l}</p>`).join('')}</div>${slots(n)}<div class="foot">${count(n, b)}</div></div>`;
+const welcome = ['Welcome to my museum of fine art!', 'Can you find all 5 hidden interactions?'];
+const TX = [['tx-smooth','1 · Smooth matte (no texture)'],['tx-tooth','2 · Paper tooth (fine grain)'],['tx-linen','3 · Linen weave'],['tx-laid','4 · Laid paper (fine stationery lines)'],['tx-fleck','5 · Cotton stock with flecks'],['tx-satin','6 · Satin (soft sheen, no grain)'],['tx-pressed','7 · Letterpressed edge (bevel + light tooth)']];
+const withTx = (html, cls) => html.replace('class="card ', 'class="card ' + cls + ' ');
+const tx7 = (html) => html.replace('class="card ', 'class="card tx7 ');
+document.getElementById('v').innerHTML = `
+<h2>7 · Letterpressed edge on both, scaled to each card (real size)</h2>
+<div class="pair">${tx7(full(2, welcome))}<div>${tx7(compact(2))}<div class="cap">Compact, real size</div></div><div>${tx7(compact(0))}<div class="cap">0 found</div></div></div>
+<h2 style="margin-top:48px">Same pair at 2×</h2>
+<div class="pair"><div class="zoom">${tx7(full(2, welcome))}</div><div class="zoom">${tx7(compact(2))}</div></div>`;
+document.body.dataset.ready = '1';
+</script>
+</body>
+</html>

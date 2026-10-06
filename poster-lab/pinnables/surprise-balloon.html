@@ -1,0 +1,307 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Surprise Rail — balloon chrome</title>
+<link href="fonts-google/fonts.css" rel="stylesheet">
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<script>
+/* Surprise Rail poster — foil party balloons, poured in chrome.
+   ?v=A..E  layout     ?seed=N
+   A stack   HBO / MAX, letters hung at their own angles, kissing
+   B crowd   tracked tight so the balloons overlap, lines overlap
+   C bleed   so big the letters leave the sheet
+   D nest    HBO large, MAX tucked under its right shoulder, a scatter of sparkles
+   E drip    the stack, one letter running
+   Each letter is its own balloon: own distance field, own dome, drawn
+   back-to-front so a front balloon occludes the one behind it. */
+const qs = new URLSearchParams(location.search);
+const V = (qs.get('v') || 'A').toUpperCase();
+const SEED = +(qs.get('seed') ?? 3);
+const W = 1600, H = 2000;
+const cv = document.getElementById('gl'); cv.width = W; cv.height = H;
+const gl = cv.getContext('webgl', { preserveDrawingBuffer: true, antialias: false });
+let rs = SEED * 9301 + 49297; const rnd = () => { rs = (rs * 9301 + 49297) % 233280; return rs / 233280; };
+
+const FONT = qs.get('font') || "'Fredoka'", WT = qs.get('wt') || 700;
+const SOFT = +(qs.get('soft') ?? 0.16);     // how much the domes pool at their creases
+const WARP = +(qs.get('warp') ?? 0.05);     // wobble of the letter edge
+const FAT = +(qs.get('fat') ?? 0.03);
+
+function layer() { const c = document.createElement('canvas'); c.width = W; c.height = H; return c; }
+
+// a slow noise warp so the silhouette is a filled balloon, not a typeset glyph
+function liquify(c, amp, scale, seed) {
+  const g = 64; const grid = new Float32Array(g * g * 2);
+  let r = seed * 7919 + 1; const rn = () => { r = (r * 9301 + 49297) % 233280; return r / 233280; };
+  for (let i = 0; i < grid.length; i++) grid[i] = rn() - .5;
+  const smooth = t => t * t * (3 - 2 * t);
+  const nz = (x, y, ch) => {
+    const fx = x / scale, fy = y / scale; const ix = Math.floor(fx), iy = Math.floor(fy);
+    const tx = smooth(fx - ix), ty = smooth(fy - iy);
+    const at = (a, b) => grid[(((b % g) + g) % g * g + ((a % g) + g) % g) * 2 + ch];
+    return (at(ix, iy) * (1 - tx) + at(ix + 1, iy) * tx) * (1 - ty) + (at(ix, iy + 1) * (1 - tx) + at(ix + 1, iy + 1) * tx) * ty;
+  };
+  const x = c.getContext('2d'); const src = x.getImageData(0, 0, W, H).data;
+  const out = x.createImageData(W, H); const d = out.data;
+  for (let y = 0; y < H; y++) for (let xx = 0; xx < W; xx++) {
+    const dx = nz(xx, y, 0) * amp, dy = nz(xx + 400, y + 900, 1) * amp;
+    const sx = Math.min(W - 1, Math.max(0, Math.round(xx + dx))), sy = Math.min(H - 1, Math.max(0, Math.round(y + dy)));
+    const i = (y * W + xx) * 4, j = (sy * W + sx) * 4;
+    d[i + 3] = src[j + 3];
+  }
+  x.putImageData(out, 0, 0);
+}
+
+function sparklePath(ctx, cx, cy, R, k, rot) {
+  ctx.beginPath();
+  const tips = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+  const c = Math.cos(rot), s = Math.sin(rot);
+  const P = (x, y) => [cx + (x * c - y * s) * R, cy + (x * s + y * c) * R];
+  let p = P(0, -1); ctx.moveTo(p[0], p[1]);
+  for (let i = 0; i < 4; i++) {
+    const a = tips[i], b = tips[(i + 1) % 4];
+    const q = P((a[0] + b[0]) * k, (a[1] + b[1]) * k), e = P(b[0], b[1]);
+    ctx.quadraticCurveTo(q[0], q[1], e[0], e[1]);
+  }
+  ctx.closePath();
+}
+
+// one balloon: a glyph at a position and tilt, on its own layer
+function glyph(ch, x, y, size, rot, seed) {
+  const c = layer(); const t = c.getContext('2d');
+  t.fillStyle = '#fff'; t.strokeStyle = '#fff'; t.lineJoin = 'round'; t.lineWidth = size * FAT;
+  t.font = `${WT} ${size}px ${FONT}`; t.textAlign = 'center'; t.textBaseline = 'middle';
+  t.translate(x, y); t.rotate(rot);
+  t.fillText(ch, 0, 0); if (FAT) t.strokeText(ch, 0, 0);
+  t.setTransform(1, 0, 0, 1, 0, 0);
+  if (WARP) liquify(c, size * WARP, size * 1.1, seed);
+  return c;
+}
+function measure(ch, size) { const t = layer().getContext('2d'); t.font = `${WT} ${size}px ${FONT}`; return t.measureText(ch).width; }
+
+// lay a word as balloons: returns [{c, x, y}] back-to-front
+function word(str, cx, cy, size, track, tiltAmt, seed) {
+  const ws = [...str].map(ch => measure(ch, size));
+  const total = ws.reduce((a, b) => a + b, 0) + track * size * (str.length - 1);
+  let x = cx - total / 2; const out = [];
+  [...str].forEach((ch, i) => {
+    const w = ws[i]; const tilt = (rnd() - .5) * 2 * tiltAmt;
+    const dy = (rnd() - .5) * size * 0.08;
+    out.push({ c: glyph(ch, x + w / 2, cy + dy, size, tilt, seed + i), x: x + w / 2, y: cy + dy, w, size });
+    x += w + track * size;
+  });
+  return out;
+}
+
+// --- distance transform → dome height, per layer, composited with occlusion
+function edt1d(f, n, out, v, z) {
+  let k = 0; v[0] = 0; z[0] = -Infinity; z[1] = Infinity;
+  for (let q = 1; q < n; q++) {
+    let s;
+    while (true) {
+      const vk = v[k];
+      s = ((f[q] + q * q) - (f[vk] + vk * vk)) / (2 * q - 2 * vk);
+      if (s <= z[k]) { k--; if (k < 0) { k = 0; break; } } else break;
+    }
+    if (k === 0 && s <= z[0]) { v[0] = q; z[0] = -Infinity; z[1] = Infinity; continue; }
+    k++; v[k] = q; z[k] = s; z[k + 1] = Infinity;
+  }
+  k = 0;
+  for (let q = 0; q < n; q++) { while (z[k + 1] < q) k++; const d = q - v[k]; out[q] = d * d + f[v[k]]; }
+}
+const n = Math.max(W, H), colBuf = new Float32Array(n), outBuf = new Float32Array(n), vBuf = new Int32Array(n), zBuf = new Float32Array(n + 1);
+function field(src, R) {
+  // returns {h: Float32 height 0..1, d: Float32 distance px, a: Uint8 alpha}
+  const id = src.getContext('2d').getImageData(0, 0, W, H).data;
+  const f = new Float32Array(W * H), a = new Uint8Array(W * H);
+  let x0 = W, x1 = 0, y0 = H, y1 = 0;
+  for (let i = 0; i < W * H; i++) { const on = id[i * 4 + 3] > 127; f[i] = on ? 1e12 : 0; a[i] = id[i * 4 + 3];
+    if (on) { const x = i % W, y = (i / W) | 0; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; } }
+  const tmp = new Float32Array(W * H);
+  if (x1 >= x0) {
+    x0 = Math.max(0, x0 - 2); x1 = Math.min(W - 1, x1 + 2); y0 = Math.max(0, y0 - 2); y1 = Math.min(H - 1, y1 + 2);
+    for (let x = x0; x <= x1; x++) { for (let y = y0; y <= y1; y++) colBuf[y - y0] = f[y * W + x]; edt1d(colBuf, y1 - y0 + 1, outBuf, vBuf, zBuf); for (let y = y0; y <= y1; y++) tmp[y * W + x] = outBuf[y - y0]; }
+    for (let y = y0; y <= y1; y++) { for (let x = x0; x <= x1; x++) colBuf[x - x0] = tmp[y * W + x]; edt1d(colBuf, x1 - x0 + 1, outBuf, vBuf, zBuf); for (let x = x0; x <= x1; x++) f[y * W + x] = outBuf[x - x0]; }
+  }
+  const d = new Float32Array(W * H), h = new Float32Array(W * H);
+  for (let i = 0; i < W * H; i++) { const dd = a[i] > 127 ? Math.sqrt(f[i]) : 0; d[i] = dd; const t = Math.min(dd / R, 1); h[i] = Math.sqrt(1 - (1 - t) * (1 - t)); }
+  // soften the creases where domes meet
+  const br = Math.max(1, Math.round(R * SOFT));
+  const t2 = new Float32Array(W * H);
+  const box = (s, o, horiz) => {
+    const nn = horiz ? W : H, m = horiz ? H : W;
+    for (let j = 0; j < m; j++) {
+      const at = i => horiz ? j * W + i : i * W + j; let acc = 0;
+      for (let i = -br; i <= br; i++) acc += s[at(Math.min(nn - 1, Math.max(0, i)))];
+      for (let i = 0; i < nn; i++) { o[at(i)] = acc / (2 * br + 1); acc += s[at(Math.min(nn - 1, i + br + 1))] - s[at(Math.max(0, i - br))]; }
+    }
+  };
+  for (let k = 0; k < 2; k++) { box(h, t2, true); box(t2, h, false); }
+  return { h, d, a };
+}
+// composite layers back-to-front into one RGBA texture:
+// r,g = 16-bit height of the frontmost balloon, b = union silhouette (AA), a = rim distance / R
+function composite(items) {
+  const px = new Uint8Array(W * H * 4);
+  const H16 = new Float32Array(W * H), D = new Float32Array(W * H), A = new Uint8Array(W * H), Rr = new Float32Array(W * H);
+  for (const { c, R } of items) {
+    const { h, d, a } = field(c, R);
+    for (let i = 0; i < W * H; i++) if (a[i] > 127) { H16[i] = h[i]; D[i] = d[i]; Rr[i] = R; A[i] = 255; } else if (a[i] > 0 && A[i] < a[i]) A[i] = a[i];
+  }
+  for (let i = 0; i < W * H; i++) {
+    const q = Math.round(Math.min(1, H16[i]) * 65535);
+    px[i * 4] = q >> 8; px[i * 4 + 1] = q & 255; px[i * 4 + 2] = A[i]; px[i * 4 + 3] = Rr[i] ? Math.round(Math.min(1, D[i] / Rr[i]) * 255) : 0;
+  }
+  return px;
+}
+
+// ---------- layouts ----------
+let texText, texSpark;
+function build() {
+  const size = +(qs.get('size') ?? { A: 680, B: 700, C: 820, D: 720, E: 680 }[V]);
+  const R = size * +(qs.get('r') ?? 0.21);
+  let items = [];
+  const cx = W * +(qs.get('x') ?? 0.5), cy = H * +(qs.get('y') ?? 0.5);
+  if (V === 'A' || V === 'E') {
+    items = [...word('HBO', cx, cy - size * 0.46, size, -0.06, 0.10, SEED), ...word('MAX', cx, cy + size * 0.46, size, -0.06, 0.10, SEED + 10)];
+  } else if (V === 'B') {
+    items = [...word('HBO', cx - size * 0.05, cy - size * 0.38, size, -0.16, 0.14, SEED), ...word('MAX', cx + size * 0.05, cy + size * 0.40, size, -0.16, 0.14, SEED + 10)];
+  } else if (V === 'C') {
+    items = [...word('HBO', cx, cy - size * 0.44, size, -0.12, 0.08, SEED), ...word('MAX', cx, cy + size * 0.44, size, -0.12, 0.08, SEED + 10)];
+  } else if (V === 'D') {
+    items = [...word('HBO', cx - size * 0.12, cy - size * 0.40, size, -0.06, 0.10, SEED), ...word('MAX', cx + size * 0.30, cy + size * 0.42, size * 0.72, -0.04, 0.10, SEED + 10)];
+  }
+  // depth: the B and the A come to the front so their counters stay open;
+  // the O and the X sit behind them
+  const front = ['B', 'A'], back = ['O', 'X'];
+  items.forEach((it, i) => { it.i = i; it.ch = 'HBOMAX'[i]; });
+  items.sort((p, q) => (back.includes(p.ch) ? -1 : front.includes(p.ch) ? 1 : 0) - (back.includes(q.ch) ? -1 : front.includes(q.ch) ? 1 : 0));
+  if (V === 'E') {
+    // one balloon runs: fat drips from its lower edge
+    const it = items[(rnd() * items.length) | 0]; const t = it.c.getContext('2d'); t.fillStyle = '#fff';
+    const y0 = it.y + it.size * 0.3;
+    for (let i = 0; i < 4; i++) { const x = it.x + (rnd() - .5) * it.w * .8, w = 40 + rnd() * 40, len = 120 + rnd() * 300;
+      t.beginPath(); t.roundRect(x - w / 2, y0 - 40, w, len, w / 2); t.fill(); t.beginPath(); t.arc(x, y0 - 40 + len, w * .75, 0, Math.PI * 2); t.fill(); }
+  }
+  texText = composite(items.map(c => ({ c: c.c, R })));
+  // sparkles: thin, behind
+  const s = layer(); const sx = s.getContext('2d'); sx.fillStyle = '#fff';
+  const SR = +(qs.get('sr') ?? 330), SK = +(qs.get('sk') ?? 0.07);
+  if (V === 'D') {
+    sparklePath(sx, W * 0.80, H * 0.24, 300, SK, 0.1); sx.fill();
+    sparklePath(sx, W * 0.16, H * 0.72, 150, SK, -0.2); sx.fill();
+    sparklePath(sx, W * 0.86, H * 0.78, 110, SK, 0.3); sx.fill();
+  } else {
+    sparklePath(sx, W * +(qs.get('sx') ?? 0.80), H * +(qs.get('sy') ?? 0.30), SR, SK, 0.06); sx.fill();
+    sparklePath(sx, W * 0.17, H * 0.74, SR * 0.36, SK + .02, -0.2); sx.fill();
+  }
+  texSpark = composite([{ c: s, R: 60 }]);
+}
+
+// ---------- GL ----------
+const vs = `attribute vec2 p; varying vec2 v; void main(){ v = p * .5 + .5; gl_Position = vec4(p, 0., 1.); }`;
+const fs = `
+precision highp float;
+varying vec2 v;
+uniform sampler2D uText, uSpark;
+uniform vec2 uRes; uniform float uVar, uSeed, uRelT, uRelS, uShine;
+
+float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float noise(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
+  return mix(mix(hash(i), hash(i+vec2(1,0)), f.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), f.x), f.y); }
+float fbm(vec2 p){ float a = .5, s = 0.; for (int i = 0; i < 5; i++){ s += a * noise(p); p = p * 2.03 + 17.1; a *= .5; } return s; }
+
+// the room the chrome mirrors: a bright sky, a thin dark horizon streak,
+// a dark floor, a dark pillar to the left. Mostly white — the reference is
+// bright foil with deep shadow only where the balloon turns under.
+vec3 env(float t, float x){
+  float k = t * .5 + .5;
+  vec3 c = vec3(.04, .045, .06);
+  c = mix(c, vec3(.18, .20, .23), smoothstep(.10, .26, k));
+  c = mix(c, vec3(.92, .93, .95), smoothstep(.30, .40, k));
+  c = mix(c, vec3(1.00), smoothstep(.44, .52, k));
+  c = mix(c, vec3(.80, .83, .87), smoothstep(.55, .62, k));
+  c = mix(c, vec3(.22, .24, .28), smoothstep(.64, .70, k));
+  c = mix(c, vec3(1.00), smoothstep(.73, .82, k));
+  c = mix(c, vec3(.85, .87, .90), smoothstep(.90, 1.0, k));
+  c = mix(c, vec3(.06, .07, .09), smoothstep(-.3, -.95, x) * .85);
+  c = mix(c, vec3(1.), smoothstep(.5, .95, x) * .4);
+  // foil streaks: the mirror wanders
+  c *= .82 + .36 * fbm(vec2(x * 1.6 + uSeed, t * 1.4));
+  return c;
+}
+float hgt(sampler2D t, vec2 uv){ vec4 m = texture2D(t, uv); return (m.r * 255. * 256. + m.g * 255.) / 65535.; }
+vec3 shade(sampler2D tex, vec2 uv, float relief, out float inside){
+  vec2 px = 1. / uRes;
+  vec4 m0 = texture2D(tex, uv); inside = m0.b;
+  float dx = hgt(tex, uv + vec2(px.x * 2., 0.)) - hgt(tex, uv - vec2(px.x * 2., 0.));
+  float dy = hgt(tex, uv + vec2(0., px.y * 2.)) - hgt(tex, uv - vec2(0., px.y * 2.));
+  vec2 rp = uv * vec2(uRes.x / uRes.y, 1.) * 4. + uSeed;
+  float r1 = fbm(rp), r2 = fbm(rp + vec2(5.2, 1.3));
+  vec3 n = normalize(vec3(-dx * relief + (r1 - .5) * .08, dy * relief + (r2 - .5) * .08, 1.));
+  vec3 r = reflect(vec3(0., 0., -1.), n);
+  vec3 col = env(r.y, r.x);
+  // key light high left; undersides fall away
+  vec3 L = normalize(vec3(-.4, .85, .5));
+  float dif = max(dot(n, L), 0.);
+  col *= .45 + .65 * dif;
+  // hot glints — the shine
+  col += pow(max(dot(normalize(L + vec3(0., 0., 1.)), n), 0.), 50.) * 1.3 * uShine;
+  col += pow(max(dot(normalize(vec3(.7, -.3, 1.)), n), 0.), 140.) * .8 * uShine;
+  col += pow(max(dot(normalize(vec3(-.9, .2, 1.)), n), 0.), 200.) * .5 * uShine;
+  // fresnel: the body silvers as it turns
+  float fr = pow(1. - n.z, 2.6);
+  col = mix(col, vec3(1.), fr * .85);
+  // the double contour: a dark seam just inside a bright lip
+  col = mix(col, vec3(.05, .06, .08), smoothstep(.015, .05, m0.a) * (1. - smoothstep(.05, .11, m0.a)) * .8);
+  col = mix(col, vec3(1.), (1. - smoothstep(.0, .025, m0.a)) * .95);
+  return col;
+}
+
+void main(){
+  vec2 uv = vec2(v.x, 1. - v.y);
+  float asp = uRes.x / uRes.y;
+  vec2 q = (uv - .5) * vec2(asp, 1.);
+  // black, with the faintest breath of the rail's periwinkle behind the mark
+  vec3 bg = vec3(.012, .012, .016);
+  float hz = exp(-dot(q, q) * 2.2);
+  bg += vec3(.15, .16, .24) * hz * .22 * (.6 + .8 * fbm(uv * 2.5 + uSeed));
+
+  float si; vec3 sc = shade(uSpark, uv, uRelS, si);
+  vec3 col = mix(bg, sc, si);
+  float sg = hgt(uSpark, uv + vec2(-.012, .018)); col *= 1. - sg * .3 * (1. - si);
+
+  float ti; vec3 tc = shade(uText, uv, uRelT, ti);
+  float tg = hgt(uText, uv + vec2(-.012, .016)); col *= 1. - tg * .5 * (1. - ti);
+  col = mix(col, tc, ti);
+
+  col += (hash(uv * uRes + uSeed) - .5) * .045;
+  col *= 1. - .3 * pow(length(q) / 1.0, 3.);
+  gl_FragColor = vec4(col, 1.);
+}`;
+function sh(t, s) { const o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o); if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) throw gl.getShaderInfoLog(o); return o; }
+const prog = gl.createProgram(); gl.attachShader(prog, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(prog); gl.useProgram(prog);
+const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+const loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+function tex(unit, px, name) { const t = gl.createTexture(); gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, W, H, 0, gl.RGBA, gl.UNSIGNED_BYTE, px);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.uniform1i(gl.getUniformLocation(prog, name), unit); }
+const U = n => gl.getUniformLocation(prog, n);
+gl.uniform2f(U('uRes'), W, H);
+gl.uniform1f(U('uVar'), 'ABCDE'.indexOf(V));
+gl.uniform1f(U('uSeed'), SEED);
+gl.uniform1f(U('uRelT'), +(qs.get('relt') ?? 22));
+gl.uniform1f(U('uRelS'), +(qs.get('rels') ?? 26));
+gl.uniform1f(U('uShine'), +(qs.get('shine') ?? 1));
+gl.viewport(0, 0, W, H);
+function draw() { tex(0, texText, 'uText'); tex(1, texSpark, 'uSpark'); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); document.body.dataset.ready = '1'; }
+document.fonts.load(`${WT} 100px ${FONT}`).then(() => { build(); draw(); });
+</script>
+</body>
+</html>

@@ -5,7 +5,7 @@ const root = __dirname;
 const mime = {
   '.html': 'text/html', '.js': 'text/javascript', '.png': 'image/png',
   '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.css': 'text/css',
-  '.webp': 'image/webp', '.mp4': 'video/mp4', '.otf': 'font/otf',
+  '.webp': 'image/webp', '.mp4': 'video/mp4', '.otf': 'font/otf', '.woff2': 'font/woff2',
 };
 http.createServer((req, res) => {
   const url = new URL(req.url, 'http://x');

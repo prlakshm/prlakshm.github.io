@@ -1,0 +1,250 @@
+/* Portrait pop-outs lab: the About wall, eight portraits, museum placards. */
+@font-face {
+  font-family: "Berkeley Mono";
+  src: url("/fonts/berkeley/BerkeleyMonoTrial-Regular.otf") format("opentype");
+  font-weight: 400;
+}
+
+:root {
+  --wall: #f8fafc;
+  --ink: #171717;
+  --grey: #666666;
+  --mono: "Berkeley Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--wall);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+.lab-head {
+  max-width: 1720px;
+  margin: 0 auto;
+  padding: 44px 56px 8px;
+}
+
+.lab-head h1 {
+  margin: 0 0 10px;
+  font-family: "Libre Franklin", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 40px;
+  letter-spacing: -0.03em;
+}
+
+.lab-head p {
+  margin: 0;
+  max-width: 78ch;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  color: var(--grey);
+  text-transform: uppercase;
+}
+
+.lab-grid {
+  max-width: 1720px;
+  margin: 0 auto;
+  padding: 30px 56px 80px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px 24px;
+}
+
+/* One cell: room on every side for what comes out, then the placard. */
+.cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 64px 0 0;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  padding: 0 0 92px;
+}
+
+/* The portrait: 3:4, the About page's crop. --u is 1/100 of its width. */
+.pp {
+  position: relative;
+  width: 260px;
+  aspect-ratio: 3 / 4;
+  margin: 0;
+  cursor: pointer;
+}
+
+.pp-photo {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 42%;
+  filter: drop-shadow(0 1px 0 rgba(23, 23, 23, 0.34));
+  will-change: transform;
+}
+
+/* Everything tucked under the photo. */
+.pp-back {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.pc {
+  position: absolute;
+  will-change: transform;
+}
+
+.pc-in {
+  position: absolute;
+  inset: 0;
+}
+
+.pc img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Gold: lit layer cross-fades in as it catches the light; a soft contact shadow,
+   because leaf is opaque and sits on the wall. The shadow sits on the resting
+   leaf only: on the wrapper it would also wrap the lit layer, and every glint
+   (an opacity change inside a filter) would redraw the filter each frame. */
+.pc--gold .rest {
+  filter: drop-shadow(0 1.2px 1.2px rgba(60, 40, 0, 0.22)) drop-shadow(0 3px 5px rgba(15, 23, 42, 0.1));
+}
+
+.pc--gold .lit {
+  opacity: 0;
+}
+
+/* Tissue: thin and see-through, so overlaps darken; the faintest shadow. */
+.pc--tissue {
+  mix-blend-mode: multiply;
+}
+
+.pc--tissue .pc-in {
+  filter: drop-shadow(0 1px 1.5px rgba(15, 23, 42, 0.08));
+}
+
+/* The star card's stamps, straight from its sprite. */
+.pc--star .st:first-child {
+  filter: drop-shadow(0 1.2px 1.2px rgba(60, 40, 0, 0.22)) drop-shadow(0 3px 5px rgba(15, 23, 42, 0.1));
+}
+
+.pc--star .st {
+  position: absolute;
+  inset: 0;
+  background-image: url("/home/card/stamps.webp");
+  background-size: 500% 400%;
+  background-repeat: no-repeat;
+}
+
+.pc--star .st-lit {
+  opacity: 0;
+}
+
+.pc--slot svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Streamers and threads: one SVG behind the photo, in u. */
+.pp-svg {
+  position: absolute;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.pp-svg .tissue-stroke {
+  mix-blend-mode: multiply;
+}
+
+/* Placard, museum style. */
+.placard {
+  width: 300px;
+  font-family: var(--mono);
+  text-transform: uppercase;
+}
+
+.placard b {
+  display: block;
+  font-weight: 400;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  -webkit-text-stroke: 0.4px currentColor;
+}
+
+.placard span {
+  display: block;
+  margin-top: 6px;
+  font-size: 11.5px;
+  line-height: 1.55;
+  letter-spacing: 0.04em;
+  color: var(--grey);
+}
+
+/* single-option mode (?only=), for frames */
+body.only .lab-head { display: none; }
+body.only .lab-grid { grid-template-columns: 1fr; max-width: 560px; padding: 20px; }
+body.only .placard { display: none; }
+
+/* round 2: five bursts, three across, with room for them */
+body[data-round="2"] .lab-grid {
+  grid-template-columns: repeat(3, 1fr);
+  max-width: 1500px;
+  gap: 40px 40px;
+}
+body[data-round="2"] .cell { padding-top: 84px; }
+body[data-round="2"] .stage { padding-bottom: 104px; }
+
+/* round 3: two big frames side by side, with room for them */
+body[data-round="3"] .lab-grid {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 1200px;
+  gap: 40px 60px;
+}
+body[data-round="3"] .cell { padding-top: 150px; }
+body[data-round="3"] .stage { padding-bottom: 170px; }
+body[data-round="3"] .placard { width: 360px; }
+
+/* round 4: A and E at 2x and 3x, two across */
+body[data-round="4"] .lab-grid {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 1200px;
+  gap: 40px 60px;
+}
+body[data-round="4"] .cell { padding-top: 150px; }
+body[data-round="4"] .stage { padding-bottom: 170px; }
+body[data-round="4"] .placard { width: 380px; }
+
+/* round 5: the full-frame party, two across */
+body[data-round="5"] .lab-grid {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 1200px;
+  gap: 40px 60px;
+}
+body[data-round="5"] .cell { padding-top: 120px; }
+body[data-round="5"] .stage { padding-bottom: 140px; }
+body[data-round="5"] .placard { width: 380px; }
+
+/* single-option mode beats the round grids (same specificity, so it comes last) */
+body.only[data-round] .lab-grid { grid-template-columns: 1fr; max-width: 760px; padding: 20px; }

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Salon wall mock</title>
+<link rel="stylesheet" href="/src/styles/tokens.css" />
+<style>
+  :root { --wall: #f8fafc; --ink: #171717; --mute: #666; --tert: #999; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--wall); color: var(--ink); font-family: var(--font-mono); -webkit-font-smoothing: antialiased; }
+  .frame { width: 1470px; padding: 40px 47px 64px; }
+  .tag { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); margin: 0 0 28px; }
+  .wall { position: relative; display: flex; gap: 0; }
+  .group { position: relative; display: flex; flex-direction: column; }
+  .group + .group { margin-left: 56px; }
+  .placard { display: flex; align-items: center; gap: 10px; font-size: 13px; letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; margin-bottom: 20px; }
+  .placard .i { color: var(--tert); }
+  .placard::after { content: ""; flex: 1; height: 1px; background: color-mix(in srgb, var(--ink) 14%, transparent); }
+  .row { position: relative; display: flex; gap: 26px; }
+  .w { position: relative; flex: none; }
+  .w img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; box-shadow: 0 1px 2px rgba(15, 23, 42, .08), 0 14px 32px -12px rgba(15, 23, 42, .22); }
+  .lab { margin-top: 14px; font-size: 13px; line-height: 1.5; letter-spacing: .05em; text-transform: uppercase; }
+  .lab b { display: block; font-weight: 400; color: var(--ink); }
+  .lab span { display: block; color: var(--mute); }
+  .lab em { display: block; margin-top: 8px; font-style: normal; color: var(--mute); max-width: 28ch; }
+  /* centre-line hanging: every work's centre on one line */
+  .centre .row { align-items: center; }
+  .centre .w { display: flex; flex-direction: column; }
+  /* asymmetric: works hang at different heights, labels beside the small ones */
+  .asym .row { align-items: flex-start; }
+  .asym .lab.side { position: absolute; left: calc(100% + 16px); bottom: 0; width: 180px; margin: 0; }
+</style>
+</head>
+<body>
+<div class="frame" id="v"></div>
+<script type="module">
+const q = new URLSearchParams(location.search).get('v') || 'centre';
+const P = '/home/work/';
+const W = { L: 300, M: 236, S: 188 };
+const works = {
+  cs: [
+    { img: 'surprise-rail-poster.webp', t: 'Surprise Rail', s: 'HBO Max · 2025', d: 'Designing a themed rail for HBO Max', z: 'L', drop: 0 },
+    { img: 'mixr-poster.webp', t: 'Mixr', s: 'iOS DJ App · 2026', d: 'Building a DJ app for beginners', z: 'S', drop: 150 },
+    { img: 'pinnables-poster.webp', t: 'Pinnables', s: 'Devtool · 2026 ↗', d: 'Sending browser annotations to coding agents', z: 'M', drop: 40 },
+  ],
+  pr: [
+    { img: 'figma-sound-poster.webp', t: 'Figma Sound', s: 'Concept · 2026', d: 'Sound as a new design system material', z: 'M', drop: 90 },
+    { img: 'codex-bookmarks-poster.webp', t: 'Codex Bookmarks', s: 'Concept · 2026 ↗', d: 'Bookmarking messages in long AI chats', z: 'S', drop: 10 },
+  ],
+};
+const label = (w, side) => `<div class="lab${side ? ' side' : ''}"><b>${w.t}</b><span>${w.s}</span><em>${w.d}</em></div>`;
+const work = (w) => {
+  const side = q === 'asym' && w.t === 'Codex Bookmarks';
+  return `<div class="w" style="width:${W[w.z]}px;${q === 'asym' ? `margin-top:${w.drop}px` : ''}"><img src="${P + w.img}" alt="">${label(w, side)}</div>`;
+};
+const group = (i, name, list, extra = '') => `<div class="group"${extra}><div class="placard"><span class="i">${i}</span>${name}</div><div class="row">${list.map(work).join('')}</div></div>`;
+const title = { centre: 'B · Salon, hung on a centre line (sizes = importance)', asym: 'C · Salon, asymmetric hang (labels beside the small works)' }[q];
+document.getElementById('v').innerHTML = `<p class="tag">${title}</p><div class="wall ${q}">${group('01', 'Case studies', works.cs)}${group('02', 'Products reimagined', works.pr)}</div>`;
+document.body.dataset.ready = '1';
+</script>
+</body>
+</html>

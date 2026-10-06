@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gilt Lab</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #171717;
+        --muted: #666;
+        --page: #fff;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--page); color: var(--ink); font: 13px/1.5 ui-monospace, Menlo, monospace; }
+      /* frozen (capture) mode: the band alone, top-left, exact size */
+      #band { position: relative; overflow: hidden; touch-action: pan-y; }
+      #band canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+      /* No WebGL / context lost: a still wash in the water's colours. */
+      #band.is-flat {
+        background:
+          radial-gradient(60% 120% at 62% 30%, rgba(228, 234, 242, 0.55), transparent 70%),
+          radial-gradient(70% 140% at 18% 80%, rgba(188, 169, 219, 0.45), transparent 70%),
+          linear-gradient(100deg, #a1d6df 0%, #87c1f0 45%, #87c1f0 70%, #9cb3ea 100%);
+      }
+      #band.is-flat canvas { display: none; }
+      /* live mode: a white page that ends in the band, like the footer */
+      body.live #page { min-height: 70vh; padding: 48px 16px 24px; display: flex; flex-direction: column; justify-content: flex-end; }
+      body.live #copy { color: var(--muted); padding: 0 0 20px; }
+      body:not(.live) #page, body:not(.live) #info { display: none; }
+      #info { padding: 16px; display: grid; gap: 6px; }
+      #title { font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+      #pitch { color: var(--muted); max-width: 80ch; }
+      #nav { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+      #nav a { color: var(--muted); text-decoration: none; }
+      #nav a.on { color: var(--ink); text-decoration: underline; }
+      #status { white-space: pre-wrap; color: #b00; padding: 0 16px; }
+      #status:empty { display: none; }
+    </style>
+  </head>
+  <body>
+    <div id="page"><div id="copy">© 2026 Pranavi Ram</div></div>
+    <div id="band" aria-hidden="true"><canvas></canvas></div>
+    <div id="info">
+      <div id="title"></div>
+      <div id="pitch"></div>
+      <div id="nav"></div>
+    </div>
+    <div id="status">loading…</div>
+    <script>
+      if (new URLSearchParams(location.search).has("live")) document.body.classList.add("live");
+    </script>
+    <script type="module" src="./engine/lab.ts"></script>
+  </body>
+</html>

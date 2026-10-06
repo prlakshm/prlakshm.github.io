@@ -1,0 +1,25 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:'OpenAI Sans';font-weight:500;src:url(../fonts/oai/OpenAISans-Medium-B7nJY_kG.woff2)}
+*{margin:0}html,body{width:1080px;height:1350px;overflow:hidden;background:#fff}
+svg{display:block;width:1080px;height:1350px}
+</style></head><body>
+<svg id="p" viewBox="0 0 1080 1350" xmlns="http://www.w3.org/2000/svg"></svg>
+<script src="kit.js"></script>
+<script>
+const {C,title,mascot,mascotDefs,sticker,sunburst,pinkDefs,tasselCard}=CX;
+const hand=(x,y,r=27)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="url(#m-g)" filter="url(#m-f)"/><circle cx="${x-8}" cy="${y-9}" r="6" fill="#fff" opacity=".6"/>`;
+p.innerHTML=`<defs>${mascotDefs('m')}${pinkDefs('pk')}${sticker('st',{r:16,dy:24,blur:22,sop:.18})}
+  <radialGradient id="glow" cx="540" cy="820" r="560" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".5" stop-color="#fff" stop-opacity=".3"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  <linearGradient id="fadeTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9D6FF"/><stop offset=".26" stop-color="#C9D6FF"/><stop offset=".44" stop-color="#C9D6FF" stop-opacity="0"/></linearGradient>
+</defs>
+${sunburst(540,820,32,'#C9D6FF','#B9C8FF')}
+<rect width="1080" height="1350" fill="url(#fadeTop)"/><rect width="1080" height="1350" fill="url(#glow)"/>
+${title(['Codex','Bookmarks'],{y:214,size:100,lh:1.04,fill:C.ink,bold:6})}
+<g filter="url(#st)">
+  ${tasselCard('pk',{x:712,y:800,w:220,h:580,r:38})}
+  ${mascot('m',{x:470,y:930,s:1.04})}
+  ${hand(706,858,28)}${hand(716,944,28)}
+</g>`;
+</script>
+</body></html>

@@ -1,0 +1,885 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Codex Bookmarks — Pranavi Ram</title>
+    <link rel="canonical" href="https://pranaviram.com/codex/" />
+    <meta name="description" content="Bookmarks for long Codex chats: mark a message, name it, jump back. A product concept by Pranavi Ram." />
+
+    <!-- Open Graph / LinkedIn -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://pranaviram.com/codex/" />
+    <meta property="og:site_name" content="Pranavi Ram" />
+    <meta property="og:title" content="Codex Bookmarks — Pranavi Ram" />
+    <meta property="og:description" content="Bookmarks for long Codex chats: mark a message, name it, jump back. A product concept by Pranavi Ram." />
+    <meta property="og:image" content="https://pranaviram.com/home/work/codex-bookmarks-poster.webp" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Codex Bookmarks — Pranavi Ram" />
+    <meta name="twitter:description" content="Bookmarks for long Codex chats: mark a message, name it, jump back. A product concept by Pranavi Ram." />
+    <meta name="twitter:image" content="https://pranaviram.com/home/work/codex-bookmarks-poster.webp" />
+    <style>
+      :root {
+        color-scheme: dark;
+        --ground: #000;
+        --ink: #fff;
+        --muted: #737373;
+        --pad: clamp(21px, 3.5vw, 56px);
+        /* Codex's own UI face */
+        --ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        background: var(--ground);
+        scroll-behavior: smooth;
+        scroll-snap-type: y mandatory;
+      }
+
+      body {
+        background: var(--ground);
+        color: var(--ink);
+        font-family: var(--ui);
+        margin: 0;
+      }
+
+      .slide {
+        align-items: center;
+        background: var(--ground);
+        display: flex;
+        justify-content: center;
+        min-height: 100svh;
+        overflow: hidden;
+        padding: var(--pad);
+        position: relative;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+      }
+
+      /* Every visual sits in a frame with the same black border on all four
+         sides. Content inside scales to fit and the frame's ground fills the
+         rest, so the frame can take the window's shape. On portrait screens a
+         full-height frame would be mostly empty, so it stays 16:9 there. */
+      .frame {
+        inset: var(--pad);
+        overflow: hidden;
+        position: absolute;
+      }
+
+      @media (max-aspect-ratio: 1 / 1) {
+        .frame {
+          aspect-ratio: 16 / 9;
+          inset: auto;
+          position: relative;
+          width: 100%;
+        }
+        .folio,
+        .concept-credit {
+          bottom: 14px;
+        }
+      }
+
+      .animation-frame {
+        border: 0;
+        display: block;
+        height: 100%;
+        inset: 0;
+        position: absolute;
+        width: 100%;
+      }
+
+      .animation-frame:focus-visible {
+        outline: 2px solid var(--muted);
+        outline-offset: -2px;
+      }
+
+      .thesis {
+        margin: 0;
+        width: min(70vw, 760px);
+      }
+
+      .thesis img {
+        display: block;
+        height: auto;
+        width: 100%;
+      }
+
+      .thesis .narrow {
+        display: none;
+        margin: 0 auto;
+        width: min(100%, 320px);
+      }
+
+      /* on phones the layer breakdown is one tall column */
+      @media (max-aspect-ratio: 1 / 1) {
+        .slide[data-slide="04"] .frame {
+          aspect-ratio: 620 / 1674;
+          width: min(100%, calc((100svh - 2 * var(--pad)) * 620 / 1674));
+        }
+      }
+
+      @media (max-width: 720px) {
+        .thesis .wide {
+          display: none;
+        }
+        .thesis .narrow {
+          display: block;
+        }
+      }
+
+      .folio {
+        bottom: max(6px, calc((var(--pad) - 15px) / 2));
+        color: var(--muted);
+        font-size: 12px;
+        left: var(--pad);
+        letter-spacing: 0.01em;
+        position: absolute;
+      }
+
+      .concept-credit {
+        bottom: max(6px, calc((var(--pad) - 15px) / 2));
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        pointer-events: none;
+        position: absolute;
+        right: var(--pad);
+        text-transform: uppercase;
+        z-index: 1;
+      }
+
+      /* ---------- 01 · hero: the poster, dropped into place ---------- */
+      .hx-frame {
+        cursor: pointer;
+      }
+
+      /* Authored at 1920 × 1080 and scaled to the frame, so every piece keeps
+         the poster's proportions at any size. */
+      .hx-stage {
+        height: 1080px;
+        left: 0;
+        position: absolute;
+        top: 0;
+        transform-origin: 0 0;
+        visibility: hidden;
+        width: 1920px;
+      }
+
+      /* Shown only once the script has fitted the stage and drawn the first
+         pose — before that the pieces would paint piled at the stage's corner. */
+      .hx-frame.is-ready .hx-stage {
+        visibility: visible;
+      }
+
+      .hx-ground {
+        background: linear-gradient(161deg, #aba8ff 0%, #8c9dff 20.6%, #5e74ff 47.4%, #3a43f5 91.2%);
+        inset: 0;
+        position: absolute;
+      }
+
+      .hx-sun {
+        background: radial-gradient(calc(540px * var(--k, 1)) calc(540px * var(--k, 1)) at 0 0, rgba(255, 214, 194, 0.95) 0%, rgba(255, 192, 217, 0.32) 50%, rgba(255, 192, 217, 0) 100%);
+        inset: 0;
+        position: absolute;
+      }
+
+      .hx-grain {
+        background: url("./assets/grain.png") 0 0 / calc(144px * var(--k, 1)) calc(144px * var(--k, 1));
+        inset: 0;
+        mix-blend-mode: overlay;
+        opacity: 0.22;
+        position: absolute;
+      }
+
+      /* The poster's own 1080 × 1350 coordinates, at 0.8 so it fills 1080 tall. */
+      .hx-poster {
+        height: 1350px;
+        left: 528px;
+        position: absolute;
+        top: 0;
+        transform: scale(0.8);
+        transform-origin: 0 0;
+        width: 1080px;
+      }
+
+      .hx-piece {
+        display: block;
+        overflow: visible;
+        position: absolute;
+        transform-origin: 50% 50%;
+        will-change: transform;
+      }
+
+      .hx-shadow {
+        background: #1c216b;
+        border-radius: 50%;
+        filter: blur(15.2px);
+        height: 26.6px;
+        left: -163.4px;
+        position: absolute;
+        top: -13.3px;
+        transform-origin: 50% 50%;
+        width: 326.8px;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="slide" data-slide="01" aria-label="Codex Bookmarks: the poster, dropped into place">
+        <div class="frame hx-frame" role="img" aria-label="Codex Bookmarks. A Codex cloud lands, the word Bookmarks balances on it like a seesaw, Codex weighs down one end and a pink bookmark lands on the other.">
+          <div class="hx-ground"></div>
+          <div class="hx-sun"></div>
+          <div class="hx-grain"></div>
+          <div class="hx-stage">
+            <div class="hx-poster">
+              <div class="hx-shadow"></div>
+{{PIECES}}            </div>
+          </div>
+        </div>
+        <span class="concept-credit">Independent concept by Pranavi Ram</span>
+      </section>
+
+      <section class="slide" data-slide="02" aria-label="Thesis">
+        <p class="thesis">
+          <img class="wide" src="./assets/thesis-wide.svg" alt="Long chats bury answers. Bookmarks bring them back in one click." />
+          <img class="narrow" src="./assets/thesis-narrow.svg" alt="" />
+        </p>
+        <span class="folio" aria-hidden="true">02 / 05</span>
+      </section>
+
+      <section class="slide" data-slide="03" aria-label="Prototype: bookmark a message, name it, jump back">
+        <div class="frame">
+          <iframe class="animation-frame" src="./scene.html?s=1" title="Prototype: bookmarking a message in a long chat, naming it, and jumping back" loading="lazy"></iframe>
+        </div>
+        <span class="folio" aria-hidden="true">03 / 05</span>
+      </section>
+
+      <section class="slide" data-slide="04" aria-label="The toolbar, layer by layer">
+        <div class="frame">
+          <iframe class="animation-frame" src="./scene.html?s=3" title="The bookmark toolbar's four layers: grid, wireframe, content and result" loading="lazy"></iframe>
+        </div>
+        <span class="folio" aria-hidden="true">04 / 05</span>
+      </section>
+
+      <section class="slide" data-slide="05" aria-label="The toolbar's layers in 3D">
+        <div class="frame">
+          <iframe class="animation-frame" src="./scene.html?s=2" title="The bookmark toolbar exploded into its layers in 3D" loading="lazy"></iframe>
+        </div>
+        <span class="folio" aria-hidden="true">05 / 05</span>
+      </section>
+    </main>
+
+    <script src="./vendor/motion.js"></script>
+    <script>
+      // ---------- 01 · hero ----------
+      // Everything is in the poster's own units (1080 × 1350). One gravity for
+      // every fall, so the pieces share a world: duration = √(2h / g), and each
+      // piece starts just above the frame so the acceleration is on screen.
+      (() => {
+        const { animate, motionValue, frame, frameData, spring: springGen, keyframes: tweenGen } = window.Motion;
+        // Tempo: the cloud's fall plays at full speed; from the moment the
+        // next piece leaves, everything plays SLOW × slower — one slow-motion
+        // factor, so every proportion between the moves is kept.
+        const SLOW = 1.2;
+        let tempo = 1; // playback speed of animations started from now on
+        const anim = (...args) => { const c = animate(...args); c.speed = tempo; return c; };
+        const vel = (mv) => mv.getVelocity() / tempo; // velocity in animation time
+        const GEO = {{GEO}};
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+        const hero = document.querySelector(".hx-frame");
+        const stage = hero.querySelector(".hx-stage");
+        const el = {};
+        hero.querySelectorAll(".hx-piece").forEach((n) => (el[n.dataset.k] = n));
+        const shadow = hero.querySelector(".hx-shadow");
+        const H = {}, W = {};
+        for (const k in el) { H[k] = el[k].viewBox.baseVal.height; W[k] = el[k].viewBox.baseVal.width; }
+
+        // Fit the 1920 × 1080 composition inside the frame and centre it; the
+        // ground layers already fill the frame. Tall frames fit the poster's
+        // own column (960 wide) instead of the full 16:9 width.
+        let TOP = 0; // the frame's top edge in poster coordinates (≤ 0)
+        new ResizeObserver(([e]) => {
+          const w = e.contentRect.width, h = e.contentRect.height;
+          const k = Math.min(w / (w / h < 1.2 ? 960 : 1920), h / 1080), oy = (h - 1080 * k) / 2;
+          hero.style.setProperty("--k", k);
+          stage.style.transform = `translate(${w / 2 - 960 * k}px, ${oy}px) scale(${k})`;
+          TOP = -oy / k / 0.8;
+          if (!hero.classList.contains("is-ready")) { render(); hero.classList.add("is-ready"); }
+        }).observe(hero);
+
+        // The cloud rolls on its own hand-drawn outline, not on a circle. Sample
+        // the drawn shapes once; at any rotation the lowest sample is what
+        // touches the ground, so the centre rides up and down over the lobes.
+        const CLOUD_PTS = (() => {
+          const svg = el.cloud, vb = svg.viewBox.baseVal, out = [];
+          for (const path of svg.querySelectorAll("path")) {
+            const m = path.transform.baseVal.consolidate()?.matrix;
+            const len = path.getTotalLength();
+            for (let i = 0; i < 360; i++) {
+              const q = path.getPointAtLength((i / 360) * len);
+              const x = m ? m.a * q.x + m.c * q.y + m.e : q.x, y = m ? m.b * q.x + m.d * q.y + m.f : q.y;
+              out.push(x - vb.width / 2, y - vb.height / 2);
+            }
+          }
+          return out;
+        })();
+        const lowest = (deg) => {
+          const a = deg * Math.PI / 180, sn = Math.sin(a), cs = Math.cos(a);
+          let m = -Infinity;
+          for (let i = 0; i < CLOUD_PTS.length; i += 2) {
+            const y = CLOUD_PTS[i] * sn + CLOUD_PTS[i + 1] * cs;
+            if (y > m) m = y;
+          }
+          return m;
+        };
+        const GROUND = GEO.cloud.cy + lowest(0); // where the cloud rests in the poster
+        const CLOUD_R = 190; // rolling radius: travel = R · angle
+        // The drawn outline (fill printed slightly off its outline) has stable
+        // two-lobe valleys at −25.5° and +26.5° and single-lobe humps between
+        // them; a cloud resting tilted has to sit in a valley, not on a hump.
+        const CLOUD_TILT = 26.5; // rolls right into this groove, resting on two lobes
+        const CLOUD_START = 2; // falls nearly upright
+        const CARRY = 0.25; // a plank on a round top turns only partly with it
+
+        // The plank (the word "Bookmarks") rests on the cloud's crown. It rocks
+        // like a board on a ball: it turns, and rolls a little with the turn.
+        // Riders keep their offset from the contact point in the plank's frame.
+        const PIVOT = { x: 553, y: 632 };
+        const ROLL = 90; // crown radius, poster px
+        const PHI_FINAL = -GEO.marks.rot; // CSS degrees; negative = left end down
+        const RAD = Math.PI / 180;
+        const local = (k) => {
+          const g = GEO[k], dx = g.cx - PIVOT.x, dy = g.cy - PIVOT.y, a = -PHI_FINAL * RAD;
+          return { x: dx * Math.cos(a) - dy * Math.sin(a), y: dx * Math.sin(a) + dy * Math.cos(a), r: -g.rot - PHI_FINAL };
+        };
+        // the top sparkle rides too: it sits on the right end, beside the bookmark
+        const RIDE = { marks: local("marks"), codex: local("codex"), bookmark: local("bookmark"), spTR: local("spTR") };
+        // where the cloud is right now, relative to its resting place
+        const cloudPose = () => {
+          const c = S.cloud, r = roll.get() + jolt.get(), th = r + c.spin;
+          return { th, dx: CLOUD_R * r * RAD + c.dx, y: GROUND - lowest(th) - c.off };
+        };
+        // Riders sit on the cloud's crown. When the cloud rolls, the crown
+        // swings with it (twice as far as the centre travels, like the top of a
+        // wheel) and carries the plank's tilt along; the plank's own rocking on
+        // the crown (p) comes on top of that.
+        const CROWN = { x: PIVOT.x - GEO.cloud.cx, y: PIVOT.y - GEO.cloud.cy };
+        // Riders only ever touch a landed cloud, so they follow its roll alone
+        // (not its fall, drift or hop). That also lets "Bookmarks" start falling
+        // toward the crown before the cloud has landed.
+        const cloudRest = (r = roll.get() + jolt.get()) => ({ th: r, dx: CLOUD_R * r * RAD, y: GROUND - lowest(r) });
+        // p: the plank's angle; th: the cloud's tilt, if not the current one
+        const ride = (k, p, th) => {
+          const L = RIDE[k], cp = cloudRest(th), t = cp.th * RAD, ct = Math.cos(t), st = Math.sin(t);
+          const d = (p - PHI_FINAL) * RAD, lx = ROLL * d, ly = ROLL * (1 - Math.cos(d));
+          const ox = CROWN.x + lx, oy = CROWN.y + ly;
+          const px = GEO.cloud.cx + cp.dx + ox * ct - oy * st, py = cp.y + ox * st + oy * ct;
+          const a = (p + CARRY * cp.th) * RAD;
+          return { x: px + L.x * Math.cos(a) - L.y * Math.sin(a), y: py + L.x * Math.sin(a) + L.y * Math.cos(a), r: L.r + p + CARRY * cp.th, a };
+        };
+
+        const G = 5200; // poster px / s²
+        // Both words are flat and catch air the same way; the bookmark sticker
+        // a little; the cloud not at all.
+        const WORD_DRAG = 0.65, BOOKMARK_DRAG = 0.85;
+        const phi = motionValue(0);
+        const roll = motionValue(0); // the cloud's roll angle, degrees
+        // Jolt: weight landing off-centre tilts the cloud toward that side.
+        // Each reaction is one smooth curve — no rocking back and forth.
+        const jolt = motionValue(0);
+        // the sparkle's tap on the plank: its own small channel, added to the
+        // plank's angle, so it never disturbs the teeter
+        const tap = motionValue(0);
+        // "Codex" on the left end tilts the cloud left: fast at the hit, then
+        // slower and slower, still visibly leaning when the bookmark arrives
+        // (a long tail, so the tower never parks and waits for the next hit).
+        // (Each reaction's settings live in one place, so the tower's future can
+        // be looked ahead — see `towerAt` — as well as played.)
+        const TILT_LEFT = { to: -7.58, duration: 0.7, ease: [0.06, 0.75, 0.55, 1] };
+        const tiltLeft = () => anim(jolt, TILT_LEFT.to, { duration: TILT_LEFT.duration, ease: TILT_LEFT.ease });
+        // the plank under "Codex": a soft spring under the landing's kick — it
+        // tips just as fast, then keeps sinking into the bookmark's hit
+        const CODEX_TIP = { to: -12, kick: -55, stiffness: 18, damping: 7.64 };
+        // Every landing moves the tower in exact proportion to how heavy the
+        // falling piece looks. Visual weight = size × value contrast: the summed
+        // L* (lightness) difference each piece makes against the real
+        // background (measure-weight.cjs). Cloud 100%, "Bookmarks" 58.7%,
+        // "Codex" 16.9%, bookmark 10.6%, sparkle 1.0% — each lighter than the
+        // one before, so each sway is smaller than the one before:
+        //   cloud sway   "Bookmarks" knock 26.5° → "Codex" 7.6° → bookmark 4.8°
+        //   plank sway   "Codex" 13.1° → bookmark 8.2° (→ 4.9° → 0.9°) → sparkle 0.8°
+        // WEIGHT also scales the secondary reactions (cloud squash, the resting
+        // sparkles' pulse).
+        const WEIGHT = { marks: 0.587, codex: 0.169, bookmark: 0.106, sparkle: 0.01 };
+        // the teeter after the bookmark's hit: 8.2° toward the right (16.9 → 10.6
+        // of "Codex"'s 13.1°), a smaller swing back, a smaller one still, home
+        const TEETER = { kick: 62, stiffness: 30, damping: 4.8 };
+        // The bookmark lands on the right end and pushes the cloud back toward
+        // upright — 4.8° in the first moment — and it eases the rest of the way
+        // home, no throw past upright: one smooth curve.
+        const TILT_BACK = { keyframes: [0], duration: 1.0, ease: [0.08, 0.5, 0.3, 1] };
+        const tiltBack = () => anim(jolt, [null, ...TILT_BACK.keyframes], { duration: TILT_BACK.duration, times: TILT_BACK.times, ease: TILT_BACK.ease });
+
+        // Looking ahead. Every move of the tower is a Motion spring or tween with
+        // known settings, so where it will be is known too — worked out with
+        // Motion's own generators. `plan` holds what the tower was last told:
+        // the "Codex" landing (the plank's tip, the cloud's lean) and the
+        // bookmark's hit. Times are performance.now() ms; the moves run SLOW.
+        const plan = {};
+        const springAt = (from, to, velocity, o, t) =>
+          springGen({ keyframes: [from, to], velocity, stiffness: o.stiffness, damping: o.damping }).next(t * 1000).value;
+        const tweenAt = (kf, o, t) =>
+          tweenGen({ keyframes: kf, times: o.times, ease: o.ease, duration: o.duration * 1000 }).next(Math.min(t, o.duration) * 1000).value;
+        const towerAt = (when) => {
+          let h = plan.hit;
+          if (!h) {
+            const c = plan.codex;
+            if (!c) return { p: phi.get(), th: roll.get() + jolt.get() };
+            // the bookmark is still in the air: it lands at a known moment on a
+            // plank and a cloud whose moves since "Codex" are known
+            const t = (S.bookmark.landAt - c.at) / 1000 / SLOW, e = 1e-3;
+            const tip = (dt) => springAt(c.phi, CODEX_TIP.to, c.v, CODEX_TIP, t + dt);
+            h = { at: S.bookmark.landAt, phi: tip(0), v: (tip(e) - tip(-e)) / (2 * e) + TEETER.kick, jolt: tweenAt([c.jolt, TILT_LEFT.to], TILT_LEFT, t) };
+          }
+          const t = Math.max(0, (when - h.at) / 1000 / SLOW);
+          return { p: springAt(h.phi, PHI_FINAL, h.v, TEETER, t), th: roll.get() + tweenAt([h.jolt, ...TILT_BACK.keyframes], TILT_BACK, t) };
+        };
+        // where a rider's seat will be at a given moment
+        const seatAt = (k, when) => { const q = towerAt(when); return ride(k, q.p, q.th); };
+        // After the teeter's third turn (the top of its steadying lift), hand it
+        // to a critically damped spring: the last degrees glide home, no
+        // dribble — firmer than the teeter, so it leaves that turn at once
+        // instead of hanging at the top.
+        const settleTeeter = (live) => {
+          let turns = 0, last = 0;
+          const stop = phi.on("change", () => {
+            if (!live()) return stop();
+            const sign = Math.sign(vel(phi));
+            if (sign && last && sign !== last && ++turns === 3) {
+              stop();
+              anim(phi, PHI_FINAL, { type: "spring", velocity: vel(phi), stiffness: 90, damping: 2 * Math.sqrt(90) });
+            }
+            if (sign) last = sign;
+          });
+        };
+        const S = {};
+        const reset = (final) => {
+          for (const k of ["cloud", "marks", "codex", "bookmark", "spTR", "spBL", "spBR"]) {
+            S[k] = { off: final || k === "spBL" || k === "spBR" ? 0 : 2000, dx: 0, sx: 1, sy: 1, spin: 0, s: 1 };
+          }
+          roll.jump(final ? 0 : CLOUD_START);
+          jolt.jump(0);
+          tap.jump(0);
+          phi.jump(final ? PHI_FINAL : 0);
+        };
+
+        // squash and stretch about the piece's base, never its centre
+        const place = (n, h, x, y, r, sx = 1, sy = 1) => {
+          n.style.transform = `translate(${x}px, ${y + (h * (1 - sy)) / 2}px) rotate(${r}deg) scale(${sx}, ${sy})`;
+        };
+
+        const render = () => {
+          const p = phi.get() + tap.get();
+          const c = S.cloud, cp = cloudPose();
+          place(el.cloud, H.cloud, GEO.cloud.cx + cp.dx, cp.y, cp.th, c.sx, c.sy);
+          // the shadow gathers as the cloud nears the ground, and rolls with it
+          const near = Math.max(0, 1 - c.off / 1050);
+          const sk = 0.35 + 0.65 * near;
+          shadow.style.transform = `translate(${GEO.cloud.cx + cp.dx}px, 1044.65px) scale(${sk * c.sx}, ${sk})`;
+          shadow.style.opacity = 0.3 * near * near;
+          for (const k of ["marks", "codex", "bookmark", "spTR"]) {
+            const s = S[k];
+            if (s.fall) { place(el[k], H[k], ...inFlight(k, s.fall, p), s.sx, s.sy); continue; }
+            const q = ride(k, p), pa = q.a;
+            // leaning by a, a box stands on its low corner: lift it along the
+            // plank's normal until that corner touches, so it rocks down onto
+            // its base instead of sinking through the plank
+            // (the sparkle is a star, not a box: it has no corner to stand on)
+            const a = Math.abs(s.spin) * RAD, lift = k === "spTR" ? 0 : (W[k] / 2) * Math.sin(a) + (H[k] / 2) * (Math.cos(a) - 1);
+            place(el[k], H[k], q.x + s.dx + Math.sin(pa) * lift, q.y - s.off - Math.cos(pa) * lift, q.r + s.spin, s.sx, s.sy);
+          }
+          for (const k of ["spBL", "spBR"]) {
+            const s = S[k];
+            place(el[k], 0, GEO[k].cx + s.dx, GEO[k].cy - s.off, s.spin, s.s, s.s);
+          }
+        };
+        const draw = () => frame.render(render);
+        phi.on("change", draw);
+        roll.on("change", draw);
+        jolt.on("change", draw);
+        tap.on("change", draw);
+
+        let run = 0;
+        const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+        // How far a piece must fall so that it starts just out of sight: its
+        // rotated half-height clears the frame's top edge, so even a tilted
+        // piece never pokes in early, and it is moving from the first frame.
+        const above = (k, rot = 0, p = phi.get()) => {
+          const y = k in RIDE ? ride(k, p).y : GEO[k].cy;
+          const a = rot * RAD, half = Math.abs((W[k] / 2) * Math.sin(a)) + Math.abs((H[k] / 2) * Math.cos(a));
+          return y - TOP + half + 4;
+        };
+
+        // Free fall as a projectile: height goes with t² (constant acceleration),
+        // while sideways drift and spin go linearly with t (nothing pushes them
+        // in the air). A piece can land leaning by `lean`; the landing settles it.
+        // Resolves with the impact speed so the landing can answer it.
+        // `drag` < 1 is a lighter piece that catches air (the flat word): it
+        // falls with a fraction of g, so it spends longer in the air.
+        // `lead` starts it that much higher, still out of sight, so it enters
+        // the frame already falling instead of crawling in from rest.
+        // `p`: the plank angle it will land on, when that differs from now
+        const airTime = (k, rot0, drag = 1, lead = 0, p) => Math.sqrt((2 * (above(k, rot0, p) + lead)) / (G * drag));
+        const entryTime = (drag, lead) => Math.sqrt((2 * (lead + 4)) / (G * drag));
+        const fall = async (k, { lean = 0, spin = 0, drift = 0, stretch = 0.04, onAir, phi0, drag = 1, lead = 0 } = {}) => {
+          const rot0 = k === "cloud" ? roll.get() + spin : k in RIDE ? ride(k, phi0 ?? phi.get()).r + lean + spin : spin;
+          const s = S[k], from = above(k, rot0) + lead, T = Math.sqrt((2 * from) / (G * drag)), vMax = G * drag * T;
+          s.landAt = performance.now() + (T / tempo) * 1000;
+          await anim(0, 1, {
+            duration: T,
+            ease: "linear",
+            onUpdate: (u) => {
+              const st = stretch * Math.min(1, (vMax * u) / 3600); // stretch with speed
+              s.off = from * (1 - u * u);
+              s.dx = -drift * (1 - u);
+              s.spin = lean + spin * (1 - u);
+              s.sy = 1 + st;
+              s.sx = 1 - st * 0.5;
+              if (onAir) onAir(u, T);
+              draw();
+            },
+          });
+          s.off = 0;
+          s.dx = 0;
+          s.spin = lean;
+          s.vx = drift / T; // sideways speed at contact, px / s
+          return vMax;
+        };
+
+
+        // A rider that lands while the tower is being thrown can't simply follow
+        // its seat down — the seat races sideways and would drag it through the
+        // air. It falls as a true projectile (straight drift, height with t²)
+        // aimed at where its seat WILL be when it arrives, and the tower swings
+        // in underneath to catch it. Once the hit has happened its throw is
+        // known exactly, so the aim is refined then; in the last frames any
+        // leftover (a frame of timing) is taken up so it touches down exactly
+        // on its seat and rides from there.
+        const dropTime = (k, landAt, { lean = 0, spin = 0, drag = 1 } = {}) => {
+          const L = seatAt(k, landAt), a = (L.r + lean + spin) * RAD;
+          const half = Math.abs((W[k] / 2) * Math.sin(a)) + Math.abs((H[k] / 2) * Math.cos(a));
+          return Math.sqrt((2 * (L.y - TOP + half + 4)) / (G * drag));
+        };
+        const smooth = (x) => { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); };
+        // Where a piece in free fall is, worked out at render time on Motion's
+        // frame clock, so the tower it is aimed at is exactly as drawn.
+        const inFlight = (k, f, p) => {
+          const now = frameData.timestamp, u = f.u;
+          // the aim, refined at the hit (a few px: the hit comes a frame after its
+          // schedule) and eased in over the rest of the fall, so the path never kinks
+          const b = f.hitAt ? smooth((now - f.hitAt) / Math.max(1, f.landAt - f.hitAt)) : 0;
+          const x = f.L0.x + (f.L1.x - f.L0.x) * b, y = f.L0.y + (f.L1.y - f.L0.y) * b, r = f.L0.r + (f.L1.r - f.L0.r) * b;
+          // the seat's actual place against its predicted one (well under a
+          // pixel), taken up over the last stretch so it lands exactly on it
+          let ex = 0, ey = 0;
+          const w = f.hitAt ? smooth((u - 0.6) / 0.4) : 0;
+          if (w > 0) {
+            const live = ride(k, p), pred = seatAt(k, now);
+            ex = (live.x - pred.x) * w;
+            ey = (live.y - pred.y) * w;
+          }
+          return [x - f.drift * (1 - u) + ex, y - f.drop * (1 - u * u) + ey, r + f.lean + f.spin * (1 - u)];
+        };
+        const fallOnto = async (k, T, { lean = 0, spin = 0, drift = 0, stretch = 0.04, drag = 1 } = {}) => {
+          const s = S[k], landAt = performance.now() + (T / tempo) * 1000, vMax = G * drag * T;
+          const L0 = seatAt(k, landAt);
+          const f = (s.fall = { u: 0, L0, L1: L0, hitAt: 0, landAt, drift, drop: (G * drag * T * T) / 2, lean, spin });
+          await anim(0, 1, {
+            duration: T,
+            ease: "linear",
+            onUpdate: (u) => {
+              if (S[k] !== s) return; // a replay started
+              if (u >= 1) {
+                // touchdown, in this very frame: from here it rides its seat
+                s.fall = null;
+                s.off = 0;
+                s.dx = 0;
+                s.spin = lean;
+              } else {
+                f.u = u;
+                if (plan.hit && !f.hitAt) { f.hitAt = performance.now(); f.L1 = seatAt(k, landAt); }
+                const st = stretch * Math.min(1, (vMax * u) / 3600); // stretch with speed
+                s.sy = 1 + st;
+                s.sx = 1 - st * 0.5;
+              }
+              draw();
+            },
+          });
+          return vMax;
+        };
+
+        // A piece that landed leaning rocks down onto its base.
+        const settle = (k) => anim(S[k].spin, 0, {
+          type: "spring", stiffness: 300, damping: 17,
+          onUpdate: (q) => { S[k].spin = q; draw(); },
+        });
+
+        // Impact: a squash that springs back about the base, and a hop that is
+        // its own small parabola (ease-out up, gravity down), both scaled by
+        // how hard it hit.
+        const impact = (k, v, { squash, hop = 0 }) => {
+          const s = S[k], hit = Math.min(1, v / 3600);
+          anim(1 - squash * hit, 1, {
+            type: "spring", stiffness: 560, damping: 13,
+            onUpdate: (q) => { s.sy = q; s.sx = 1 + (1 - q) * 0.55; draw(); },
+          });
+          if (hop > 0) {
+            const up = hop * hit, t = Math.sqrt((2 * up) / G);
+            anim(0, up, { duration: t, ease: (x) => 1 - (1 - x) * (1 - x), onUpdate: (q) => { s.off = q; draw(); } })
+              .then(() => anim(up, 0, { duration: t, ease: (x) => x * x, onUpdate: (q) => { s.off = q; draw(); } }));
+          }
+        };
+
+        // Secondary action: the two resting sparkles feel each landing.
+        const pulse = (v) => {
+          const amt = 0.16 * Math.min(1, v / 3600);
+          for (const k of ["spBL", "spBR"]) {
+            anim(1 + amt, 1, { type: "spring", stiffness: 380, damping: 10, onUpdate: (q) => { S[k].s = q; draw(); } });
+          }
+        };
+
+        const play = async () => {
+          const id = ++run;
+          const live = () => id === run;
+          tempo = 1;
+          plan.codex = plan.hit = null;
+          reset(reduce.matches);
+          draw();
+          if (reduce.matches) return;
+
+          await wait(40);
+          if (!live()) return;
+
+          // 1 · the cloud drops in nearly straight and upright, lands on one
+          //     lobe, and rolls right into its groove — no dead beat before
+          //     "Bookmarks", which is already falling, timed to land just after.
+          //     "Bookmarks" is lighter and floats down: it leaves early and lands
+          //     0.6 s after the cloud, the same beat as the drops that follow.
+          const cloudT = airTime("cloud", roll.get() + 6);
+          const plankT = airTime("marks", ride("marks", 6).r, WORD_DRAG);
+          const t0 = performance.now(); // every drop is scheduled from this clock
+          const at = (sec) => wait(Math.max(0, t0 + sec * 1000 - performance.now()));
+          const plank = (async () => {
+            await at(cloudT + (0.6 - plankT) * SLOW); // lands 0.6 × SLOW after the cloud
+            if (!live()) return 0;
+            tempo = 1 / SLOW; // from here on, a little slower
+            return fall("marks", { drift: -60, stretch: 0.02, phi0: 6, drag: WORD_DRAG, onAir: (u) => phi.set(6 - 4 * u) });
+          })();
+          const later = (async () => {
+            // 3 · An even beat: each landing comes BEAT seconds after the one
+            //     before. "Codex" and the bookmark start just above the frame, so
+            //     their whole fall is on screen like the pieces before them, and
+            //     each enters while the previous landing is still playing out.
+            const BEAT = 0.72; // seconds between landings
+            // the bookmark comes sooner: it lands as the plank bottoms out from
+            // the "Codex" tip, catching it like a seesaw at its low point
+            const marksLand = cloudT + 0.6 * SLOW, codexLand = marksLand + BEAT, bmLand = codexLand + 0.55;
+            await at(marksLand);
+            if (!live()) return;
+            await at(codexLand - airTime("codex", ride("codex", phi.get()).r - 15, WORD_DRAG) * SLOW);
+            if (!live()) return;
+            // the sparkle's drop is aimed using the "Codex" landing's reaction,
+            // so it waits for that landing before it times itself
+            let codexDown;
+            const codexLanded = new Promise((r) => (codexDown = r));
+            const bookmarkDrop = (async () => {
+              // 4 · the bookmark and its sparkle land on the raised right end:
+              //     the hit shakes the tower, the plank teeters, and everything
+              //     settles where the poster rests.
+              await at(bmLand - airTime("bookmark", ride("bookmark", -12).r + 17, BOOKMARK_DRAG, 0, -12) * SLOW);
+              if (!live()) return;
+              const bookmark = fall("bookmark", { lean: 7, spin: 10, drift: -45, stretch: 0.05, drag: BOOKMARK_DRAG });
+              // The sparkle is the light thing that follows the heavy one: it
+              // leaves just after the bookmark and lands a beat behind it —
+              // thud, then tick — on the top of the plank's lift, the one instant
+              // the tower stands still. It is in the air while the hit throws the
+              // tower, so it falls toward where its seat will be (`fallOnto`) and
+              // the tower swings in to catch it, just right of the bookmark. It
+              // lands on a corner, gives one small bounce, tips upright, and from
+              // then on rides the scale.
+              const LIFT = 0.33; // s, the bookmark's hit to the bottom of its tip
+              const sparkle = (async () => {
+                const landAt = S.bookmark.landAt + LIFT * 1000;
+                await codexLanded;
+                if (!live()) return;
+                const T = dropTime("spTR", landAt, { lean: 12, spin: 34, drag: BOOKMARK_DRAG });
+                await wait(landAt - T * SLOW * 1000 - performance.now());
+                if (!live()) return;
+                const v = await fallOnto("spTR", T, { lean: 12, spin: 34, drift: -30, stretch: 0.05, drag: BOOKMARK_DRAG });
+                if (!live()) return;
+                impact("spTR", v, { squash: 0.2 });
+                // its 1% weight taps the right end down 0.8° (13.1° × 1.0 / 16.9)
+                anim(tap, 0, { type: "spring", velocity: 16.5, stiffness: 120, damping: 2 * Math.sqrt(120) * 0.6 });
+                settle("spTR");
+                const s = S.spTR, up = 12, t = Math.sqrt((2 * up) / G); // one small bounce, same gravity
+                await anim(0, up, { duration: t, ease: (x) => 1 - (1 - x) * (1 - x), onUpdate: (q) => { s.off = q; draw(); } });
+                if (!live()) return;
+                await anim(up, 0, { duration: t, ease: (x) => x * x, onUpdate: (q) => { s.off = q; draw(); } });
+                if (!live()) return;
+                impact("spTR", G * t, { squash: 0.5 });
+              })();
+              const vb = await bookmark;
+              if (!live()) return;
+              impact("bookmark", vb, { squash: 0.08 });
+              settle("bookmark");
+              const kick = vel(phi) + TEETER.kick;
+              plan.hit = { at: performance.now(), phi: phi.get(), v: kick, jolt: jolt.get() };
+              // the hit shakes the tower: the cloud rolls back past upright and home
+              tiltBack();
+              impact("cloud", vb * WEIGHT.bookmark, { squash: 0.04 });
+              pulse(vb * WEIGHT.bookmark);
+              // the teeter: a lift, a swing back past rest, a smaller lift —
+              // then, instead of dribbling out in tiny swings, it glides home
+              // (the base settles first, the top of the stack a beat later)
+              anim(phi, PHI_FINAL, { type: "spring", velocity: kick, stiffness: TEETER.stiffness, damping: TEETER.damping });
+              settleTeeter(live);
+              await sparkle;
+            })();
+
+            const v = await fall("codex", { lean: -6, spin: -9, drift: 40, stretch: 0.02, drag: WORD_DRAG });
+            if (!live()) return;
+            impact("codex", v, { squash: 0.05 });
+            settle("codex");
+            // weight on the left end: the plank leans down at the same pace as
+            // the rest of the piece (a measured tip, barely past its rest); the
+            // cloud tilts left and keeps easing left until the bookmark lands
+            const tip = vel(phi) + CODEX_TIP.kick;
+            plan.codex = { at: performance.now(), phi: phi.get(), v: tip, jolt: jolt.get() };
+            codexDown();
+            tiltLeft();
+            impact("cloud", v * WEIGHT.codex, { squash: 0.04 });
+            pulse(v * WEIGHT.codex);
+            anim(phi, CODEX_TIP.to, { type: "spring", velocity: tip, stiffness: CODEX_TIP.stiffness, damping: CODEX_TIP.damping });
+            await bookmarkDrop;
+          })();
+          let v = await fall("cloud", { spin: 2, drift: -12, stretch: 0.07 });
+          if (!live()) return;
+          impact("cloud", v, { squash: 0.14, hop: 10 });
+          pulse(v);
+          // it lands upright on a single lobe, tips off it to the right and
+          // rolls into its two-lobe groove, rocking once as it settles there
+          anim(roll, CLOUD_TILT, { type: "spring", velocity: 25, stiffness: 30, damping: 6 });
+
+          // 2 · "Bookmarks" lands on the leaning crown, moving left: its fall
+          //     adds its push to the roll already under way, so the cloud
+          //     suddenly rolls much faster, swings just past rest and settles,
+          //     and the word rides that roll down to level
+          v = await plank;
+          if (!live()) return;
+          impact("marks", v, { squash: 0.05, hop: 6 });
+          impact("cloud", v * WEIGHT.marks, { squash: 0.05 });
+          // the shove rolls it uphill out of the valley: fast at first, slowing
+          // as its centre rises, easing just past upright and settling
+          anim(roll, 0, { duration: 0.8, ease: [0.16, 0.72, 0.3, 1] });
+          pulse(v * WEIGHT.marks);
+          anim(phi, 0, { type: "spring", velocity: -12, stiffness: 300, damping: 11 });
+
+          await later;
+        };
+
+        reset(false);
+        render();
+
+        // Play when the hero is on screen; replay each time it comes back.
+        let seen = false;
+        new IntersectionObserver(([e]) => {
+          if (e.intersectionRatio > 0.6 && !seen) { seen = true; play(); }
+          else if (e.intersectionRatio < 0.05) seen = false;
+        }, { threshold: [0, 0.05, 0.6] }).observe(hero);
+        hero.addEventListener("click", play);
+        window.__heroPlay = () => { play(); };
+      })();
+
+      // ---------- deck navigation (same shortcuts as the other decks) ----------
+      const slides = [...document.querySelectorAll(".slide")];
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+      const currentIndex = () => {
+        const viewportCenter = window.scrollY + window.innerHeight / 2;
+        return slides.reduce((best, slide, index) => {
+          const currentDistance = Math.abs(slide.offsetTop + slide.offsetHeight / 2 - viewportCenter);
+          const bestSlide = slides[best];
+          const bestDistance = Math.abs(bestSlide.offsetTop + bestSlide.offsetHeight / 2 - viewportCenter);
+          return currentDistance < bestDistance ? index : best;
+        }, 0);
+      };
+
+      const goTo = (index) => {
+        slides[index].scrollIntoView({ behavior: reducedMotion.matches ? "auto" : "smooth", block: "start" });
+      };
+
+      const handleKeydown = (event) => {
+        if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
+        const target = event.target;
+        if (target && typeof target.closest === "function" && target.closest("a, button, input, textarea, select, [contenteditable]")) return;
+        const index = currentIndex();
+        const { key } = event;
+        if (["ArrowDown", "ArrowRight", "PageDown"].includes(key) || (key === " " && !event.shiftKey)) {
+          event.preventDefault();
+          goTo(Math.min(index + 1, slides.length - 1));
+        } else if (["ArrowUp", "ArrowLeft", "PageUp"].includes(key) || (key === " " && event.shiftKey)) {
+          event.preventDefault();
+          goTo(Math.max(index - 1, 0));
+        } else if (key === "Home") {
+          event.preventDefault();
+          goTo(0);
+        } else if (key === "End") {
+          event.preventDefault();
+          goTo(slides.length - 1);
+        } else if (/^[1-9]$/.test(key)) {
+          event.preventDefault();
+          goTo(Math.min(Number(key) - 1, slides.length - 1));
+        }
+      };
+
+      window.addEventListener("keydown", handleKeydown);
+
+      // The prototype iframes are same-origin: wire the same shortcuts inside
+      // them, and play each one from the start whenever its slide is in view.
+      for (const frame of document.querySelectorAll("iframe.animation-frame")) {
+        const wire = () => {
+          try {
+            frame.contentWindow.addEventListener("keydown", handleKeydown);
+          } catch {
+            /* not ready yet — the load listener will retry */
+          }
+        };
+        frame.addEventListener("load", () => {
+          wire();
+          if (frame.dataset.visible === "1") frame.contentWindow.postMessage("cx:play", location.origin);
+        });
+        wire();
+        new IntersectionObserver(([e]) => {
+          const on = e.intersectionRatio > 0.6;
+          if (on === (frame.dataset.visible === "1")) return;
+          frame.dataset.visible = on ? "1" : "0";
+          frame.contentWindow?.postMessage(on ? "cx:play" : "cx:pause", location.origin);
+        }, { threshold: [0, 0.6] }).observe(frame);
+      }
+    </script>
+  </body>
+</html>
+
+

@@ -12,7 +12,7 @@ const SETTLE = { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const };
 
 /** A unit in the queue: an element (or a group that comes in as one) and how many beats it holds (a two-line
     title holds two, so what follows waits for its second line). */
-export type Step = { el: HTMLElement | HTMLElement[]; beats?: number; rows?: boolean | number; large?: boolean };
+export type Step = { el: HTMLElement | HTMLElement[]; beats?: number; rows?: boolean | number; large?: boolean; lead?: number };
 // Large dark blocks (the posters) are a big jump in brightness on the light
 // page: a text-speed fade flashes them in. They fade slower and settle longer.
 const FADE_LARGE = { duration: 0.9, ease: [0.33, 0, 0.2, 1] as const };
@@ -59,7 +59,10 @@ export function play(steps: Step[]) {
     const els = Array.isArray(s.el) ? s.el : [s.el];
     const ripple = typeof s.rows === "number" ? s.rows : s.rows ? ROW : 0;
     const fade = s.large ? FADE_LARGE : FADE, settle = s.large ? SETTLE_LARGE : SETTLE;
-    const start = at - now();
+    // A step can overlap the queue slightly without changing when the steps
+    // after it begin. Useful for a large visual that should start breathing in
+    // just before the preceding copy has completely landed.
+    const start = at - now() - (s.lead ?? 0);
     at += BEAT * (s.beats ?? 1) + ripple * Math.max(0, els.length - 1);
     // explicit from-values: Motion otherwise starts from a remembered value.
     // The delay goes inside each value's transition: a per-value transition

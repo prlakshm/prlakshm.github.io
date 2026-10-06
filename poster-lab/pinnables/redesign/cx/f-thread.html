@@ -1,0 +1,28 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:'OpenAI Sans';font-weight:500;src:url(../fonts/oai/OpenAISans-Medium-B7nJY_kG.woff2)}
+*{margin:0}html,body{width:1080px;height:1350px;overflow:hidden;background:#fff}
+svg{display:block;width:1080px;height:1350px}
+</style></head><body>
+<svg id="p" viewBox="0 0 1080 1350" xmlns="http://www.w3.org/2000/svg"></svg>
+<script src="kit.js"></script>
+<script>
+const {C,f,title,mascot,mascotDefs,sticker,pinkDefs,dotgrid,bubble,ribbonPath,cubic}=CX;
+const rows=[[0,'a',3],[1,'u',1],[0,'a',2],[1,'u',1],[0,'a',3],[1,'u',2],[0,'a',2],[1,'u',1]];
+let y=330,b='';const BM=4;
+rows.forEach(([side,who,n],i)=>{const w=who==='a'?520:380,h=60+n*30,x=side?850-w:230;
+  b+=`<g ${i===BM?'id="bm"':''}>${CX.bubble(x,y,w,h,{fill:who==='a'?'#fff':'#C3D0FF',lines:n,lineCol:who==='a'?'#DCE3FF':'#AFC0FF'})}</g>`;
+  if(i===BM) window.bmBox={x,y,w,h}; y+=h+26;});
+const bx=bmBox;
+const rib=ribbonPath(cubic({x:bx.x+bx.w-90,y:bx.y-10},{x:bx.x+bx.w-90,y:bx.y+60},{x:bx.x+bx.w-70,y:bx.y+bx.h+40},{x:bx.x+bx.w-110,y:bx.y+bx.h+170}),64,.55);
+p.innerHTML=`<defs>${mascotDefs('m')}${pinkDefs('pk')}${sticker('st',{r:12,dy:16,blur:16,sop:.16})}${sticker('st2',{r:0.1,dy:10,blur:14,sop:.12})}${dotgrid('dg','#DFE6FF','#C8D4FF',40,3)}
+ <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1"><stop offset=".2" stop-color="#DFE6FF"/><stop offset=".3" stop-color="#DFE6FF" stop-opacity="0"/><stop offset=".86" stop-color="#DFE6FF" stop-opacity="0"/><stop offset="1" stop-color="#DFE6FF"/></linearGradient></defs>
+<rect width="1080" height="1350" fill="url(#dg)"/>
+<g filter="url(#st2)">${b}</g>
+<rect width="1080" height="1350" fill="url(#fade)"/>
+<rect x="${bx.x-6}" y="${bx.y-6}" width="${bx.w+12}" height="${bx.h+12}" rx="40" fill="none" stroke="${C.pink}" stroke-width="5"/>
+<g filter="url(#st)"><path d="${rib}" fill="url(#pk-g)" filter="url(#pk-f)"/></g>
+${title(['Codex','Bookmarks'],{y:180,size:96,lh:1.04,fill:C.ink,bold:6})}
+<g filter="url(#st)">${mascot('m',{x:860,y:1210,s:.62})}</g>`;
+</script>
+</body></html>

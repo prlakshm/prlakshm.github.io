@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Celebrate design · museum options</title>
+<style>
+  @font-face { font-family: "General Sans"; src: url("/fonts/general-sans/GeneralSans-Variable.woff2") format("woff2"); font-weight: 200 700; }
+  @font-face { font-family: "Berkeley Mono"; src: url("/fonts/berkeley/BerkeleyMonoTrial-Regular.otf"); }
+  :root { --page: #f8fafc; --u: 3px; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); font-family: "Berkeley Mono", ui-monospace, monospace; color: #444; }
+  main { display: grid; grid-template-columns: repeat(3, 560px); gap: 40px 20px; padding: 40px; }
+  .cell { position: relative; height: 760px; }
+  .cell h2 { position: absolute; left: 0; top: 0; margin: 0; font: 600 13px/1.4 "General Sans", sans-serif; letter-spacing: .02em; color: #171717; }
+  .cell p { position: absolute; left: 0; top: 20px; margin: 0; width: 520px; font-size: 10.5px; line-height: 1.5; letter-spacing: .03em; text-transform: uppercase; color: #737373; }
+  /* the portrait: 100u wide, tilted as it is when hovered */
+  .stage { position: absolute; left: 130px; top: 190px; width: calc(100 * var(--u)); height: calc(133.33 * var(--u)); }
+  .photo { position: absolute; inset: 0; z-index: 5; transform: rotate(-3deg) scale(1.05) translateY(-6px); box-shadow: 0 10px 24px rgba(15,23,42,.18); }
+  .photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .pc { position: absolute; pointer-events: none; transform: translate(-50%, -50%) rotate(var(--r, 0deg)); }
+  .pc img { display: block; width: 100%; height: 100%; }
+  .frame { position: absolute; z-index: 6; pointer-events: none; filter: brightness(1.32) saturate(.92) contrast(.95) drop-shadow(0 6px 10px rgba(15,23,42,.18)) drop-shadow(0 1px 1px rgba(15,23,42,.22)); transform: rotate(-3deg) scale(1.05) translateY(-6px); }
+  .placard { position: absolute; z-index: 7; left: 50%; transform: translateX(-50%); padding: 7px 11px; background: #fff; border: 1px solid rgba(23,23,23,.12); box-shadow: 0 3px 8px rgba(15,23,42,.10); font-size: 9.5px; line-height: 1.5; letter-spacing: .06em; text-transform: uppercase; color: #444; white-space: nowrap; text-align: left; }
+  .placard b { display: block; font-weight: 400; color: #171717; }
+  .spot { position: absolute; z-index: 1; left: -60%; right: -60%; top: -45%; bottom: -10%; background: radial-gradient(48% 42% at 50% 38%, rgba(255,240,200,.75), rgba(255,240,200,0) 70%); }
+</style>
+</head>
+<body>
+<main id="grid"></main>
+<script type="module">
+const ART = '../art/';
+const FR = { f02: { w: 507, h: 638, ox: 107, oy: 75, ow: 324, oh: 457 }, f04: { w: 642, h: 713, ox: 179, oy: 118, ow: 349, oh: 451 }, f09: { w: 461, h: 648, ox: 42, oy: 57, ow: 355, oh: 497 }, f12: { w: 539, h: 640, ox: 106, oy: 64, ow: 359, oh: 471 } };
+const U = 3, PW = 100, PH = 133.33;
+const FAM = ['blush', 'lilac', 'sky', 'chart', 'peach', 'aqua'];
+function rng(a) { return () => { a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+// a point on the photo's edge at fraction t, pushed `out` units outward
+function rim(t, out) {
+  const P = 2 * (PW + PH); let d = ((t % 1) + 1) % 1 * P;
+  if (d < PW) return [d, -out]; d -= PW;
+  if (d < PH) return [PW + out, d]; d -= PH;
+  if (d < PW) return [PW - d, PH + out]; d -= PW;
+  return [-out, PH - d];
+}
+const piece = (stage, src, x, y, w, h, r, z) => {
+  const el = document.createElement('div'); el.className = 'pc';
+  Object.assign(el.style, { left: `${x * U}px`, top: `${y * U}px`, width: `${w * U}px`, height: `${h * U}px`, zIndex: z, '--r': `${r}deg` });
+  el.innerHTML = `<img src="${ART}${src}.webp" alt="">`; stage.appendChild(el);
+};
+// the gilt frame around the tilted photo: its opening wraps the photo with a hair of overlap
+const frame = (stage, f, mat = 0) => {
+  const m = FR[f]; const sc = (PW + mat * 2) * U / (m.ow - 6);
+  const el = document.createElement('img'); el.className = 'frame'; el.src = `./frame-${f}.png`;
+  Object.assign(el.style, { width: `${m.w * sc}px`, left: `${-(m.ox + 3) * sc - mat * U}px`, top: `${-(m.oy + 3) * sc - mat * U * PH / PW}px`, height: `${m.h * sc}px` });
+  stage.appendChild(el); return { sc, m, bottom: (m.h - m.oy - 3) * sc - mat * U };
+};
+const placard = (stage, top, lines) => {
+  const el = document.createElement('div'); el.className = 'placard'; el.style.top = `${top}px`;
+  el.innerHTML = lines; stage.appendChild(el);
+};
+const burst = (stage, seed, opts) => {
+  const R = rng(seed); const n = opts.n ?? 46;
+  for (let i = 0; i < n; i++) {
+    const t = opts.at ? opts.at[i % opts.at.length] + (R() - .5) * (opts.spread ?? .05) : R();
+    const out = (opts.outMin ?? 2) + R() * (opts.outMax ?? 14);
+    const [x, y] = rim(t, out);
+    const gold = R() < (opts.gold ?? .22);
+    const shapes = gold ? opts.goldShapes : opts.shapes;
+    const [kind, w, h, vars] = shapes[Math.floor(R() * shapes.length)];
+    const sc = (opts.scale ?? 1) * (.7 + R() * .6);
+    const fam = opts.fams[Math.floor(R() * opts.fams.length)];
+    const src = gold ? kind.replace('#', 1 + Math.floor(R() * vars)) : kind.replace('$', fam).replace('#', 1 + Math.floor(R() * vars));
+    piece(stage, src, x, y, w * sc, h * sc, R() * 360, gold ? 4 : 2);
+  }
+};
+const T_SHAPES = [['t-btri-$-#', 24, 24, 3], ['t-bsq-$-#', 20, 20, 2], ['t-bstrip-$', 7, 30, 1], ['t-bheart-$-#', 26, 24, 2]];
+const G_SHAPES = [['g-btri-#', 24, 24, 4], ['g-bsparkle-#', 22, 22, 2], ['g-bstar-#', 22, 22, 3], ['g-bstrip-#', 7, 28, 2]];
+const OPTIONS = [
+  { id: 'now', title: 'Now: party burst (pastel tissue)', note: 'For reference. Candy pastels, every colour at once, and the shapes (hearts, triangles) say birthday party, not gallery.',
+    build: (s) => burst(s, 7, { shapes: T_SHAPES, goldShapes: G_SHAPES, fams: FAM.map((f) => 'p' + f), n: 52, gold: .16 }) },
+  { id: 'w', title: 'A  Same burst, the About palette', note: 'Your ask: tissue dyed in the lily painting\'s own colours (pink, periwinkle, water blue, pad green, ochre, teal), fitted to render true on #f8fafc. Gold kept as the accent.',
+    build: (s) => burst(s, 7, { shapes: T_SHAPES, goldShapes: G_SHAPES, fams: FAM.map((f) => 'w' + f), n: 52, gold: .2 }) },
+  { id: 'opening', title: 'B  Opening night', note: 'The photo is hung: a gilt frame closes round it and a museum placard drops in below. A few gold-leaf flakes catch the light. Celebrates design as an exhibition opening.',
+    build: (s) => { const f = frame(s, 'f09'); placard(s, PH * U + 78, '<b>Pranavi Ram</b>Designer, 2026 · mixed media'); burst(s, 31, { shapes: [['g-bsparkle-#', 22, 22, 2]], goldShapes: [['g-bsparkle-#', 22, 22, 2], ['g-bdot-#', 16, 16, 2]], fams: [''], n: 7, gold: 1, outMin: 18, outMax: 16, scale: .55 }); } },
+  { id: 'prize', title: 'C  Best in show', note: 'The gilt frame, plus a gold rosette pinned to its corner with ribbon tails in the lily colours. Celebrates design as an award: the work was judged and won.',
+    build: (s) => { frame(s, 'f02', 1); piece(s, 'g-rosette', PW + 7, -6, 30, 30, -8, 9); piece(s, 't-bstrip-wblush', PW + 1, 18, 8, 32, 14, 8); piece(s, 't-bstrip-wsky', PW + 11, 17, 8, 32, -10, 8); placard(s, PH * U + 70, '<b>First prize · design</b>Pranavi Ram'); } },
+  { id: 'corners', title: 'D  Gilt frame, confetti at the corners', note: 'The frame holds it together; the celebration bursts only from behind its four corners, in the lily tissue and gold. Party and gallery in one, still restrained.',
+    build: (s) => { frame(s, 'f09', 1); burst(s, 12, { shapes: T_SHAPES, goldShapes: G_SHAPES, fams: FAM.map((f) => 'w' + f), n: 40, gold: .25, at: [0, PW / (2 * (PW + PH)), .5, (2 * PW + PH) / (2 * (PW + PH))], spread: .06, outMin: 6, outMax: 12, scale: .9 }); } },
+  { id: 'leaf', title: 'E  Gilding', note: 'Only gold: torn gold leaf sweeps round the frame\'s edge as if the photo were being gilded, with a soft gallery light behind. The quietest, most fine-art.',
+    build: (s) => { const sp = document.createElement('div'); sp.className = 'spot'; s.appendChild(sp); frame(s, 'f12'); burst(s, 44, { shapes: [['g-leaf-#', 22, 18, 6]], goldShapes: [['g-leaf-#', 22, 18, 6], ['g-shard-#', 14, 12, 9]], fams: [''], n: 26, gold: 1, outMin: 4, outMax: 10, scale: .7 }); } },
+];
+const grid = document.getElementById('grid');
+for (const o of OPTIONS) {
+  const cell = document.createElement('section'); cell.className = 'cell'; cell.dataset.id = o.id;
+  cell.innerHTML = `<h2>${o.title}</h2><p>${o.note}</p><div class="stage"><div class="photo"><img src="./portrait.webp" alt=""></div></div>`;
+  grid.appendChild(cell); o.build(cell.querySelector('.stage'));
+}
+</script>
+</body>
+</html>

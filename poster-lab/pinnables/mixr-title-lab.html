@@ -1,0 +1,238 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>MIXR — title treatments</title>
+<link href="fonts-google/fonts.css" rel="stylesheet">
+<style>
+  html, body { margin: 0; background: #07070F; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="out"></canvas>
+<script>
+/* Ten treatments of the MIXR wordmark over the exported heatmap posters.
+   ?opt=glass|heat|prism|liquid|fluted|melt|xray|lens|slices|contour
+   ?seed=72..77   ?font=sf|schibsted|albert   ?border=48   ?nogrout
+   The poster is the Figma export at 4× (1600×2000, tiles at 70px margin,
+   24px grout). The type is set to the same box the vector occupied in
+   Figma — 1264 wide, cap top at y 1360 — then cut by the grout, then the
+   equal border is applied. */
+const qs = new URLSearchParams(location.search);
+const OPT = qs.get('opt') || 'glass', SEED = qs.get('seed') || '77', FONT = qs.get('font') || 'sf';
+const BORDER = +(qs.get('border') ?? 48);
+const W = 1600, H = 2000;
+const GROUT_V = [[344, 366], [640, 664], [938, 960], [1234, 1256]], GROUT_H = [[518, 540], [990, 1012], [1460, 1482]];
+const BOX = { x0: 70, x1: 1529, y0: 70, y1: 1929 };
+const PAL = { pink: [255, 79, 122], yellow: [255, 210, 63], blue: [55, 200, 255], lilac: [201, 185, 244], red: [255, 70, 70] };
+
+const cv = (w = W, h = H) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+
+// --- separable box blur ×3 ≈ gaussian, on Float32 planes
+function blur(src, r, w = W, h = H) {
+  r = Math.round(r); if (r <= 0) return src.slice();
+  let a = src.slice(), b = new Float32Array(a.length);
+  for (let pass = 0; pass < 3; pass++) {
+    // horizontal
+    for (let y = 0; y < h; y++) { const o = y * w; let s = 0; for (let x = -r; x <= r; x++) s += a[o + clamp(x, 0, w - 1)];
+      for (let x = 0; x < w; x++) { b[o + x] = s / (2 * r + 1); s += a[o + clamp(x + r + 1, 0, w - 1)] - a[o + clamp(x - r, 0, w - 1)]; } }
+    // vertical
+    for (let x = 0; x < w; x++) { let s = 0; for (let y = -r; y <= r; y++) s += b[clamp(y, 0, h - 1) * w + x];
+      for (let y = 0; y < h; y++) { a[y * w + x] = s / (2 * r + 1); s += b[clamp(y + r + 1, 0, h - 1) * w + x] - b[clamp(y - r, 0, h - 1) * w + x]; } }
+  }
+  return a;
+}
+const smooth = (e0, e1, x) => { const t = clamp((x - e0) / (e1 - e0), 0, 1); return t * t * (3 - 2 * t); };
+const sampleF = (f, x, y) => { x = clamp(x, 0, W - 1.001); y = clamp(y, 0, H - 1.001); const xi = x | 0, yi = y | 0, fx = x - xi, fy = y - yi, o = yi * W + xi;
+  return f[o] * (1 - fx) * (1 - fy) + f[o + 1] * fx * (1 - fy) + f[o + W] * (1 - fx) * fy + f[o + W + 1] * fx * fy; };
+const sampleRGB = (d, x, y, out) => { x = clamp(x, 0, W - 1.001); y = clamp(y, 0, H - 1.001); const xi = x | 0, yi = y | 0, fx = x - xi, fy = y - yi, o = (yi * W + xi) * 4;
+  for (let c = 0; c < 3; c++) out[c] = d[o + c] * (1 - fx) * (1 - fy) + d[o + 4 + c] * fx * (1 - fy) + d[o + W * 4 + c] * (1 - fx) * fy + d[o + W * 4 + 4 + c] * fx * fy; };
+
+// seeded noise for the slice option
+let rs = 1234; const rnd = () => { rs = (rs * 1103515245 + 12345) & 0x7fffffff; return rs / 0x7fffffff; };
+
+(async () => {
+  const img = new Image(); img.src = `figma-src/row/seed${SEED}.png`; await img.decode();
+  await document.fonts.ready;
+  const base = cv(); const bx = base.getContext('2d'); bx.fillStyle = '#07070F'; bx.fillRect(0, 0, W, H); bx.drawImage(img, 0, 0);
+  const B = bx.getImageData(0, 0, W, H).data;
+
+  // the field: luminance of the poster, blurred, and its gradient (the heat's flow)
+  const lum = new Float32Array(W * H);
+  for (let i = 0; i < W * H; i++) lum[i] = (B[i * 4] * .299 + B[i * 4 + 1] * .587 + B[i * 4 + 2] * .114) / 255;
+  const field = blur(lum, 28);
+  const gx = new Float32Array(W * H), gy = new Float32Array(W * H);
+  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) { const o = y * W + x; gx[o] = (field[o + 1] - field[o - 1]) * 0.5; gy[o] = (field[o + W] - field[o - W]) * 0.5; }
+
+  // the type: SF Pro Display Heavy by default, fitted to the Figma box
+  const fam = FONT === 'schibsted' ? "'Schibsted Grotesk'" : FONT === 'albert' ? "'Albert Sans'" : "'SF Pro Display', 'SF Pro', -apple-system";
+  const wgt = FONT === 'sf' ? 800 : FONT === 'albert' ? 800 : 700;
+  const tc = cv(); const tx = tc.getContext('2d');
+  tx.font = `${wgt} 100px ${fam}`; const m = tx.measureText('MIXR');
+  const size = 100 * 1264 / m.width; tx.font = `${wgt} ${size}px ${fam}`;
+  const mm = tx.measureText('M'); const capTop = 1360, baseline = capTop + mm.actualBoundingBoxAscent;
+  const TX = 157.6, TY = baseline;
+  const drawText = (ctx, dx = 0, dy = 0) => { ctx.font = `${wgt} ${size}px ${fam}`; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = '#fff'; ctx.fillText('MIXR', TX + dx, TY + dy); };
+  drawText(tx);
+  const T = tx.getImageData(0, 0, W, H).data; const mask = new Float32Array(W * H);
+  for (let i = 0; i < W * H; i++) mask[i] = T[i * 4 + 3] / 255;
+
+  // a grout-free poster for anything that samples the field through glass:
+  // the grout bands are filled from the tiles around them, so a refracted
+  // sample never drags a black line into a letter
+  const CLEAN = new Uint8ClampedArray(B);
+  { const isG = new Float32Array(W * H); for (let i = 0; i < W * H; i++) { const y = (i / W) | 0, x = i - y * W; let g = x < BOX.x0 + 4 || x > BOX.x1 - 4 || y < BOX.y0 + 4 || y > BOX.y1 - 4;
+      for (const [a, b] of GROUT_V) if (x >= a - 5 && x < b + 5) g = true; for (const [a, b] of GROUT_H) if (y >= a - 5 && y < b + 5) g = true; isG[i] = g ? 1 : 0; }
+    const keep = blur(Float32Array.from(isG, v => 1 - v), 30); const ch = [0, 1, 2].map(c => blur(Float32Array.from({ length: W * H }, (_, i) => B[i * 4 + c] * (1 - isG[i])), 30));
+    for (let i = 0; i < W * H; i++) if (isG[i]) for (let c = 0; c < 3; c++) CLEAN[i * 4 + c] = ch[c][i] / Math.max(keep[i], 0.02); }
+  const out = cv(); const ox = out.getContext('2d'); ox.drawImage(base, 0, 0);
+  const O = ox.getImageData(0, 0, W, H); const D = O.data;
+  const px = [0, 0, 0];
+  const put = (i, r, g, b) => { D[i * 4] = r; D[i * 4 + 1] = g; D[i * 4 + 2] = b; };
+  const mixTo = (i, r, g, b, a) => { D[i * 4] += (r - D[i * 4]) * a; D[i * 4 + 1] += (g - D[i * 4 + 1]) * a; D[i * 4 + 2] += (b - D[i * 4 + 2]) * a; };
+  const whiteOn = (mk, a = 1) => { for (let i = 0; i < W * H; i++) if (mk[i] > 0.002) mixTo(i, 255, 255, 255, mk[i] * a); };
+  const shadow = (mk, r, dy, a) => { const s = blur(mk, r); for (let i = 0; i < W * H; i++) { const y = (i / W) | 0, x = i - y * W; const v = sampleF(s, x, y - dy); if (v > 0.002) mixTo(i, 7, 7, 16, v * a * (1 - mk[i])); } };
+
+  if (OPT === 'glass') {
+    // the Figma look, done properly: the letters are slabs of frosted glass.
+    // Inside them the poster is refracted (bent along the heat, blurred),
+    // lifted toward white, with a bright top-left rim and a dark bottom edge.
+    const sm = blur(mask, 2), inner = blur(mask, 10);
+    const cl = cv(); cl.getContext('2d').putImageData(new ImageData(CLEAN, W, H), 0, 0);
+    const bl = cv(); bl.getContext('2d').filter = 'blur(9px)'; bl.getContext('2d').drawImage(cl, 0, 0); const BL = bl.getContext('2d').getImageData(0, 0, W, H).data;
+    shadow(mask, 14, 10, 0.5);
+    for (let i = 0; i < W * H; i++) { const a = sm[i]; if (a < 0.002) continue; const y = (i / W) | 0, x = i - y * W;
+      sampleRGB(BL, x + gx[i] * 4200, y + gy[i] * 4200 + 10, px);
+      const edge = 1 - inner[i];                          // 1 at the rim, 0 deep inside
+      const lift = 0.5 + 0.3 * edge;
+      const r = px[0] + (255 - px[0]) * lift, g = px[1] + (255 - px[1]) * lift, b = px[2] + (255 - px[2]) * lift;
+      mixTo(i, r, g, b, a); }
+    // rim light: top-left bright, bottom-right dark
+    for (let i = W; i < W * H - W; i++) { if (mask[i] < 0.01) continue; const dxm = mask[i + 1] - mask[i - 1], dym = mask[i + W] - mask[i - W];
+      const rim = clamp((-dxm - dym) * 2.2, -1, 1); if (rim > 0) mixTo(i, 255, 255, 255, rim); else mixTo(i, 60, 50, 90, -rim * 0.6); }
+  }
+
+  else if (OPT === 'heat') {
+    // the word is a hot source in the field: the ramp climbs to its white end
+    // inside the letters and the seams (blue → yellow → pink) wrap the outline,
+    // the same seams the blobs already have.
+    const sm = blur(mask, 16), core = blur(mask, 4);
+    for (let i = 0; i < W * H; i++) { const s = sm[i]; if (s < 0.01) continue;
+      // seam colours by distance: outside the core, blue, then yellow, then pink nearest the letter
+      const seam = clamp((s - 0.08) / 0.5, 0, 1);
+      let c; if (seam < 0.33) { const t = seam / 0.33; c = [PAL.blue[0] + (PAL.yellow[0] - PAL.blue[0]) * t, PAL.blue[1] + (PAL.yellow[1] - PAL.blue[1]) * t, PAL.blue[2] + (PAL.yellow[2] - PAL.blue[2]) * t]; }
+      else if (seam < 0.66) { const t = (seam - 0.33) / 0.33; c = [PAL.yellow[0] + (PAL.pink[0] - PAL.yellow[0]) * t, PAL.yellow[1] + (PAL.pink[1] - PAL.yellow[1]) * t, PAL.yellow[2] + (PAL.pink[2] - PAL.yellow[2]) * t]; }
+      else { const t = (seam - 0.66) / 0.34; c = [PAL.pink[0] + (255 - PAL.pink[0]) * t, PAL.pink[1] + (255 - PAL.pink[1]) * t, PAL.pink[2] + (255 - PAL.pink[2]) * t]; }
+      const a = smooth(0.06, 0.3, s) * 0.95; mixTo(i, c[0], c[1], c[2], a);
+      mixTo(i, 255, 255, 255, smooth(0.35, 0.8, core[i])); }
+  }
+
+  else if (OPT === 'prism') {
+    // white letters seen through a prism: the three channels are pulled apart
+    // along the heat's flow, so the fringes are the poster's own cyan and magenta.
+    const sm = blur(mask, 1.5); const d = 18;
+    for (let i = 0; i < W * H; i++) { const y = (i / W) | 0, x = i - y * W; const n = Math.hypot(gx[i], gy[i]) + 1e-6; const ux = gx[i] / n, uy = gy[i] / n;
+      const mr = sampleF(sm, x - ux * d, y - uy * d), mg = sm[i], mb = sampleF(sm, x + ux * d, y + uy * d);
+      if (mr + mg + mb < 0.003) continue;
+      D[i * 4] += (255 - D[i * 4]) * mr; D[i * 4 + 1] += (255 - D[i * 4 + 1]) * mg; D[i * 4 + 2] += (255 - D[i * 4 + 2]) * mb; }
+  }
+
+  else if (OPT === 'liquid') {
+    // the letters poured into the field: every point is pushed along the heat's
+    // gradient, so the strokes swell where the blobs are hot and pinch where cold.
+    const sm = blur(mask, 1); const warped = new Float32Array(W * H);
+    for (let i = 0; i < W * H; i++) { const y = (i / W) | 0, x = i - y * W; warped[i] = sampleF(sm, x + gx[i] * 3600, y + gy[i] * 3600); }
+    const w2 = blur(warped, 2); shadow(w2, 10, 8, 0.35); whiteOn(w2);
+  }
+
+  else if (OPT === 'fluted') {
+    // reeded glass over the word: vertical flutes, each one a cylindrical lens,
+    // bend the letters sideways; a highlight runs down every rib.
+    const sm = blur(mask, 1); const period = 112, amp = 34; const out2 = new Float32Array(W * H);
+    for (let i = 0; i < W * H; i++) { const y = (i / W) | 0, x = i - y * W; const u = ((x % period) / period) - 0.5; const bend = Math.sign(u) * Math.pow(Math.abs(u) * 2, 1.8) * amp;
+      out2[i] = sampleF(sm, x + bend, y); }
+    const o2 = blur(out2, 1.5); shadow(o2, 10, 8, 0.35); whiteOn(o2);
+    for (let i = 0; i < W * H; i++) { if (o2[i] < 0.1) continue; const x = i % W; const u = ((x % period) / period); const hi = Math.exp(-Math.pow((u - 0.28) / 0.07, 2)) * 0.5 + Math.exp(-Math.pow((u - 0.98) / 0.03, 2)) * 0.25;
+      mixTo(i, 200, 196, 220, hi * o2[i] * 0.9); }
+  }
+
+  else if (OPT === 'melt') {
+    // the word melting: its lower edges run downward where the field is hot,
+    // in drips of uneven length.
+    const sm = blur(mask, 1); const melted = new Float32Array(W * H);
+    // drips: a few columns run long, most not at all; each drip is a rounded bead
+    const dripLen = new Float32Array(W); for (let x = 0; x < W; x++) { const n = Math.sin(x * 0.047) * 0.45 + Math.sin(x * 0.0113 + 1.7) * 0.35 + Math.sin(x * 0.0031 + 0.4) * 0.2; const h = sampleF(field, x, 1680);
+      dripLen[x] = n > 0.55 ? 60 + (n - 0.55) * 700 + h * 90 : n > 0.3 ? (n - 0.3) * 60 : 0; }
+    for (let x = 0; x < W; x++) { let run = 0; for (let y = 0; y < H; y++) { const i = y * W + x; const v = sm[i]; if (v > 0.5) { run = dripLen[x]; melted[i] = v; } else if (run > 0) { const t = run / dripLen[x]; melted[i] = Math.max(v, smooth(0, 0.25, t)); run -= 1; } else melted[i] = v; } }
+    // round the drip tips by blurring across x a touch
+    const m2 = blur(melted, 3); for (let i = 0; i < W * H; i++) m2[i] = smooth(0.35, 0.65, m2[i]);
+    shadow(m2, 10, 8, 0.35); whiteOn(m2);
+  }
+
+  else if (OPT === 'xray') {
+    // the letters are windows: inside them the poster is seen in negative
+    // (hot blobs turn ink-dark, cold turns paper), with a white hairline edge.
+    const sm = blur(mask, 1.5), inner = blur(mask, 5);
+    for (let i = 0; i < W * H; i++) { const a = sm[i]; if (a < 0.002) continue;
+      const l = clamp((lum[i] - 0.25) / 0.6, 0, 1); const v = 255 - l * 235; mixTo(i, v, v, v + 6, a); }
+    for (let i = 0; i < W * H; i++) { const e = clamp((sm[i] - inner[i]) * 3, 0, 1); if (e > 0.01) mixTo(i, 255, 255, 255, e); }
+  }
+
+  else if (OPT === 'lens') {
+    // no fill at all: the letters are lenses pressed into the glass. The
+    // poster bends around their edges, brightens a little inside, and a rim
+    // light draws the outline. You read the word by what it does to the field.
+    const sdf = blur(mask, 22); const inner = blur(mask, 6);
+    const src = CLEAN;
+    for (let i = W; i < W * H - W; i++) { const s = sdf[i]; if (s < 0.004) continue; const y = (i / W) | 0, x = i - y * W;
+      const dx = (sdf[i + 1] - sdf[i - 1]) * 0.5, dy = (sdf[i + W] - sdf[i - W]) * 0.5;
+      sampleRGB(src, x - dx * 1500, y - dy * 1500, px);
+      const lift = 0.5 * inner[i];
+      put(i, px[0] + (255 - px[0]) * lift, px[1] + (255 - px[1]) * lift, px[2] + (255 - px[2]) * lift);
+      const rim = clamp((-dx - dy) * 90, -1, 1) * clamp(1 - Math.abs(inner[i] - 0.5) * 2, 0, 1);
+      if (rim > 0) mixTo(i, 255, 255, 255, rim); else mixTo(i, 10, 8, 30, -rim * 0.6); }
+  }
+
+  else if (OPT === 'slices') {
+    // the word under a stack of glass strips: horizontal bands of uneven height,
+    // each one carrying its slice of the letters a little left or right.
+    const sm = blur(mask, 1); const sl = new Float32Array(W * H);
+    let y = 1300; const bands = []; while (y < 1800) { const h = 10 + rnd() * 34; const big = rnd() < 0.18; bands.push([y, y + h, (rnd() - 0.5) * (big ? 110 : 26)]); y += h; }
+    for (const [y0, y1, dx] of bands) for (let yy = Math.max(0, y0 | 0); yy < Math.min(H, y1 | 0); yy++) for (let x = 0; x < W; x++) sl[yy * W + x] = sampleF(sm, x - dx, yy);
+    shadow(sl, 8, 6, 0.3); whiteOn(sl);
+  }
+
+  else if (OPT === 'contour') {
+    // the letters as a contour map: no fill, just isolines stepping outward,
+    // the same language as the heat seams, the innermost ring solid white.
+    const sdf = blur(mask, 26), core = blur(mask, 2);
+    for (let i = 0; i < W * H; i++) { const s = sdf[i]; if (s < 0.01) continue;
+      const rings = 5; const v = s * rings; const f = v - Math.floor(v); const line = Math.exp(-Math.pow((f - 0.5) / 0.09, 2));
+      const k = Math.floor(v) / rings; mixTo(i, 255, 255, 255, line * (0.25 + 0.75 * k));
+      mixTo(i, 255, 255, 255, smooth(0.45, 0.7, core[i])); }
+  }
+
+  // the grout, laid back over everything
+  if (!qs.has('nogrout')) {
+    const gm = new Uint8Array(W * H);
+    for (let i = 0; i < W * H; i++) { const y = (i / W) | 0, x = i - y * W; let g = x < BOX.x0 || x > BOX.x1 || y < BOX.y0 || y > BOX.y1;
+      for (const [a, b] of GROUT_V) if (x >= a && x < b) g = true; for (const [a, b] of GROUT_H) if (y >= a && y < b) g = true; gm[i] = g; }
+    // a 3px feather so the bevel highlight at each tile edge comes back softly
+    const gf = blur(Float32Array.from(gm), 2);
+    for (let i = 0; i < W * H; i++) { const a = gf[i]; if (a < 0.01) continue; D[i * 4] += (B[i * 4] - D[i * 4]) * a; D[i * 4 + 1] += (B[i * 4 + 1] - D[i * 4 + 1]) * a; D[i * 4 + 2] += (B[i * 4 + 2] - D[i * 4 + 2]) * a; }
+  }
+  ox.putImageData(O, 0, 0);
+
+  // the border: content box + BORDER each side, scaled back to 1600 wide
+  const cw = BOX.x1 - BOX.x0 + 1 + 2 * BORDER, ch = BOX.y1 - BOX.y0 + 1 + 2 * BORDER;
+  const fin = document.getElementById('out'); fin.width = 1600; fin.height = Math.round(1600 * ch / cw);
+  const fx = fin.getContext('2d'); fx.fillStyle = '#07070F'; fx.fillRect(0, 0, fin.width, fin.height);
+  fx.imageSmoothingQuality = 'high';
+  fx.drawImage(out, BOX.x0 - BORDER, BOX.y0 - BORDER, cw, ch, 0, 0, fin.width, fin.height);
+  document.body.dataset.ready = '1';
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Codex Bookmarks poster 4:5</title>
+<style>
+@font-face{font-family:'OpenAI Sans';font-weight:500;src:url(fonts/oai/OpenAISans-Medium-B7nJY_kG.woff2)}
+*{margin:0;box-sizing:border-box}
+html,body{width:1080px;height:1350px;overflow:hidden}
+body{position:relative;background:#AFC0FF}
+h1{position:absolute;left:84px;top:96px;font:500 172px/.98 'OpenAI Sans';letter-spacing:-.03em;color:#fff;-webkit-text-stroke:4px #fff}
+svg.art{position:absolute;left:0;top:0;width:1080px;height:1350px}
+</style></head><body>
+<h1>Codex<br>Bookmarks</h1>
+<svg class="art" viewBox="0 0 1080 1350">
+ <defs>
+  <filter id="wob" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".018" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="11"/></filter>
+  <filter id="wob2" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="9"/><feDisplacementMap in="SourceGraphic" scale="8"/></filter>
+  <linearGradient id="cl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F2F4FF"/><stop offset="1" stop-color="#D3DCFF"/></linearGradient>
+ </defs>
+ <g id="cloud"></g>
+ <!-- bookmark ribbon, upright and facing straight on -->
+ <g transform="translate(800 905)">
+  <path d="M-92 -150 h184 v300 l-92 -70 l-92 70 z" fill="#FF6FA8" transform="translate(16 14)" filter="url(#wob2)"/>
+  <path d="M-92 -150 h184 v300 l-92 -70 l-92 70 z" fill="none" stroke="#fff" stroke-width="13" stroke-linejoin="round" filter="url(#wob)"/>
+  <path d="M-58 -112 h40" stroke="#fff" stroke-width="10" stroke-linecap="round" filter="url(#wob2)"/>
+ </g>
+</svg>
+<script>
+// doodled Codex cloud: 7 lobes, drawn as a fill offset from a wobbly outline (misregistered print)
+const cx=410,cy=900,R=210,N=7;let d='';
+for(let i=0;i<=N;i++){const a=-Math.PI/2+i*2*Math.PI/N,x=cx+R*Math.cos(a),y=cy+R*Math.sin(a);
+ if(i===0){d+=`M${x.toFixed(1)} ${y.toFixed(1)}`;continue}
+ const am=a-Math.PI/N,bx=cx+R*1.42*Math.cos(am),by=cy+R*1.42*Math.sin(am);d+=` Q${bx.toFixed(1)} ${by.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}`}
+document.getElementById('cloud').innerHTML=
+ `<path d="${d}Z" fill="url(#cl)" transform="translate(-18 16)" filter="url(#wob2)"/>`+
+ `<path d="${d}Z" fill="none" stroke="#fff" stroke-width="14" stroke-linejoin="round" filter="url(#wob)"/>`+
+ `<g stroke="#3A43F5" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#wob2)"><path d="M${cx-90} ${cy-72} l62 80 l-62 80"/><path d="M${cx+32} ${cy+88} h112"/></g>`;
+</script>
+</body></html>

@@ -1,0 +1,485 @@
+{
+ "atlas": {
+  "w": 1024,
+  "h": 1024
+ },
+ "hero": "hero",
+ "pieces": [
+  {
+   "id": "hero",
+   "rect": [
+    0,
+    0,
+    472,
+    202
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "kind": "pad",
+   "desktop": {
+    "x": 0.175,
+    "y": 0.86,
+    "h": 0.362,
+    "rot": -0.03,
+    "flip": false
+   },
+   "mobile": {
+    "x": 0.24,
+    "y": 0.84,
+    "h": 0.3439,
+    "rot": -0.03,
+    "flip": false
+   },
+   "z": 2,
+   "keep": 1.0,
+   "phase": 0.39,
+   "breathe": 1.0
+  },
+  {
+   "id": "l1",
+   "rect": [
+    476,
+    0,
+    312,
+    128
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "kind": "pad",
+   "desktop": {
+    "x": 0.045,
+    "y": 0.58,
+    "h": 0.2294,
+    "rot": 0.04,
+    "flip": true
+   },
+   "mobile": {
+    "x": 0.05,
+    "y": 0.5,
+    "h": 0.195,
+    "rot": 0.04,
+    "flip": true
+   },
+   "z": 1,
+   "keep": 1.0,
+   "phase": 0.921,
+   "breathe": 1.0
+  },
+  {
+   "id": "l2",
+   "rect": [
+    0,
+    206,
+    212,
+    82
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "kind": "pad",
+   "desktop": {
+    "x": 0.315,
+    "y": 0.6,
+    "h": 0.147,
+    "rot": 0.02,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 1,
+   "keep": 0.6,
+   "phase": 0.958,
+   "breathe": 1.0
+  },
+  {
+   "id": "l3",
+   "rect": [
+    216,
+    206,
+    140,
+    50
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "kind": "pad",
+   "desktop": {
+    "x": 0.235,
+    "y": 0.41,
+    "h": 0.0896,
+    "rot": 0.0,
+    "flip": true
+   },
+   "mobile": {
+    "x": 0.4,
+    "y": 0.42,
+    "h": 0.0806,
+    "rot": 0.0,
+    "flip": false
+   },
+   "z": 1,
+   "keep": 1.0,
+   "phase": 0.995,
+   "breathe": 1.0
+  },
+  {
+   "id": "lily",
+   "rect": [
+    792,
+    0,
+    162,
+    108
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "kind": "lily",
+   "desktop": {
+    "x": 0.205,
+    "y": 0.7,
+    "h": 0.1935,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": {
+    "x": 0.27,
+    "y": 0.66,
+    "h": 0.1645,
+    "rot": 0.0,
+    "flip": false
+   },
+   "z": 5,
+   "keep": 1.0,
+   "phase": 0.858,
+   "breathe": 1.0
+  },
+  {
+   "id": "f1",
+   "rect": [
+    360,
+    206,
+    96,
+    34
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "kind": "pad",
+   "desktop": {
+    "x": 0.41,
+    "y": 0.19,
+    "h": 0.0609,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": {
+    "x": 0.62,
+    "y": 0.2,
+    "h": 0.0518,
+    "rot": 0.0,
+    "flip": false
+   },
+   "z": 0,
+   "keep": 0.4,
+   "phase": 0.915,
+   "breathe": 1.0
+  },
+  {
+   "id": "f2",
+   "rect": [
+    360,
+    206,
+    96,
+    34
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "kind": "pad",
+   "desktop": {
+    "x": 0.465,
+    "y": 0.15,
+    "h": 0.0487,
+    "rot": 0.0,
+    "flip": true
+   },
+   "mobile": null,
+   "z": 0,
+   "keep": 0.3,
+   "phase": 0.952,
+   "breathe": 1.0
+  },
+  {
+   "id": "f3",
+   "rect": [
+    216,
+    206,
+    140,
+    50
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "kind": "pad",
+   "desktop": {
+    "x": 0.64,
+    "y": 0.24,
+    "h": 0.0762,
+    "rot": 0.01,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 0,
+   "keep": 0.5,
+   "phase": 0.989,
+   "breathe": 1.0
+  },
+  {
+   "id": "f4",
+   "rect": [
+    360,
+    206,
+    96,
+    34
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "kind": "pad",
+   "desktop": {
+    "x": 0.705,
+    "y": 0.17,
+    "h": 0.0548,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": {
+    "x": 0.8,
+    "y": 0.24,
+    "h": 0.0487,
+    "rot": 0.0,
+    "flip": true
+   },
+   "z": 0,
+   "keep": 0.4,
+   "phase": 0.026,
+   "breathe": 1.0
+  },
+  {
+   "id": "r1",
+   "rect": [
+    476,
+    0,
+    312,
+    128
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "kind": "pad",
+   "desktop": {
+    "x": 0.8,
+    "y": 0.8,
+    "h": 0.2409,
+    "rot": -0.02,
+    "flip": true
+   },
+   "mobile": {
+    "x": 0.8,
+    "y": 0.86,
+    "h": 0.1835,
+    "rot": -0.02,
+    "flip": true
+   },
+   "z": 1,
+   "keep": 1.0,
+   "phase": 0.927,
+   "breathe": 1.0
+  },
+  {
+   "id": "r2",
+   "rect": [
+    0,
+    206,
+    212,
+    82
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "kind": "pad",
+   "desktop": {
+    "x": 0.925,
+    "y": 0.54,
+    "h": 0.147,
+    "rot": 0.03,
+    "flip": false
+   },
+   "mobile": {
+    "x": 0.95,
+    "y": 0.55,
+    "h": 0.1176,
+    "rot": 0.0,
+    "flip": false
+   },
+   "z": 1,
+   "keep": 1.0,
+   "phase": 0.964,
+   "breathe": 1.0
+  },
+  {
+   "id": "r3",
+   "rect": [
+    0,
+    0,
+    472,
+    202
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "kind": "pad",
+   "desktop": {
+    "x": 0.975,
+    "y": 0.98,
+    "h": 0.2606,
+    "rot": 0.02,
+    "flip": true
+   },
+   "mobile": null,
+   "z": 2,
+   "keep": 1.0,
+   "phase": 0.001,
+   "breathe": 1.0
+  },
+  {
+   "id": "r4",
+   "rect": [
+    216,
+    206,
+    140,
+    50
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "kind": "pad",
+   "desktop": {
+    "x": 0.7,
+    "y": 0.62,
+    "h": 0.0806,
+    "rot": 0.0,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 1,
+   "keep": 0.6,
+   "phase": 0.038,
+   "breathe": 1.0
+  },
+  {
+   "id": "d1",
+   "rect": [
+    460,
+    206,
+    76,
+    24
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "kind": "dab",
+   "desktop": {
+    "x": 0.585,
+    "y": 0.42,
+    "h": 0.043,
+    "rot": 0.03,
+    "flip": false
+   },
+   "mobile": {
+    "x": 0.55,
+    "y": 0.4,
+    "h": 0.0344,
+    "rot": 0.0,
+    "flip": false
+   },
+   "z": 0,
+   "keep": 0.5,
+   "phase": 0.913,
+   "breathe": 1.0
+  },
+  {
+   "id": "d2",
+   "rect": [
+    540,
+    206,
+    56,
+    21
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "kind": "dab",
+   "desktop": {
+    "x": 0.615,
+    "y": 0.53,
+    "h": 0.0376,
+    "rot": -0.02,
+    "flip": false
+   },
+   "mobile": null,
+   "z": 0,
+   "keep": 0.5,
+   "phase": 0.95,
+   "breathe": 1.0
+  },
+  {
+   "id": "d3",
+   "rect": [
+    460,
+    206,
+    76,
+    24
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "kind": "dab",
+   "desktop": {
+    "x": 0.565,
+    "y": 0.66,
+    "h": 0.0516,
+    "rot": 0.01,
+    "flip": true
+   },
+   "mobile": {
+    "x": 0.62,
+    "y": 0.62,
+    "h": 0.0387,
+    "rot": 0.0,
+    "flip": true
+   },
+   "z": 0,
+   "keep": 0.5,
+   "phase": 0.987,
+   "breathe": 1.0
+  }
+ ]
+}

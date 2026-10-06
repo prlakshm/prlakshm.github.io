@@ -1,0 +1,537 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Mixr — gradient tiles</title>
+<link href="fonts-google/fonts.css" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#17181C;display:grid;place-items:center;min-height:100vh;font:12px/1.4 ui-monospace,Menlo,monospace;color:#9CA3AF}
+  canvas{height:min(96vh,1200px);width:auto;box-shadow:0 30px 90px rgba(0,0,0,.55)}
+  body.export canvas{height:2000px;box-shadow:none}
+  .hud{position:fixed;left:16px;bottom:14px;letter-spacing:.06em}
+  .hud a{color:#C9B9F4;margin-right:10px;text-decoration:none}
+  .hud a.on{color:#fff;text-decoration:underline}
+  body.export .hud{display:none}
+</style>
+</head>
+<body>
+<canvas id="c" width="1600" height="2000"></canvas>
+<div class="hud" id="hud"></div>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   MIXR — GRADIENT TILES  (audit build)
+
+   A 4:5 sheet, five columns by four rows of glass tiles, facing straight on.
+   Every tile is drawn per pixel by one shader, no images:
+
+     field    a domain-warped fractal noise, squeezed hard along x so it
+              streaks vertically — the thermal-camera smear of the reference
+     palette  the scalar field goes through a colour ramp built ONLY from
+              MixrColors.swift; thin hot bands (pink / yellow / red) sit at
+              the ramp's steep transitions, which is where the reference gets
+              its green-and-orange seams
+     glass    a bevel (lit top-left, shaded bottom-right), an inner shadow
+              into the frame, a specular sweep, chromatic fringe at the rim,
+              and film grain
+     grid     dark grout with a bright rim, so the tiles read as set glass
+
+   Options (?o=A..E) change the ramp and the field; the glass stays.
+   ═══════════════════════════════════════════════════════════════════════ */
+const W = 1600, H = 2000;
+const COLS = 5, ROWS = 4;
+const cv = document.getElementById('c');
+const gl = cv.getContext('webgl', { antialias: false, preserveDrawingBuffer: true });
+
+// MixrColors.swift
+const MX = {
+  black: '050816', navy: '1A1830', deep: '0B0B16', surface: '111827',
+  purple: '7231DD', purple2: '9873EB', pink: 'FF5FA2', pinkHi: 'FF7FB8',
+  blue: '0EA5E9', blueHi: '38BDF8', yellow: 'EAB308', yellowHi: 'FACC15', red: 'EF4444',
+  lavender: 'C9B9F4', lilac: 'E4DBFA', glow: 'B8A8FF', violet: 'C084FC',
+};
+const rgb = h => [parseInt(h.slice(0, 2), 16) / 255, parseInt(h.slice(2, 4), 16) / 255, parseInt(h.slice(4, 6), 16) / 255];
+
+/* The ramps. Each is a list of [t, colour]. Thin bands = two stops close
+   together. "Thermal" is the reference's logic in Mixr's colours: black
+   through blue to pink to near-white, with hot seams between. */
+const RAMPS = {
+  // wide zones of black, blue and pink; the hot seams (yellow, pink) are thin
+  A: { name: 'Thermal · purple', stops: [[0, 'black'], [0.2, 'navy'], [0.3, 'purple'], [0.46, 'blue'], [0.53, 'yellow'], [0.58, 'pink'], [0.7, 'lavender'], [0.88, 'lilac'], [1, 'lilac']], warp: 0.9, streak: 11.0, scale: 1.0, seed: 3 },
+  B: { name: 'Blue · pink · white', stops: [[0, 'black'], [0.22, 'navy'], [0.38, 'blue'], [0.5, 'blueHi'], [0.58, 'pinkHi'], [0.66, 'lavender'], [0.84, 'lilac'], [1, 'lilac']], warp: 0.7, streak: 13.0, scale: 0.9, seed: 11 },
+  C: { name: 'Violet heat', stops: [[0, 'black'], [0.18, 'deep'], [0.3, 'purple'], [0.44, 'violet'], [0.5, 'red'], [0.54, 'yellowHi'], [0.6, 'pink'], [0.72, 'glow'], [0.88, 'lilac'], [1, 'lilac']], warp: 1.1, streak: 9.0, scale: 1.2, seed: 29 },
+  D: { name: 'Night · electric', stops: [[0, 'black'], [0.32, 'black'], [0.42, 'navy'], [0.52, 'purple'], [0.62, 'blue'], [0.7, 'pink'], [0.78, 'lavender'], [0.9, 'lilac'], [1, 'lilac']], warp: 0.9, streak: 12.0, scale: 1.0, seed: 47 },
+  E: { name: 'Full rack', stops: [[0, 'black'], [0.16, 'navy'], [0.3, 'blue'], [0.4, 'yellow'], [0.44, 'red'], [0.5, 'pink'], [0.6, 'purple2'], [0.68, 'blue'], [0.76, 'lavender'], [0.9, 'lilac'], [1, 'lilac']], warp: 1.2, streak: 9.0, scale: 1.1, seed: 71 },
+};
+const qs = new URLSearchParams(location.search);
+const opt = qs.get('o') || 'E';
+/* The object and the word.
+     obj=cut    headphones are a region of the picture seen in black and white
+     obj=layer  headphones are a dark object laid over the picture, under the glass
+     obj=none
+     word=layer MIXR as white type over the picture (a third of the glass bend)
+     word=cut   MIXR as a black-and-white region of the picture
+     word=none
+     gather=1   the heat gathers around the headphones */
+const OBJ = qs.get('obj') || 'none', WORD = qs.get('word') || 'none', GATHER = +(qs.get('gather') || 0);
+const DRAG = +(qs.get('drag') ?? 0);     // marbling: how far the object is pulled along the heat (0 = off)
+/* obj=blob / word=blob: the shape is a region of the picture seen in black and
+   white — a silhouette only, soft-edged, its edge wandering with the blobs,
+   bent by the glass like everything else. No photo, no type on top. */
+const FONTS = {
+  1: "900 470px 'Archivo Black'", 3: "900 500px 'Inter Tight'", 4: "700 490px 'Familjen Grotesk'", 5: "800 480px 'Bricolage Grotesque'",
+  inter: "700 500px 'Inter'", geist: "700 500px 'Geist'", manrope: "800 500px 'Manrope'", jakarta: "800 500px 'Plus Jakarta Sans'",
+  outfit: "700 500px 'Outfit'", sora: "700 480px 'Sora'", instrument: "700 500px 'Instrument Sans'", figtree: "800 500px 'Figtree'",
+  onest: "800 500px 'Onest'", hanken: "800 500px 'Hanken Grotesk'", albert: "800 500px 'Albert Sans'", redhat: "800 500px 'Red Hat Display'",
+  schibsted: "700 500px 'Schibsted Grotesk'", publicsans: "800 500px 'Public Sans'",
+};
+const FONT = FONTS[qs.get('font') || 'inter'] || FONTS.inter;
+const WARP = +(qs.get('warp') ?? 1);   // how far the blobbed shapes swell with the heat
+const R = { ...(RAMPS[opt] || RAMPS.A) };
+// ?seed=N re-rolls the picture (the blobs), keeping the ramp and the glass
+if (new URLSearchParams(location.search).has('seed')) R.seed = +new URLSearchParams(location.search).get('seed');
+
+// the ramp as a 256-wide texture
+function rampTexture(stops) {
+  const n = 256, data = new Uint8Array(n * 4);
+  for (let i = 0; i < n; i++) {
+    const t = i / (n - 1);
+    let k = 0;
+    while (k < stops.length - 2 && stops[k + 1][0] < t) k++;
+    const [t0, c0] = stops[k], [t1, c1] = stops[k + 1];
+    const u = Math.max(0, Math.min(1, (t - t0) / Math.max(1e-5, t1 - t0)));
+    const s = u * u * (3 - 2 * u);
+    const a = rgb(MX[c0]), b = rgb(MX[c1]);
+    for (let c = 0; c < 3; c++) data[i * 4 + c] = Math.round(255 * (a[c] + (b[c] - a[c]) * s));
+    data[i * 4 + 3] = 255;
+  }
+  const tex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, n, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  return tex;
+}
+
+const VERT = `attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }`;
+const FRAG = `
+precision highp float;
+uniform vec2 uRes;
+uniform sampler2D uRamp;
+uniform float uWarp, uStreak, uScale, uSeed;
+uniform float uFlat;
+uniform sampler2D uMono, uPhones, uGlow, uWord;
+uniform float uCut, uLayer, uWordLayer, uWordCut, uGather, uDrag, uBlob, uWordBlob;
+uniform float uHeat, uRings, uBlobbed, uWordBlobbed, uSwell;
+uniform sampler2D uHeatMask;
+uniform vec2 uGrid;      // cols, rows
+uniform vec4 uFrame;     // margin x, margin y, gutter, corner radius
+
+// ---- noise
+vec2 hash2(vec2 p){ p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3))); return fract(sin(p) * 43758.5453); }
+float hash(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+float vnoise(vec2 p){
+  vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y);
+}
+// few octaves: the reference is big soft blobs, not texture
+float fbm(vec2 p){
+  float v = 0.0, a = 0.55;
+  for (int i = 0; i < 3; i++){ v += a * vnoise(p); p = p * 2.1 + 17.1; a *= 0.42; }
+  return v / 0.95;
+}
+// interleaved gradient noise, for grain
+float ign(vec2 p){ return fract(52.9829189 * fract(dot(p, vec2(0.06711056, 0.00583715)))); }
+
+// --- the drag ------------------------------------------------------------
+// Marbling. The object is not painted onto the picture, it is pulled through
+// it: every point of it is dragged along the heat's own contour lines — the
+// direction the blobs run — by a distance that rises and falls in combed
+// stripes, the way a toothpick drawn through wet paint leaves lines of
+// unequal pull. The sample is averaged along that drag (a motion blur along
+// the line), and the three channels are dragged slightly different
+// distances, so the edges split into colour.
+float field(vec2 q, vec2 id);
+float dragTone;
+vec4 dragged(sampler2D mask, vec2 q, vec2 id, vec2 bendUv, float amount, float bendK){
+  vec2 tileOff = (hash2(id * 7.3 + uSeed) - 0.5) * 0.06;
+  vec2 sUv = (id + q + bendUv * bendK) / uGrid + tileOff;
+  // the direction of the stroke: the heat's large-scale flow — a slow turn
+  // across the sheet, mostly sideways, never spinning on the spot
+  float f0 = field(q, id);
+  float ang = (fbm(sUv * 2.2 + uSeed * 0.37) - 0.5) * 1.9 + 0.25;
+  vec2 along = vec2(cos(ang), sin(ang));
+  // combed: stripes of unequal pull across the stroke — about four teeth to
+  // a tile, wandering a little with the heat
+  vec2 across = vec2(-along.y, along.x);
+  float comb = 0.1 + 0.9 * pow(0.5 + 0.5 * sin(dot(sUv, across) * 120.0 + f0 * 3.0 + hash(id) * 2.0), 1.6);
+  // the pull leans one way more than the other, slowly, so it reads as a stroke
+  float lean = 0.5 + 0.38 * sin(dot(sUv, across) * 19.0 + 2.0);
+  float amp = amount * comb;
+  vec4 acc = vec4(0.0);
+  float tone = 0.0;
+  float wsum = 0.0;
+  for (int i = -6; i <= 6; i++){
+    float t = float(i) / 6.0;
+    float d = (t < 0.0 ? t * (1.0 - lean) : t * lean) * amp;
+    float w = 1.0 - abs(t) * 0.55;
+    vec2 u = sUv + along * d;
+    // dispersion: the channels dragged a hair apart
+    vec2 uR = u + along * amp * 0.08, uB = u - along * amp * 0.08;
+    vec4 m = texture2D(mask, vec2(u.x, 1.0 - u.y));
+    acc += vec4(texture2D(mask, vec2(uR.x, 1.0 - uR.y)).a, m.a, texture2D(mask, vec2(uB.x, 1.0 - uB.y)).a, m.a) * w;
+    tone += m.g * w;
+    wsum += w;
+  }
+  dragTone = tone / max(acc.a, 1e-3);
+  return acc / wsum;
+}
+
+// ---- the field inside one tile. q in 0..1 across the tile, id picks its crop
+float field(vec2 q, vec2 id){
+  // one picture across the whole sheet, so the blobs run from tile to tile;
+  // each pane of glass is set a hair off, which breaks the picture at the
+  // grout the way real tiles do
+  vec2 o = (hash2(id * 7.3 + uSeed) - 0.5) * 0.06;
+  vec2 sheet = (id + q) / uGrid + o;
+  // squeeze x so the structure streaks vertically
+  // (x runs faster than y, so the shapes stand tall; the sheet is 4:5)
+  vec2 p = vec2(sheet.x * uScale * 3.2, sheet.y * uScale * 4.0 / uStreak * 2.2) + uSeed;
+  // domain warp: bend the picture, smoothly
+  vec2 w = vec2(fbm(p * 0.7 + 3.0), fbm(p * 0.7 + 9.0)) - 0.5;
+  p += w * uWarp * 0.7;
+  float f = fbm(p * 1.1) + 0.05;
+  // the heat gathers around the object: near it the field is pulled into
+  // the colourful middle of the ramp (pink, blue, yellow), varied by its own noise
+  float g = texture2D(uGlow, vec2(sheet.x, 1.0 - sheet.y)).a;
+  f = mix(f, 0.3 + 0.42 * fbm(p * 1.7 + 5.0), uGather * 0.85 * g);
+  // the object as a source of heat (or cold): its silhouette is added to
+  // the field, so the ramp's bands wrap round its outline as contour lines
+  if (uHeat != 0.0) f += uHeat * texture2D(uHeatMask, vec2(sheet.x, 1.0 - sheet.y)).a;
+  // a little vertical ripple, so the streaks are not dead straight
+  f += 0.05 * sin(sheet.y * 40.0 + fbm(p * 3.0) * 4.0);
+  // contrast: the reference goes to pure black and to white, with wide ramps between
+  f = smoothstep(0.2, 0.86, f);
+  return f;
+}
+
+void main(){
+  vec2 px = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y);
+  vec2 inner = uRes - 2.0 * uFrame.xy;
+  vec2 cell = (inner - uFrame.z * (uGrid - 1.0)) / uGrid;
+  vec2 rel = px - uFrame.xy;
+  vec2 id = floor(rel / (cell + uFrame.z));
+  vec2 local = rel - id * (cell + uFrame.z);     // 0..cell inside the tile, beyond it in the gutter
+  vec3 col = vec3(0.02, 0.025, 0.06);           // 050816, the ground
+
+  if (uFlat > 0.0) {
+    // flat: the picture only, continuous across the gutters, no glass finish
+    id = clamp(id, vec2(0.0), uGrid - 1.0);
+    local = clamp(rel - id * (cell + uFrame.z), vec2(0.0), cell);
+  }
+  bool inSheet = uFlat > 0.0 ? (rel.x > -uFrame.x && rel.y > -uFrame.y && rel.x < inner.x + uFrame.x && rel.y < inner.y + uFrame.y) : (rel.x >= 0.0 && rel.y >= 0.0 && id.x < uGrid.x && id.y < uGrid.y);
+  if (inSheet) {
+    // rounded-rect distance of the tile
+    vec2 hc = cell * 0.5;
+    vec2 d = abs(local - hc) - (hc - uFrame.w);
+    float sd = length(max(d, 0.0)) + min(max(d.x, d.y), 0.0) - uFrame.w;   // <0 inside
+    if (uFlat > 0.0) sd = -200.0;
+    float edge = 1.0 - smoothstep(-1.0, 1.0, sd);
+    if (edge > 0.0) {
+      vec2 q = local / cell;
+      // chromatic fringe: the three channels read the field a hair apart,
+      // more so near the rim
+      // the glass has thickness: toward the rim it bends what is behind it
+      // outward (a thick bevel, ~22px), and the three channels bend by
+      // different amounts, so every edge carries a colour fringe
+      float rim = smoothstep(-22.0, 0.0, sd);
+      vec2 away = normalize(local - hc + 1e-4);
+      vec2 bendUv = away * rim * rim * 0.06 / (cell / 300.0);
+      float ca = 0.003 + 0.02 * rim;
+      float fr = field(q + bendUv * 0.9 + vec2(ca, 0.0), id);
+      float fg = field(q + bendUv, id);
+      float fb = field(q + bendUv * 1.12 - vec2(ca, 0.0), id);
+      vec3 c = vec3(texture2D(uRamp, vec2(fr, 0.5)).r, texture2D(uRamp, vec2(fg, 0.5)).g, texture2D(uRamp, vec2(fb, 0.5)).b);
+      // bloom: the bright areas glow a little past themselves, as light does in glass
+      // (and the picture is softened: four wide taps averaged with the centre)
+      float fw = (field(q + vec2(0.05, 0.03), id) + field(q - vec2(0.05, 0.03), id) + field(q + vec2(-0.04, 0.05), id) + field(q + vec2(0.04, -0.05), id)) * 0.25;
+      vec3 cw = texture2D(uRamp, vec2(fw, 0.5)).rgb;
+      c = mix(c, cw, 0.45);
+      c = mix(c, max(c, cw), 0.3);
+      // the object and the word, in the picture, bent by the same glass
+      vec2 tileOff = (hash2(id * 7.3 + uSeed) - 0.5) * 0.06;
+      vec2 sUv = (id + q + bendUv) / uGrid + tileOff;
+      vec2 mUv = vec2(sUv.x, 1.0 - sUv.y);
+      vec3 mono = texture2D(uMono, vec2(fg, 0.5)).rgb;
+      if (uCut > 0.0) c = mix(c, mono, texture2D(uPhones, mUv).a * uCut);
+      if (uRings > 0.0){
+        // the silhouette drawn in the heatmap's own language, in black and
+        // white: a dark core, then rings of grey stepping outward with thin
+        // pale seams between, like contour lines on a map
+        float m = texture2D(uHeatMask, mUv).a;
+        float core = smoothstep(0.55, 0.7, m);
+        float band = smoothstep(0.2, 0.3, m) - core;
+        float seam = smoothstep(0.02, 0.0, abs(m - 0.42)) + smoothstep(0.02, 0.0, abs(m - 0.3));
+        vec3 ink = mix(vec3(0.03, 0.03, 0.05), vec3(0.42, 0.42, 0.48), band * 0.9);
+        ink = mix(ink, vec3(0.95), seam * 0.9);
+        c = mix(c, ink, smoothstep(0.18, 0.26, m) * uRings);
+      }
+      if (uBlobbed > 0.0 || uWordBlobbed > 0.0){
+        // the silhouette itself bulges with the heat: sampled through the
+        // field's own warp at two scales — a slow swell and a finer ripple —
+        // and with a threshold that breathes with the heat, so its outline
+        // swells where the picture is hot and pinches where it is cold.
+        // Ink fill, and a rim in the ramp's hot colours, the seam of a blob.
+        float f1 = field(q + vec2(0.06, 0.0), id) - field(q - vec2(0.06, 0.0), id);
+        float f2 = field(q + vec2(0.0, 0.06), id) - field(q - vec2(0.0, 0.06), id);
+        float g1 = field(q * 0.4 + vec2(0.3, 0.1), id) - field(q * 0.4 - vec2(0.3, 0.1), id);
+        float g2 = field(q * 0.4 + vec2(0.1, 0.3), id) - field(q * 0.4 - vec2(0.1, 0.3), id);
+        // (the field's slope is in tile units; a tile is a fifth of the
+        // sheet, so this lands as a few dozen px of swell at uSwell = 1)
+        vec2 warp = (vec2(f1, -f2) * 0.9 + vec2(g1, -g2) * 0.6) * 0.045 * uSwell;
+        float breathe = (fg - 0.5) * 0.1 * uSwell;
+        if (uBlobbed > 0.0){
+          float a = texture2D(uPhones, mUv + warp).a + breathe;
+          float fill = smoothstep(0.4, 0.62, a);
+          float rim1 = smoothstep(0.14, 0.28, a) - smoothstep(0.34, 0.5, a);
+          float rim2 = smoothstep(0.26, 0.4, a) - smoothstep(0.42, 0.58, a);
+          c = mix(c, texture2D(uRamp, vec2(0.36, 0.5)).rgb, rim1 * 0.9 * uBlobbed);
+          c = mix(c, texture2D(uRamp, vec2(0.48, 0.5)).rgb, rim2 * 0.9 * uBlobbed);
+          c = mix(c, vec3(0.03, 0.03, 0.05), fill * uBlobbed);
+        }
+        if (uWordBlobbed > 0.0){
+          vec2 wUv = (id + q + bendUv * 0.5) / uGrid + tileOff;
+          float a = texture2D(uWord, vec2(wUv.x, 1.0 - wUv.y) + warp * 0.6).a + breathe * 0.6;
+          // the word a little tighter than the headphones, so the counters hold
+          float fill = smoothstep(0.47, 0.62, a);
+          float rim1 = smoothstep(0.24, 0.34, a) - smoothstep(0.4, 0.52, a);
+          float rim2 = smoothstep(0.33, 0.43, a) - smoothstep(0.48, 0.58, a);
+          c = mix(c, texture2D(uRamp, vec2(0.36, 0.5)).rgb, rim1 * 0.9 * uWordBlobbed);
+          c = mix(c, texture2D(uRamp, vec2(0.48, 0.5)).rgb, rim2 * 0.9 * uWordBlobbed);
+          c = mix(c, vec3(1.0), fill * uWordBlobbed);
+        }
+      }
+      if (uBlob > 0.0){
+        // the silhouette's edge wanders with the heat, so the shape is made
+        // of blobs rather than cut out with scissors
+        float a = texture2D(uPhones, mUv).a;
+        float wob = (fg - 0.5) * 0.5;
+        float m = smoothstep(0.32 + wob, 0.6 + wob, a);
+        // inside: the same picture in black and white, a little deeper
+        vec3 inside = mono * 0.9;
+        c = mix(c, inside, m * uBlob);
+      }
+      if (uLayer > 0.0){
+        // the headphones, dragged through the heat: a dark object whose
+        // edges split into the colours of the picture
+        vec4 ph = dragged(uPhones, q, id, bendUv, uDrag * 0.07, 1.0);
+        // the leather's own highlights come through, so the stripes show
+        // inside the shape and not only at its edge
+        vec3 ink = vec3(0.03, 0.03, 0.05) + vec3(0.42, 0.4, 0.46) * clamp(dragTone * 1.6 - 0.05, 0.0, 1.0);
+        c = mix(c, ink, ph.a * 0.92 * uLayer);
+        c = mix(c, c * vec3(1.0 - ph.r, 1.0 - ph.g, 1.0 - ph.b) + ink * vec3(ph.r, ph.g, ph.b), uLayer * 0.6);
+      }
+      if (uWordCut > 0.0){
+        vec2 wUv = (id + q + bendUv * 0.33) / uGrid + tileOff;
+        c = mix(c, mono, texture2D(uWord, vec2(wUv.x, 1.0 - wUv.y)).a * uWordCut);
+      }
+      if (uWordBlob > 0.0){
+        vec2 wUv = (id + q + bendUv * 0.5) / uGrid + tileOff;
+        float a = texture2D(uWord, vec2(wUv.x, 1.0 - wUv.y)).a;
+        float wob = (fg - 0.5) * 0.3;
+        float m = smoothstep(0.34 + wob, 0.62 + wob, a);
+        c = mix(c, mono * 0.9, m * uWordBlob);
+      }
+      if (uWordLayer > 0.0){
+        vec4 wd = dragged(uWord, q, id, bendUv, uDrag * 0.022, 0.33);
+        // the word sits in the glass: a soft shade under it, so it still
+        // reads where the picture goes pale
+        float under = dragged(uWord, q, id, bendUv * 0.33 + vec2(0.0, 0.012), uDrag * 0.03, 0.33).a;
+        c *= 1.0 - 0.28 * under * uWordLayer;
+        c = mix(c, vec3(1.0), wd.a * 0.96 * uWordLayer);
+        c += vec3(wd.r - wd.a, 0.0, wd.b - wd.a) * 0.35 * uWordLayer;
+      }
+
+      // the bevel itself: lit from the top left, in shade bottom right
+      float bev = smoothstep(-22.0, -4.0, sd) * (1.0 - smoothstep(-4.0, 0.0, sd));
+      float lit = clamp(dot(normalize(vec2(-1.0, -1.0)), away), -1.0, 1.0);
+      c += bev * (0.3 * max(lit, 0.0) - 0.22 * max(-lit, 0.0));
+      // and the light that is trapped in the glass: a soft glow just inside the rim
+      c += vec3(0.9, 0.85, 1.0) * smoothstep(-10.0, -1.0, sd) * (1.0 - smoothstep(-1.0, 0.0, sd)) * 0.28;
+      // a reflection: a diagonal band of the room's light lying on the surface,
+      // in a slightly different place on every pane
+      float band = (q.x * 0.6 + q.y) * 1.3 + hash(id + uSeed) * 1.6 - 0.8;
+      float refl = smoothstep(0.0, 0.5, band) * smoothstep(1.0, 0.5, band);
+      c += 0.08 * refl + 0.06 * smoothstep(0.0, 0.16, q.y) * smoothstep(0.36, 0.16, q.y);
+      // the surface, a faint top-lit gradient, and a little dark in the corners
+      c *= uFlat > 0.0 ? 1.0 : 0.92 + 0.14 * (1.0 - q.y);
+      c *= 1.0 - (uFlat > 0.0 ? 0.0 : 0.14) * smoothstep(0.55, 0.75, length((q - 0.5) * vec2(1.0, 0.7)));
+      // bright hairline where the glass meets the grout
+      c += vec3(0.85, 0.8, 1.0) * smoothstep(1.4, 0.0, abs(sd + 0.8)) * 0.6;
+      col = mix(col, c, edge);
+    }
+    // the grout: dark, with the tile's shadow falling into it
+    col = mix(col, vec3(0.02, 0.025, 0.06), (1.0 - edge) * 1.0);
+    col += (1.0 - edge) * vec3(0.06, 0.05, 0.1) * smoothstep(8.0, 0.0, sd);
+  }
+
+  // film grain, a little stronger in the darks
+  float gr = (ign(gl_FragCoord.xy + uSeed) - 0.5) * (0.045 + 0.04 * (1.0 - length(col) * 0.6));
+  col += gr;
+  gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+}`;
+
+function compile(type, src) {
+  const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+  return s;
+}
+const prog = gl.createProgram();
+gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT));
+gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG));
+gl.linkProgram(prog);
+gl.useProgram(prog);
+const buf = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+const aPos = gl.getAttribLocation(prog, 'p');
+gl.enableVertexAttribArray(aPos);
+gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+const U = n => gl.getUniformLocation(prog, n);
+
+gl.viewport(0, 0, W, H);
+gl.uniform2f(U('uRes'), W, H);
+gl.uniform2f(U('uGrid'), COLS, ROWS);
+// margin 70, gutter 14, corner 6
+gl.uniform4f(U('uFrame'), 70, 70, 24, 6);
+gl.uniform1f(U('uWarp'), R.warp);
+gl.uniform1f(U('uStreak'), R.streak);
+gl.uniform1f(U('uScale'), R.scale);
+gl.uniform1f(U('uSeed'), R.seed);
+gl.uniform1f(U('uFlat'), new URLSearchParams(location.search).has('flat') ? 1 : 0);
+gl.activeTexture(gl.TEXTURE0);
+gl.bindTexture(gl.TEXTURE_2D, rampTexture(R.stops));
+gl.uniform1i(U('uRamp'), 0);
+// the same stops, in black and white: dark where the colour is dark, with the
+// white end held back to 86% so the object still parts from a pale field
+const MONO = R.stops.map(([t, c]) => [t, c]);
+// a negative: dark where the colour is bright, light where the picture is black,
+// so the cut object always parts from what is around it
+const monoLum = { black: 0.92, deep: 0.88, navy: 0.8, purple: 0.6, purple2: 0.42, violet: 0.36, blue: 0.5, blueHi: 0.4, red: 0.55, yellow: 0.3, yellowHi: 0.26, pink: 0.34, pinkHi: 0.26, glow: 0.2, lavender: 0.16, lilac: 0.1, white: 0.06 };
+(function monoTexture() {
+  const n = 256, data = new Uint8Array(n * 4);
+  for (let i = 0; i < n; i++) {
+    const t = i / (n - 1);
+    let k = 0;
+    while (k < MONO.length - 2 && MONO[k + 1][0] < t) k++;
+    const [t0, c0] = MONO[k], [t1, c1] = MONO[k + 1];
+    const u = Math.max(0, Math.min(1, (t - t0) / Math.max(1e-5, t1 - t0)));
+    const sm = u * u * (3 - 2 * u);
+    const v = Math.round(255 * ((monoLum[c0] ?? 0.5) + ((monoLum[c1] ?? 0.5) - (monoLum[c0] ?? 0.5)) * sm));
+    data[i * 4] = data[i * 4 + 1] = data[i * 4 + 2] = v; data[i * 4 + 3] = 255;
+  }
+  const tex = gl.createTexture();
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, n, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.uniform1i(U('uMono'), 1);
+})();
+function canvasTex(unit, cnv, name) {
+  const tex = gl.createTexture();
+  gl.activeTexture(gl.TEXTURE0 + unit);
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, cnv);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.uniform1i(U(name), unit);
+}
+const blank = document.createElement('canvas'); blank.width = 4; blank.height = 4;
+async function objects() {
+  // headphones: keyed off the white, the wire cut away under the cups,
+  // hung big in the upper middle, edges softened for the glass
+  const img = new Image();
+  await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = 'assets/mixr-headphones.png'; });
+  const S = 1200, k = document.createElement('canvas'); k.width = S; k.height = S;
+  const kx = k.getContext('2d');
+  kx.drawImage(img, 0, 0, S, S);
+  const im = kx.getImageData(0, 0, S, S), d = im.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const l = d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11;
+    const y = Math.floor(i / 4 / S);
+    let a = 1 - Math.max(0, Math.min(1, (l - 150) / 95));
+    if (y > 1036) a = 0;               // the wire
+    d[i + 3] = Math.round(255 * a);
+  }
+  kx.putImageData(im, 0, 0);
+  const phones = document.createElement('canvas'); phones.width = W; phones.height = H;
+  const px = phones.getContext('2d');
+  const size = 1600;
+  // the silhouette, for the heat: solid, blurred at two widths so the
+  // contours have both a firm core and a long fall-off
+  const sil = document.createElement('canvas'); sil.width = S; sil.height = S;
+  { const sx = sil.getContext('2d'); sx.drawImage(k, 0, 0); sx.globalCompositeOperation = 'source-in'; sx.fillStyle = '#000'; sx.fillRect(0, 0, S, S); }
+  const heat = document.createElement('canvas'); heat.width = W; heat.height = H;
+  { const hx = heat.getContext('2d');
+    hx.globalAlpha = 0.6; hx.filter = 'blur(22px)'; hx.drawImage(sil, (W - size) / 2, 0, size, size);
+    hx.globalAlpha = 0.5; hx.filter = 'blur(70px)'; hx.drawImage(sil, (W - size) / 2 - 20, -20, size + 40, size + 40); }
+  if (OBJ === 'blob') {
+    // the shape only: alpha painted solid, then blurred wide so the edge is
+    // soft enough for the heat to wander through
+    px.filter = 'blur(26px)';
+    px.drawImage(sil, (W - size) / 2, 0, size, size);
+  } else if (OBJ === 'blobbed') {
+    px.filter = 'blur(48px)';
+    px.drawImage(sil, (W - size) / 2, 0, size, size);
+  } else {
+    px.filter = 'blur(11px)';
+    px.drawImage(k, (W - size) / 2, 0, size, size);
+  }
+  // the glow the heat gathers to: the silhouette, blurred wide
+  const glow = document.createElement('canvas'); glow.width = W; glow.height = H;
+  const gx = glow.getContext('2d');
+  gx.filter = 'blur(110px)';
+  gx.drawImage(k, (W - size) / 2 - 40, 50, size + 80, size + 80);
+  gx.drawImage(k, (W - size) / 2 - 40, 50, size + 80, size + 80);
+  // the word
+  await document.fonts.load(FONT.replace(/\d+px/, '100px')).catch(() => {});
+  const word = document.createElement('canvas'); word.width = W; word.height = H;
+  const wx = word.getContext('2d');
+  wx.fillStyle = '#fff'; wx.textAlign = 'center'; wx.textBaseline = 'alphabetic';
+  wx.font = FONT;
+  wx.filter = WORD === 'blob' ? 'blur(14px)' : WORD === 'blobbed' ? 'blur(19px)' : 'blur(5px)';
+  wx.fillText('MIXR', W / 2, 1850);
+  canvasTex(2, OBJ === 'none' ? blank : phones, 'uPhones');
+  canvasTex(5, OBJ === 'none' ? blank : heat, 'uHeatMask');
+  canvasTex(3, GATHER ? glow : blank, 'uGlow');
+  canvasTex(4, WORD === 'none' ? blank : word, 'uWord');
+}
+gl.uniform1f(U('uCut'), OBJ === 'cut' ? 1 : 0);
+gl.uniform1f(U('uLayer'), OBJ === 'layer' ? 1 : 0);
+gl.uniform1f(U('uWordLayer'), WORD === 'layer' ? 1 : 0);
+gl.uniform1f(U('uWordCut'), WORD === 'cut' ? 1 : 0);
+gl.uniform1f(U('uGather'), GATHER);
+gl.uniform1f(U('uDrag'), DRAG);
+gl.uniform1f(U('uBlob'), OBJ === 'blob' ? 1 : 0);
+gl.uniform1f(U('uHeat'), OBJ === 'heat' ? 0.55 : OBJ === 'cold' ? -0.7 : 0);
+gl.uniform1f(U('uRings'), OBJ === 'rings' ? 1 : 0);
+gl.uniform1f(U('uBlobbed'), OBJ === 'blobbed' ? 1 : 0);
+gl.uniform1f(U('uWordBlobbed'), WORD === 'blobbed' ? 1 : 0);
+gl.uniform1f(U('uSwell'), WARP);
+gl.uniform1f(U('uWordBlob'), WORD === 'blob' ? 1 : 0);
+objects().then(() => { gl.drawArrays(gl.TRIANGLES, 0, 3); document.body.dataset.done = '1'; });
+
+document.getElementById('hud').innerHTML =
+  Object.keys(RAMPS).map(k => `<a href="?o=${k}" class="${k === opt ? 'on' : ''}">${k} · ${RAMPS[k].name}</a>`).join('');
+if (new URLSearchParams(location.search).has('export')) document.body.classList.add('export');
+</script>
+</body>
+</html>
