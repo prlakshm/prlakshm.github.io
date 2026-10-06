@@ -77,12 +77,30 @@ export function onEarn(fn: (e: EarnEvent) => void) {
  * `defer` is for links that leave the page: the badge is saved now and its
  * celebration plays when the visitor returns.
  */
+/* Badges only count once the visitor has had a moment to look around: until
+   the intro ticket has flown home and settled (+ARM_MS), or ARM_MS after the
+   page loads when there is no intro. A cursor that just happens to rest on
+   her name while the page opens hasn't found anything. */
+const ARM_MS = 1500;
+let armedAt = (typeof performance !== "undefined" ? performance.now() : 0) + ARM_MS;
+/** The intro is showing: nothing counts until it is done (see armBadges). */
+export const holdBadges = () => {
+  armedAt = Infinity;
+};
+/** Start counting `delay` ms from now. */
+export const armBadges = (delay = ARM_MS) => {
+  armedAt = performance.now() + delay;
+};
+export const badgesArmed = () => performance.now() >= armedAt;
+
 export function earn(
   id: BadgeId,
   from: { x: number; y: number } | null = null,
   opts: { defer?: boolean } = {}
 ) {
   if (found.includes(id)) return false;
+  // a click on the way out (defer) is always deliberate
+  if (!opts.defer && !badgesArmed()) return false;
   found = [...found, id];
   save();
   if (opts.defer) {

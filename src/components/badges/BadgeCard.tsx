@@ -2,8 +2,10 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { createPortal } from "react-dom";
 import { animate } from "motion";
 import {
+  armBadges,
   BADGES,
   getFound,
+  holdBadges,
   nextHint,
   hintOf,
   onEarn,
@@ -30,8 +32,8 @@ import "./badges.css";
 const TOTAL = BADGES.length;
 const INTRO_KEY = "pr-badge-intro";
 const CARD_W = 356; // .bc-card width — the compact card scales to/from this
-const HOLD_MS = 2900; // how long the intro card sits before flying home
-const AUTO_CLOSE_MS = 1700; // how long a freshly stamped card stays open
+const HOLD_MS = 1600; // how long the intro card sits before flying home (2.9s felt long)
+const FOUND_TIP_MS = 2400; // how long a freshly stamped card stays open, its new star's tooltip naming the find
 const STAMP_SPRITE = "/home/card/stamps.webp";
 const LIGHT_PAD = 6; // the light layer overhangs the row, so tilted corners are lit too
 const TIP_MS = 2600; // how long a tapped tip (touch) stays up
@@ -514,9 +516,7 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
           inFlight.current.delete(id);
           sync();
           setAnnounce(`Found: ${titleOf(id)}. ${getFound().length} of ${TOTAL}.`);
-          autoCloseTimer.current = window.setTimeout(() => {
-            if (!hovering.current) setOpen(false);
-          }, AUTO_CLOSE_MS);
+          nameTheFind(getFound().indexOf(id));
         }, 120);
         return;
       }
@@ -532,15 +532,24 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
 
   useEffect(() => onEarn(({ id, from }) => celebrate(id, from)), [celebrate]);
 
+  /* A stamp just landed: its star's tooltip names what was found, so the
+     visitor knows what they did, then card and tip go together. */
+  const nameTheFind = (slot: number) => {
+    window.setTimeout(() => showTip(slot), reduced ? 0 : 260); // once the stamp has pressed in
+    window.clearTimeout(autoCloseTimer.current);
+    autoCloseTimer.current = window.setTimeout(() => {
+      if (hovering.current) return;
+      setTipAt(null);
+      setOpen(false);
+    }, FOUND_TIP_MS);
+  };
+
   const landedFlight = (f: Flight) => {
     setFlights((all) => all.filter((x) => x.key !== f.key));
     inFlight.current.delete(f.id);
     sync();
     setAnnounce(`Found: ${titleOf(f.id)}. ${getFound().length} of ${TOTAL}.`);
-    window.clearTimeout(autoCloseTimer.current);
-    autoCloseTimer.current = window.setTimeout(() => {
-      if (!hovering.current) setOpen(false);
-    }, AUTO_CLOSE_MS);
+    nameTheFind(getFound().indexOf(f.id));
   };
 
   useLayoutEffect(() => {
@@ -607,6 +616,7 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
     let flown = false;
     let holdTimer = 0;
 
+    holdBadges(); // nothing counts while the ticket is up (badgeStore.ts)
     card.style.transformOrigin = "50% 50%";
     const enter = animate(
       card,
@@ -631,6 +641,7 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
           /* no-op */
         }
         setIntro(false);
+        armBadges(); // the hunt starts a moment after the ticket lands
         if (miniRef.current)
           animate(miniRef.current, { scale: [1.22, 1] }, { type: "spring", stiffness: 520, damping: 16 });
       };
@@ -670,6 +681,7 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
       window.clearTimeout(holdTimer);
       detach();
       enter.stop();
+      if (!flown) armBadges();
     };
   }, [intro]);
 

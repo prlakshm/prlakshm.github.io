@@ -105,6 +105,7 @@ function ribbon(st: Ribbon, N: number) {
 
 const COLS: Record<string, string> = {
   bblush: "#ff9ccc", blilac: "#c9a6ff", bsky: "#8fd3ff", bchart: "#d6f07a", bpeach: "#ffc48a", baqua: "#84ecd0",
+  oeblush: "#ffb0d2", oelilac: "#d4c2ff", oesky: "#b2dcff", oechart: "#e9f09c", oepeach: "#fec79a", oeaqua: "#ade9cf",
 };
 const tint = (hex: string, f: number) => {
   const n = (i: number) => Math.round(Math.min(255, parseInt(hex.slice(i, i + 2), 16) * f));
@@ -174,7 +175,9 @@ const BIG: Record<string, Shape> = {
 // a dye's colour, so the dyes are deeper (prefix p, fitted by
 // poster-lab/portrait-pop/bake/fit_tissue.py at alpha 0.45) and each sheet
 // renders at ffb0d7 d3b7ff a8dfff e5fb9d ffd4a5 a3f5de.
-const PEN_T = ["pblush", "plilac", "psky", "pchart", "ppeach", "paqua"];
+// spring pastels (lab scheme "oc"): blossom, lavender, baby blue, pistachio,
+// orange sherbet, mint. Baked with coloured light so they stay clear, never chalky
+const PEN_T = ["oeblush", "oelilac", "oesky", "oechart", "oepeach", "oeaqua"];
 
 type Layer = { scale: number; step: number; d: [number, number]; out: number; palette: [number, string][]; delay: number; dur: number; tint?: number };
 

@@ -109,7 +109,8 @@ export function mountPortraitPop(fig: HTMLElement, photo: HTMLElement, reduced: 
       pieces.forEach((q) => q.lit && (q.lit.style.opacity = "0.35"));
       return;
     }
-    animate(photo, { rotate: -3, scale: 1.05, y: -6 }, PHOTO_GLIDE);
+    // a gentler turn than the old -3deg: the glass now leans with the cursor too
+    animate(photo, { rotate: -1.5, scale: 1.05, y: -6 }, PHOTO_GLIDE);
     pieces.forEach((q) => {
       animate(q.el, q.open, { type: "spring", bounce: 0, duration: q.p.dur, delay: q.p.delay });
       if (q.lit) animate(q.lit, { opacity: [0, 0.95, 0.35] }, { duration: 1.1, delay: q.p.delay + 0.12, times: [0, 0.35, 1] });

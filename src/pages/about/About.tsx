@@ -7,6 +7,7 @@ import WtNav from "../home/WtNav.js";
 import SiteFooter from "../home/SiteFooter.js";
 import { earn } from "../../components/badges/badgeStore.js";
 import { mountPortraitPop } from "./portraitPop.js";
+import { mountPortraitGlass } from "./portraitGlass.js";
 import { prefersReducedMotion } from "../home/interactions.js";
 
 // public/about/"Profile picture.webp" — space encoded for the URL.
@@ -100,9 +101,11 @@ function About() {
      opens it and a tap anywhere else (or on it again) tucks it away. */
   useEffect(() => {
     const fig = portraitRef.current;
-    const img = fig?.querySelector<HTMLElement>("img");
-    if (!fig || !img) return;
-    const pop = mountPortraitPop(fig, img, prefersReducedMotion());
+    const pane = fig?.querySelector<HTMLElement>(".ab-pane");
+    const glassEl = fig?.querySelector<HTMLElement>(".ab-glass");
+    if (!fig || !pane || !glassEl) return;
+    const pop = mountPortraitPop(fig, pane, prefersReducedMotion());
+    const glass = mountPortraitGlass(fig, glassEl, prefersReducedMotion());
     let touch = false;
     const celebrate = (e: PointerEvent | MouseEvent) => earn("celebrate", { x: e.clientX, y: e.clientY });
     const down = (e: PointerEvent) => {
@@ -115,6 +118,10 @@ function About() {
     };
     const off = (e: PointerEvent) => {
       if (e.pointerType === "mouse" || e.pointerType === "pen") pop.close();
+      glass.leave();
+    };
+    const move = (e: PointerEvent) => {
+      if (e.pointerType === "mouse" || e.pointerType === "pen") glass.aim(e.clientX, e.clientY);
     };
     const tap = (e: MouseEvent) => {
       if (!touch) return;
@@ -130,15 +137,18 @@ function About() {
     fig.addEventListener("pointerdown", down);
     fig.addEventListener("pointerenter", on);
     fig.addEventListener("pointerleave", off);
+    fig.addEventListener("pointermove", move);
     fig.addEventListener("click", tap);
     document.addEventListener("pointerdown", outside);
     return () => {
       fig.removeEventListener("pointerdown", down);
       fig.removeEventListener("pointerenter", on);
       fig.removeEventListener("pointerleave", off);
+      fig.removeEventListener("pointermove", move);
       fig.removeEventListener("click", tap);
       document.removeEventListener("pointerdown", outside);
       pop.destroy();
+      glass.destroy();
     };
   }, []);
 
@@ -182,11 +192,20 @@ function About() {
               </section>
             </div>
             <figure className="ab-portrait" ref={portraitRef}>
-              <img
-                src={PORTRAIT}
-                alt="Pranavi Ram, smiling, on the Brown University campus green."
-                decoding="async"
-              />
+              {/* the pane lifts for the celebration; the glass inside it leans
+                  toward the cursor and catches the light, as the posters do */}
+              <div className="ab-pane">
+                <div className="ab-glass">
+                  <img
+                    src={PORTRAIT}
+                    alt="Pranavi Ram, smiling, on the Brown University campus green."
+                    decoding="async"
+                  />
+                  <span className="ab-sheen" aria-hidden="true" />
+                  <span className="ab-glare" aria-hidden="true" />
+                  <span className="ab-rim" aria-hidden="true" />
+                </div>
+              </div>
             </figure>
           </div>
         </section>

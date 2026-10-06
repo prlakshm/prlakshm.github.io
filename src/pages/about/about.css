@@ -281,7 +281,9 @@
    pull-up it used under the homepage. */
 .ab--page {
   margin-top: 0;
-  padding-block: clamp(40px, 8vh, 112px) clamp(48px, 8vh, 100px);
+  /* the bottom leaves room for the portrait's party frame, which blooms
+     ~0.37 of the portrait's width below it, plus a clear gap to the footer */
+  padding-block: clamp(40px, 8vh, 112px) clamp(120px, 12vw, 180px);
 }
 
 .ab--page .ab-portrait {
@@ -500,4 +502,80 @@
 
 .ab-exp-kind {
   color: var(--mono-tertiary, #737373);
+}
+
+/* --- The portrait as glass (portraitGlass.ts), like the gallery's posters ---
+   .ab-pane lifts for the celebration (portraitPop.ts); .ab-glass inside it
+   leans toward the cursor and holds the light layers. */
+.ab-pane,
+.ab-glass {
+  position: absolute;
+  inset: 0;
+}
+
+.ab-pane {
+  z-index: 1;
+  filter: drop-shadow(0 1px 0 var(--shadow-contact));
+}
+
+.ab-glass {
+  overflow: hidden;
+  isolation: isolate;
+  backface-visibility: hidden;
+  transform-origin: 50% 50%;
+}
+
+.ab-portrait .ab-glass img {
+  filter: none;
+}
+
+.ab-sheen,
+.ab-glare,
+.ab-rim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* the glass's glare: the posters' soft band of light, travelling across the
+   pane as it tilts; kept faint (at full strength it washed the photo white,
+   and as a narrow streak it read streaky) */
+.ab-sheen {
+  inset: 0 auto 0 0;
+  width: 250%;
+  mix-blend-mode: screen;
+  opacity: 0;
+  transform: translate3d(-72%, 0, 0);
+  background: linear-gradient(
+    105deg,
+    transparent 24%,
+    rgba(255, 214, 230, 0.3) 35%,
+    rgba(255, 255, 255, 0.75) 43%,
+    rgba(200, 230, 255, 0.25) 50%,
+    transparent 64%
+  );
+}
+
+
+/* the cursor's light: a soft pool under the cursor, as on the posters */
+.ab-glare {
+  inset: -50%;
+  mix-blend-mode: screen;
+  opacity: 0;
+  background: radial-gradient(
+    circle closest-side,
+    rgba(255, 255, 255, 0.15),
+    rgba(255, 255, 255, 0.035) 25.6%,
+    transparent 46.4%
+  );
+}
+
+/* the pane's edge: a lit top, a shaded bottom */
+.ab-rim {
+  z-index: 3;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.16);
 }

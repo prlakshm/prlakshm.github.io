@@ -7,7 +7,7 @@ import ContactIcons from "./ContactIcons.js";
 import WtNav, { scrollToId } from "./WtNav.js";
 import WorkGrid from "./WorkGrid.js";
 import SiteFooter from "./SiteFooter.js";
-import { earn } from "../../components/badges/badgeStore.js";
+import { badgesArmed, earn } from "../../components/badges/badgeStore.js";
 import { attachUnderlineWipe, prefersReducedMotion, PIN_MS, PIN_SLOP } from "./interactions.js";
 
 /* The homepage is the work: a plain centred hero, then the grid. The sketched
@@ -198,7 +198,11 @@ function Home() {
       let learnTimer = 0;
       let lastX = 0;
       let lastY = 0;
+      // A hover only counts if it started after the hunt began: a cursor that
+      // was already resting on her name when the page opened hasn't found it.
+      let fresh = false;
       const learnSoon = (x: number, y: number) => {
+        if (!fresh) return;
         lastX = x;
         lastY = y;
         window.clearTimeout(learnTimer);
@@ -229,6 +233,7 @@ function Home() {
 
       const enter = (e: PointerEvent) => {
         byTouch = e.pointerType === "touch";
+        fresh = badgesArmed();
         measure();
         place(e.clientX, e.clientY);
         show(true);
@@ -259,6 +264,7 @@ function Home() {
         measure();
         place(e.clientX, e.clientY);
         show(true);
+        fresh = badgesArmed(); // a tap is deliberate
         learnSoon(e.clientX, e.clientY);
         pinned = true;
         pinX = e.clientX;
