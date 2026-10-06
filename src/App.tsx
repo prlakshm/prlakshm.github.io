@@ -9,6 +9,7 @@ import { animate } from 'motion';
 import Header from './components/Header.js';
 import Footer from './components/Footer.js';
 import Home from './pages/home/Home.js';
+import About from './pages/about/About.js';
 import './app.css';
 
 /* The older routes are split out so their CSS — and with it the Adobe Fonts
@@ -57,7 +58,7 @@ function Shell() {
       '/hbo-max-surprise': `${PINK} fixed`,
     };
     document.body.dataset.route = pathname;
-    document.body.style.background = GROUND[pathname] ?? '#ffffff';
+    document.body.style.background = GROUND[pathname] ?? '#f8fafc'; // --parchment
   }, [pathname]);
 
   useEffect(() => {
@@ -89,8 +90,8 @@ function Shell() {
             Kept routed, not linked, so the exhibition-room treatment is not lost. */}
         <Route path="/surprise-rail-v1" element={<SurpriseRailV1 />} />
         <Route path="/hbo-max-rtw" element={<CaseStudyHBOMax2 />} />
-        {/* /about deep-links to the manifesto section on the homepage. */}
-        <Route path="/about" element={<Home />} />
+        {/* About is its own page: the manifesto and the portrait. */}
+        <Route path="/about" element={<About />} />
       </Routes>
       </Suspense>
       </div>

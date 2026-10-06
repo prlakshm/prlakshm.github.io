@@ -272,6 +272,310 @@
   }
 
   .ab-portrait img {
-    position: static;
+    position: relative;
   }
+}
+
+/* --- About as its own page (2026-10) --------------------------------------
+   No decks above it any more, so it gets its own top breath instead of the
+   pull-up it used under the homepage. */
+.ab--page {
+  margin-top: 0;
+  /* the bottom leaves room for the portrait's party frame, which blooms
+     ~0.37 of the portrait's width below it, plus a clear gap to the footer */
+  padding-block: clamp(40px, 8vh, 112px) clamp(120px, 12vw, 180px);
+}
+
+.ab--page .ab-portrait {
+  cursor: pointer;
+}
+
+/* Tissue-paper confetti (confetti.ts). Fixed to the viewport, its own 3D
+   space so each piece can flutter. */
+.tissue-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  perspective: 700px;
+}
+
+.tissue {
+  position: absolute;
+  display: block;
+  opacity: 0;
+  mix-blend-mode: multiply;
+  border-radius: 1px;
+  backface-visibility: visible;
+}
+
+/* Fibres in the tissue. */
+.tissue::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  mix-blend-mode: soft-light;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.6 0.45' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.7 0'/%3E%3C/filter%3E%3Crect width='40' height='40' filter='url(%23f)'/%3E%3C/svg%3E");
+}
+
+.tissue--triangle {
+  clip-path: polygon(50% 0, 100% 92%, 0 100%);
+}
+
+.tissue--dot {
+  border-radius: 50%;
+}
+
+.tissue--ribbon {
+  clip-path: polygon(0 30%, 12% 0, 25% 30%, 37% 0, 50% 30%, 62% 0, 75% 30%, 87% 0, 100% 30%, 100% 100%, 87% 70%, 75% 100%, 62% 70%, 50% 100%, 37% 70%, 25% 100%, 12% 70%, 0 100%);
+}
+
+.tissue--streamer {
+  border-radius: 2px;
+}
+
+/* --- The party frame (portraitPop.ts) ---------------------------------------
+   Tucked under the photo: its own layer behind the image, so the pieces hide
+   beneath it at rest and bloom out round it when the photo tilts up. */
+.ab-pop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.ab-portrait img {
+  z-index: 1;
+}
+
+.ab-pc {
+  position: absolute;
+  will-change: transform;
+}
+
+.ab-pc-in {
+  position: absolute;
+  inset: 0;
+}
+
+.ab-pc img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Gold leaf is opaque and sits on the page: a soft contact shadow, on the
+   resting leaf only (on the wrapper it would also wrap the lit layer, and
+   every glint would redraw the filter). */
+.ab-pc--gold .rest {
+  filter: drop-shadow(0 1.2px 1.2px rgba(60, 40, 0, 0.22)) drop-shadow(0 3px 5px rgba(15, 23, 42, 0.1));
+}
+
+.ab-pc--gold .lit {
+  opacity: 0;
+}
+
+/* Tissue is thin: where sheets cross they layer, the page and the sheet
+   beneath still showing through. Normal blending, not multiply: multiplied,
+   two pastels cross to a dark, muddy third colour. */
+
+.ab-pc--tissue .ab-pc-in {
+  filter: drop-shadow(0 1px 1.5px rgba(15, 23, 42, 0.08));
+}
+
+.ab-curl {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.ab-curl--gold {
+  filter: drop-shadow(0 0.6px 0.6px rgba(60, 40, 0, 0.25));
+}
+
+.ab-curl--tissue {
+  mix-blend-mode: multiply;
+}
+
+/* --- About, typed (2026-10-05) -------------------------------------------
+   Her handwriting is retired for typed copy: the title in General Sans,
+   left-aligned, a window onto the lily painting (as Home's title is onto the
+   skyline), a step smaller than the hero so it fits beside the portrait; the
+   copy in the site's mono. */
+.ab-heading {
+  margin: 0;
+  font-family: var(--font-hero);
+  font-weight: 700;
+  /* "an interdisciplinary" is ~8.9em wide: on narrow phones it shrinks to fit */
+  font-size: min(clamp(40px, 5vw, 76px), calc((100vw - 40px) / 8.9));
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  text-align: left;
+  /* lifted off the page by a soft shadow (no border: her call). A filter, not
+     text-shadow: with a clipped fill, text-shadow paints over the painting */
+  filter: drop-shadow(0 0 0.85px rgba(23, 23, 23, 0.42)); /* a touch more than the hero: the lilies are lighter */
+  background-image: url("/home/footer/water-lilies-5b-smooth.webp");
+  background-size: cover;
+  background-position: 30% 45%;
+  /* room for the descenders (p, y, g) inside the painted box; see .hero-title */
+  padding-block: 0.04em 0.2em;
+  margin-block: -0.04em -0.2em;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.ab-body .line {
+  text-transform: none; /* reading copy: sentence case, unlike the labels */
+}
+
+.ab-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1em;
+  max-width: 60ch;
+  margin-top: clamp(22px, 3.2vh, 36px);
+}
+
+/* Berkeley Mono Trial draws "/" as a backslash: the slash comes from the next mono */
+.ab-slash {
+  font-family: var(--font-mono-system);
+}
+
+/* Experience: a ruled table, as on emmiwu.com/about. Org, role, year; a
+   hairline between rows. */
+.ab-exp {
+  margin-top: clamp(40px, 6vh, 64px);
+  width: var(--ab-title-w, 100%);
+  max-width: 100%;
+}
+
+.ab-exp-h {
+  margin: 0 0 12px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mono-secondary);
+}
+
+.ab-exp-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ab-exp-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) auto;
+  column-gap: 20px;
+  padding: 10px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--espresso) 14%, transparent);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: var(--mono-secondary);
+}
+
+@media (max-width: 599px) {
+  .ab-exp-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .ab-exp-role {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .ab-exp-year {
+    grid-row: 1;
+    grid-column: 2;
+  }
+}
+
+.ab-exp-kind {
+  color: var(--mono-tertiary, #737373);
+}
+
+/* --- The portrait as glass (portraitGlass.ts), like the gallery's posters ---
+   .ab-pane lifts for the celebration (portraitPop.ts); .ab-glass inside it
+   leans toward the cursor and holds the light layers. */
+.ab-pane,
+.ab-glass {
+  position: absolute;
+  inset: 0;
+}
+
+.ab-pane {
+  z-index: 1;
+  filter: drop-shadow(0 1px 0 var(--shadow-contact));
+}
+
+.ab-glass {
+  overflow: hidden;
+  isolation: isolate;
+  backface-visibility: hidden;
+  transform-origin: 50% 50%;
+}
+
+.ab-portrait .ab-glass img {
+  filter: none;
+}
+
+.ab-sheen,
+.ab-glare,
+.ab-rim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* the glass's glare: the posters' soft band of light, travelling across the
+   pane as it tilts; kept faint (at full strength it washed the photo white,
+   and as a narrow streak it read streaky) */
+.ab-sheen {
+  inset: 0 auto 0 0;
+  width: 250%;
+  mix-blend-mode: screen;
+  opacity: 0;
+  transform: translate3d(-72%, 0, 0);
+  background: linear-gradient(
+    105deg,
+    transparent 24%,
+    rgba(255, 214, 230, 0.3) 35%,
+    rgba(255, 255, 255, 0.75) 43%,
+    rgba(200, 230, 255, 0.25) 50%,
+    transparent 64%
+  );
+}
+
+
+/* the cursor's light: a soft pool under the cursor, as on the posters */
+.ab-glare {
+  inset: -50%;
+  mix-blend-mode: screen;
+  opacity: 0;
+  background: radial-gradient(
+    circle closest-side,
+    rgba(255, 255, 255, 0.15),
+    rgba(255, 255, 255, 0.035) 25.6%,
+    transparent 46.4%
+  );
+}
+
+/* the pane's edge: a lit top, a shaded bottom */
+.ab-rim {
+  z-index: 3;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.16);
 }

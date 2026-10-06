@@ -808,7 +808,7 @@ function Journal({ journal, index }: Props) {
 
       {/* One line, and always the topmost thing on screen — the images land
           around it, never over it. */}
-      <span className="jr-tooltip">
+      <span className="jr-tooltip wt-tip">
         {href ? (
           <span className="jr-tooltip-cta">
             {ctaLabel}

@@ -59,31 +59,31 @@ function ContactIcons({ className = "" }: { className?: string }) {
     const root = rootRef.current;
     if (!root) return;
     const cleanups = Array.from(
-      root.querySelectorAll<HTMLElement>(".tile")
+      root.querySelectorAll<HTMLElement>(".wt-tile")
     ).map(attachTilePress);
     return () => cleanups.forEach((fn) => fn());
   }, []);
 
   return (
-    <ul className={`tiles ${className}`.trim()} ref={rootRef}>
+    <ul className={`wt-tiles ${className}`.trim()} ref={rootRef}>
       {links.map((l) => (
         <li key={l.href}>
           <a
-            className="tile tile--gear"
+            className="wt-tile wt-tile--gear"
             href={l.href}
             aria-label={l.label}
             {...(l.external ? { target: "_blank", rel: "noreferrer" } : {})}
           >
             <svg
-              className="tile-gear"
+              className="wt-tile-gear"
               viewBox="0 0 100 100"
               aria-hidden="true"
               focusable="false"
             >
-              <path className="tile-gear-body" d={GEAR_PATH} />
+              <path className="wt-tile-gear-body" d={GEAR_PATH} />
             </svg>
             <svg
-              className="tile-glyph"
+              className="wt-tile-glyph"
               viewBox={l.viewBox}
               aria-hidden="true"
               focusable="false"

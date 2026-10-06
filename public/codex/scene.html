@@ -1,0 +1,546 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Codex Bookmarks — prototype</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  --desk:#efeff2; --win:#ffffff; --side:#f9f9f9; --line:#e6e6e6; --line2:#ececec;
+  --ink:#0d0d0d; --ink2:#5d5d5d; --ink3:#8e8e8e; --bubble:#f4f4f4; --code:#f7f7f7;
+  --c-blue:#3A83F7; --c-purple:#A075F1; --c-pink:#EE61A2; --c-yellow:#E5B53A; --c-green:#53B559; --c-gray:#737373;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:"SF Mono",Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg,var(--desk));font-family:var(--font);-webkit-font-smoothing:antialiased}
+#stage{position:absolute;left:50%;top:50%;margin:-450px 0 0 -720px;transform:scale(var(--k,1));width:1440px;height:900px;background:var(--desk);overflow:hidden;perspective:2600px;perspective-origin:50% 50%}
+#stage.dark{background:#000}
+#screen{position:absolute;left:46px;top:56px;width:1348px;height:788px;transform-style:preserve-3d}
+#window{position:absolute;inset:0;background:var(--win);border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.18),0 0 0 1px rgba(0,0,0,.08);overflow:hidden;transform-style:preserve-3d}
+/* sidebar */
+#sidebar{position:absolute;left:0;top:0;bottom:0;width:216px;background:#f9f9f9;border-right:1px solid #ececec;padding:0 6px;color:var(--ink)}
+.chrome{display:flex;align-items:center;height:34px;padding:0 8px;gap:9px;color:#8a8a8a}
+.lights{display:flex;gap:7px;margin-right:2px}
+.lights i{width:12px;height:12px;border-radius:50%;display:block}
+.lights i:nth-child(1){background:#ff5f57}.lights i:nth-child(2){background:#febc2e}.lights i:nth-child(3){background:#28c840}
+.chrome svg{width:16px;height:16px;display:block}
+.chrome .nav{color:#b9b9b9}
+.sb-top{display:flex;align-items:center;justify-content:space-between;margin-top:0;padding:0 8px 0 7px;height:28px}
+.brand{font-weight:600;font-size:14px;display:flex;align-items:center;gap:5px;color:var(--ink)}
+.sb-icons{display:flex;gap:12px;color:#5d5d5d}
+.sb-icons svg{width:15px;height:15px;display:block}
+.sb-new{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:0 7px;height:28px;color:var(--ink)}
+.sb-new svg{width:14px;height:14px}
+.sb-rule{height:1px;background:#e6e6e6;margin:2px -6px 6px}
+.sb-item{font-size:12.5px;color:var(--ink);height:24.5px;line-height:24.5px;padding:0 7px;border-radius:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;justify-content:space-between;gap:6px}
+.sb-item span{overflow:hidden;text-overflow:ellipsis}
+.sb-item svg{width:12px;height:12px;flex:none;color:#8a8a8a}
+.sb-item.dim{color:#a3a3a3}
+.sb-item.active{background:#ececec}
+.sb-item.in{padding-left:25px}
+.sb-sec{font-size:12px;color:#8e8e8e;padding:0 7px;height:24px;line-height:24px;margin-top:16px}
+.sb-proj{display:flex;align-items:center;gap:6px;font-size:12.5px;padding:0 7px;height:24.5px;color:var(--ink);margin-top:14px}
+.sb-proj svg{width:13px;height:13px;color:#5d5d5d}
+.sb-gap{height:14px}
+.sb-account{position:absolute;left:6px;right:6px;bottom:8px;display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:500;padding:0 7px;height:28px}
+.avatar{width:22px;height:22px;border-radius:50%;background:#3b3b3b;color:#fff;font-size:8.5px;font-weight:600;display:flex;align-items:center;justify-content:center;letter-spacing:.02em}
+/* main */
+#main{position:absolute;left:216px;top:0;right:0;bottom:0;background:var(--win)}
+#topbar{position:absolute;left:0;right:0;top:0;height:36px;display:flex;align-items:center;justify-content:flex-end;gap:18px;padding:0 16px;color:#5d5d5d;font-size:12.5px;z-index:5}
+#topbar svg{width:14px;height:14px;display:block}
+#topbar .share{display:flex;align-items:center;gap:5px}
+#pane{position:absolute;left:0;right:0;top:44px;bottom:60px;overflow:hidden}
+#doc{position:absolute;left:0;right:0;top:0;padding:0 0 22px}
+.col{width:582px;margin:0 auto}
+.msg{position:relative;padding:10px 0}
+.msg.user{display:flex;flex-direction:column;align-items:flex-end}
+.msg.user .uacts{display:flex;gap:5px;color:#5d5d5d;margin:6px -3px 0 0}
+.msg.user .uacts .ic{width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:6px}
+.msg.user .uacts svg{width:13px;height:13px;display:block}
+.msg.user .b{background:#f3f3f3;border-radius:16px;padding:7px 13px;max-width:400px;font-size:13px;line-height:18px;color:var(--ink)}
+.msg.ai{font-size:13px;line-height:18px;color:var(--ink)}
+.msg.ai p{margin:0 0 11px}
+.msg.ai h4{font-size:13.5px;font-weight:600;margin:2px 0 6px}
+.msg.ai blockquote{border-left:2px solid #e3e3e3;padding:1px 0 1px 16px;margin:0 0 11px;color:var(--ink)}
+.msg.ai blockquote.q{font-weight:600}
+.msg.ai pre{background:#f4f4f4;border-radius:10px;padding:9px 16px 12px;font-family:var(--mono);font-size:11.5px;line-height:16px;margin:0 0 11px;color:#222;white-space:pre}
+.msg.ai pre .hdr{display:flex;justify-content:space-between;align-items:center;font-family:var(--font);font-size:11.5px;color:#3d3d3d;margin:0 -4px 10px;padding-bottom:0}
+.msg.ai pre .hdr svg{width:13px;height:13px;display:inline-block;vertical-align:-2px}
+.msg.ai pre .hdr .r{display:flex;gap:16px;color:#5d5d5d}
+.actions{display:flex;gap:5px;color:#5d5d5d;margin-top:-2px;align-items:center;margin-left:-3px}
+.actions svg{width:13px;height:13px;display:block}
+.actions .ic{width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:6px;position:relative}
+.actions .ic.hover{background:#ececec}
+.actions .tip{position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);background:#fff;color:var(--ink);font-size:11.5px;font-weight:500;padding:4px 8px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.12),0 0 0 1px rgba(0,0,0,.06);white-space:nowrap;pointer-events:none}
+.flash{position:absolute;left:-14px;top:12px;bottom:12px;width:3px;border-radius:2px;opacity:0}
+/* composer */
+#composer{position:absolute;left:0;right:0;bottom:0;height:60px;background:var(--win)}
+#composer .box{width:582px;margin:12px auto 0;height:36px;border:1px solid #e9e9e9;border-radius:18px;box-shadow:0 2px 8px rgba(0,0,0,.05);display:flex;align-items:center;padding:0 8px 0 14px;gap:10px;color:#9a9a9a;font-size:13.5px}
+#composer .box svg{width:14px;height:14px;display:block;color:#5d5d5d}
+#composer .box .sp{flex:1}
+#composer .send{width:26px;height:26px;border-radius:50%;background:#bcd7fb;display:flex;align-items:center;justify-content:center;color:#fff}
+#composer .send svg{color:#fff;width:13px;height:13px}
+/* scrollbar */
+#thumb{position:absolute;right:3px;width:6px;border-radius:3px;background:rgba(0,0,0,.28);opacity:0}
+/* markers */
+.mk{position:absolute;right:22px;height:16px;width:14px;transform-origin:50% 50%;transform:translateY(-50%);background:none!important}
+.mk .g{position:absolute;inset:0;z-index:2}
+.mk .g svg{width:14px;height:16px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.18))}
+.mk .chip{position:absolute;right:20px;top:50%;width:max-content;transform-origin:100% 50%;transform:translateY(-50%);background:#fff!important;color:var(--ink)!important;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.14),0 0 0 1px rgba(0,0,0,.06);padding:7px 8px 7px 12px;display:flex;align-items:flex-start;gap:8px;white-space:nowrap;font-size:12.5px;font-weight:500;overflow:hidden;opacity:0;pointer-events:none}
+.mk .chip .dot{width:8px;height:8px;border-radius:50%;flex:none;margin-top:5px}
+.mk .chip .cc{display:flex;flex-direction:column;gap:2px}
+.mk .chip .sn{font-size:11px;font-weight:400;color:var(--ink3);white-space:nowrap}
+.mk .chip .sn b{font-weight:500;color:var(--ink2)}
+.mk .chip svg{width:14px;height:14px;flex:none}
+.mk .chip .pen{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;margin-left:6px;align-self:center;color:var(--ink2);background:none!important}
+/* toolbar */
+#tb{z-index:20;position:absolute;width:272px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.12),0 0 0 1px rgba(0,0,0,.07);padding:12px;transform-origin:100% 100%;opacity:0;transform-style:preserve-3d}
+.tbx .tail{display:none}
+.tbx .field{height:36px;border:0;border-radius:8px;padding:0 12px;display:flex;align-items:center;font-size:13.5px;color:var(--ink);position:relative;background:#f4f4f5}
+.tbx .field .sp{flex:1}
+.tbx .field{white-space:nowrap;overflow:hidden}
+.tbx .field #typed,.tbx .field .typed{overflow:hidden;flex:0 1 auto}
+.tbx .field .count{font-size:11.5px;color:var(--ink3);font-variant-numeric:tabular-nums;margin-left:8px}
+.tbx .field.focus{background:#f4f4f5}
+.tbx .field .ph{color:var(--ink3)}
+.tbx .caret{width:1px;height:18px;background:var(--ink);margin-left:1px}
+.tbx .meta{display:none}
+.tbx .meta .count{font-variant-numeric:tabular-nums}
+.tbx .div{display:none}
+.tbx .swatches{display:flex;justify-content:space-between;padding:0 4px;margin-top:16px}
+.tbx .sw{width:20px;height:20px;border-radius:50%;position:relative;transform:scale(1);display:flex;align-items:center;justify-content:center;background:none!important}
+.tbx .sw::before{content:"";width:16px;height:16px;border-radius:50%;background:var(--c)}
+.tbx .sw .ring{position:absolute;inset:-2px;border-radius:50%;border:2px solid currentColor;opacity:0;transform:scale(.7);box-shadow:inset 0 0 0 2px #fff}
+.tbx .sw .dot{display:none}
+.tbx .sw.hover{}
+/* flying icon */
+#fly{position:absolute;z-index:21;width:20px;height:20px;opacity:0;pointer-events:none;transform-origin:50% 50%}
+#fly svg{width:20px;height:20px;display:block}
+/* cursor & click */
+#cursor{position:absolute;width:12px;height:19px;transform-origin:1px 1px;opacity:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));z-index:50}
+#ripple{position:absolute;width:44px;height:44px;border-radius:50%;border:2px solid rgba(0,0,0,.35);opacity:0;pointer-events:none;z-index:49}
+/* enter key */
+#keycap{position:absolute;right:36px;bottom:32px;width:76px;height:64px;border-radius:12px;background:#fff;box-shadow:0 1px 0 #cfcfcf,0 8px 20px rgba(0,0,0,.14),0 0 0 1px rgba(0,0,0,.06);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--ink);opacity:0;z-index:60}
+#keycap .g{font-size:22px;line-height:1}
+#keycap .l{font-size:11px;color:var(--ink3);letter-spacing:.02em}
+/* 3D layers */
+.layer{position:absolute;width:272px;border-radius:12px;opacity:0;transform-style:flat;overflow:visible}
+.layer.grid{background:#fafafa;box-shadow:0 0 0 1px rgba(0,0,0,.08),0 24px 48px rgba(0,0,0,.35);background-image:linear-gradient(rgba(0,0,0,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.06) 1px,transparent 1px);background-size:8px 8px;background-position:-1px -1px;border-radius:12px}
+.layer.grid .gl{position:absolute;background:#8e8e93;opacity:.9}
+.layer.grid .gl.h{height:1px}.layer.grid .gl.v{width:1px}
+.layer.grid .dim{position:absolute;font-size:9px;line-height:1;color:#8e8e93;font-family:var(--mono);font-weight:600;background:#fafafa;padding:1px 3px;border-radius:3px;white-space:nowrap}
+.layer.grid .tick{display:none}
+.layer.grid .dl{position:absolute;background:#8e8e93}
+.layer.grid .dl.h{height:1px}.layer.grid .dl.v{width:1px}
+.layer.grid .dt{position:absolute;background:#8e8e93}
+.layer.grid .dt.h{width:1px;height:5px}.layer.grid .dt.v{width:5px;height:1px}
+.layer.grid .cap{display:none;font-family:var(--mono);letter-spacing:.02em;white-space:nowrap}
+.layer.wire{background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.08),0 24px 48px rgba(0,0,0,.35);border-radius:12px;overflow:hidden}
+.layer.wire .bx{position:absolute;border:1px solid #c9c9ce;border-radius:8px;background:#fafafa}
+.layer.wire .bx.circ{border-radius:50%}
+.layer.wire .t{position:absolute;font-size:11px;color:#6b6b70;font-family:var(--font);letter-spacing:.01em}
+.layer.wire .t::after{content:"";position:absolute;left:0;width:var(--rw,0px);bottom:-2px;height:1px;background:#d6d6db}
+.layer.real{box-shadow:0 24px 48px rgba(0,0,0,.35),0 0 0 1px rgba(0,0,0,.06);overflow:hidden}
+.layer.blocks{background:#f2f2f4;box-shadow:0 0 0 1px rgba(0,0,0,.08),0 24px 48px rgba(0,0,0,.35);border-radius:12px;overflow:hidden}
+.layer.blocks .bx{position:absolute;background:#d2d2d8;border-radius:8px}
+.layer.blocks .bx.circ{border-radius:50%}
+.cap4{position:absolute;width:300px;color:#fff;font-family:var(--font)}
+.cap4 .n{font-family:var(--mono);font-size:15px;color:#8e8e8e;letter-spacing:.04em}
+.cap4 .h{font-size:26px;font-weight:600;letter-spacing:-.01em;margin:8px 0 6px}
+.cap4 .d{font-size:18px;line-height:25px;color:#a3a3a3}
+#surfaceShadow{position:absolute;left:0;top:0;width:1348px;height:788px;border-radius:12px;background:rgba(255,255,255,.06);opacity:0}
+</style></head>
+<body>
+<div id="stage">
+ <div id="screen">
+  <div id="window">
+   <div id="sidebar">
+    <div class="chrome"><div class="lights"><i></i><i></i><i></i></div>
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1.5" y="3" width="13" height="10" rx="2"/><path d="M6 3v10"/></svg>
+      <svg class="nav" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>
+      <svg class="nav" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg>
+    </div>
+    <div class="sb-top"><div class="brand">ChatGPT <svg width="9" height="9" viewBox="0 0 10 10"><path d="M2 3.5l3 3 3-3" fill="none" stroke="#5d5d5d" stroke-width="1.3"/></svg></div>
+      <div class="sb-icons"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14" stroke-linecap="round"/></svg><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M4 11V7a4 4 0 0 1 8 0v4l1.2 1.5H2.8z"/><path d="M6.5 14h3" stroke-linecap="round"/></svg></div></div>
+    <div class="sb-new"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3H3.5A1.5 1.5 0 0 0 2 4.5v8A1.5 1.5 0 0 0 3.5 14h8a1.5 1.5 0 0 0 1.5-1.5V9"/><path d="M12.5 2.5l1 1L8 9l-1.6.6L7 8z"/></svg>New chat</div>
+    <div class="sb-rule"></div>
+    <div class="sb-item in"><span>Plan a Lisbon long weekend</span></div>
+    <div class="sb-item in"><span>Sourdough hydration math</span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="3" cy="6" r="1.3"/><circle cx="9" cy="2.5" r="1.3"/><circle cx="9" cy="9.5" r="1.3"/><path d="M4.2 5.4l3.6-2.2M4.2 6.6l3.6 2.2"/></svg></div>
+    <div class="sb-item in"><span>Name my houseplant startup</span></div>
+    <div class="sb-item in"><span>Rewrite tenant email politely</span></div>
+    <div class="sb-item in dim"><span>Show more</span></div>
+    <div class="sb-proj"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"><path d="M1.5 4.5A1 1 0 0 1 2.5 3.5h3.2l1.5 1.5h6.3a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1z"/></svg>Marathon training</div>
+    <div class="sb-item in"><span>Week 6 long run plan</span></div>
+    <div class="sb-item in"><span>Compare racing shoe drop</span></div>
+    <div class="sb-item in"><span>Fix Strava sync script</span></div>
+    <div class="sb-item in"><span>Race day checklist</span></div>
+    <div class="sb-item in"><span>Interval pace calculator</span></div>
+    <div class="sb-item in dim"><span>Show more</span></div>
+    <div class="sb-sec">Recents</div>
+    <div class="sb-item"><span>Explain taper week to Sam</span></div>
+    <div class="sb-item"><span>Cheap ways to soundproof a door</span></div>
+    <div class="sb-item active"><span>Half marathon plan</span></div>
+    <div class="sb-item"><span>Chat bookmark options</span></div>
+    <div class="sb-item"><span>Summarize book club chapter 4</span></div>
+    <div class="sb-item"><span>Pick a paint color for hallway</span></div>
+    <div class="sb-item"><span>Convert recipe to metric</span></div>
+    <div class="sb-item"><span>Debug espresso channeling</span></div>
+    <div class="sb-item"><span>Write toast for wedding</span></div>
+    <div class="sb-item"><span>Explain APR vs APY simply</span></div>
+    <div class="sb-item"><span>Plan garage shelving layout</span></div>
+    <div class="sb-item"><span>Generate crossword clues</span></div>
+    <div class="sb-account"><div class="avatar">JD</div>Jane Doe</div>
+   </div>
+   <div id="main">
+    <div id="topbar"><span class="share"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v8M5 5l3-3 3 3M3 9.5V13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V9.5"/></svg>Share</span><span style="letter-spacing:1px">···</span><span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2.5" y="2.5" width="11" height="11" rx="2"/></svg></span></div>
+    <div id="pane"><div id="doc"><div class="col" id="col"></div></div><div id="thumb"></div><div id="markers"></div></div>
+    <div id="composer"><div class="box"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg><span>Message ChatGPT</span><span class="sp"></span><span style="font-size:12.5px;display:flex;align-items:center;gap:4px">Instant <svg viewBox="0 0 10 10" style="width:9px;height:9px"><path d="M2 3.5l3 3 3-3" fill="none" stroke="#5d5d5d" stroke-width="1.3"/></svg></span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="5.5" y="1.5" width="5" height="8" rx="2.5"/><path d="M3 7.5a5 5 0 0 0 10 0M8 12.5V15"/></svg><div class="send"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V3M4 7l4-4 4 4"/></svg></div></div></div>
+   </div>
+  </div>
+   <div id="fly"></div>
+   <div id="tb" class="tbx"><div class="tail"></div>
+     <div class="field" id="field"><span class="ph" id="ph">Name this bookmark</span><span id="typed"></span><span class="caret" id="caret"></span><span class="sp"></span><span class="count" id="count">0/40</span></div>
+     <div class="meta"></div>
+     <div class="div"></div>
+     <div class="swatches" id="swatches"></div>
+   </div>
+   <div class="layer grid" id="lgrid"></div>
+   <div class="layer blocks" id="lblocks"></div>
+   <div class="layer wire" id="lwire"></div>
+   <div class="layer real tbx" id="lreal"></div>
+ </div>
+ <div id="keycap"><div class="g">↵</div><div class="l">return</div></div>
+ <div id="ripple"></div>
+ <svg id="cursor" viewBox="0 0 12 19"><path d="M1 1v14.6l3.4-3.3 2.3 5.4 2.4-1.1-2.3-5.2H11z" fill="#000" stroke="#fff" stroke-width="1.1" stroke-linejoin="round"/></svg>
+</div>
+<script>
+// ---------- content ----------
+const ICON = {
+ copy:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="2"/><path d="M10.5 5.5v-1a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h1"/></svg>',
+ share:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 2v8M5 5l3-3 3 3M3 9v4h10V9"/></svg>',
+ retry:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M13 8a5 5 0 1 1-1.5-3.6M13 2.5v3h-3"/></svg>',
+ thumbs:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M2 7h2.2v6H2zM4.2 7l2.6-4.4c1 0 1.8.7 1.8 1.7V6h2.6a1 1 0 0 1 1 1.2l-.7 4.6a1 1 0 0 1-1 .9H4.2z"/><path d="M11.5 11.5c.6 0 1.1.4 1.1 1v1.2" opacity=".0"/></svg>',
+ more:'<svg viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.3"/><circle cx="8" cy="8" r="1.3"/><circle cx="13" cy="8" r="1.3"/></svg>',
+ bm:(fill)=>`<svg viewBox="0 0 16 16" fill="${fill||'none'}" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M4 2.5h8v11l-4-3-4 3z"/></svg>`,
+ edit:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M3 13l.6-2.8L10.8 3l2.2 2.2-7.2 7.2z"/><path d="M9.8 4l2.2 2.2"/></svg>',
+ pen:'<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"><path d="M2.5 11.5l.6-2.6 6.4-6.4 2 2-6.4 6.4z"/><path d="M8.6 3.4l2 2"/></svg>'
+};
+const MSGS = [
+ {r:'user', t:'I keep bonking around mile 9 on long runs. What am I doing wrong with fuel?'},
+ {r:'ai', h:`<p>Almost certainly you are starting too late. Most people take their first gel when they already feel flat, and by then you are 20 minutes behind. The fix is boring: <b>fuel on a schedule, not on feel</b>.</p><h4>The one rule</h4><blockquote class="q">"Eat before you need it, drink before you're thirsty, and never try anything new on race day."</blockquote><p>For a 13.1 you want roughly 30 to 60 g of carbs per hour, starting at minute 30, not minute 60.</p>`},
+ {r:'user', t:'Okay, give me the actual timeline. I run about 10:30 pace.'},
+ {r:'ai', h:`<h4>Fuel timeline at 10:30 pace</h4><pre><div class="hdr"><span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M5.5 4L2 8l3.5 4M10.5 4L14 8l-3.5 4"/></svg> Plain text</span><span class="r"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M2 4h10M2 8h7a2 2 0 0 1 0 4H7M9 10l-2 2 2 2M13 6v6"/></svg><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="5.5" width="8" height="8" rx="2"/><path d="M10.5 5.5v-1a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h1"/></svg></span></div>Before start:
+• Bagel + banana, 2 hours out
+• 16 oz water, sip until 15 min before
+
+During:
+• Mile 3   → gel #1 + water
+• Mile 6   → gel #2 + water
+• Mile 9   → gel #3 + electrolytes
+• Mile 11  → half gel if stomach is grouchy</pre><p>So the honest rule: if you are waiting to feel hungry, you are already late. Gel #1 goes in while you still feel great.</p>`},
+ {r:'user', t:'What about the week before? My friend says carb loading is a myth.'},
+ {r:'ai', h:`<h4>Carb loading, the non-myth version</h4><p>It is not a giant pasta dinner the night before. It is <b>two to three days of slightly higher carbs</b> while your mileage drops, so glycogen actually has room to top up.</p><pre><div class="hdr"><span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M5.5 4L2 8l3.5 4M10.5 4L14 8l-3.5 4"/></svg> Plain text</span><span class="r"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M2 4h10M2 8h7a2 2 0 0 1 0 4H7M9 10l-2 2 2 2M13 6v6"/></svg><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="5.5" width="8" height="8" rx="2"/><path d="M10.5 5.5v-1a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h1"/></svg></span></div>Thu → normal meals, add rice at lunch
+Fri → 60% of plate is carbs, low fiber
+Sat → same, dinner by 7pm, nothing new
+Sun → race, bagel at 5:30am</pre><p>If your friend means "one huge dinner does nothing," they are right. Three quiet days of extra rice does something.</p>`},
+ {r:'user', t:'Last one. Is the taper week a rest week or a training week? Sam asked in the group chat and nobody answered.'},
+ {r:'ai', h:`<p>Then you change one thing about the taper:</p><p><b>Before:</b> 32 miles, legs heavy on race day<br><b>After:</b> 18 miles, same intensity, legs fresh</p><p>→ improvement.</p><h4>So is it rest or training?</h4><p>I'd actually say it's <b>closer to a training week at lower volume</b> than a rest week, because you keep touching every kind of run:</p><blockquote>Tuesday → short strides, race pace<br>Thursday → easy 3 with 4 pickups<br>Saturday → 2 miles, shake out<br>Sunday → race</blockquote><p>And when you find a workout that leaves you flat, you <b>drop it from next taper</b> so it never happens again.</p><p>For Sam, the simple explanation I'd use is:</p><blockquote class="q">"Taper week is a normal training week with the miles cut in half and the sharpness kept."</blockquote><p>If they get technical, add that you'd ideally keep <b>one short race pace session</b> too, because dropping intensity entirely makes the first mile feel like running in sand.</p>`}
+];
+const col=document.getElementById('col');
+MSGS.forEach((m,i)=>{
+ const d=document.createElement('div');d.className='msg '+m.r;d.id='m'+i;
+ if(m.r==='user'){const bk=i===4;d.innerHTML=`<div class="b">${m.t}</div>${bk?`<div class="uacts"><span class="ic">${ICON.copy}</span><span class="ic" style="color:#53B559">${ICON.bm('currentColor')}</span><span class="ic">${ICON.edit}</span></div>`:''}`}
+ else{d.innerHTML=`<div class="flash" id="flash${i}"></div>${m.h}<div class="actions"><span class="ic">${ICON.copy}</span><span class="ic">${ICON.share}</span><span class="ic">${ICON.retry}</span><span class="ic">${ICON.thumbs}</span><span class="ic bmk" id="bmk${i}"${i===1?` style="color:#3A83F7"`:``}>${i===1?ICON.bm('currentColor'):ICON.bm()}</span><span class="ic">${ICON.more}</span></div>`}
+ col.appendChild(d);
+});
+const COLORS=[['blue','#3A83F7'],['purple','#A075F1'],['pink','#EE61A2'],['yellow','#E5B53A'],['green','#53B559'],['gray','#737373']];
+const sw=document.getElementById('swatches');
+COLORS.forEach(([n,c])=>{const s=document.createElement('div');s.className='sw';s.id='sw-'+n;s.style.setProperty('--c',c);s.style.color=c;s.innerHTML='<span class="ring"></span><span class="dot"></span>';sw.appendChild(s)});
+
+// ---------- geometry ----------
+const pane=document.getElementById('pane'), doc=document.getElementById('doc'), thumb=document.getElementById('thumb');
+const PANE={top:44,h:788-44-60,w:1132}; // relative to #main
+const MAIN_X=216; // window-relative
+const WIN={x:46,y:56};
+let DOC_H=0, MAX_SCROLL=0;
+function measure(){DOC_H=doc.offsetHeight;MAX_SCROLL=Math.max(0,DOC_H-PANE.h)}
+measure();
+function docY(id){const el=document.getElementById(id);let y=0,n=el;while(n&&n!==doc){y+=n.offsetTop;n=n.offsetParent}return y}
+// bookmarks: existing ones on messages 1 and 3; new one on message 5
+const BOOKS=[
+ {id:'b1',msg:1,color:'#3A83F7',dark:false,title:'Fuel on a schedule',sn:'Sep 4'},
+ {id:'b3',msg:4,color:'#53B559',dark:false,title:'Carb loading question',sn:'Yesterday'},
+ {id:'b7',msg:7,color:'#737373',dark:false,title:'',sn:'Today'}
+];
+const mkWrap=document.getElementById('markers');
+BOOKS.forEach(b=>{const m=document.createElement('div');m.className='mk';m.id=b.id;m.style.background=b.color;m.innerHTML=`<div class="chip"><i class="dot"></i><div class="cc"><span class="tt"></span><span class="sn"></span></div><span class="pen">${ICON.pen}</span></div><div class="g"></div>`;mkWrap.appendChild(m);b.el=m;b.chip=m.querySelector('.chip');b.tt=m.querySelector('.tt');b.snEl=m.querySelector('.sn');b.g=m.querySelector('.g')});
+function markerY(b){const target=Math.min(Math.max(docY('m'+b.msg)-40,0),MAX_SCROLL);return 12+(target/MAX_SCROLL)*(PANE.h-64)}
+
+// ---------- easing ----------
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const seg=(t,a,b)=>clamp((t-a)/(b-a));
+const easeOutQuint=x=>1-Math.pow(1-x,5);
+const easeInOutCubic=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const easeOutCubic=x=>1-Math.pow(1-x,3);
+const easeInQuad=x=>x*x;
+const easeInOutQuart=x=>x<.5?8*x*x*x*x:1-Math.pow(-2*x+2,4)/2;
+// motion.dev-style spring: stiffness, damping, mass; from 0 to 1, v0=0 (underdamped analytical)
+function spring(t,{stiffness=170,damping=22,mass=1}={}){
+ if(t<=0)return 0;const w0=Math.sqrt(stiffness/mass),z=damping/(2*Math.sqrt(stiffness*mass));
+ if(z<1){const wd=w0*Math.sqrt(1-z*z);return 1-Math.exp(-z*w0*t)*(Math.cos(wd*t)+(z*w0/wd)*Math.sin(wd*t))}
+ return 1-(1+w0*t)*Math.exp(-w0*t);
+}
+const lerp=(a,b,p)=>a+(b-a)*p;
+function bez(p0,p1,p2,p){const u=1-p;return {x:u*u*p0.x+2*u*p*p1.x+p*p*p2.x,y:u*u*p0.y+2*u*p*p1.y+p*p*p2.y}}
+function path(t,pts){ // pts: [{t,x,y}] cursor waypoints, eased between
+ if(t<=pts[0].t)return pts[0];for(let i=0;i<pts.length-1;i++){const a=pts[i],b=pts[i+1];if(t<=b.t){const p=easeInOutCubic(seg(t,a.t,b.t));return {x:lerp(a.x,b.x,p),y:lerp(a.y,b.y,p)}}}return pts[pts.length-1]}
+
+// ---------- state applier ----------
+const S={};
+const $=id=>document.getElementById(id);
+const stage=$('stage'),screen=$('screen'),tb=$('tb'),fly=$('fly'),cursor=$('cursor'),ripple=$('ripple'),keycap=$('keycap');
+const TITLE='Taper week, explained';
+function stageXY(mainX,mainY){return {x:WIN.x+MAIN_X+mainX,y:WIN.y+mainY}}
+function applyScroll(s){doc.style.transform=`translateY(${-s}px)`;const th=Math.max(40,PANE.h*PANE.h/DOC_H);thumb.style.height=th+'px';thumb.style.top=(s/MAX_SCROLL)*(PANE.h-th)+'px'}
+function bmkAt(i){const el=$('bmk'+i);return {x:MAIN_X+el.getBoundingClientRect().left-WIN.x-MAIN_X-0,y:0}}
+function setMarker(b,{y,w=4,h=14,sx=1,sy=1,op=1,expand=0,title='',dark=false}){
+ b.el.style.top=y+'px';b.el.style.opacity=op;
+ const e=easeOutQuint(clamp(expand));
+ b.el.style.transform=`translateY(-50%) scale(${sx*lerp(1,1.2,e)},${sy*lerp(1,1.2,e)})`;
+ b.g.innerHTML=`<svg viewBox="0 0 14 16" fill="${b.color}" stroke="${b.color}" stroke-width="1.2" stroke-linejoin="round"><path d="M1.6 1.4h10.8v13.2L7 10.6l-5.4 4z"/></svg>`;
+ b.chip.style.opacity=clamp(expand*2.5);b.chip.style.transform=`translate(${lerp(6,0,e)}px,-50%) scale(${lerp(.96,1,e)/ lerp(1,1.2,e)})`;
+ b.chip.querySelector('.dot').style.background=b.color;b.tt.textContent=title;b.snEl.innerHTML=b.sn||'';
+}
+function setToolbar({x,y,op,sc,ty=0,text='',focus=false,sel='gray',hover=null,selp=1,caret=true,stg=1}){
+ tb.style.left=x+'px';tb.style.top=y+'px';tb.style.opacity=op;tb.style.transform=`translateY(${ty}px) scale(${sc})`;
+ $('typed').textContent=text;$('ph').style.display=text?'none':'';$('caret').style.opacity=(focus&&caret)?1:0;$('count').textContent=text.length+'/40';
+ $('field').classList.toggle('focus',focus);$('count').style.color=text.length>=36?'#ff9f0a':'';
+ COLORS.forEach(([n])=>{const s=$('sw-'+n);const on=n===sel;s.querySelector('.ring').style.opacity=on?1:0;s.querySelector('.ring').style.transform=`scale(${on?lerp(.7,1,easeOutCubic(selp)):.7})`;s.querySelector('.dot').style.opacity=on?1:0;s.querySelector('.dot').style.transform=`scale(${on?lerp(.4,1,easeOutCubic(selp)):.4})`;s.classList.toggle('hover',hover===n);const i=COLORS.findIndex(c=>c[0]===n);const a=easeOutQuint(seg(stg,i*.09,i*.09+.55));s.style.opacity=a;s.style.transform=`scale(${lerp(.6,hover===n?1.12:1,a)})`;});
+}
+function setCursor(x,y,down=0){cursor.style.left=(x-1)+'px';cursor.style.top=(y-1)+'px';cursor.style.transform='none'}
+function setRipple(x,y,p){ripple.style.left=(x-22)+'px';ripple.style.top=(y-22)+'px';if(p<=0||p>=1){ripple.style.opacity=0;return}ripple.style.opacity=(1-p)*.8;ripple.style.transform=`scale(${lerp(.3,1.4,easeOutCubic(p))})`}
+function setKeycap(p,press){keycap.style.opacity=p;keycap.style.transform=`translateY(${press*3}px) scale(${1-press*.03})`;keycap.style.background=press>0.5?'#f2f2f2':'#fff'}
+function setBmkIcon(i,{hover=false,filled=false,sc=1,op=1,color='#737373',tip=0}){const el=$('bmk'+i);el.classList.toggle('hover',hover);el.innerHTML=ICON.bm(filled?'currentColor':'none')+`<span class="tip" style="opacity:${tip}">Bookmark</span>`;el.style.transform=`scale(${sc})`;el.style.opacity=op;el.style.color=filled?color:''}
+
+// Positions (window-relative)
+const LAST=7;
+function lastBmkPos(scroll){const a=$('bmk'+LAST).getBoundingClientRect(),d=doc.getBoundingClientRect(),w=$('window').getBoundingClientRect(); return {x:a.left-w.left+12, y:PANE.top+(a.top-d.top)+12-scroll}}
+const EDGE_X=MAIN_X+PANE.w; // right edge of pane, window-relative
+
+// ---------- SCENE 1 ----------
+function scene1(t){
+ stage.classList.remove('dark');screen.style.transform='';screen.style.transformOrigin='';
+ ['lgrid','lblocks','lwire','lreal'].forEach(id=>$(id).style.opacity=0);
+ setKeycap(0,0);setRipple(0,0,0);
+ // ---- key times
+ const T={hover:1.30,click:1.80,fly0:2.05,fly1:2.95,tb:3.15,pinkHover:3.75,pink:3.95,type0:4.30,type1:5.70,off:6.50,card0:6.70,card1:7.80,h3:8.35,h1:10.10,jump:10.60};
+ const B1=BOOKS[0],B3=BOOKS[1],NEW=BOOKS[2];
+ // ---- scroll
+ const targetScroll=docY('m1')-40;
+ let scroll=MAX_SCROLL;
+ if(t>T.jump)scroll=lerp(MAX_SCROLL,targetScroll,easeInOutCubic(seg(t,T.jump,T.jump+1.1)));
+ applyScroll(scroll);
+ thumb.style.opacity=t>T.jump&&t<T.jump+2.2?clamp(seg(t,T.jump,T.jump+.12))*(1-seg(t,T.jump+1.6,T.jump+2.2))*.75:0;
+ // ---- action-row icon
+ const bp=lastBmkPos(scroll), bs=stageXY(bp.x-MAIN_X,bp.y);
+ const hoverIcon=t>=T.hover&&t<T.fly0;
+ const pressed=t>=T.click&&t<T.click+.12;
+ let iconSc=1; if(pressed)iconSc=.92; else if(t>=T.click+.12&&t<T.click+.3){iconSc=lerp(.92,1,easeOutCubic(seg(t,T.click+.12,T.click+.3)))}
+ let filled=t>=T.click, iconOp=1;
+ if(t>=T.fly0&&t<T.fly1+.35)iconOp=0;
+ setBmkIcon(LAST,{hover:hoverIcon,filled,sc:iconSc,op:iconOp,color:t>=T.pink?'#EE61A2':'#737373',tip:hoverIcon?seg(t,T.hover+.08,T.hover+.22):0});
+ // ---- flight (Cursor-style: quick launch, long ease-out)
+ const my=markerY(NEW); const target={x:EDGE_X-29,y:PANE.top+my};
+ if(t>=T.fly0&&t<T.fly1+.1){
+  const u=seg(t,T.fly0,T.fly1); const p=easeInOutCubic(u);
+  const start={x:bp.x,y:bp.y}, ctrl={x:lerp(start.x,target.x,.5),y:Math.min(start.y,target.y)-60};
+  const pos=bez(start,ctrl,target,p);
+  fly.style.left=(pos.x-10)+'px';fly.style.top=(pos.y-10)+'px';fly.style.opacity=1-seg(t,T.fly1-.1,T.fly1);
+  fly.style.transform=`scale(${lerp(1,.85,p)})`;fly.innerHTML=ICON.bm('currentColor');fly.style.color='#737373';
+ } else fly.style.opacity=0;
+ // ---- new marker: land with a spring, gray until pink is picked
+ NEW.color=t>=T.pink?'#EE61A2':'#737373';
+ let m={op:0,sx:1,sy:1,expand:0};
+ if(t>=T.fly1-.06){const e=easeOutCubic(seg(t,T.fly1-.06,T.fly1+.2));m.op=1;m.sx=lerp(.85,1,e);m.sy=lerp(.85,1,e)}
+ // saved confirmation: expand briefly after click-off, then collapse
+ if(t>=T.card0)m.expand=seg(t,T.card0,T.card0+.28)*(1-seg(t,T.card1,T.card1+.22));
+ setMarker(NEW,{y:my,op:m.op,sx:m.sx,sy:m.sy,expand:clamp(m.expand),title:TITLE});
+ // ---- toolbar (Notion-style: 200ms, scale .96→1, rise 6px, swatches stagger)
+ const tbW=272,tbH=tb.offsetHeight||96; const tbx=EDGE_X-22-tbW, tby=PANE.top+my-tbH-14;
+ let tbOp=0,tbSc=.96,tbTy=6,stg=0;
+ if(t>=T.tb&&t<T.off){const p=easeOutQuint(seg(t,T.tb,T.tb+.24));tbOp=p;tbSc=lerp(.96,1,p);tbTy=lerp(6,0,p);stg=seg(t,T.tb+.05,T.tb+.45)}
+ else if(t>=T.off){const p=easeInQuad(seg(t,T.off,T.off+.16));tbOp=1-p;tbSc=lerp(1,.98,p);tbTy=lerp(0,3,p);stg=1}
+ const n=Math.floor(TITLE.length*seg(t,T.type0,T.type1)); const text=TITLE.slice(0,n);
+ const blink=Math.floor(t*2.4)%2===0 || (t>T.type0&&t<T.type1+.1);
+ const sel=t>=T.pink?'pink':'gray'; const selp=t>=T.pink?seg(t,T.pink,T.pink+.32):1;
+ const swHover=t>=T.pinkHover&&t<T.pink+.2?'pink':null;
+ setToolbar({x:tbx,y:tby,op:tbOp,sc:tbSc,ty:tbTy,text,focus:t>=T.tb+.15&&t<T.off,sel,selp,hover:swHover,caret:blink,stg});
+ // ---- earlier bookmarks: hover Yesterday, then Sep 4 and click to jump
+ const h3=t>=T.h3&&t<T.h1-.05?seg(t,T.h3,T.h3+.26):(t>=T.h1-.05?1-seg(t,T.h1-.05,T.h1+.15):0);
+ const h1=t>=T.h1&&t<T.jump+.05?seg(t,T.h1,T.h1+.26):(t>=T.jump+.05?1-seg(t,T.jump+.05,T.jump+.25):0);
+ setMarker(B3,{y:markerY(B3),expand:clamp(h3),title:B3.title});
+ setMarker(B1,{y:markerY(B1),expand:clamp(h1),title:B1.title});
+ // jump highlight on message 1 (left accent + tint)
+ const fp=clamp(seg(t,T.jump+.45,T.jump+.85)*(1-seg(t,T.jump+1.5,T.jump+2.3)));
+ const fl=$('flash1');fl.style.background=B1.color;fl.style.opacity=fp;
+ // ---- cursor path (traditional mac arrow)
+ const swPink=$('sw-pink'); const swS=stageXY(tbx+swPink.offsetLeft+10-MAIN_X, tby+swPink.offsetTop+10);
+ const restS=stageXY(tbx+tbW-28-MAIN_X, tby+tbH+46); // just outside, bottom-right of the toolbar
+ const offS=restS;
+ const m3s=stageXY(PANE.w-29, markerY(B3)+PANE.top), m1s=stageXY(PANE.w-29, markerY(B1)+PANE.top);
+ const pts=[
+  {t:0,x:bs.x+300,y:bs.y+60},{t:.45,x:bs.x+300,y:bs.y+60},
+  {t:T.hover,x:bs.x,y:bs.y},{t:T.fly0+.1,x:bs.x,y:bs.y},
+  {t:T.pinkHover,x:swS.x,y:swS.y},{t:T.pink+.2,x:swS.x,y:swS.y},
+  {t:T.pink+.7,x:restS.x,y:restS.y},{t:T.card1-.3,x:restS.x,y:restS.y},
+  {t:T.h3,x:m3s.x,y:m3s.y},{t:T.h1-1.2,x:m3s.x,y:m3s.y},
+  {t:T.h1,x:m1s.x,y:m1s.y},{t:20,x:m1s.x,y:m1s.y}
+ ];
+ const c=path(t,pts);
+ const down=(t>=T.click&&t<T.click+.12)||(t>=T.pink&&t<T.pink+.12)||(t>=T.off&&t<T.off+.12)||(t>=T.jump&&t<T.jump+.12)?1:0;
+ setCursor(c.x,c.y,down);
+}
+// ---------- SCENE 2 (3D exploded) ----------
+function buildLayers(){
+ const f=$('field'),cnt=$('count'),sws=tb.querySelectorAll('.sw');
+ const H=tb.offsetHeight, W=272;
+ const F={x:f.offsetLeft,y:f.offsetTop,w:f.offsetWidth,h:f.offsetHeight};
+ const C={x:f.offsetLeft+cnt.offsetLeft,y:f.offsetTop+cnt.offsetTop,w:cnt.offsetWidth,h:cnt.offsetHeight};
+ const S=[...sws].map(sw=>({x:sw.offsetLeft,y:sw.offsetTop,w:20,h:20}));
+ const sy=S[0].y, sx0=S[0].x, pitch=S[1].x-S[0].x, gap=pitch-20;
+ // grid: faint 8px cells + pink measurement guides with labels
+ const g=$('lgrid');g.style.height=H+'px';
+ // ---- spec drawing helpers
+ const LBL=(x,y,t)=>`<div class="dim" style="left:${x}px;top:${y}px">${t}</div>`;
+ const lw=t=>t.length*5.6+6; // approx label width at 9px mono
+ // guide line with labels sitting in breaks
+ const guideH=(y,labels)=>{let out='',x=0;labels.sort((p,q)=>p.x-q.x).forEach(l=>{const w=lw(l.t);out+=`<div class="gl h" style="left:${x}px;top:${y}px;width:${Math.max(0,l.x-w/2-x)}px"></div>`+LBL(l.x-w/2,y-5,l.t);x=l.x+w/2});return out+`<div class="gl h" style="left:${x}px;top:${y}px;width:${Math.max(0,W-x)}px"></div>`};
+ const guideV=(x,labels)=>{let out='',y=0;labels.sort((p,q)=>p.y-q.y).forEach(l=>{out+=`<div class="gl v" style="left:${x}px;top:${y}px;height:${Math.max(0,l.y-6-y)}px"></div>`+LBL(x-lw(l.t)/2,l.y-5,l.t);y=l.y+6});return out+`<div class="gl v" style="left:${x}px;top:${y}px;height:${Math.max(0,H-y)}px"></div>`};
+ // dimension lines: unbroken line with end ticks, label outside the line
+ const dimH=(x0,x1,y,t,noTicks)=>{const m=(x0+x1)/2,w=lw(t);return (noTicks?'':`<div class="dt h" style="left:${x0}px;top:${y-2}px"></div><div class="dt h" style="left:${x1}px;top:${y-2}px"></div>`)+
+   `<div class="dl h" style="left:${x0}px;top:${y}px;width:${x1-x0}px"></div>`+LBL(m-w/2,y-12,t)};
+ const dimV=(y0,y1,x,t)=>{const m=(y0+y1)/2;return `<div class="dt v" style="left:${x-2}px;top:${y0}px"></div><div class="dt v" style="left:${x-2}px;top:${y1}px"></div>`+
+   `<div class="dl v" style="left:${x}px;top:${y0}px;height:${y1-y0}px"></div>`+LBL(x-5-lw(t),m-5,t)};
+ g.innerHTML=
+  guideH(12,[{x:W/2,t:'12'}])+
+  guideH(H-12,[{x:W/2,t:'12'},{x:W-12-38,t:`272 × ${H}`}])+
+  guideV(12,[{y:H/2,t:'12'}])+
+  guideV(W-12,[{y:H/2,t:'12'}])+
+  dimV(F.y,F.y+F.h,W/2+5+lw('12')/2,'36')+
+  dimV(F.y+F.h,sy,W/2+5+lw('12')/2,'16')+
+  dimH(S[1].x,S[1].x+20,sy+4,'20')+
+  dimH(S[1].x+20,S[2].x,sy+4,String(gap),true)+
+  `<div class="dt h" style="left:${S[2].x}px;top:${sy+2}px"></div>`;
+ // wireframe: gray blocks
+ const bl=$('lblocks');bl.style.height=H+'px';
+ bl.innerHTML=`<div class="bx" style="left:${F.x}px;top:${F.y}px;width:${F.w}px;height:${F.h}px"></div>`+S.map(o=>`<div class="bx circ" style="left:${o.x+2}px;top:${o.y+2}px;width:16px;height:16px"></div>`).join('');
+ // content: roles only, labels at slot top-left
+ const w=$('lwire');w.style.height=H+'px';
+ w.innerHTML=`<div class="bx" style="left:${F.x}px;top:${F.y}px;width:${F.w}px;height:${F.h}px"></div><div class="t" style="left:${F.x+12}px;top:${F.y+11}px;--rw:${F.w-24}px">Title</div><div class="t" style="right:${W-(F.x+F.w)+12}px;top:${F.y+11}px">Count</div>`
+  +S.map((o,i)=>`<div class="bx circ" style="left:${o.x+2}px;top:${o.y+2}px;width:16px;height:16px;background:${COLORS[i][1]}33;border-color:${COLORS[i][1]}88"></div>`).join('');
+ // real
+ const r=$('lreal');r.innerHTML=tb.innerHTML;r.style.height=H+'px';r.style.background='#fff';r.style.padding='12px';r.style.borderRadius='12px';
+ r.querySelector('.tail')&&r.querySelector('.tail').remove();
+ return H;
+}
+let layersBuilt=false;
+function scene2(t){
+ applyScroll(MAX_SCROLL);thumb.style.opacity=0;fly.style.opacity=0;setKeycap(0,0);setRipple(0,0,0);cursor.style.opacity=0;
+ setBmkIcon(LAST,{filled:true,color:'#EE61A2'});
+ const NEW=BOOKS[2];NEW.color='#EE61A2';
+ const my=markerY(NEW);
+ BOOKS.forEach(b=>setMarker(b,{y:markerY(b),title:b.title||TITLE}));
+ const tbW=272,tbH=tb.offsetHeight;const tbx=EDGE_X-22-tbW,tby=PANE.top+my-tbH-14;
+ setToolbar({x:tbx,y:tby,op:1,sc:1,text:TITLE,focus:true,sel:'pink',caret:true});
+ if(!layersBuilt){buildLayers();layersBuilt=true}
+ // ---- timing
+ const D=11.6;
+ const tilt=easeInOutCubic(seg(t,1.0,2.4))*(1-easeInOutCubic(seg(t,11.2,12.6)));
+ const explode=easeOutQuint(seg(t,2.0,3.3))*(1-easeInOutCubic(seg(t,10.1,11.4)));
+ const away=easeInOutCubic(seg(t,2.1,3.5))*(1-easeInOutCubic(seg(t,10.0,11.3)));
+ // background
+ stage.style.background='#000';
+ // ---- screen transform: mirrored (left-handed), toolbar close to camera
+ const cx=tbx+tbW/2, cy=tby+tbH/2;
+ screen.style.transformOrigin=`${cx}px ${cy}px`;
+ const dx=(720-WIN.x-cx), dy=(450-WIN.y-cy)+420*away;
+ $('window').style.opacity=1-away;
+ const rx=lerp(0,56,tilt), rz=lerp(0,30,tilt)+Math.sin((t-3)*.7)*1.5*explode, sc=lerp(1,1.3,tilt)*lerp(1,1.45,away);
+ screen.style.transform=`translate(${dx*tilt}px,${dy*tilt}px) rotateX(${rx}deg) rotateZ(${rz}deg) scale(${sc})`;
+ $('window').style.boxShadow=`0 ${lerp(20,0,tilt)}px ${lerp(60,0,tilt)}px rgba(0,0,0,${lerp(.5,0,tilt)}),0 0 0 1px rgba(255,255,255,${lerp(.12,.22,tilt)})`;
+ // ---- layer slots: each plane lifts through the stack in turn (reference grammar)
+ // slot 0 = bottom, 3 = top. Start: grid0 blocks1 wire2 real3.
+ const GAP=96;
+ const lifts=[{id:'lgrid',t0:3.8},{id:'lblocks',t0:5.3},{id:'lwire',t0:6.8},{id:'lreal',t0:8.3}]; // bottom to top; 0.9s lift + 0.6s hold each
+ let order=['lgrid','lblocks','lwire','lreal'];
+ const slot={};order.forEach((id,i)=>slot[id]=i);
+ const arc={};['lgrid','lblocks','lwire','lreal'].forEach(id=>arc[id]=0);
+ lifts.forEach(L=>{
+  const p=seg(t,L.t0,L.t0+.9);if(p<=0)return;
+  const e=easeInOutCubic(p);
+  const from=order.indexOf(L.id);
+  // lifted layer goes to top slot; layers above it shift down one
+  order.forEach((id)=>{const i=order.indexOf(id);if(id===L.id)slot[id]=lerp(from,3,e);else if(i>from)slot[id]=lerp(i,i-1,e)});
+  arc[L.id]+=Math.sin(p*Math.PI)*GAP*.9; // overshoot above the stack while passing
+  if(p>=1){order.splice(from,1);order.push(L.id)}
+  else{const o=order.slice();o.splice(from,1);o.push(L.id);/* keep order for next lift only when complete */}
+ });
+ ['lgrid','lblocks','lwire','lreal'].forEach(id=>{
+  const L=$(id);L.style.left=tbx+'px';L.style.top=tby+'px';
+  const z=(slot[id]*GAP+arc[id])*explode;
+  L.style.transform=`translate(0px,${-40*away}px) translateZ(${z+300*away}px)`;L.style.opacity=clamp(explode*1.6);
+  L.style.zIndex="";
+ });
+ tb.style.opacity=1-clamp(explode*3);tb.style.zIndex=explode>0?0:20;tb.style.transform='scale(1)';
+}
+window.seek=function(t,scene){ (scene===2?scene2:scene1)(t) };
+window.SCENES={1:{dur:13.2},2:{dur:13.4}};
+
+// ---------- flat view (deck slide 04): the four layers, read in order ----------
+// Wide screens: 2 × 2 at the cards' original size, centred
+// Tall screens (phones): one column.
+let SW=1440,SH=900,flatH=0;
+function flat(){
+ stage.style.background='#000';$('window').style.display='none';cursor.style.opacity=0;tb.style.opacity=0;
+ screen.style.transform='none';flatH=buildLayers();layoutFlat();
+}
+function layoutFlat(){
+ const H=flatH,W=272,tall=innerWidth<innerHeight;
+ stage.querySelectorAll('.cap4').forEach(c=>c.remove());
+ const caps=[
+  ['lgrid','Grid','Every size and gap is a multiple of 4pt.'],
+  ['lblocks','Wireframe','Compact toolbar. Spacing does the dividing.'],
+  ['lwire','Content','Six colors. Title aligns with count.'],
+  ['lreal','Result','Gray by default. Nudges users to choose a color.']];
+ let cols,K,colGap,rowGap,capH,x0,y0;
+ if(tall){cols=1;SW=620;K=(SW-80)/W;colGap=0;rowGap=64;capH=112;
+  const cellH=H*K+28+capH;SH=Math.round(4*cellH+3*rowGap+160);x0=40;y0=80}
+ else{cols=2;SW=1440;SH=900;rowGap=88;capH=104;K=1.75;colGap=306; // original card size, centred
+  const cellH=H*K+28+capH;x0=(SW-(2*W*K+colGap))/2;y0=56+(788-(2*cellH+rowGap))/2}
+ const cellW=W*K,cellH=H*K+28+capH;
+ Object.assign(stage.style,{width:SW+'px',height:SH+'px',margin:`${-SH/2}px 0 0 ${-SW/2}px`});
+ caps.forEach(([id,h,d],i)=>{const L=$(id),x=x0+(i%cols)*(cellW+colGap),y=y0+Math.floor(i/cols)*(cellH+rowGap);
+  L.style.left=(x-WIN.x)+'px';L.style.top=(y-WIN.y)+'px';L.style.opacity=1;L.style.transformOrigin='0 0';L.style.transform=`scale(${K})`;
+  const c=document.createElement('div');c.className='cap4';c.style.left=x+'px';c.style.top=(y+H*K+28)+'px';c.style.width=cellW+'px';
+  c.innerHTML=`<div class="n">0${i+1}</div><div class="h">${h}</div><div class="d">${d}</div>`;stage.appendChild(c)});
+ fit();
+}
+// ---------- player: fit the 1440×900 stage, loop in real time, deck controls play ----------
+const q=new URLSearchParams(location.search);const MODE=parseInt(q.get('s')||'1');
+// every scene sits on the deck's black; on slide 03 the white window floats on it
+document.documentElement.style.setProperty('--bg','#000');
+if(MODE===1){stage.style.background='#000';$('window').style.boxShadow='0 0 0 1px rgba(255,255,255,.1),0 30px 80px rgba(0,0,0,.6)'}
+function fit(){document.documentElement.style.setProperty('--k',Math.min(innerWidth/SW,innerHeight/SH))}
+fit();addEventListener('resize',()=>{if(MODE===3)layoutFlat();else fit()});
+if(MODE===3){flat()}else{
+ const dur=window.SCENES[MODE].dur,HOLD=MODE===1?1.4:0.6;
+ const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ let t0=null,playing=window.parent===window,raf=0;
+ const draw=(now)=>{if(t0===null)t0=now;const t=((now-t0)/1000)%(dur+HOLD);window.seek(Math.min(t,dur),MODE);raf=playing?requestAnimationFrame(draw):0};
+ const play=(restart)=>{if(reduce){window.seek(MODE===1?7.2:6.5,MODE);return}if(restart)t0=null;if(!playing){playing=true;raf=requestAnimationFrame(draw)}};
+ const pause=()=>{playing=false;cancelAnimationFrame(raf)};
+ window.seek(0,MODE);if(playing)play(true);
+ addEventListener('message',(e)=>{if(e.origin!==location.origin)return;if(e.data==='cx:play')play(true);else if(e.data==='cx:pause')pause()});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)pause()});
+}
+
+</script>
+</body></html>

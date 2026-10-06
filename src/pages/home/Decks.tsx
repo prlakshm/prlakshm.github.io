@@ -352,7 +352,7 @@ function DeckWindow({ deck, index }: { deck: Deck; index: number }) {
           positioning — same reason the scrap tooltips park there. */}
       {typeof document !== "undefined" &&
         createPortal(
-          <span className="deck-tooltip" aria-hidden="true" ref={tipRef}>
+          <span className="deck-tooltip wt-tip" aria-hidden="true" ref={tipRef}>
             {cta}
             <TipArrow />
           </span>,

@@ -15,9 +15,9 @@
 <meta name="twitter:description" content="Designing Surprise Rail for HBO Max. Frosted tiles hide key art and tease titles in three words. A case study by Pranavi Ram.">
 <meta name="twitter:image" content="https://pranaviram.com/about/Profile%20picture.png">
 <link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="16x16" href="/icons/notebook-favicon-16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/notebook-favicon-32.png">
-<link rel="apple-touch-icon" href="/icons/notebook-apple-touch-icon.png">
+<link rel="icon" type="image/svg+xml" href="/icons/frame-favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/frame-favicon-32.png">
+<link rel="apple-touch-icon" href="/icons/frame-apple-touch-icon.png">
 
 <style>
 /* Two widths only: every run of text (title, headings, lede, paragraphs) ends
@@ -31,7 +31,7 @@
   color-scheme:light;
   /* Neutral greys on a white dot canvas — the same scale the homepage tokens
      use (src/styles/tokens.css). Names are historical; only values changed. */
-  --ground:#ffffff; --ink:#171717; --body:#444444; --soft:#737373; --brass:#737373;
+  --ground:#f8fafc; --ink:#171717; --body:#444444; --soft:#737373; --brass:#737373;
   --rule:#eaeaea; --card:#fafafa; --paper:#fafafa;
   --dot:#d4d4d4; --shadow:rgba(0,0,0,.08);
   --max-ink:#0a0a10;
@@ -81,7 +81,9 @@
    theme, so they stay black either way. No prefers-color-scheme override and no
    data-theme hook: there is one appearance. */
 
-*{box-sizing:border-box}
+/* .shell is the page's own content; the site nav and footer outside it are
+   laid out as in the app (content-box, their own <p> styles). */
+:where(.shell,.shell *){box-sizing:border-box}
 /* browsers give <code> its own size; hold it on the scale */
 code{font-family:var(--fm);font-size:var(--fs-body)}
 html{scroll-behavior:smooth}
@@ -91,49 +93,28 @@ html{scroll-behavior:smooth}
    scroll container and break the sticky sidebar. */
 body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--fd);line-height:1.62;position:relative;
   overflow-x:clip}
-/* Dots sit on their own fixed layer so washes can stack above them and below text. */
-body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:radial-gradient(circle,var(--dot) 1.1px,transparent 1.6px);
-  background-size:24px 24px}
-/* The nav is deliberately NOT in here. This rule exists to lift content above
-   the fixed grid layer (body::before, z-index 0), but position:relative also
+/* The nav is deliberately NOT in here. This rule lifted content above the
+   dot grid (a fixed body::before layer, since removed: case studies sit on
+   plain white, dots are for the everything page), but position:relative also
    silently overrode .wt-nav's position:sticky — so the bar had never actually
    stuck, it just scrolled away with the page. Sticky already establishes its
    own stacking context, and .wt-nav carries z-index:30, so it needs nothing
    from this rule. */
 body>.shell{position:relative;z-index:1}
 
-/* Landing-page chrome */
-/* Hides on the way down, comes back the moment you scroll up — the nav is only
-   wanted when you are looking for it. transform, not top/height: it composites
-   without laying anything out, so it cannot fight the sticky sidebar. */
-.wt-nav{position:sticky;top:0;z-index:30;background:none;
-  transition:transform .28s cubic-bezier(.22,.61,.36,1)}
-.wt-nav.nav-away{transform:translateY(-100%)}
-.wt-nav-inner{position:relative;isolation:isolate;height:var(--nav-height);display:flex;align-items:center;justify-content:space-between;
-  gap:24px;padding-inline:clamp(22px,3.2vw,60px)}
-.wt-wordmark,.wt-nav-links a{font-family:"Berkeley Mono",var(--fm);font-weight:400;font-size:16px;
-  letter-spacing:.12em;line-height:1.6rem;color:var(--body);text-decoration:none;
-  -webkit-text-stroke:.55px currentColor;transition:color .18s ease}
-.wt-wordmark{white-space:nowrap}
-.wt-nav-links{display:flex;align-items:center;gap:clamp(26px,3vw,40px);list-style:none;margin:0;padding:0}
-.wt-nav-links a{position:relative;display:inline-flex;align-items:center;gap:6px;padding-block:4px}
-.nav-rule{position:absolute;left:0;right:0;bottom:0;height:1.5px;
+/* Site chrome: the nav and the footer are the app's own, mounted by
+   src/static-chrome.tsx into #site-nav and #site-foot, and their rules come
+   with them (src/pages/home/chrome.css). Nothing for them lives here. */
+/* This page's own links (the Figma / prototype links, the HOME and NEXT
+   corner) borrow the nav's underline element, .nav-rule, and wipe it in with
+   a CSS transition. Scoped to .shell: the site nav's own .nav-rule is driven
+   by Motion (src/pages/home/chrome.css) and must not get this transition. */
+.shell .nav-rule{position:absolute;left:0;right:0;bottom:0;height:1.5px;
   background:color-mix(in srgb,currentColor 48%,transparent);transform:scaleX(0);
   transform-origin:left;transition:transform .24s cubic-bezier(.22,.61,.36,1)}
-.wt-wordmark:hover,.wt-nav-links a:hover,.wt-wordmark:focus-visible,.wt-nav-links a:focus-visible{color:var(--soft)}
-.wt-nav-links a:hover .nav-rule,.wt-nav-links a:focus-visible .nav-rule{transform:scaleX(1)}
-.wt-wordmark:focus-visible,.wt-nav-links a:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
-.ext-arrow{width:12.5px;height:12.5px;flex:none}
 
 /* Feathered paper wash — grid layer below, wash above grid, text above wash. */
 :is(.jump,.prog),main{position:relative;isolation:isolate}
-/* The nav is out of the wash. It used to sit at the top of the page where the
-   wash just blended into the paper; now that it actually sticks and slides back
-   over content, that same panel reads as a slab moving across the page. Bare is
-   better here. It also drops the wash's -67.2px side bleed, which was the whole
-   reason body needed overflow-x:clip. */
-.wt-nav-inner{position:relative;isolation:isolate}
 :is(.jump,.prog)::before,main::before{content:"";position:absolute;z-index:-1;inset:clamp(-89.6px,-9.8%,-44.8px) clamp(-67.2px,-8.4%,-33.6px);pointer-events:none;background:color-mix(in srgb,var(--ground) 50%,transparent);mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);mask-composite:intersect;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);-webkit-mask-composite:source-in}
 /* Keep the wash's top and side bleed without turning its bottom bleed into scroll. */
 main::before{bottom:0}
@@ -201,7 +182,7 @@ h1{font-size:var(--fs-h1);line-height:1;letter-spacing:-.026em;
 h2{font-size:var(--fs-h2);line-height:1.08;letter-spacing:-.02em;
   font-variation-settings:"wght" 640;margin:0;text-wrap:balance;max-width:var(--measure)}
 h3{font-size:var(--fs-lede);line-height:1.24;font-variation-settings:"wght" 620;margin:0}
-p{margin:0;max-width:var(--measure);font-family:var(--fm);font-size:var(--fs-body);line-height:1.9;
+:where(.shell) p{margin:0;max-width:var(--measure);font-family:var(--fm);font-size:var(--fs-body);line-height:1.9;
   color:var(--body)}
 p.lede{font-family:var(--fd);font-size:var(--fs-lede);line-height:1.55;color:var(--ink);
   font-variation-settings:"wght" 420;max-width:var(--measure)}
@@ -574,7 +555,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
    from .ico's margin-right, not a flex gap. */
 .links a{display:block;color:var(--body);
   text-decoration:none;transition:color .18s ease}
-.links a:hover,.links a:focus-visible{color:var(--soft)}
+.links a:hover,.links a:focus-visible{color:#262626}
 .links a:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
 .links .sep{color:var(--rule)}
 /* Not dead with the links gone: 2ch is narrower than the digits' natural advance,
@@ -623,9 +604,6 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 }
 @media (max-width:767px){
   :root{--nav-height:62px}
-  .wt-nav-inner{padding-inline:16px}
-  .wt-wordmark,.wt-nav-links a{font-size:13px;letter-spacing:.07em}
-  .wt-nav-links{gap:16px}
   /* Phone: no section list. At 900px it becomes a horizontally scrolling strip,
      and on a phone that strip sits directly under the nav and competes with the
      page for the first swipe — you flick to read on and scrub the chapters
@@ -649,7 +627,6 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
      than this breakpoint and is what was letting the two overlap in between. */
 }
 @media (prefers-reduced-motion:reduce){
-  .wt-nav{transition:none}
   .dgflow .fx{opacity:1}
   .dgflow .fx-line{stroke-dashoffset:0}
   html{scroll-behavior:auto}
@@ -657,15 +634,21 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   .rv{opacity:1;transform:none;transition:none}
   .tile .inner{transition:none}
 }
+
 </style>
 
 
+<!-- The site nav: src/static-chrome.tsx replaces this with the app's own bar
+     (the star card, then these links), so it matches Home and About. What is
+     here is only what shows before that script runs. -->
+<div id="site-nav" style="display:contents">
 <header class="wt-nav">
   <div class="wt-nav-inner">
-    <a class="wt-wordmark" href="/#/">PRANAVI RAM</a>
+    <span aria-hidden="true"></span>
     <nav aria-label="Primary">
       <ul class="wt-nav-links">
         <li><a href="/#/projects">WORK<span class="nav-rule" aria-hidden="true"></span></a></li>
+        <li class="nav-soon-wrap"><button type="button" class="nav-mock">GALLERY<span class="nav-rule" aria-hidden="true"></span></button></li>
         <li><a href="/#/about">ABOUT<span class="nav-rule" aria-hidden="true"></span></a></li>
         <li>
           <a href="/docs/Pranavi_Ram_Resume_2026.pdf" target="_blank" rel="noreferrer">
@@ -681,6 +664,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
     </nav>
   </div>
 </header>
+</div>
 
 <div class="shell">
 
@@ -1006,6 +990,10 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 </main>
 </div>
 
+<!-- The site footer (the © line, the contact gears, the painting), mounted by
+     src/static-chrome.tsx: the same one Home and About end on. -->
+<div id="site-foot" style="display:contents"></div>
+
 <script>
 (function(){
   var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1032,36 +1020,6 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
   }
   addEventListener("scroll", onScroll, {passive:true});
 
-  /* Nav auto-hide. Direction is judged from the last position that actually
-     moved the nav, not the last scroll event — sampling every event makes a
-     slow drag flap, because sub-pixel jitter changes sign constantly.
-     State only changes when the threshold is crossed, so letting go mid-scroll
-     leaves the nav exactly as it was. */
-  var wtNav = document.querySelector(".wt-nav");
-  if(wtNav){
-    var navAnchor = window.scrollY, navHidden = false;
-    var NAV_STEP = 8;                        // px of travel before it reacts
-    addEventListener("scroll", function(){
-      var y = window.scrollY;
-      // At the very top it is always available, whatever the direction.
-      if(y <= 4){
-        if(navHidden){ wtNav.classList.remove("nav-away"); navHidden = false; }
-        navAnchor = y;
-        return;
-      }
-      // Never hide the bar while it holds keyboard focus — that would move
-      // focus off-screen with no way to see where it went.
-      if(wtNav.contains(document.activeElement)){ navAnchor = y; return; }
-      var dy = y - navAnchor;
-      if(Math.abs(dy) < NAV_STEP) return;
-      var down = dy > 0;
-      if(down !== navHidden){
-        wtNav.classList.toggle("nav-away", down);
-        navHidden = down;
-      }
-      navAnchor = y;
-    }, {passive:true});
-  }
 
   addEventListener("resize", onScroll);
   onScroll();

@@ -15,9 +15,9 @@
 <meta name="twitter:description" content="Mixr is a native iOS DJ app for beginners. Pranavi Ram’s design + engineering case study. Making remixing approachable by drawing on patterns from video editing.">
 <meta name="twitter:image" content="https://pranaviram.com/about/Profile%20picture.png">
 <link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="16x16" href="/icons/notebook-favicon-16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/notebook-favicon-32.png">
-<link rel="apple-touch-icon" href="/icons/notebook-apple-touch-icon.png">
+<link rel="icon" type="image/svg+xml" href="/icons/frame-favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/frame-favicon-32.png">
+<link rel="apple-touch-icon" href="/icons/frame-apple-touch-icon.png">
 
 <style>
 /* Two widths only: every run of text (title, headings, lede, paragraphs) ends
@@ -31,7 +31,7 @@
   color-scheme:light;
   /* Neutral greys on a white dot canvas — the same scale the homepage tokens
      use (src/styles/tokens.css). Names are historical; only values changed. */
-  --ground:#ffffff; --ink:#171717; --body:#444444; --soft:#737373; --brass:#737373;
+  --ground:#f8fafc; --ink:#171717; --body:#444444; --soft:#737373; --brass:#737373;
   --rule:#eaeaea; --card:#fafafa; --paper:#fafafa;
   --dot:#d4d4d4; --shadow:rgba(0,0,0,.08);
   --max-ink:#0a0a10;
@@ -60,53 +60,35 @@
    the portfolio's surface; the black panels are the product being shown, so
    they stay black either way. */
 
-*{box-sizing:border-box}
+/* .shell is the page's own content; the site nav and footer outside it are
+   laid out as in the app (content-box, their own <p> styles). */
+:where(.shell,.shell *){box-sizing:border-box}
 code{font-family:var(--fm);font-size:var(--fs-body)}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--fd);line-height:1.62;position:relative;
   overflow-x:clip}
-body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:radial-gradient(circle,var(--dot) 1.1px,transparent 1.6px);
-  background-size:24px 24px}
-/* The nav is deliberately NOT in here. This rule exists to lift content above
-   the fixed grid layer (body::before, z-index 0), but position:relative also
+/* The nav is deliberately NOT in here. This rule lifted content above the
+   dot grid (a fixed body::before layer, since removed: case studies sit on
+   plain white, dots are for the everything page), but position:relative also
    silently overrode .wt-nav's position:sticky — so the bar had never actually
    stuck, it just scrolled away with the page. Sticky already establishes its
    own stacking context, and .wt-nav carries z-index:30, so it needs nothing
    from this rule. */
 body>.shell{position:relative;z-index:1}
 
-/* Landing-page chrome */
-/* Hides on the way down, comes back the moment you scroll up — the nav is only
-   wanted when you are looking for it. transform, not top/height: it composites
-   without laying anything out, so it cannot fight the sticky sidebar. */
-.wt-nav{position:sticky;top:0;z-index:30;background:none;
-  transition:transform .28s cubic-bezier(.22,.61,.36,1)}
-.wt-nav.nav-away{transform:translateY(-100%)}
-.wt-nav-inner{position:relative;isolation:isolate;height:var(--nav-height);display:flex;align-items:center;justify-content:space-between;
-  gap:24px;padding-inline:clamp(22px,3.2vw,60px)}
-.wt-wordmark,.wt-nav-links a{font-family:"Berkeley Mono",var(--fm);font-weight:400;font-size:16px;
-  letter-spacing:.12em;line-height:1.6rem;color:var(--body);text-decoration:none;
-  -webkit-text-stroke:.55px currentColor;transition:color .18s ease}
-.wt-wordmark{white-space:nowrap}
-.wt-nav-links{display:flex;align-items:center;gap:clamp(26px,3vw,40px);list-style:none;margin:0;padding:0}
-.wt-nav-links a{position:relative;display:inline-flex;align-items:center;gap:6px;padding-block:4px}
-.nav-rule{position:absolute;left:0;right:0;bottom:0;height:1.5px;
+/* Site chrome: the nav and the footer are the app's own, mounted by
+   src/static-chrome.tsx into #site-nav and #site-foot, and their rules come
+   with them (src/pages/home/chrome.css). Nothing for them lives here. */
+/* This page's own links (the Figma / prototype links, the HOME and NEXT
+   corner) borrow the nav's underline element, .nav-rule, and wipe it in with
+   a CSS transition. Scoped to .shell: the site nav's own .nav-rule is driven
+   by Motion (src/pages/home/chrome.css) and must not get this transition. */
+.shell .nav-rule{position:absolute;left:0;right:0;bottom:0;height:1.5px;
   background:color-mix(in srgb,currentColor 48%,transparent);transform:scaleX(0);
   transform-origin:left;transition:transform .24s cubic-bezier(.22,.61,.36,1)}
-.wt-wordmark:hover,.wt-nav-links a:hover,.wt-wordmark:focus-visible,.wt-nav-links a:focus-visible{color:var(--soft)}
-.wt-nav-links a:hover .nav-rule,.wt-nav-links a:focus-visible .nav-rule{transform:scaleX(1)}
-.wt-wordmark:focus-visible,.wt-nav-links a:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
-.ext-arrow{width:12.5px;height:12.5px;flex:none}
 
 /* Feathered paper wash */
 :is(.jump,.prog),main{position:relative;isolation:isolate}
-/* The nav is out of the wash. It used to sit at the top of the page where the
-   wash just blended into the paper; now that it actually sticks and slides back
-   over content, that same panel reads as a slab moving across the page. Bare is
-   better here. It also drops the wash's -67.2px side bleed, which was the whole
-   reason body needed overflow-x:clip. */
-.wt-nav-inner{position:relative;isolation:isolate}
 :is(.jump,.prog)::before,main::before{content:"";position:absolute;z-index:-1;inset:clamp(-89.6px,-9.8%,-44.8px) clamp(-67.2px,-8.4%,-33.6px);pointer-events:none;background:color-mix(in srgb,var(--ground) 50%,transparent);mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);mask-composite:intersect;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);-webkit-mask-composite:source-in}
 main::before{bottom:0}
 
@@ -172,7 +154,7 @@ h1{font-size:var(--fs-h1);line-height:1;letter-spacing:-.026em;
 h2{font-size:var(--fs-h2);line-height:1.08;letter-spacing:-.02em;
   font-variation-settings:"wght" 640;margin:0;text-wrap:balance;max-width:var(--measure)}
 h3{font-size:var(--fs-lede);line-height:1.24;font-variation-settings:"wght" 620;margin:0}
-p{margin:0;max-width:var(--measure);font-family:var(--fm);font-size:var(--fs-body);line-height:1.9;
+:where(.shell) p{margin:0;max-width:var(--measure);font-family:var(--fm);font-size:var(--fs-body);line-height:1.9;
   color:var(--body)}
 p.lede{font-family:var(--fd);font-size:var(--fs-lede);line-height:1.55;color:var(--ink);
   font-variation-settings:"wght" 420;max-width:var(--measure)}
@@ -212,7 +194,7 @@ figure img,figure video{display:block;width:100%;height:auto;border:1px solid va
 .links{display:flex;align-items:center;gap:10px;margin:0;
   font-family:var(--fm);font-size:var(--fs-body);letter-spacing:.06em;color:var(--body)}
 .links a{display:block;color:var(--body);text-decoration:none;transition:color .18s ease}
-.links a:hover,.links a:focus-visible{color:var(--soft)}
+.links a:hover,.links a:focus-visible{color:#262626}
 .links a:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
 .links .sep{color:var(--rule)}
 .links--head{margin-top:10px}
@@ -229,7 +211,7 @@ section p:not(.links) a,.icons i a{position:relative;color:inherit;text-decorati
 section p:not(.links) a .nav-rule,.icons i a .nav-rule{bottom:-1.5px}
 section p:not(.links) a:hover .nav-rule,section p:not(.links) a:focus-visible .nav-rule,
 .icons i a:hover .nav-rule,.icons i a:focus-visible .nav-rule{transform:scaleX(1)}
-section p:not(.links) a:hover,section p:not(.links) a:focus-visible{color:var(--soft)}
+section p:not(.links) a:hover,section p:not(.links) a:focus-visible{color:#262626}
 /* Captions inside the demo panels run on Mixr's near-black, where the sepia
    would vanish. That one lifts its own grey toward white by the same distance
    the sepia lifts the brown — going all the way to white overpowers a 13px
@@ -249,30 +231,25 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 .ff-wrap{position:relative;display:inline-flex}
 .links .ff{display:block;background:none;border:0;padding:0;cursor:pointer;
   font:inherit;color:var(--body);transition:color .18s ease}
-.links .ff:hover,.links .ff:focus-visible,.links .ff[aria-expanded="true"]{color:var(--soft)}
+.links .ff:hover,.links .ff:focus-visible,.links .ff[aria-expanded="true"]{color:#262626}
 .links .ff:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
 .links .ff:hover .nav-rule,
 .links .ff:focus-visible .nav-rule,
 .links .ff[aria-expanded="true"] .nav-rule{transform:scaleX(1)}
-/* The landing page's cursor tip plate, same recipe: opaque page-colour fill so
-   the cutting-mat grid does not read through it, a 12% hairline, a 1px radius,
-   13px mono. No nib — it follows the pointer rather than pointing at a word,
-   so an arrow would aim at nothing. Position comes from JS. */
+/* The site's one tooltip, .wt-tip (src/pages/home/chrome.css, which this page
+   loads with the site nav): the plate, the type, no tail. Here only what this
+   tip needs of its own: it rides the pointer (position from JS), and as the
+   one tip that is a whole sentence it wraps, with a little more leading, and
+   keeps its sentence case.
+   It fades like the nav's "Coming soon": in .16s, out .22s. */
 .ff-tip{position:fixed;left:0;top:0;z-index:40;
-  max-width:min(408px,68vw);
-  opacity:0;pointer-events:none;
-  background:var(--ground);
-  border:1px solid color-mix(in srgb,var(--ink) 12%,transparent);
-  border-radius:1px;
-  padding:9px 13px;
-  font-family:var(--fm);font-size:13px;font-weight:400;line-height:1.65;
-  letter-spacing:.03em;color:var(--body);text-align:left;
-  box-shadow:0 4px 12px color-mix(in srgb,var(--ink) 14%,transparent);
-  transition:opacity .18s ease}
+  max-width:min(408px,68vw);text-align:left;
+  opacity:0;pointer-events:none;transition:opacity .22s ease}
+.ff-tip.wt-tip{white-space:normal;line-height:1.5;text-transform:none}
 /* Italic only — no colour shift. The emphasis is the slant; recolouring it too
    makes one word look like a link in the middle of a sentence. */
 .ff-tip em{font-style:italic;color:inherit}
-.ff-tip.on{opacity:1}
+.ff-tip.on{opacity:1;transition-duration:.16s}
 
 /* decision + flag blocks */
 .dec{border-top:1px solid var(--rule);padding-top:20px;margin-top:30px}
@@ -927,9 +904,6 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 }
 @media (max-width:767px){
   :root{--nav-height:62px}
-  .wt-nav-inner{padding-inline:16px}
-  .wt-wordmark,.wt-nav-links a{font-size:13px;letter-spacing:.07em}
-  .wt-nav-links{gap:16px}
   /* Phone: no section list. At 900px it becomes a horizontally scrolling strip,
      and on a phone that strip sits directly under the nav and competes with the
      page for the first swipe — you flick to read on and scrub the chapters
@@ -1622,7 +1596,6 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 .tog button:focus-visible{outline:2px solid #f2f0ec;outline-offset:2px}
 
 @media (prefers-reduced-motion:reduce){
-  .wt-nav{transition:none}
   .dgflow .fx{opacity:1}
   .dgflow .fx-line{stroke-dashoffset:0}
   html{scroll-behavior:auto}
@@ -1630,15 +1603,21 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   .sb-clip,.sg-pill{transition:none}
   .nb-cluster,.nb-tick,.nb-play,.nb-meta,.nb-meta span{transition:none}
 }
+
 </style>
 
 
+<!-- The site nav: src/static-chrome.tsx replaces this with the app's own bar
+     (the star card, then these links), so it matches Home and About. What is
+     here is only what shows before that script runs. -->
+<div id="site-nav" style="display:contents">
 <header class="wt-nav">
   <div class="wt-nav-inner">
-    <a class="wt-wordmark" href="/#/">PRANAVI RAM</a>
+    <span aria-hidden="true"></span>
     <nav aria-label="Primary">
       <ul class="wt-nav-links">
         <li><a href="/#/projects">WORK<span class="nav-rule" aria-hidden="true"></span></a></li>
+        <li class="nav-soon-wrap"><button type="button" class="nav-mock">GALLERY<span class="nav-rule" aria-hidden="true"></span></button></li>
         <li><a href="/#/about">ABOUT<span class="nav-rule" aria-hidden="true"></span></a></li>
         <li>
           <a href="/docs/Pranavi_Ram_Resume_2026.pdf" target="_blank" rel="noreferrer">
@@ -1654,6 +1633,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     </nav>
   </div>
 </header>
+</div>
 
 <div class="shell">
 
@@ -2148,7 +2128,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
         <button type="button" class="ff" id="ff" aria-expanded="false" aria-controls="ff-tip">
           <i class="ico">🎉</i><span class="lbl">Fun Fact<span class="nav-rule" aria-hidden="true"></span></span>
         </button>
-        <span class="ff-tip" id="ff-tip" role="tooltip">This is also my first time coding in Swift! Coding agents are just <em>that</em> cool.</span>
+        <span class="ff-tip wt-tip" id="ff-tip" role="tooltip">This is also my first time coding in Swift! Coding agents are just <em>that</em> cool.</span>
       </span>
     </p>
   </div>
@@ -2185,6 +2165,10 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
 </main>
 </div>
+
+<!-- The site footer (the © line, the contact gears, the painting), mounted by
+     src/static-chrome.tsx: the same one Home and About end on. -->
+<div id="site-foot" style="display:contents"></div>
 
 <script>
 (function(){
@@ -2245,36 +2229,6 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   }
   addEventListener("scroll", onScroll, {passive:true});
 
-  /* Nav auto-hide. Direction is judged from the last position that actually
-     moved the nav, not the last scroll event — sampling every event makes a
-     slow drag flap, because sub-pixel jitter changes sign constantly.
-     State only changes when the threshold is crossed, so letting go mid-scroll
-     leaves the nav exactly as it was. */
-  var wtNav = document.querySelector(".wt-nav");
-  if(wtNav){
-    var navAnchor = window.scrollY, navHidden = false;
-    var NAV_STEP = 8;                        // px of travel before it reacts
-    addEventListener("scroll", function(){
-      var y = window.scrollY;
-      // At the very top it is always available, whatever the direction.
-      if(y <= 4){
-        if(navHidden){ wtNav.classList.remove("nav-away"); navHidden = false; }
-        navAnchor = y;
-        return;
-      }
-      // Never hide the bar while it holds keyboard focus — that would move
-      // focus off-screen with no way to see where it went.
-      if(wtNav.contains(document.activeElement)){ navAnchor = y; return; }
-      var dy = y - navAnchor;
-      if(Math.abs(dy) < NAV_STEP) return;
-      var down = dy > 0;
-      if(down !== navHidden){
-        wtNav.classList.toggle("nav-away", down);
-        navHidden = down;
-      }
-      navAnchor = y;
-    }, {passive:true});
-  }
 
   addEventListener("resize", onScroll);
   onScroll();

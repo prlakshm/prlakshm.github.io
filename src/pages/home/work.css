@@ -1,0 +1,448 @@
+/* ==========================================================================
+   Work grid
+   Full nav width, narrow gutters (Rachel Chen's proportions). Each card is one
+   16:10 stage — the product loop — with the poster riding on it as a printed
+   card. Treatments: [data-cards="print" | "still" | "reveal"].
+   ========================================================================== */
+
+.wk {
+  /* Same side padding as .wt-nav-inner, so the grid's edges are the nav's. */
+  --wk-pad: clamp(22px, 3.2vw, 60px);
+  --wk-radius: 0px; /* sharp, like Rachel's media */
+  /* the bottom is the walk out of the gallery: a long pause before the
+     footer row (~180px on a 13" laptop with the row's own top padding) */
+  padding: clamp(10px, 2vh, 24px) var(--wk-pad) clamp(104px, 16vh, 200px);
+  scroll-margin-top: calc(var(--nav-height) - 8px);
+}
+
+.wk-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: clamp(12px, 1.25vw, 20px);
+  row-gap: clamp(26px, 2.6vw, 42px);
+}
+
+/* --- Section heads ------------------------------------------------------- */
+.wk-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-top: 2px;
+}
+
+.wk-kicker,
+.wk-sub {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 14.5px;
+  line-height: 1.65;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mono-secondary);
+}
+
+.wk-kicker {
+  letter-spacing: 0.18em;
+}
+
+.wk-h {
+  margin: 10px 0 14px;
+  font-family: var(--font-hero);
+  font-weight: var(--weight-display);
+  font-size: clamp(34px, 3.8vw, 58px);
+  line-height: 0.97;
+  letter-spacing: -0.04em;
+  color: var(--espresso);
+}
+
+.wk-sub {
+  max-width: 30ch;
+}
+
+/* --- Cards --------------------------------------------------------------- */
+.wk-card {
+  display: block;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  outline: none;
+  /* The 3D space the stage tilts in; the print floats above the screen. */
+  perspective: 1600px;
+}
+
+/* No overflow, filter, opacity or blend mode here: any of them would flatten
+   the 3D context and the print could no longer float above the screen. */
+.wk-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.wk-card:focus-visible .wk-stage {
+  outline: 2px solid var(--espresso);
+  outline-offset: 4px;
+}
+
+/* Thickness of the glass, glowing behind the sheet in the project's colours. */
+.wk-glow {
+  position: absolute;
+  inset: -12px;
+  background: linear-gradient(150deg, var(--t1, #ccc), var(--t2, #999));
+  filter: blur(24px);
+  opacity: 0;
+  transform: translateZ(-1px);
+  transition: opacity 520ms var(--ease-settle);
+  pointer-events: none;
+}
+
+.wk-card.is-lit .wk-glow,
+.wk-card:focus-visible .wk-glow {
+  opacity: 0.4;
+}
+
+/* The product: a screen of glass. */
+.wk-screen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--loop-bg, #111);
+  box-shadow:
+    0 1px 2px rgba(23, 23, 23, 0.08),
+    0 22px 42px -26px rgba(23, 23, 23, 0.45);
+  transition: box-shadow 520ms var(--ease-settle);
+}
+
+.wk-card.is-lit .wk-screen {
+  box-shadow:
+    0 2px 4px rgba(23, 23, 23, 0.1),
+    0 38px 70px -32px rgba(23, 23, 23, 0.5);
+}
+
+.wk-screen video {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The printed poster. Sized and placed per treatment below; Motion owns its
+   transform (rest tilt included). */
+.wk-print {
+  position: absolute;
+  z-index: 2;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #111;
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.18),
+    0 2px 4px rgba(0, 0, 0, 0.14),
+    0 26px 40px -18px rgba(0, 0, 0, 0.55);
+  backface-visibility: hidden;
+}
+
+.wk-print img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(1.08) contrast(1.03);
+}
+
+/* UV varnish on the print: an iridescent film that only shows where the light
+   strikes. */
+.wk-uv {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.16;
+  background: linear-gradient(
+    105deg,
+    transparent 18%,
+    color-mix(in srgb, var(--t1, #fff) 45%, transparent) 33%,
+    rgba(255, 255, 255, 0.42) 43%,
+    color-mix(in srgb, var(--t2, #fff) 32%, transparent) 52%,
+    transparent 76%
+  );
+  background-size: 250% 100%;
+  background-position: 120% 0;
+  transition:
+    opacity 520ms var(--ease-settle),
+    background-position 360ms var(--ease-settle);
+}
+
+.wk-card.is-lit .wk-uv {
+  opacity: 0.78;
+}
+
+/* Print stock, so the poster reads as printed rather than on screen. */
+.wk-tex {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  opacity: 0.26;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23p)' opacity='0.42'/%3E%3C/svg%3E");
+}
+
+/* One glare, the same light on screen and print. */
+.wk-spec,
+.wk-pspec {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0;
+  background: linear-gradient(
+    101deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.5) 47%,
+    rgba(255, 255, 255, 0.1) 51%,
+    transparent 58%
+  );
+  background-size: 250% 100%;
+  background-position: 120% 0;
+  transition:
+    opacity 480ms var(--ease-settle),
+    background-position 340ms var(--ease-settle);
+}
+
+.wk-spec {
+  background: linear-gradient(
+    101deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.22) 47%,
+    rgba(255, 255, 255, 0.05) 51%,
+    transparent 58%
+  );
+  background-size: 250% 100%;
+  background-position: 120% 0;
+}
+
+.wk-card.is-lit .wk-spec,
+.wk-card.is-lit .wk-pspec {
+  opacity: 1;
+}
+
+.wk-rim {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.16),
+    inset 0 0 0 0.5px rgba(23, 23, 23, 0.12);
+}
+
+/* --- Treatment: print — the poster pinned on the corner of the screen ------- */
+[data-cards="print"] .wk-print {
+  left: 4.5%;
+  bottom: 6.5%;
+  width: 23%;
+}
+
+/* --- Treatment: still — print and screen on a table of the poster's colour -- */
+.wk-backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--loop-bg, #111);
+  box-shadow:
+    0 1px 2px rgba(23, 23, 23, 0.08),
+    0 22px 42px -26px rgba(23, 23, 23, 0.45);
+}
+
+.wk-backdrop::before {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  background: var(--poster) center / cover no-repeat;
+  filter: blur(42px) saturate(1.35);
+  transform: scale(1.15);
+}
+
+.wk-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Dark posters blur to flat grey, so the project's own two colours glow
+     through as light — every card gets a vivid ground of its own. Grain on
+     top so the gradients read as printed, not as CSS. */
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.05'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.22 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(70% 85% at 14% 22%, color-mix(in srgb, var(--t1) 62%, transparent), transparent 70%),
+    radial-gradient(75% 90% at 92% 88%, color-mix(in srgb, var(--t2) 58%, transparent), transparent 72%);
+  mix-blend-mode: screen;
+  opacity: 0.85;
+}
+
+[data-cards="still"] .wk-screen {
+  inset: auto;
+  right: 5%;
+  top: 19%;
+  width: 57%;
+  aspect-ratio: 16 / 10;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.18),
+    0 30px 50px -22px rgba(0, 0, 0, 0.55);
+}
+
+[data-cards="still"] .wk-print {
+  left: 6%;
+  top: 17%;
+  width: 26.5%;
+}
+
+/* --- Treatment: reveal — only the screen, until you hover ------------------- */
+[data-cards="reveal"] .wk-stage {
+  overflow: hidden;
+  transform-style: flat;
+}
+
+[data-cards="reveal"] .wk-print {
+  left: 4.5%;
+  bottom: 6.5%;
+  width: 26%;
+}
+
+/* --- Titles (Rachel's arrangement, the site's mono) ----------------------- */
+.wk-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 12px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.45;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.wk-title {
+  min-width: 0;
+  color: var(--espresso);
+  -webkit-text-stroke: 0.4px currentColor;
+}
+
+.wk-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  color: var(--mono-tertiary);
+  white-space: nowrap;
+  text-align: right;
+  -webkit-text-stroke: 0.3px currentColor;
+}
+
+.wk-tag .ext-arrow {
+  width: 10px;
+  height: 10px;
+}
+
+/* --- Everything: a peek at the canvas, with the bagel in the middle ------- */
+.wk-stage--canvas {
+  overflow: hidden;
+  transform-style: flat;
+  background-color: #fbfbfa;
+  background-image: radial-gradient(circle, var(--dot) var(--dot-size), transparent calc(var(--dot-size) + 0.5px));
+  background-size: var(--dot-step) var(--dot-step);
+  box-shadow:
+    0 1px 2px rgba(23, 23, 23, 0.06),
+    0 22px 42px -30px rgba(23, 23, 23, 0.35);
+}
+
+.wk-mini {
+  position: absolute;
+  display: block;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(23, 23, 23, 0.06),
+    0 10px 18px -10px rgba(23, 23, 23, 0.45);
+}
+
+.wk-mini img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Centred with margins, not translate — Motion owns this element's transform. */
+.wk-bagel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 26%;
+  margin-left: -13%;
+  margin-top: -9.97%; /* half the bagel's height, as a share of the stage's width */
+  z-index: 2;
+  cursor: pointer;
+  filter: drop-shadow(0 14px 14px rgba(58, 42, 29, 0.25));
+}
+
+.wk-bagel svg {
+  position: static !important;
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* --- Responsive ------------------------------------------------------------ */
+@media (max-width: 1023px) {
+  .wk-grid {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 30px;
+  }
+
+  .wk-head {
+    padding-top: 24px;
+  }
+
+  .wk-head:first-child {
+    padding-top: 0;
+  }
+
+  .wk-h {
+    margin-block: 6px 10px;
+  }
+}
+
+@media (max-width: 767px) {
+  .wk {
+    --wk-pad: 16px;
+  }
+
+  .wk-kicker,
+  .wk-sub {
+    font-size: 14px;
+  }
+
+  .wk-meta {
+    flex-direction: column;
+    gap: 2px;
+    font-size: 12px;
+  }
+
+  .wk-tag {
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wk-glow,
+  .wk-screen,
+  .wk-uv,
+  .wk-spec,
+  .wk-pspec {
+    transition: none;
+  }
+}
