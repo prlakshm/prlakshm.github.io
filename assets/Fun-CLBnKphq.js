@@ -1,4 +1,4 @@
-import{j as e,a as i,b as de}from"./SiteFooter-BxtDcg5Y.js";const ce=[{id:"2074143950701494659",url:"https://x.com/pranavibuilds/status/2074143950701494659",name:"pranaviln",handle:"pranavibuilds",avatar:"/fun/avatar.png",text:`Hey X 👋
+import{j as e,a as i,b as de}from"./SiteFooter--zF2tnUD.js";const ce=[{id:"2074143950701494659",url:"https://x.com/pranavibuilds/status/2074143950701494659",name:"pranaviln",handle:"pranavibuilds",avatar:"/fun/avatar.png",text:`Hey X 👋
 
 If we haven't met, I'm pranavi (pronounced pren-uh-vee).
 
