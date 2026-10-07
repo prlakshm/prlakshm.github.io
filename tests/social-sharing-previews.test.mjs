@@ -5,6 +5,26 @@ import { readFile } from "node:fs/promises";
 const root = new URL("../", import.meta.url);
 const text = (path) => readFile(new URL(path, root), "utf8");
 
+const socialImages = [
+  "public/social/portfolio-landing-v1.png",
+  "public/social/about-v1.png",
+  "public/social/cursor-loves-indie-v1.png",
+  "public/social/figma-sound-v1.png",
+  "public/social/codex-bookmarks-v1.png",
+];
+
+const pngSize = (buffer) => {
+  assert.deepEqual([...buffer.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+  return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
+};
+
+test("all social preview assets are 1200 by 630 PNGs", async () => {
+  for (const path of socialImages) {
+    const image = await readFile(new URL(path, root));
+    assert.deepEqual(pngSize(image), { width: 1200, height: 630 }, path);
+  }
+});
+
 test("About has a clean Vite page entry", async () => {
   const [html, entry, vite] = await Promise.all([
     text("about/index.html"),

@@ -9,7 +9,9 @@
     "start": "react-scripts start",
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:social": "node --test tests/social-sharing-previews.test.mjs",
+    "social:previews": "node scripts/generate-social-previews.mjs"
   },
   "dependencies": {
     "@calcom/embed-react": "^1.5.0",
