@@ -44,7 +44,9 @@ Each concept preview is a direct, clean 1200 × 630 rendering of its established
 
 The current About route is `/#/about`. Social crawlers do not send URL fragments to the server, so that address cannot expose metadata distinct from the homepage.
 
-Add a real `/about/` document with About-specific Open Graph and Twitter metadata. Human visitors who open `/about/` should be taken to the existing About experience at `/#/about`. This preserves the application and gives social crawlers a stable URL from which to read the About preview.
+Move the public About page to the clean canonical address `/about/`. That document must contain the About-specific Open Graph and Twitter metadata and render the existing About experience while the browser remains at `https://pranaviram.com/about/`; it must not redirect visitors back to a hash route.
+
+Update every first-party About navigation link to use `/about/`. The old `/#/about` route may remain as a compatibility path for saved links, but it is no longer the canonical or internally linked About address.
 
 ## Metadata
 
@@ -68,5 +70,6 @@ Generate the images from the real local site and its existing poster/wordmark pa
 - Assert no in-scope metadata still references the profile portrait.
 - Build the production site and verify that all preview assets and endpoint documents are present in `dist`.
 - Inspect every final image visually at full size and at a reduced social-card size.
-- Verify `/about/` exposes About metadata without changing the existing About page experience for human visitors.
+- Verify `/about/` exposes About metadata, renders the existing About page experience, and keeps the clean `/about/` address in the browser.
+- Verify first-party navigation no longer points to `/#/about`.
 - After verification, commit all implementation changes, push `main`, deploy the production build, and confirm the live metadata and image URLs.
