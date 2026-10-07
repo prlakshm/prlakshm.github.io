@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { animate } from "motion";
 import BadgeCard from "../../components/badges/BadgeCard.js";
 import { attachUnderlineWipe, prefersReducedMotion, SPRING } from "./interactions.js";
@@ -312,10 +312,15 @@ export function NavBar({ work, about, autoHide = false, onHome }: NavBarProps) {
 export default function WtNav() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const onCleanAbout = window.location.pathname.replace(/\/+$/, "") === "/about";
 
   /* WORK is a button, not <a href="#work">: this is a HashRouter, so the hash
      is the route. From another page it goes home and asks Home to scroll. */
   const goWork = () => {
+    if (onCleanAbout) {
+      window.location.assign("/#/projects");
+      return;
+    }
     if (pathname === "/" || pathname === "/projects") scrollToId("work");
     else navigate("/", { state: { scrollTo: "work" } });
   };
@@ -323,6 +328,10 @@ export default function WtNav() {
   /* The star card goes home: from another page it opens Home at the top
      (Home keeps no scroll of its own); on Home it glides back to the top. */
   const goHome = () => {
+    if (onCleanAbout) {
+      window.location.assign("/#/");
+      return;
+    }
     const here = pathname === "/";
     if (!here) navigate("/");
     window.scrollTo({ top: 0, behavior: here && !prefersReducedMotion() ? "smooth" : "auto" });
@@ -338,10 +347,10 @@ export default function WtNav() {
         </button>
       }
       about={
-        <Link to="/about" aria-current={pathname === "/about" ? "page" : undefined}>
+        <a href="/about/" aria-current={onCleanAbout || pathname === "/about" ? "page" : undefined}>
           ABOUT
           <span className="nav-rule" aria-hidden="true" />
-        </Link>
+        </a>
       }
     />
   );

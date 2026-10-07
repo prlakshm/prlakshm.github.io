@@ -37,7 +37,7 @@ function StaticNav({ badgeOnOpen }: { badgeOnOpen?: string }) {
     <NavBar
       autoHide
       work={<a href="/#/projects">WORK{rule}</a>}
-      about={<a href="/#/about">ABOUT{rule}</a>}
+      about={<a href="/about/">ABOUT{rule}</a>}
     />
   );
 }

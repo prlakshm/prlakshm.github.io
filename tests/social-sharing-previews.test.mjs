@@ -1,0 +1,37 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+
+const root = new URL("../", import.meta.url);
+const text = (path) => readFile(new URL(path, root), "utf8");
+
+test("About has a clean Vite page entry", async () => {
+  const [html, entry, vite] = await Promise.all([
+    text("about/index.html"),
+    text("src/about-main.tsx"),
+    text("vite.config.ts"),
+  ]);
+  assert.match(html, /<link rel="canonical" href="https:\/\/pranaviram\.com\/about\/"/);
+  assert.match(html, /<div id="root"><\/div>/);
+  assert.match(html, /src="\/src\/about-main\.tsx"/);
+  assert.match(entry, /BrowserRouter/);
+  assert.match(entry, /<About\s*\/>/);
+  assert.match(vite, /about:\s*resolve\(__dirname,\s*"about\/index\.html"\)/);
+});
+
+test("first-party navigation uses the clean About URL", async () => {
+  const paths = [
+    "src/pages/home/WtNav.tsx",
+    "src/components/Header.tsx",
+    "src/static-chrome.tsx",
+    "public/mixr/index.html",
+    "public/surprise-rail/index.html",
+    "public/reasons-to-watch/index.html",
+  ];
+  for (const path of paths) {
+    const source = await text(path);
+    assert.doesNotMatch(source, /#\/about/, path);
+  }
+  assert.match(await text("src/pages/home/WtNav.tsx"), /href="\/about\/"/);
+  assert.match(await text("src/static-chrome.tsx"), /href="\/about\/"/);
+});

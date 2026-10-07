@@ -121,7 +121,7 @@ function Header() {
           <a href="#/fun" onClick={() => handleLinkClick('#fun')}>
             Fun
           </a>
-          <a href="#/about" onClick={() => handleLinkClick('#about')}>
+          <a href="/about/">
             About
           </a>
           <a
@@ -145,7 +145,7 @@ function Header() {
           <a href="#/fun" onClick={() => handleLinkClick('#fun')}>
             Fun
           </a>
-          <a href="#/about" onClick={() => handleLinkClick('#about')}>
+          <a href="/about/">
             About
           </a>
           <a
