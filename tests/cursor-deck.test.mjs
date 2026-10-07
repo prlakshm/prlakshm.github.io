@@ -5,6 +5,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = fileURLToPath(new URL("..", import.meta.url));
+const publicDir = resolve(repoRoot, "public");
 const deckDir = resolve(repoRoot, "public/cursor");
 
 const localReferences = (html) => {
@@ -47,7 +48,9 @@ test("publishes the complete nine-slide Cursor deck with every local dependency"
 
     const html = await readFile(htmlPath, "utf8");
     for (const reference of localReferences(html)) {
-      const dependencyPath = resolve(dirname(htmlPath), reference);
+      const dependencyPath = reference.startsWith("/")
+        ? resolve(publicDir, reference.slice(1))
+        : resolve(dirname(htmlPath), reference);
       const dependency = await stat(dependencyPath);
       assert.ok(dependency.isFile(), `${reference} should resolve to a file`);
       if (dependencyPath.endsWith(".html")) htmlQueue.push(dependencyPath);
