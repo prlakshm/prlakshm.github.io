@@ -55,3 +55,26 @@ test("first-party navigation uses the clean About URL", async () => {
   assert.match(await text("src/pages/home/WtNav.tsx"), /href="\/about\/"/);
   assert.match(await text("src/static-chrome.tsx"), /href="\/about\/"/);
 });
+
+const metadata = [
+  ["index.html", "https://pranaviram.com/social/portfolio-landing-v1.png"],
+  ["about/index.html", "https://pranaviram.com/social/about-v1.png"],
+  ["public/surprise-rail/index.html", "https://pranaviram.com/social/portfolio-landing-v1.png"],
+  ["public/mixr/index.html", "https://pranaviram.com/social/portfolio-landing-v1.png"],
+  ["public/cursor/index.html", "https://pranaviram.com/social/cursor-loves-indie-v1.png"],
+  ["public/figma/index.html", "https://pranaviram.com/social/figma-sound-v1.png"],
+  ["public/codex/index.html", "https://pranaviram.com/social/codex-bookmarks-v1.png"],
+];
+
+test("every shareable endpoint declares its approved large image", async () => {
+  for (const [path, image] of metadata) {
+    const html = await text(path);
+    assert.match(html, new RegExp(`property=["']og:image["'] content=["']${image.replaceAll(".", "\\.")}['"]`), path);
+    assert.match(html, new RegExp(`name=["']twitter:image["'] content=["']${image.replaceAll(".", "\\.")}['"]`), path);
+    assert.match(html, /property=["']og:image:width["'] content=["']1200["']/, path);
+    assert.match(html, /property=["']og:image:height["'] content=["']630["']/, path);
+    assert.match(html, /property=["']og:image:alt["'] content=["'][^"']+["']/, path);
+    assert.match(html, /name=["']twitter:image:alt["'] content=["'][^"']+["']/, path);
+    assert.doesNotMatch(html, /about\/Profile(?:%20| )picture\.png/i, path);
+  }
+});
