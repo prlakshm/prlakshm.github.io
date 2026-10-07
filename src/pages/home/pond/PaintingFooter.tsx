@@ -144,7 +144,7 @@ const PAINTINGS: Record<string, Painting> = {
     pos: "50% 0",
     phone: "75% 0",
     ...FRAME_SKYLINE,
-    live: { swell: 0, clouds: { src: "/home/footer/skyline-d-clouds.webp", rgb: SKYLINE_CLOUD_RGB, speed: 24, secondarySpeed: 9, vertical: 3, gain: 1.65 } },
+    live: { swell: 0, clouds: { src: "/home/footer/skyline-d-clouds.webp", rgb: SKYLINE_CLOUD_RGB, speed: 52, secondarySpeed: 22, vertical: 5, verticalPeriod: 15, gain: 2.1 } },
   },
   "skyline-b": {
     src: "/home/footer/skyline-b.webp",
@@ -153,7 +153,7 @@ const PAINTINGS: Record<string, Painting> = {
     phone: "75% 0",
     ...FRAME_SKYLINE,
     size: [3376, 704],
-    live: { swell: 0, clouds: { src: "/home/footer/skyline-b-clouds.webp", rgb: SKYLINE_CLOUD_RGB, speed: 24, secondarySpeed: 9, vertical: 3, gain: 1.65 } },
+    live: { swell: 0, clouds: { src: "/home/footer/skyline-b-clouds.webp", rgb: SKYLINE_CLOUD_RGB, speed: 52, secondarySpeed: 22, vertical: 5, verticalPeriod: 15, gain: 2.1 } },
   },
 };
 const DEFAULT = "5b-smooth";

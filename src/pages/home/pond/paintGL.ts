@@ -132,12 +132,21 @@ void main() {
   // this changes the sky without brightening it continuously; towers stay put.
   if (uCloudOn > 0.5) {
     vec4 c0 = texture2D(uCloud, uv);
-    if (c0.g > 0.01) {
+    float sky = smoothstep(0.04, 0.96, c0.g);
+    if (sky > 0.001) {
       float here = c0.r - 0.5;
       float primary = texture2D(uCloud, vec2(fract(uv.x - uCloudMotion.x), clamp(uv.y + uCloudMotion.z, 0.0, 1.0))).r - 0.5;
       float secondary = texture2D(uCloud, vec2(fract(uv.x - uCloudMotion.y), clamp(uv.y - uCloudMotion.z * 0.55, 0.0, 1.0))).r - 0.5;
       float there = mix(primary, secondary, 0.28);
-      col += (there - here) * 8.0 * uCloudRGB * c0.g * uCloudMotion.w;
+      // Move the cloud value, but shade the painting's own colour. Adding a
+      // neutral RGB delta made stronger shadows look pasted-on grey; screen
+      // light and proportional shade preserve the sky's local painted hue.
+      float cloudScale = (uCloudRGB.r + uCloudRGB.g + uCloudRGB.b) / 3.0;
+      float cloudDelta = (there - here) * 8.0 * cloudScale * sky * uCloudMotion.w;
+      float light = max(cloudDelta, 0.0);
+      float shade = max(-cloudDelta, 0.0) * 0.55;
+      col += (vec3(1.0) - col) * light;
+      col *= 1.0 - shade;
     }
   }
 
@@ -257,6 +266,7 @@ export type PaintOptions = {
     speed: number;
     secondarySpeed?: number;
     vertical?: number;
+    verticalPeriod?: number;
     gain?: number;
   }; // drifting sky: cloud layer (R cloud, G sky), two speeds and a small vertical meander in painting px
 };
@@ -380,7 +390,7 @@ export async function createPaintGL(canvas: HTMLCanvasElement, paintSrc: string,
       if (opts.clouds) {
         const primary = ((t * opts.clouds.speed) / paint.width) % 1;
         const secondary = ((t * (opts.clouds.secondarySpeed ?? opts.clouds.speed * 0.4)) / paint.width) % 1;
-        const vertical = Math.sin((t * 2 * Math.PI) / 24) * (opts.clouds.vertical ?? 0) / paint.height;
+        const vertical = Math.sin((t * 2 * Math.PI) / (opts.clouds.verticalPeriod ?? 24)) * (opts.clouds.vertical ?? 0) / paint.height;
         gl.uniform4f(u("uCloudMotion"), primary, secondary, vertical, opts.clouds.gain ?? 1);
       }
       const sh = shine ?? [0, 0, 1, 0, 1, 0, 1];

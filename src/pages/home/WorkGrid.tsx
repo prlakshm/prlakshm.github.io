@@ -1,7 +1,16 @@
 import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { animate } from "motion";
-import { earn, type BadgeId } from "../../components/badges/badgeStore.js";
+import {
+  awardOnArrival,
+  earn,
+  type BadgeId,
+} from "../../components/badges/badgeStore.js";
+import {
+  beginConceptJourney,
+  mountConceptReturnListener,
+  opensInNewTab,
+} from "../../components/badges/conceptJourney.js";
 import { ExternalArrow } from "./WtNav.js";
 import { prefersReducedMotion } from "./interactions.js";
 import PosterGallery from "./PosterGallery.js";
@@ -174,7 +183,6 @@ function WorkCard({ work, variant }: { work: Work; variant: CardVariant }) {
     const MAX = 5;
     const spring = { type: "spring", stiffness: 220, damping: 24 } as const;
     const printSpring = { type: "spring", stiffness: 260, damping: 22 } as const;
-    let holdTimer = 0;
 
     // Touch screens have no hover, so a revealed print simply rests in view.
     const rest = variant === "reveal" && !fine ? PRINT_LIT.reveal : PRINT_REST[variant];
@@ -184,10 +192,6 @@ function WorkCard({ work, variant }: { work: Work; variant: CardVariant }) {
       card.classList.add("is-lit");
       if (reduced && videoRef.current) videoRef.current.play().catch(() => {});
       if (fine) animate(print, PRINT_LIT[variant], reduced ? { duration: 0 } : printSpring);
-      // Lingering on a concept counts as reimagining it.
-      if (work.badge === "reimagine") {
-        holdTimer = window.setTimeout(() => earn("reimagine", { x: e.clientX, y: e.clientY }), 900);
-      }
     };
     const move = (e: PointerEvent) => {
       if (reduced || !fine) return;
@@ -202,7 +206,6 @@ function WorkCard({ work, variant }: { work: Work; variant: CardVariant }) {
     };
     const leave = () => {
       card.classList.remove("is-lit");
-      window.clearTimeout(holdTimer);
       if (reduced && videoRef.current) videoRef.current.pause();
       if (fine) {
         animate(print, PRINT_REST[variant], reduced ? { duration: 0 } : printSpring);
@@ -218,7 +221,6 @@ function WorkCard({ work, variant }: { work: Work; variant: CardVariant }) {
     card.addEventListener("focus", focus);
     card.addEventListener("blur", blur);
     return () => {
-      window.clearTimeout(holdTimer);
       card.removeEventListener("pointerenter", enter);
       card.removeEventListener("pointermove", move);
       card.removeEventListener("pointerleave", leave);
@@ -227,11 +229,13 @@ function WorkCard({ work, variant }: { work: Work; variant: CardVariant }) {
     };
   }, [work.badge, variant]);
 
-  /* Opening a card earns its badge. Links that leave the page save it now and
-     stamp it in when the visitor comes back. */
+  /* Opening a concept starts a visit. Its destination and the later return
+     complete the award; ordinary case-study links do not earn on landing. */
   const onOpen = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    const point = stageRef.current ? centre(stageRef.current) : { x: e.clientX, y: e.clientY };
-    earn(work.badge, point, { defer: !work.external });
+    if (work.badge !== "reimagine") return;
+    beginConceptJourney(new URL(work.href, window.location.href).pathname, {
+      newTab: opensInNewTab(e),
+    });
   };
 
   const poster = `${ASSET}${work.id}-poster.webp`;
@@ -242,6 +246,7 @@ function WorkCard({ work, variant }: { work: Work; variant: CardVariant }) {
       ref={cardRef}
       href={work.href}
       onClick={onOpen}
+      onAuxClick={onOpen}
       {...(work.external ? { target: "_blank", rel: "noreferrer" } : {})}
     >
       <div
@@ -401,6 +406,10 @@ function EverythingCard() {
 
 export default function WorkGrid() {
   const { search } = useLocation();
+  useEffect(
+    () => mountConceptReturnListener(() => awardOnArrival("reimagine")),
+    [],
+  );
   const asked = new URLSearchParams(search).get("cards") as Variant | null;
   const variant: Variant = asked && VARIANTS.includes(asked) ? asked : "gallery";
 

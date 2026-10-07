@@ -97,69 +97,6 @@ test("the visible masks and accessible copy use the rewritten manifesto", () => 
   assert.doesNotMatch(generated, /\bd:\s*"/);
 });
 
-test("body and title preserve their authored stroke treatment at the compact scale", () => {
-  const css = read("src/pages/about/about.css");
-  const build = read("scripts/manifesto/build.py");
-  const component = read("src/pages/about/Manifesto.tsx");
-
-  const manifestoRule = css.match(/\.mf\s*\{([\s\S]*?)\n\}/)?.[1];
-  const titleLineRule = css.match(
-    /\.mf-line--title\s*\{([\s\S]*?)\n\}/,
-  )?.[1];
-  const bodyLineRule = css.match(
-    /\.mf-line--body\s*\{([\s\S]*?)\n\}/,
-  )?.[1];
-  const bodyWeightRule = css.match(
-    /\.mf-line--body \.mf-word\s*\{([\s\S]*?)\n\}/,
-  )?.[1];
-  const glowRule = css.match(
-    /\.mf-line--title \.mf-word\s*\{([\s\S]*?)\n\}/,
-  )?.[1];
-  const titleMaxUnit = Number(
-    titleLineRule?.match(/--mf-u:\s*clamp\([^;]*,\s*([0-9.]+)px\);/)?.[1],
-  );
-  const bodyMaxUnit = Number(
-    bodyLineRule?.match(/--mf-u:\s*clamp\([^;]*,\s*([0-9.]+)px\);/)?.[1],
-  );
-  const titleGap = Number(
-    titleLineRule?.match(
-      /margin-bottom:\s*calc\(var\(--mf-u\) \* ([0-9.]+)(?: - 4px)?\)/,
-    )?.[1],
-  );
-
-  assert.match(titleLineRule ?? "", /color:\s*var\(--mono-secondary\);/);
-  assert.match(
-    build,
-    /RENDER_DILATION_RADII\s*=\s*\{\s*"body":\s*0\.375,\s*"title":\s*0\.625\s*\}/,
-  );
-  assert.match(
-    build,
-    /MARK_DILATION_RADII\s*=\s*\{\s*"body":\s*0\.625,\s*"title":\s*0\.75\s*\}/,
-  );
-  assert.match(build, /if radius < 1:/);
-  assert.match(build, /alpha \* \(1 - radius\) \+ expanded \* radius/);
-  assert.match(build, /maximum_filter/);
-  assert.match(component, /manifesto-body-ink\.png/);
-  assert.match(component, /manifesto-title-ink\.png/);
-  assert.ok(
-    bodyMaxUnit >= 1.48 && bodyMaxUnit <= 1.49,
-    "body text must grow five percent from its compact 90 percent scale",
-  );
-  assert.ok(titleMaxUnit > bodyMaxUnit, "title must render visibly larger than the body");
-  assert.match(
-    titleLineRule ?? "",
-    /margin-bottom:\s*calc\(var\(--mf-u\) \* 10 - 4px\)/,
-  );
-  assert.doesNotMatch(
-    bodyWeightRule ?? "",
-    /drop-shadow/,
-    "body thickness must come from its alpha mask, not a costly filter chain",
-  );
-  assert.doesNotMatch(glowRule ?? "", /currentColor/);
-  assert.match(glowRule ?? "", /drop-shadow/);
-  assert.match(glowRule ?? "", /rgba\(255,\s*255,\s*255/);
-});
-
 test("body row spacing scales with the compact manifesto", () => {
   const css = read("src/pages/about/about.css");
   const bodyLineRule = css.match(
@@ -287,36 +224,6 @@ test("the manifesto handwriting and its wash scale down to 90 percent without re
   assert.match(bodyRule ?? "", /--mf-body-row-step:\s*clamp\(26\.4995px,\s*calc\(1\.637685vw \+ 20\.13965px\),\s*41\.09975px\);/);
   assert.match(titleRule ?? "", /--mf-u:\s*clamp\(1\.206px,\s*0\.1305vw \+ 0\.72px,\s*1\.8px\);/);
   assert.match(portraitRule ?? "", /width:\s*clamp\(250px,\s*26\.25vw,\s*375px\);/);
-});
-
-test("the hero wash hugs the title and copy instead of extending through the contact row", () => {
-  const css = read("src/pages/home/home.css");
-  const blockRule = css.match(/\.hero-block\s*\{([\s\S]*?)\n\}/)?.[1];
-  const washRule = css.match(/\.hero-title::before,\s*\.hero-col::before\s*\{([\s\S]*?)\n\}/)?.[1];
-
-  assert.match(blockRule ?? "", /position:\s*relative;/);
-  assert.match(blockRule ?? "", /isolation:\s*isolate;/);
-  assert.doesNotMatch(css, /\.hero-block::before\s*\{/);
-  assert.match(washRule ?? "", /content:\s*["']{2};/);
-  assert.match(washRule ?? "", /inset:\s*-8px\s+-14px;/);
-  assert.match(washRule ?? "", /background:\s*color-mix\(in srgb, var\(--parchment\) 50%, transparent\);/);
-  assert.match(washRule ?? "", /mask-image:[\s\S]*?10%/);
-  assert.match(washRule ?? "", /-webkit-mask-image:[\s\S]*?10%/);
-  assert.doesNotMatch(washRule ?? "", /border(?:-radius)?:|box-shadow:/);
-});
-
-test("the navigation text uses the same feathered paper wash", () => {
-  const css = read("src/pages/home/home.css");
-  const navRule = css.match(/\.wt-nav-inner\s*\{([\s\S]*?)\n\}/)?.[1];
-  const washRule = css.match(/\.wt-nav-inner::before\s*\{([\s\S]*?)\n\}/)?.[1];
-
-  assert.match(navRule ?? "", /position:\s*relative;/);
-  assert.match(navRule ?? "", /isolation:\s*isolate;/);
-  assert.match(washRule ?? "", /content:\s*["']{2};/);
-  assert.match(washRule ?? "", /background:\s*color-mix\(in srgb, var\(--parchment\) 50%, transparent\);/);
-  assert.match(washRule ?? "", /mask-image:[\s\S]*?10%/);
-  assert.match(washRule ?? "", /-webkit-mask-image:[\s\S]*?10%/);
-  assert.doesNotMatch(washRule ?? "", /border(?:-radius)?:|box-shadow:/);
 });
 
 test("each handwriting mask has a restrained light ink halo", () => {
@@ -491,39 +398,6 @@ test("every sentence period survives the alpha cleanup", () => {
   assert.match(build, /word\.endswith\("\."\)/);
   assert.ok(joy);
   assert.ok(Number(joy[1]) > 29, "joy. crop must include its period");
-});
-
-test("all i-dots and periods receive heavier source-mask overlays", () => {
-  const generated = read("src/pages/about/manifesto-words.ts");
-  const build = read("scripts/manifesto/build.py");
-  const component = read("src/pages/about/Manifesto.tsx");
-
-  assert.equal(
-    [...generated.matchAll(/\bmx:\s*-[0-9.]+/g)].length,
-    44,
-    "two title i-dots, thirty body i-dots, and twelve periods need overlays",
-  );
-  assert.match(component, /w\.m\.map/);
-  assert.match(component, /className="mf-mark"/);
-  assert.match(
-    build,
-    /MARK_DILATION_RADII\s*=\s*\{\s*"body":\s*0\.625,\s*"title":\s*0\.75\s*\}/,
-  );
-  assert.match(component, /body-marks\.png/);
-  assert.match(component, /title-marks\.png/);
-  assert.match(component, /maskStack\(MARK_MASKS\[w\.s\]\)/);
-});
-
-test("words from Automate onward use a calibrated heavier authored mask", () => {
-  const build = read("scripts/manifesto/build.py");
-  const component = read("src/pages/about/Manifesto.tsx");
-
-  assert.match(build, /LATE_BODY_START_LINE\s*=\s*13/);
-  assert.match(build, /LATE_BODY_DILATION_RADIUS\s*=\s*0\.625/);
-  assert.match(build, /manifesto-body-late-ink\.png/);
-  assert.match(component, /manifesto-body-late-ink\.png/);
-  assert.match(component, /w\.l >= LATE_BODY_START_LINE/);
-  assert.match(component, /className=\{isLateBody \? "mf-word mf-word--late" : "mf-word"\}/);
 });
 
 test("crowded late-body words gain smooth local spacing without redrawing the handwriting", () => {

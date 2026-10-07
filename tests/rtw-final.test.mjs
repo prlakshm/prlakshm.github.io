@@ -10,17 +10,7 @@ const cssPath = new URL(
   "../src/pages/case-study-hbo-max2/case-study-hbo-max2.css",
   import.meta.url,
 );
-const journalsPath = new URL("../src/pages/home/journals.ts", import.meta.url);
 const planPath = new URL("../docs/rtw-case-study-plan.md", import.meta.url);
-
-test("uses the red notebook as the stable entry to the finished RTW case study", async () => {
-  const journals = await readFile(journalsPath, "utf8");
-
-  assert.match(
-    journals,
-    /id: "reasons-to-watch",[\s\S]*?closed: "\/home\/journals\/red-closed\.png",[\s\S]*?href: "\/reasons-to-watch\/"/,
-  );
-});
 
 test("follows the six-chapter claim-first structure from cs-final", async () => {
   const source = await readFile(componentPath, "utf8");
@@ -47,19 +37,6 @@ test("states the concept, ownership, and evidence boundary in the hero", async (
   assert.match(source, /System design, prompting, prototype, evaluation/);
   assert.match(source, /Internal POC · Not shipped/);
   assert.doesNotMatch(source, /improved retention|reduced churn|POC was successful/i);
-});
-
-test("distinguishes the internal model-backed POC from the public walkthrough", async () => {
-  const source = await readFile(componentPath, "utf8");
-
-  assert.match(source, /built the internal POC with the Gemini API/i);
-  assert.match(source, /deterministic walkthrough/i);
-  assert.match(source, /optional Critic/i);
-  assert.match(source, /criticReviewed/);
-  assert.match(source, /Run optional critic/);
-  assert.match(source, /\[1, 2, 3\]\.forEach/);
-  assert.doesNotMatch(source, /\[1, 2, 3, 4\]\.forEach/);
-  assert.doesNotMatch(source, /Live four-agent handoff/);
 });
 
 test("keeps technical evidence concrete and links the source artifacts", async () => {

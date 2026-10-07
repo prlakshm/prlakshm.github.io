@@ -2,6 +2,10 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { animate } from "motion";
 import { earn, type BadgeId } from "../../components/badges/badgeStore.js";
+import {
+  beginConceptJourney,
+  opensInNewTab,
+} from "../../components/badges/conceptJourney.js";
 import { ExternalArrow } from "./WtNav.js";
 import { prefersReducedMotion } from "./interactions.js";
 import "./rail.css";
@@ -250,8 +254,8 @@ export default function PosterRail({
     return () => io.disconnect();
   }, []);
 
-  /* Concepts count as reimagined once you have stayed with one; the bagel is
-     found once it is on screen. */
+  /* The bagel remains a dwell find. Concept visits are confirmed explicitly
+     by their destination pages instead of by resting on this preview. */
   useEffect(() => {
     window.clearTimeout(timers.current.badge);
     if (open === null) return;
@@ -261,10 +265,6 @@ export default function PosterRail({
         const bagel = screenRef.current?.querySelectorAll(".pr-bagel")[open];
         earn("bagel", bagel ? centre(bagel) : null);
       }, 700);
-    } else if (item.badge === "reimagine") {
-      timers.current.badge = window.setTimeout(() => {
-        if (screenRef.current) earn("reimagine", centre(screenRef.current));
-      }, 1100);
     }
     return () => window.clearTimeout(timers.current.badge);
   }, [open, items]);
@@ -359,12 +359,20 @@ export default function PosterRail({
     if (e.key === "ArrowLeft") setOpen((v) => (v === null ? v : Math.max(0, v - 1)));
   };
 
-  const go = (item: RailItem, from: Element | null) => {
+  const go = (
+    item: RailItem,
+    from: Element | null,
+    event: React.MouseEvent<HTMLAnchorElement>,
+  ) => {
     if (item.everything) {
       earn("bagel", from ? centre(from) : null);
       return;
     }
-    earn(item.badge, from ? centre(from) : null, { defer: !item.external });
+    if (item.badge === "reimagine") {
+      beginConceptJourney(new URL(item.href, window.location.href).pathname, {
+        newTab: opensInNewTab(event),
+      });
+    }
   };
 
   const linkProps = (item: RailItem) => (item.external ? { target: "_blank", rel: "noreferrer" } : {});
@@ -415,7 +423,8 @@ export default function PosterRail({
                 onFocus={(e) => {
                   if (geo.spread && e.currentTarget.matches(":focus-visible")) setOpen(i);
                 }}
-                onClick={(e) => go(item, e.currentTarget)}
+                onClick={(e) => go(item, e.currentTarget, e)}
+                onAuxClick={(e) => go(item, e.currentTarget, e)}
                 {...linkProps(item)}
               >
                 {item.everything ? (
@@ -444,7 +453,8 @@ export default function PosterRail({
           href={current.href}
           tabIndex={-1}
           aria-hidden="true"
-          onClick={(e) => go(current, e.currentTarget)}
+          onClick={(e) => go(current, e.currentTarget, e)}
+          onAuxClick={(e) => go(current, e.currentTarget, e)}
           {...linkProps(current)}
         >
           {items.map((item, i) => (
@@ -478,7 +488,7 @@ export default function PosterRail({
         {/* Open: the project on screen, and the switcher. */}
         <div className="pr-bar" ref={barRef} aria-hidden={open === null}>
           <div className="pr-bar-text" ref={barTextRef}>
-            <a className="pr-title" href={current.href} tabIndex={-1} onClick={(e) => go(current, e.currentTarget)} {...linkProps(current)}>
+            <a className="pr-title" href={current.href} tabIndex={-1} onClick={(e) => go(current, e.currentTarget, e)} onAuxClick={(e) => go(current, e.currentTarget, e)} {...linkProps(current)}>
               {current.title}
             </a>
             <span className="pr-tag">

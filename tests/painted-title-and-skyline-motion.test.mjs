@@ -116,16 +116,22 @@ test("title light is clipped to the paintings' gold masks", () => {
   assert.match(aboutCss, /radial-gradient\(/);
 });
 
-test("skyline clouds use two-speed drift with a small vertical meander", () => {
+test("skyline clouds use legible two-speed drift feathered into the painted sky", () => {
   const footer = read("src/pages/home/pond/PaintingFooter.tsx");
   const shader = read("src/pages/home/pond/paintGL.ts");
 
-  assert.match(footer, /speed:\s*24/);
-  assert.match(footer, /secondarySpeed:\s*9/);
-  assert.match(footer, /vertical:\s*3/);
-  assert.match(footer, /gain:\s*1\.65/);
+  assert.match(footer, /speed:\s*52/);
+  assert.match(footer, /secondarySpeed:\s*22/);
+  assert.match(footer, /vertical:\s*5/);
+  assert.match(footer, /verticalPeriod:\s*15/);
+  assert.match(footer, /gain:\s*2\.1/);
   assert.match(shader, /uniform vec4 uCloudMotion/);
   assert.match(shader, /uCloudMotion\.y/);
   assert.match(shader, /uCloudMotion\.z/);
   assert.match(shader, /uCloudMotion\.w/);
+  assert.match(shader, /float sky = smoothstep\(0\.04, 0\.96, c0\.g\)/);
+  assert.match(shader, /\(there - here\)/);
+  assert.match(shader, /float cloudDelta =/);
+  assert.match(shader, /col \+= \(vec3\(1\.0\) - col\) \* light/);
+  assert.match(shader, /col \*= 1\.0 - shade/);
 });

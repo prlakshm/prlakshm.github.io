@@ -52,6 +52,7 @@
    is approximated with a hairline text-stroke instead of browser-synthesised
    bold. */
 .wt-wordmark,
+.wt-nav-toggle,
 .wt-nav-links a,
 .wt-nav-links button {
   font-family: var(--font-mono);
@@ -76,6 +77,11 @@
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+/* Text disclosure uses the same typography as the desktop navigation. */
+.wt-nav-toggle {
+  display: none;
 }
 
 .wt-nav-links a,
@@ -366,21 +372,119 @@
     --nav-height: 62px;
   }
 
-  /* `button` must be listed alongside `a`: WORK and GALLERY are
-     buttons for routing reasons, and omitting them here leaves them at desktop
-     size while their siblings shrink, overflowing the bar.
-     14px, with the hero subtext, which steps to 14px here too; it fits down to
-     420px, and the smaller steps below take over from 419px. */
   .wt-wordmark,
+  .wt-nav-toggle,
   .wt-nav-links a,
   .wt-nav-links button {
     font-size: 14px;
     letter-spacing: 0.07em;
   }
 
-  /* Four items since EVERYTHING joined; 12px keeps the row inside 360px. */
+  .wt-nav-toggle {
+    position: relative;
+    display: inline-flex;
+    min-width: 44px;
+    height: 44px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    appearance: none;
+    border: 0;
+    background: none;
+    color: var(--mono-secondary);
+    cursor: pointer;
+    transition: color var(--dur-nav) var(--ease-settle),
+      border-color var(--dur-nav) var(--ease-settle),
+      background-color var(--dur-nav) var(--ease-settle);
+  }
+
+  .wt-nav-toggle:hover,
+  .wt-nav-toggle:focus-visible,
+  .wt-nav-toggle[aria-expanded="true"] {
+    color: #444444;
+  }
+
+  .wt-nav-toggle:focus-visible {
+    outline: 1px solid currentColor;
+    outline-offset: 3px;
+  }
+
+  .wt-nav-toggle .nav-rule {
+    bottom: 7px;
+  }
+
+  .wt-primary-nav {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 16px;
+    width: min(168px, calc(100vw - 32px));
+    box-sizing: border-box;
+    /* Ticket text occupies 264/356 of its card: ~13% inset per side. */
+    padding: 5px 0;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-7px);
+    background: color-mix(in srgb, var(--parchment) 92%, transparent);
+    border: 0;
+    border-radius: 0;
+    box-shadow: 0 5px 16px var(--shadow-soft);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    backdrop-filter: saturate(1.4) blur(14px);
+    transition: opacity 180ms ease, transform 220ms var(--ease-settle), visibility 0s linear 220ms;
+  }
+
+  .wt-primary-nav.is-open {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+    transition-delay: 0s;
+  }
+
   .wt-nav-links {
-    gap: 12px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    margin-inline: 13%;
+  }
+
+  .wt-nav-links > li {
+    display: flex;
+    justify-content: center;
+  }
+
+  .wt-nav-links > li + li {
+    border-top: 1px solid color-mix(in srgb, var(--espresso) 16%, transparent);
+  }
+
+  .wt-nav-links a,
+  .wt-nav-links button {
+    width: max-content;
+    /* Links default to content-box, buttons to border-box. Include padding
+       in the same 44px target for both kinds of navigation item. */
+    box-sizing: border-box;
+    height: 44px;
+    min-height: 44px;
+    justify-content: center;
+    padding-block: 8px;
+  }
+
+  .nav-soon {
+    left: auto;
+    right: 0;
+    top: calc(100% - 5px);
+    translate: 0 0;
+  }
+
+  .wt-nav-links .ext-arrow {
+    position: absolute;
+    left: calc(100% + 6px);
+  }
+
+  .wt-nav-links .nav-rule {
+    bottom: 7px;
   }
 
   .wt-nav-inner,
@@ -403,41 +507,8 @@
   }
 }
 
-/* Phones up to 419px (iPhone mini to Plus): the four-item row needs a size
-   down to keep clear of the edge. `button` is listed because WORK and
-   GALLERY are buttons. */
-@media (max-width: 419px) {
-  .wt-nav-links a,
-  .wt-nav-links button {
-    font-size: 12px;
-    letter-spacing: 0.05em;
-  }
-
-  .wt-nav-links {
-    gap: 10px;
-  }
-}
-
-/* 360px Androids: the badge card, the gaps and the links add up to ~367px,
-   so the gaps close in. At 320px the type steps down once more. */
-@media (max-width: 370px) {
-  .wt-nav-inner {
-    gap: 12px;
-  }
-
-  .wt-nav-links {
-    gap: 8px;
-  }
-}
-
-@media (max-width: 340px) {
-  .wt-nav-links a,
-  .wt-nav-links button {
-    font-size: 11px;
-    letter-spacing: 0;
-  }
-
-  .wt-nav-links {
-    gap: 6px;
+@media (prefers-reduced-motion: reduce) {
+  .wt-primary-nav {
+    transition-duration: 0s;
   }
 }

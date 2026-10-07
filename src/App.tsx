@@ -4,12 +4,18 @@ import {
   Routes,
   Route,
   useLocation,
+  useNavigate,
 } from 'react-router-dom';
 import { animate } from 'motion';
 import Header from './components/Header.js';
 import Footer from './components/Footer.js';
 import Home from './pages/home/Home.js';
 import About from './pages/about/About.js';
+import {
+  normalizeRoutePath,
+  normalizeRouteSearch,
+  pageOwnsChrome,
+} from './routePolicy.js';
 import './app.css';
 
 /* The older routes are split out so their CSS — and with it the Adobe Fonts
@@ -20,15 +26,35 @@ const CaseStudyHBOMax2 = lazy(() => import('./pages/case-study-hbo-max2/CaseStud
 const SurpriseRailV1 = lazy(() => import('./pages/surprise-rail-v1/SurpriseRailV1.js'));
 const Fun = lazy(() => import('./pages/fun/Fun.js'));
 
-/* Pages that ship their own nav and footer as part of their surface, so the
-   global chrome is suppressed there and kept elsewhere. The worktable homepage
-   and the case-study exhibition rooms both own their chrome. */
-const OWN_CHROME = ['/', '/projects', '/about', '/surprise-rail-v1'];
-
 function Shell() {
-  const { pathname } = useLocation();
-  const ownsChrome = OWN_CHROME.includes(pathname);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const pathname = normalizeRoutePath(location.pathname);
+  const search = normalizeRouteSearch(location.search);
+  const ownsChrome = pageOwnsChrome(pathname);
   const viewRef = useRef<HTMLDivElement>(null);
+
+  /* Chrome ownership is normalized synchronously above, so a trailing slash
+     never paints the legacy header/footer for even one frame. The URL itself
+     is then replaced with the same canonical route. A bare browser-level `?`
+     is also removed without touching meaningful outer query parameters. */
+  useEffect(() => {
+    if (pathname !== location.pathname || search !== location.search) {
+      navigate(
+        { pathname, search, hash: location.hash },
+        { replace: true },
+      );
+    }
+
+    const beforeHash = window.location.href.split('#', 1)[0];
+    if (beforeHash.endsWith('?')) {
+      window.history.replaceState(
+        window.history.state,
+        '',
+        `${window.location.pathname}${window.location.hash}`,
+      );
+    }
+  }, [location.hash, location.pathname, location.search, navigate, pathname, search]);
 
   /* Cross-fade between routes. Keyed on pathname only, so in-page interactions
      never retrigger it.

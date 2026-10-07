@@ -165,13 +165,13 @@ function About() {
               <div className="ab-body">
                 <p className="line">
                   I grew up going to the Museum of Modern Art in D.C., and now I go to one in NYC. I wanted to bring a
-                  piece of that into my portfolio. I studied UI<span className="ab-slash">/</span>UX design at Brown
+                  piece of that into my portfolio. I studied UI<span className="ab-slash">/</span>UX Design at Brown
                   University and come from a film background. I&rsquo;ve worked on short films, written, directed,
                   and acted.
                 </p>
                 <p className="line">
-                  I design to challenge what is possible. If we always designed by the rulebook, there would be no
-                  change. We are a house for creative spirit. So let&rsquo;s be intentional about what we create.
+                  I design to challenge what&rsquo;s possible. If we always designed by the rulebook, there would be no
+                  change. We are a house for creative spirit. Let&rsquo;s be intentional about what we create.
                 </p>
               </div>
               <section className="ab-exp" aria-labelledby="ab-exp-h">

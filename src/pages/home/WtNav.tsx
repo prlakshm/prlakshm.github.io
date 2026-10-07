@@ -1,8 +1,8 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { animate } from "motion";
 import BadgeCard from "../../components/badges/BadgeCard.js";
-import { attachUnderlineWipe, prefersReducedMotion } from "./interactions.js";
+import { attachUnderlineWipe, prefersReducedMotion, SPRING } from "./interactions.js";
 import "./chrome.css";
 
 /* The site nav. Top-left is the hidden-interactions card (it replaced the
@@ -48,6 +48,54 @@ type NavBarProps = {
 
 export function NavBar({ work, about, autoHide = false, onHome }: NavBarProps) {
   const rootRef = useRef<HTMLElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const menuId = useId();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    const button = menuButtonRef.current;
+    const rule = button?.querySelector<HTMLElement>(".nav-rule");
+    if (!button || !rule) return;
+    const update = () => animate(
+      rule,
+      { scaleX: mobileOpen || button.matches(":hover, :focus-visible") ? 1 : 0 },
+      prefersReducedMotion() ? { duration: 0 } : SPRING,
+    );
+    update();
+    const events = ["pointerenter", "pointerleave", "focusin", "focusout"];
+    events.forEach((event) => button.addEventListener(event, update));
+    return () => events.forEach((event) => button.removeEventListener(event, update));
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const onOutside = (event: PointerEvent) => {
+      const root = rootRef.current;
+      if (root && !root.contains(event.target as Node)) setMobileOpen(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setMobileOpen(false);
+      menuButtonRef.current?.focus();
+    };
+
+    document.addEventListener("pointerdown", onOutside);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onOutside);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 768px)");
+    const closeAtDesktop = (event: MediaQueryListEvent) => {
+      if (event.matches) setMobileOpen(false);
+    };
+    desktop.addEventListener("change", closeAtDesktop);
+    return () => desktop.removeEventListener("change", closeAtDesktop);
+  }, []);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -171,7 +219,7 @@ export function NavBar({ work, about, autoHide = false, onHome }: NavBarProps) {
           return true; // no :focus-visible support: treat any focus as keyboard
         }
       };
-      const held = () => keyboardIn() || cardOpen();
+      const held = () => keyboardIn() || cardOpen() || root.dataset.menuOpen === "true";
       // The card opening (a stamp about to land, or a tap) brings the bar back
       // even without a scroll, so the stamp never flies into a hidden bar.
       const watch = new MutationObserver(() => {
@@ -210,11 +258,31 @@ export function NavBar({ work, about, autoHide = false, onHome }: NavBarProps) {
   }, [autoHide]);
 
   return (
-    <header className="wt-nav" ref={rootRef}>
+    <header className="wt-nav" ref={rootRef} data-menu-open={mobileOpen}>
       <span className="wt-nav-glass" aria-hidden="true" />
       <div className="wt-nav-inner">
         <BadgeCard onHome={onHome} />
-        <nav aria-label="Primary">
+        <button
+          ref={menuButtonRef}
+          type="button"
+          className="wt-nav-toggle"
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
+          aria-controls={menuId}
+          onClick={() => setMobileOpen((open) => !open)}
+        >
+          INDEX
+          <span className="nav-rule" aria-hidden="true" />
+        </button>
+        <nav
+          id={menuId}
+          aria-label="Primary"
+          className={`wt-primary-nav${mobileOpen ? " is-open" : ""}`}
+          onClick={(event) => {
+            const target = event.target;
+            if (target instanceof Element && !target.closest(".nav-mock")) setMobileOpen(false);
+          }}
+        >
           <ul className="wt-nav-links">
             <li>{work}</li>
             <li className="nav-soon-wrap">

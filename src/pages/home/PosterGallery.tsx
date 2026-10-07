@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { animate, frame, motionValue, type MotionValue } from "motion";
-import { earn, type BadgeId } from "../../components/badges/badgeStore.js";
+import type { BadgeId } from "../../components/badges/badgeStore.js";
+import {
+  beginConceptJourney,
+  opensInNewTab,
+} from "../../components/badges/conceptJourney.js";
 import { ExternalArrow } from "./WtNav.js";
 import { prefersReducedMotion } from "./interactions.js";
 import "./gallery.css";
@@ -31,7 +35,6 @@ export type GalleryItem = {
 export type GalleryGroup = { index: string; title: string; items: GalleryItem[] };
 
 const ASSET = "/home/work/";
-const LINGER = 900; // resting on a concept counts as reimagining it
 /* Hover: the print leans toward the cursor and drifts a few pixels with it.
    No scale, so even at full lean it stays inside its own column's gap. */
 const TILT = 6; // degrees at the print's edge
@@ -76,14 +79,12 @@ export default function PosterGallery({ groups }: { groups: GalleryGroup[] }) {
   const reduced = prefersReducedMotion();
   const tipRef = useRef<HTMLSpanElement>(null);
   const tipOn = useRef(false);
-  const linger = useRef(0);
   const [tipText, setTipText] = useState("VIEW CASE STUDY");
   const glasses = useRef(new Map<string, Glass>());
 
   useEffect(() => {
     const all = glasses.current;
     return () => {
-      window.clearTimeout(linger.current);
       all.forEach((g) => g.off());
       all.clear();
     };
@@ -189,10 +190,6 @@ export default function PosterGallery({ groups }: { groups: GalleryGroup[] }) {
       glowTo(g, a.over ? 1 : GLOW_OFF_PRINT);
       frame.render(g.render);
     }
-    if (item.badge === "reimagine") {
-      const at = { x: e.clientX, y: e.clientY };
-      linger.current = window.setTimeout(() => earn("reimagine", at), LINGER);
-    }
   };
   const onMove = (item: GalleryItem, e: React.PointerEvent<HTMLAnchorElement>) => {
     if (e.pointerType !== "mouse") return;
@@ -212,7 +209,6 @@ export default function PosterGallery({ groups }: { groups: GalleryGroup[] }) {
     animate(g.ly, a.y, LEAN);
   };
   const onLeave = (item: GalleryItem) => {
-    window.clearTimeout(linger.current);
     showTip(false);
     const g = glasses.current.get(item.id);
     if (!g) return;
@@ -228,11 +224,13 @@ export default function PosterGallery({ groups }: { groups: GalleryGroup[] }) {
     frame.render(g.render);
   };
 
-  /* Opening a print earns its badge. Links that leave the page save it now and
-     stamp it in when the visitor comes back. */
+  /* A concept starts a journey here, but Reimagine is not awarded until its
+     destination confirms opening and the visitor returns. */
   const onOpen = (item: GalleryItem, e: React.MouseEvent<HTMLAnchorElement>) => {
-    const print = e.currentTarget.querySelector(".gl-print");
-    earn(item.badge, print ? centre(print) : { x: e.clientX, y: e.clientY }, { defer: !item.external });
+    if (item.badge !== "reimagine") return;
+    beginConceptJourney(new URL(item.href, window.location.href).pathname, {
+      newTab: opensInNewTab(e),
+    });
   };
 
   /* Desktop columns: one per print, plus a spacer between groups so each
@@ -267,6 +265,7 @@ export default function PosterGallery({ groups }: { groups: GalleryGroup[] }) {
                     onPointerMove={(e) => onMove(item, e)}
                     onPointerLeave={() => onLeave(item)}
                     onClick={(e) => onOpen(item, e)}
+                    onAuxClick={(e) => onOpen(item, e)}
                     {...(item.external ? { target: "_blank", rel: "noreferrer" } : {})}
                   >
                     <span
