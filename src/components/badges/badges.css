@@ -182,11 +182,17 @@
   height: calc(100% + 12px);
   pointer-events: none;
   mix-blend-mode: screen;
+  visibility: hidden;
 }
 
-/* with the light layer running, the baked cross-fade steps aside (the stamps
-   keep their resting gold: Pranavi didn't want them dimmed for the light) */
-.bc-gl .bc-lit {
+/* A successful first WebGL draw toggles one row class after the following
+   browser paint. That single class reveals the canvas and retires its baked
+   cross-fade together, so neither a black nor blank intermediate frame shows. */
+.bc-slots.is-light-ready .bc-light {
+  visibility: visible;
+}
+
+.bc-slots.is-light-ready .bc-lit {
   display: none;
 }
 

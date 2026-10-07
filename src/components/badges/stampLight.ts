@@ -23,8 +23,47 @@ export type StampLight = {
   flash(i: number): void;
   /** only the visible card renders */
   setActive(on: boolean): void;
+  /** true only after a drawn frame has crossed a browser paint boundary */
+  isReady(): boolean;
   destroy(): void;
 };
+
+const LIGHT_READY_CLASS = "is-light-ready";
+
+/**
+ * Keep the opaque WebGL backing out of the compositor until one completed
+ * draw has had a full paint to settle its screen-blend layer. The row class
+ * swaps the baked highlight and the canvas in the same style calculation.
+ */
+export function createStampLightRevealGate(
+  canvas: Pick<HTMLCanvasElement, "parentElement">,
+  requestFrame: (callback: FrameRequestCallback) => number = requestAnimationFrame,
+  cancelFrame: (id: number) => void = cancelAnimationFrame
+) {
+  let ready = false;
+  let pending = 0;
+  const hide = () => {
+    if (pending) cancelFrame(pending);
+    pending = 0;
+    ready = false;
+    canvas.parentElement?.classList.remove(LIGHT_READY_CLASS);
+  };
+  return {
+    afterDraw() {
+      if (ready || pending) return;
+      pending = requestFrame(() => {
+        pending = 0;
+        const row = canvas.parentElement;
+        if (!row) return;
+        row.classList.add(LIGHT_READY_CLASS);
+        ready = true;
+      });
+    },
+    hide,
+    isReady: () => ready,
+    destroy: hide,
+  };
+}
 
 const VERT = `
 attribute vec2 aPos;
@@ -137,6 +176,7 @@ const POOL = { cursor: [1.0, 0.7], drift: [2.2, 1.2] };
 export function createStampLight(canvas: HTMLCanvasElement, spriteUrl: string): StampLight | null {
   const gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: true, antialias: false });
   if (!gl) return null;
+  const reveal = createStampLightRevealGate(canvas);
 
   const sh = (type: number, src: string) => {
     const s = gl.createShader(type)!;
@@ -193,7 +233,16 @@ export function createStampLight(canvas: HTMLCanvasElement, spriteUrl: string): 
   let active = false;
   let raf = 0;
   let last = 0;
+  let contextLost = false;
   const t0 = performance.now();
+
+  const onContextLost = () => {
+    contextLost = true;
+    reveal.hide();
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+  };
+  canvas.addEventListener("webglcontextlost", onContextLost);
 
   // the lamp: follows the cursor, else drifts on its own, dimmer and broader
   const lamp = { x: 0, y: 0, z: 40, on: 0, reach: POOL.drift[0], near: POOL.drift[1] };
@@ -233,7 +282,7 @@ export function createStampLight(canvas: HTMLCanvasElement, spriteUrl: string): 
 
   const frame = (now: number) => {
     raf = 0;
-    if (!active || !ready || document.hidden) return;
+    if (!active || !ready || contextLost || document.hidden) return;
     // ~30fps is plenty for a slow twinkle, and kind to the battery
     if (now - last < 31) {
       raf = requestAnimationFrame(frame);
@@ -287,10 +336,11 @@ export function createStampLight(canvas: HTMLCanvasElement, spriteUrl: string): 
       gl.uniform4f(u("uShineDir"), 1, 0, 1, 0);
     }
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    if (!reveal.isReady() && gl.getError() === gl.NO_ERROR) reveal.afterDraw();
     raf = requestAnimationFrame(frame);
   };
   const kick = () => {
-    if (!raf && active && ready) raf = requestAnimationFrame(frame);
+    if (!raf && active && ready && !contextLost) raf = requestAnimationFrame(frame);
   };
   const onVis = () => kick();
   document.addEventListener("visibilitychange", onVis);
@@ -335,10 +385,15 @@ export function createStampLight(canvas: HTMLCanvasElement, spriteUrl: string): 
         raf = 0;
       }
     },
+    isReady() {
+      return reveal.isReady();
+    },
     destroy() {
       active = false;
       if (raf) cancelAnimationFrame(raf);
+      canvas.removeEventListener("webglcontextlost", onContextLost);
       document.removeEventListener("visibilitychange", onVis);
+      reveal.destroy();
     },
   };
 }

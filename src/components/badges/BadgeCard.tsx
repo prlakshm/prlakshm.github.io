@@ -710,8 +710,8 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
     root && miniRef.current && root.contains(miniRef.current) ? lights.current.mini : lights.current.card;
   const light = (e: React.PointerEvent<HTMLElement>, root: HTMLElement | null) => {
     if (reduced || e.pointerType !== "mouse" || !root) return;
-    const gl = glOn ? lightFor(root) : null;
-    if (gl) {
+    const gl = lightFor(root);
+    if (gl?.isReady()) {
       const c = root.querySelector<HTMLCanvasElement>(".bc-light");
       if (!c) return;
       const r = c.getBoundingClientRect();
@@ -737,7 +737,8 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
     });
   };
   const unlight = (root: HTMLElement | null) => {
-    if (glOn) lightFor(root)?.lamp(null);
+    const gl = lightFor(root);
+    if (gl?.isReady()) gl.lamp(null);
     cancelAnimationFrame(lightFrame.current);
     root?.classList.remove("is-lit");
   };
@@ -765,7 +766,7 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
 
   return (
     <div
-      className={`bc${glOn ? " bc-gl" : ""}`}
+      className="bc"
       ref={slotRef}
       data-open={open ? "true" : "false"}
       // keyboard: focusing the card opens it, so the note and the hint are reachable
