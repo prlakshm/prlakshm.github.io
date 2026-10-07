@@ -104,7 +104,6 @@ function award(id: BadgeId, from: { x: number; y: number } | null) {
 export function earn(
   id: BadgeId,
   from: { x: number; y: number } | null = null,
-  _legacyOptions: { defer?: boolean } = {},
 ) {
   if (!badgesArmed()) return false;
   return award(id, from);

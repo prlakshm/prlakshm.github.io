@@ -114,10 +114,11 @@ test("a concept tab awards when focus later returns to the landing tab", () => {
   landing.close();
 });
 
-test("concept pages load the bridge and landing layouts do not award Reimagine on dwell", async () => {
-  const [figma, codex, gallery, grid, rail] = await Promise.all([
+test("concept pages load a visibility-gated bridge and landing layouts do not award Reimagine on dwell", async () => {
+  const [figma, codex, bridge, gallery, grid, rail] = await Promise.all([
     readFile(new URL("../public/figma/index.html", import.meta.url), "utf8"),
     readFile(new URL("../public/codex/index.html", import.meta.url), "utf8"),
+    readFile(new URL("../public/badge-concept-bridge.js", import.meta.url), "utf8"),
     readFile(new URL("../src/pages/home/PosterGallery.tsx", import.meta.url), "utf8"),
     readFile(new URL("../src/pages/home/WorkGrid.tsx", import.meta.url), "utf8"),
     readFile(new URL("../src/pages/home/PosterRail.tsx", import.meta.url), "utf8"),
@@ -125,6 +126,9 @@ test("concept pages load the bridge and landing layouts do not award Reimagine o
 
   assert.match(figma, /src=["']\/badge-concept-bridge\.js["']/);
   assert.match(codex, /src=["']\/badge-concept-bridge\.js["']/);
+  assert.match(bridge, /document\.visibilityState\s*===\s*["']hidden["']/);
+  assert.match(bridge, /visibilitychange/);
+  assert.match(bridge, /addEventListener\(["']focus["']/);
   for (const source of [gallery, grid, rail]) {
     assert.doesNotMatch(source, /earn\(["']reimagine["']/);
     assert.match(source, /beginConceptJourney/);

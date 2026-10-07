@@ -70,11 +70,6 @@ type Glass = {
 
 const fmt = (n: number) => Math.round(n * 1000) / 1000;
 
-const centre = (el: Element) => {
-  const r = el.getBoundingClientRect();
-  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-};
-
 export default function PosterGallery({ groups }: { groups: GalleryGroup[] }) {
   const reduced = prefersReducedMotion();
   const tipRef = useRef<HTMLSpanElement>(null);
