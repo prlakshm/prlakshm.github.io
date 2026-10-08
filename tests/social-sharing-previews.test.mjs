@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 
 const root = new URL("../", import.meta.url);
@@ -77,4 +78,25 @@ test("every shareable endpoint declares its approved large image", async () => {
     assert.match(html, /name=["']twitter:image:alt["'] content=["'][^"']+["']/, path);
     assert.doesNotMatch(html, /about\/Profile(?:%20| )picture\.png/i, path);
   }
+});
+
+test("tracked HTML has no social image metadata pointing to the profile picture", async () => {
+  const paths = execFileSync("git", ["ls-files", "-z", "--", "*.html"], {
+    cwd: new URL("../", import.meta.url),
+    encoding: "utf8",
+  }).split("\0").filter(Boolean);
+  const staleReferences = [];
+
+  for (const path of paths) {
+    const html = await text(path);
+    for (const match of html.matchAll(/<meta\b[^>]*>/gi)) {
+      const tag = match[0];
+      if (/(?:property|name)=["'](?:og:image|twitter:image)["']/i.test(tag)
+        && /about\/Profile(?:%20| )picture\.png/i.test(tag)) {
+        staleReferences.push(path);
+      }
+    }
+  }
+
+  assert.deepEqual(staleReferences, []);
 });
