@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 
 const root = new URL("../", import.meta.url);
@@ -58,24 +58,24 @@ test("first-party navigation uses the clean About URL", async () => {
 });
 
 const metadata = [
-  ["index.html", "https://pranaviram.com/social/portfolio-landing-v1.png"],
-  ["about/index.html", "https://pranaviram.com/social/about-v1.png"],
-  ["public/surprise-rail/index.html", "https://pranaviram.com/social/portfolio-landing-v1.png"],
-  ["public/mixr/index.html", "https://pranaviram.com/social/portfolio-landing-v1.png"],
-  ["public/cursor/index.html", "https://pranaviram.com/social/cursor-loves-indie-v1.png"],
-  ["public/figma/index.html", "https://pranaviram.com/social/figma-sound-v1.png"],
-  ["public/codex/index.html", "https://pranaviram.com/social/codex-bookmarks-v1.png"],
+  ["index.html", "https://pranaviram.com/social/portfolio-landing-v1.png", "Pranavi Ram’s portfolio shown in responsive browser windows."],
+  ["about/index.html", "https://pranaviram.com/social/about-v1.png", "Pranavi Ram’s About page shown in responsive browser windows."],
+  ["public/surprise-rail/index.html", "https://pranaviram.com/social/portfolio-landing-v1.png", "Pranavi Ram’s portfolio shown in responsive browser windows."],
+  ["public/mixr/index.html", "https://pranaviram.com/social/portfolio-landing-v1.png", "Pranavi Ram’s portfolio shown in responsive browser windows."],
+  ["public/cursor/index.html", "https://pranaviram.com/social/cursor-loves-indie-v1.png", "Thin white looping letterforms spell cursor loves indie across a black background."],
+  ["public/figma/index.html", "https://pranaviram.com/social/figma-sound-v1.png", "Figma Sound wordmark surrounded by colorful hand-drawn sound icons on a dark dotted grid."],
+  ["public/codex/index.html", "https://pranaviram.com/social/codex-bookmarks-v1.png", "Blue Codex Bookmarks poster with a pink bookmark and a doodled terminal cloud."],
 ];
 
 test("every shareable endpoint declares its approved large image", async () => {
-  for (const [path, image] of metadata) {
+  for (const [path, image, alt] of metadata) {
     const html = await text(path);
     assert.match(html, new RegExp(`property=["']og:image["'] content=["']${image.replaceAll(".", "\\.")}['"]`), path);
     assert.match(html, new RegExp(`name=["']twitter:image["'] content=["']${image.replaceAll(".", "\\.")}['"]`), path);
     assert.match(html, /property=["']og:image:width["'] content=["']1200["']/, path);
     assert.match(html, /property=["']og:image:height["'] content=["']630["']/, path);
-    assert.match(html, /property=["']og:image:alt["'] content=["'][^"']+["']/, path);
-    assert.match(html, /name=["']twitter:image:alt["'] content=["'][^"']+["']/, path);
+    assert.ok(html.includes(`<meta property="og:image:alt" content="${alt}"`), path);
+    assert.ok(html.includes(`<meta name="twitter:image:alt" content="${alt}"`), path);
     assert.doesNotMatch(html, /about\/Profile(?:%20| )picture\.png/i, path);
   }
 });
@@ -107,4 +107,18 @@ test("About describes its responsive collage rather than the retired portrait pr
   assert.match(html, new RegExp(`property=["']og:image:alt["'] content=["']${alt}["']`));
   assert.match(html, new RegExp(`name=["']twitter:image:alt["'] content=["']${alt}["']`));
   assert.doesNotMatch(html, /image:alt["'] content=["']A portrait of Pranavi Ram/i);
+});
+
+test("tracked first-party source no longer generates the retired hash About URL", () => {
+  const paths = execFileSync("git", ["ls-files", "-z", "--", "*.html", "*.tsx", "*.ts", "*.js"], {
+    cwd: new URL("../", import.meta.url),
+    encoding: "utf8",
+  }).split("\0").filter(Boolean);
+  const result = spawnSync("git", ["grep", "-l", "-E", "(/#|#)/about", "--", ...paths], {
+    cwd: new URL("../", import.meta.url),
+    encoding: "utf8",
+  });
+  assert.ok(result.status === 0 || result.status === 1, result.stderr);
+  const staleLinks = result.stdout.trim().split("\n").filter(Boolean);
+  assert.deepEqual(staleLinks, []);
 });
