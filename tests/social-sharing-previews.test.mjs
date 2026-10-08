@@ -5,6 +5,7 @@ import { readFile } from "node:fs/promises";
 import {
   CODEX_FULL_BLEED_CSS,
   PAGE_PREVIEWS,
+  SOCIAL_PREVIEW_BADGES,
   SOCIAL_CANVAS,
 } from "../scripts/social-preview-layout.mjs";
 
@@ -12,8 +13,8 @@ const root = new URL("../", import.meta.url);
 const text = (path) => readFile(new URL(path, root), "utf8");
 
 const socialImages = [
-  "public/social/portfolio-landing-v3.png",
-  "public/social/about-v3.png",
+  "public/social/portfolio-landing-v4.png",
+  "public/social/about-v4.png",
   "public/social/cursor-loves-indie-v1.png",
   "public/social/figma-sound-v1.png",
   "public/social/codex-bookmarks-v2.png",
@@ -26,13 +27,21 @@ const pngSize = (buffer) => {
 
 test("Home and About social artwork are direct page captures without browser chrome", async () => {
   assert.deepEqual(PAGE_PREVIEWS, [
-    { name: "portfolio-landing-v3.png", url: "/" },
-    { name: "about-v3.png", url: "/about/" },
+    { name: "portfolio-landing-v4.png", url: "/" },
+    { name: "about-v4.png", url: "/about/" },
   ]);
   assert.deepEqual(SOCIAL_CANVAS, { width: 1200, height: 630 });
 
   const generator = await text("scripts/generate-social-previews.mjs");
   assert.doesNotMatch(generator, /browser__chrome|safari-toolbar|chrome-toolbar|const collage/);
+});
+
+test("direct page captures start with three earned stars without changing visitor defaults", async () => {
+  assert.deepEqual(SOCIAL_PREVIEW_BADGES, ["name", "read", "reimagine"]);
+  const generator = await text("scripts/generate-social-previews.mjs");
+  assert.match(generator, /context\.addInitScript/);
+  assert.match(generator, /pr-badges-session-v2/);
+  assert.match(generator, /pr-badge-intro/);
 });
 
 test("Codex social capture removes only the page framing around the poster", () => {
@@ -80,10 +89,10 @@ test("first-party navigation uses the clean About URL", async () => {
 });
 
 const metadata = [
-  ["index.html", "https://pranaviram.com/social/portfolio-landing-v3.png", "Pranavi Ram’s portfolio landing page."],
-  ["about/index.html", "https://pranaviram.com/social/about-v3.png", "Pranavi Ram’s About page."],
-  ["public/surprise-rail/index.html", "https://pranaviram.com/social/portfolio-landing-v3.png", "Pranavi Ram’s portfolio landing page."],
-  ["public/mixr/index.html", "https://pranaviram.com/social/portfolio-landing-v3.png", "Pranavi Ram’s portfolio landing page."],
+  ["index.html", "https://pranaviram.com/social/portfolio-landing-v4.png", "Pranavi Ram’s portfolio landing page with three collected stars."],
+  ["about/index.html", "https://pranaviram.com/social/about-v4.png", "Pranavi Ram’s About page with three collected stars."],
+  ["public/surprise-rail/index.html", "https://pranaviram.com/social/portfolio-landing-v4.png", "Pranavi Ram’s portfolio landing page with three collected stars."],
+  ["public/mixr/index.html", "https://pranaviram.com/social/portfolio-landing-v4.png", "Pranavi Ram’s portfolio landing page with three collected stars."],
   ["public/cursor/index.html", "https://pranaviram.com/social/cursor-loves-indie-v1.png", "Thin white looping letterforms spell cursor loves indie across a black background."],
   ["public/figma/index.html", "https://pranaviram.com/social/figma-sound-v1.png", "Figma Sound wordmark surrounded by colorful hand-drawn sound icons on a dark dotted grid."],
   ["public/codex/index.html", "https://pranaviram.com/social/codex-bookmarks-v2.png", "Blue Codex Bookmarks poster with a pink bookmark and a doodled terminal cloud."],
@@ -132,7 +141,7 @@ test("tracked HTML no longer points to replaced framed page previews", async () 
 
   for (const path of paths) {
     const html = await text(path);
-    if (/social\/(?:portfolio-landing|about)-v[12]\.png/.test(html)) {
+    if (/social\/(?:portfolio-landing|about)-v[123]\.png/.test(html)) {
       staleReferences.push(path);
     }
   }
@@ -142,7 +151,7 @@ test("tracked HTML no longer points to replaced framed page previews", async () 
 
 test("About describes the page rather than the retired portrait or browser collage", async () => {
   const html = await text("about/index.html");
-  const alt = "Pranavi Ram’s About page.";
+  const alt = "Pranavi Ram’s About page with three collected stars.";
   assert.match(html, new RegExp(`property=["']og:image:alt["'] content=["']${alt}["']`));
   assert.match(html, new RegExp(`name=["']twitter:image:alt["'] content=["']${alt}["']`));
   assert.doesNotMatch(html, /image:alt["'] content=["']A portrait of Pranavi Ram/i);

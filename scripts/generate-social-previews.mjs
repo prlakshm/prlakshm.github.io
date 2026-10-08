@@ -3,6 +3,7 @@ import { chromium } from "playwright";
 import {
   CODEX_FULL_BLEED_CSS,
   PAGE_PREVIEWS,
+  SOCIAL_PREVIEW_BADGES,
   SOCIAL_CANVAS,
 } from "./social-preview-layout.mjs";
 
@@ -20,13 +21,28 @@ const launchOptions = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE
 // between runs instead of depending on the host GPU's rasterization cache.
 const browser = await chromium.launch({ ...launchOptions, headless: true, args: ["--disable-gpu"] });
 
-const capture = async ({ url, width, height, selector, style, wait = 1200 }) => {
+const capture = async ({ url, width, height, selector, style, badges = [], wait = 1200 }) => {
   const context = await browser.newContext({
     viewport: { width, height },
     deviceScaleFactor: 1,
     reducedMotion: "reduce",
   });
   try {
+    if (badges.length) {
+      await context.addInitScript((badgeIds) => {
+        try {
+          const records = badgeIds.map((id, index) => ({
+            id,
+            eventId: `social-preview-${id}`,
+            foundAt: index + 1,
+          }));
+          sessionStorage.setItem("pr-badges-session-v2", JSON.stringify({ found: badgeIds, records }));
+          sessionStorage.setItem("pr-badge-intro", "seen");
+        } catch {
+          // The capture still renders if a browser blocks session storage.
+        }
+      }, badges);
+    }
     const page = await context.newPage();
     const response = await page.goto(`${BASE}${url}`, { waitUntil: "networkidle", timeout: 30000 });
     if (!response?.ok()) throw new Error(`Capture failed: ${url} (${response?.status()})`);
@@ -49,6 +65,7 @@ try {
       width: SOCIAL_CANVAS.width,
       height: SOCIAL_CANVAS.height,
       selector: "#root > *",
+      badges: SOCIAL_PREVIEW_BADGES,
       wait: 2500,
     })]);
   }
