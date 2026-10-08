@@ -314,17 +314,6 @@ export default function WtNav() {
   const navigate = useNavigate();
   const onCleanAbout = window.location.pathname.replace(/\/+$/, "") === "/about";
 
-  /* WORK is a button, not <a href="#work">: this is a HashRouter, so the hash
-     is the route. From another page it goes home and asks Home to scroll. */
-  const goWork = () => {
-    if (onCleanAbout) {
-      window.location.assign("/#/projects");
-      return;
-    }
-    if (pathname === "/" || pathname === "/projects") scrollToId("work");
-    else navigate("/", { state: { scrollTo: "work" } });
-  };
-
   /* The star card goes home: from another page it opens Home at the top
      (Home keeps no scroll of its own); on Home it glides back to the top. */
   const goHome = () => {
@@ -341,7 +330,7 @@ export default function WtNav() {
     <NavBar
       onHome={goHome}
       work={
-        <button type="button" onClick={goWork}>
+        <button type="button" onClick={goHome}>
           WORK
           <span className="nav-rule" aria-hidden="true" />
         </button>

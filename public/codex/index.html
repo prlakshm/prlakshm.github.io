@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script type="module" src="/badge-concept-bridge.js"></script>
-    <title>Codex Bookmarks — Pranavi Ram</title>
+    <title>Codex Bookmarks | Pranavi Ram</title>
     <link rel="icon" type="image/svg+xml" href="/icons/frame-favicon.svg?v=gold-frame-2">
     <link rel="icon" type="image/png" sizes="32x32" href="/icons/frame-favicon-32.png?v=gold-frame-2">
     <link rel="icon" type="image/png" sizes="16x16" href="/icons/frame-favicon-16.png?v=gold-frame-2">
@@ -243,10 +243,12 @@
         }
       }
     </style>
+  <link rel="stylesheet" href="/concept-home.css">
   </head>
   <body>
     <main>
       <section class="slide" data-slide="01" aria-label="Codex Bookmarks: the poster, dropped into place">
+        <a class="concept-home" href="/#/"><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2 5 H8 M5.5 2.5 L8 5 L5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"/></svg> <span class="concept-home-label">Back Home<span class="concept-home-rule" aria-hidden="true"></span></span></a>
         <div class="frame hx-frame" role="img" aria-label="Codex Bookmarks. A Codex cloud lands, the word Bookmarks balances on it like a seesaw, Codex weighs down one end and a pink bookmark lands on the other.">
           <div class="hx-ground"></div>
           <div class="hx-sun"></div>
@@ -268,6 +270,7 @@
       </section>
 
       <section class="slide" data-slide="02" aria-label="Thesis">
+        <a class="concept-home" href="/#/"><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2 5 H8 M5.5 2.5 L8 5 L5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"/></svg> <span class="concept-home-label">Back Home<span class="concept-home-rule" aria-hidden="true"></span></span></a>
         <p class="thesis">
           <img class="wide" src="./assets/thesis-wide.svg" alt="Long chats bury answers. Bookmarks bring them back in one click." />
           <img class="narrow" src="./assets/thesis-narrow.svg" alt="" />
@@ -276,6 +279,7 @@
       </section>
 
       <section class="slide" data-slide="03" aria-label="Prototype: bookmark a message, name it, jump back">
+        <a class="concept-home" href="/#/"><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2 5 H8 M5.5 2.5 L8 5 L5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"/></svg> <span class="concept-home-label">Back Home<span class="concept-home-rule" aria-hidden="true"></span></span></a>
         <div class="frame">
           <iframe class="animation-frame" src="./scene.html?s=1" title="Prototype: bookmarking a message in a long chat, naming it, and jumping back" loading="lazy"></iframe>
         </div>
@@ -283,6 +287,7 @@
       </section>
 
       <section class="slide" data-slide="04" aria-label="The toolbar, layer by layer">
+        <a class="concept-home" href="/#/"><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2 5 H8 M5.5 2.5 L8 5 L5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"/></svg> <span class="concept-home-label">Back Home<span class="concept-home-rule" aria-hidden="true"></span></span></a>
         <div class="frame">
           <iframe class="animation-frame" src="./scene.html?s=3" title="The bookmark toolbar's four layers: grid, wireframe, content and result" loading="lazy"></iframe>
         </div>
@@ -290,6 +295,7 @@
       </section>
 
       <section class="slide" data-slide="05" aria-label="The toolbar's layers in 3D">
+        <a class="concept-home concept-home--final" href="/#/"><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2 5 H8 M5.5 2.5 L8 5 L5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"/></svg> <span class="concept-home-label">Back Home<span class="concept-home-rule" aria-hidden="true"></span></span></a>
         <div class="frame">
           <iframe class="animation-frame" src="./scene.html?s=2" title="The bookmark toolbar exploded into its layers in 3D" loading="lazy"></iframe>
         </div>
@@ -442,7 +448,7 @@
         const WEIGHT = { marks: 0.587, codex: 0.169, bookmark: 0.106, sparkle: 0.01 };
         // Add a stronger angular impulse at contact while retaining incoming
         // velocity and damping: a deeper first tip, then diminishing swings.
-        const TEETER = { kick: 95.0208, stiffness: 30, damping: 4.8 };
+        const TEETER = { kick: 95.971008, stiffness: 30, damping: 4.8 };
         // The bookmark lands on the right end and pushes the cloud back toward
         // upright — 4.8° in the first moment — and it eases the rest of the way
         // home, no throw past upright: one smooth curve.
@@ -897,5 +903,6 @@
         }, { threshold: [0, 0.6] }).observe(frame);
       }
     </script>
-  </body>
+  <script defer src="/concept-home.js"></script>
+</body>
 </html>

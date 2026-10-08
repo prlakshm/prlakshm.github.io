@@ -51,6 +51,7 @@ function About() {
       range.selectNodeContents(titleText);
       const w = Math.max(...Array.from(range.getClientRects()).map((r) => r.width));
       text.style.setProperty("--ab-title-w", `${Math.ceil(w)}px`);
+
     };
     fit();
     const ro = new ResizeObserver(fit);

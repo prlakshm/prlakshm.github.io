@@ -652,3 +652,11 @@
     --title-highlight-cap: rgb(196 196 196 / 50%);
   }
 }
+
+/* Center the portrait beside the complete text column. */
+@media (min-width: 768px) {
+  .ab--page .ab-portrait { align-self: center; margin-top: 0; }
+}
+@media (max-width: 767px) {
+  .ab--page .ab-portrait { margin-top: 0; }
+}

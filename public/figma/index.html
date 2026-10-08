@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script type="module" src="/badge-concept-bridge.js"></script>
-    <title>Pranavi Ram — Figma Sound</title>
+    <title>Figma Sound | Pranavi Ram</title>
     <link rel="canonical" href="https://pranaviram.com/figma/" />
     <meta name="description" content="Figma Sound makes sound a design system material. An independent product concept by Pranavi Ram." />
     <meta property="og:type" content="website" />
@@ -141,7 +141,7 @@
       .figma-mark {
         left: clamp(18px, 3vw, 48px);
         position: absolute;
-        top: clamp(16px, 2.4vw, 32px);
+        top: calc(max(10px, env(safe-area-inset-top)) + 44px + 12px);
         z-index: 2;
       }
       .figma-mark svg { display: block; }
@@ -490,6 +490,7 @@
         .sound-title-word .title-letter { transform: translate3d(0, var(--rest-y), 0); }
       }
     </style>
+  <link rel="stylesheet" href="/concept-home.css">
   </head>
   <body>
     <main>
@@ -503,6 +504,7 @@
 
 
       <section class="slide sound-slide sound-title film-slide" data-slide="10" aria-label="Figma Sound launch film">
+        <a class="concept-home" href="/#/"><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2 5 H8 M5.5 2.5 L8 5 L5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"/></svg> <span class="concept-home-label">Back Home<span class="concept-home-rule" aria-hidden="true"></span></span></a>
         <div class="film-stage">
           <video class="film-video" id="figmaFilm" muted playsinline preload="metadata" poster="../branding/assets/film/figma-sound-film-poster.jpg" aria-label="Figma Sound launch film, 29 seconds. Tap to play or pause.">
             <source src="../branding/assets/film/figma-sound-film.webm" type="video/webm" />
@@ -514,6 +516,7 @@
       </section>
 
       <section class="slide sound-slide" data-slide="12" data-slide-audio="select" aria-label="Figma Sound campaign thesis">
+        <a class="concept-home" href="/#/"><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2 5 H8 M5.5 2.5 L8 5 L5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"/></svg> <span class="concept-home-label">Back Home<span class="concept-home-rule" aria-hidden="true"></span></span></a>
         <span class="folio" aria-hidden="true">02 / 06</span>
         <p class="sound-copy film-type" data-reveal-lines aria-label="Figma Sound makes sound a design system material.">
           <span class="reveal-line" style="--li:0" aria-hidden="true"><span>Figma Sound makes <span class="film-chip">sound</span></span></span>
@@ -523,24 +526,28 @@
       </section>
 
       <section class="slide sound-slide product-slide" data-slide="14" data-slide-audio="select" aria-label="Figma prototype Sound control">
+        <a class="concept-home" href="/#/"><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2 5 H8 M5.5 2.5 L8 5 L5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"/></svg> <span class="concept-home-label">Back Home<span class="concept-home-rule" aria-hidden="true"></span></span></a>
         <span class="figma-mark" aria-hidden="true"><svg viewBox="0 0 38 57" width="17" height="25.5"><path fill="#f24e1e" d="M19 0H9.5a9.5 9.5 0 100 19H19V0z"/><path fill="#ff7262" d="M19 0h9.5a9.5 9.5 0 110 19H19V0z"/><path fill="#a259ff" d="M19 19H9.5a9.5 9.5 0 100 19H19V19z"/><circle fill="#1abcfe" cx="28.5" cy="28.5" r="9.5"/><path fill="#0acf83" d="M9.5 38H19v9.5A9.5 9.5 0 119.5 38z"/></svg></span>
         <span class="folio" aria-hidden="true">03 / 06</span>
         <iframe class="animation-frame" id="interactionProto" src="../branding/interaction-proto.html" title="Animated Figma prototype: dragging an interaction and assigning a sound token" loading="lazy" allow="autoplay"></iframe>
       </section>
 
       <section class="slide sound-slide product-slide" data-slide="15" data-slide-audio="select" aria-label="Figma Sound tokens">
+        <a class="concept-home" href="/#/"><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2 5 H8 M5.5 2.5 L8 5 L5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"/></svg> <span class="concept-home-label">Back Home<span class="concept-home-rule" aria-hidden="true"></span></span></a>
         <span class="figma-mark" aria-hidden="true"><svg viewBox="0 0 38 57" width="17" height="25.5"><path fill="#f24e1e" d="M19 0H9.5a9.5 9.5 0 100 19H19V0z"/><path fill="#ff7262" d="M19 0h9.5a9.5 9.5 0 110 19H19V0z"/><path fill="#a259ff" d="M19 19H9.5a9.5 9.5 0 100 19H19V19z"/><circle fill="#1abcfe" cx="28.5" cy="28.5" r="9.5"/><path fill="#0acf83" d="M9.5 38H19v9.5A9.5 9.5 0 119.5 38z"/></svg></span>
         <iframe class="animation-frame" id="variablesProto" src="../branding/variables-proto.html" title="Animated Figma variables prototype playing each sound token" loading="lazy" allow="autoplay"></iframe>
         <span class="folio" aria-hidden="true">04 / 06</span>
       </section>
 
       <section class="slide sound-slide product-slide" data-slide="16" data-slide-audio="select" aria-label="Figma Dev Mode sound specification">
+        <a class="concept-home" href="/#/"><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2 5 H8 M5.5 2.5 L8 5 L5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"/></svg> <span class="concept-home-label">Back Home<span class="concept-home-rule" aria-hidden="true"></span></span></a>
         <span class="figma-mark" aria-hidden="true"><svg viewBox="0 0 38 57" width="17" height="25.5"><path fill="#f24e1e" d="M19 0H9.5a9.5 9.5 0 100 19H19V0z"/><path fill="#ff7262" d="M19 0h9.5a9.5 9.5 0 110 19H19V0z"/><path fill="#a259ff" d="M19 19H9.5a9.5 9.5 0 100 19H19V19z"/><circle fill="#1abcfe" cx="28.5" cy="28.5" r="9.5"/><path fill="#0acf83" d="M9.5 38H19v9.5A9.5 9.5 0 119.5 38z"/></svg></span>
         <span class="folio" aria-hidden="true">05 / 06</span>
         <iframe class="animation-frame" id="devmodeProto" src="../branding/devmode-proto.html" title="Animated Figma Dev Mode walkthrough of the Sound section" loading="lazy" allow="autoplay"></iframe>
       </section>
 
       <section class="slide sound-slide animation-slide" data-slide="17" aria-label="Figma Sound closing wordmark">
+        <a class="concept-home concept-home--final" href="/#/"><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2 5 H8 M5.5 2.5 L8 5 L5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"/></svg> <span class="concept-home-label">Back Home<span class="concept-home-rule" aria-hidden="true"></span></span></a>
         <span class="folio" aria-hidden="true">06 / 06</span>
         <iframe class="animation-frame" id="orbitFrame" src="../branding/sound-orbit.html" title="Figma Sound wordmark with the film's sound icons orbiting it" loading="eager" allow="autoplay"></iframe>
       </section>
@@ -1798,5 +1805,7 @@
         for (const slide of document.querySelectorAll(".sound-slide")) entrances.observe(slide);
       }
     </script>
-  </body>
+  <script defer src="/codex/vendor/motion.js"></script>
+<script defer src="/concept-home.js"></script>
+</body>
 </html>

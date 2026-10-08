@@ -1,0 +1,44 @@
+/* Each link belongs to its slide and scrolls away with it. */
+.concept-home {
+  position: absolute;
+  top: max(10px, env(safe-area-inset-top));
+  left: var(--pad, clamp(18px, 3vw, 48px));
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  box-sizing: border-box;
+  color: var(--muted, var(--cursor-muted, #8c8c8c));
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  text-transform: uppercase;
+  font-size: 12px;
+  line-height: 1.4;
+  letter-spacing: .01em;
+  text-decoration: none;
+}
+.sound-slide .concept-home {
+  color: #8c8c8c;
+  font-size: 13px;
+}
+/* Photography needs local contrast rather than a dark label backing. */
+.image-slide .concept-home { color: #fff; mix-blend-mode: difference; }
+.concept-home.concept-home--final { color: #fff; }
+.concept-home svg { width: 1em; height: 1em; flex: none; transform: rotate(180deg); }
+/* A lighter member of the homepage's neutral gray family. */
+.concept-home:hover, .concept-home:focus-visible { color: #a3a3a3; }
+.sound-slide .concept-home:hover, .sound-slide .concept-home:focus-visible { color: #a3a3a3; }
+.concept-home.concept-home--final:hover, .concept-home.concept-home--final:focus-visible { color: #fff; }
+.concept-home:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+
+.concept-home-label { position: relative; }
+.concept-home-rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 1.5px;
+  background: color-mix(in srgb, currentColor 48%, transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+}
