@@ -100,3 +100,11 @@ test("tracked HTML has no social image metadata pointing to the profile picture"
 
   assert.deepEqual(staleReferences, []);
 });
+
+test("About describes its responsive collage rather than the retired portrait preview", async () => {
+  const html = await text("about/index.html");
+  const alt = "Pranavi Ram’s About page shown in responsive browser windows.";
+  assert.match(html, new RegExp(`property=["']og:image:alt["'] content=["']${alt}["']`));
+  assert.match(html, new RegExp(`name=["']twitter:image:alt["'] content=["']${alt}["']`));
+  assert.doesNotMatch(html, /image:alt["'] content=["']A portrait of Pranavi Ram/i);
+});
