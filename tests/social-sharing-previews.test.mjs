@@ -2,22 +2,62 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
+import {
+  CODEX_FULL_BLEED_CSS,
+  COLLAGE_WINDOWS,
+  SOCIAL_CANVAS,
+} from "../scripts/social-preview-layout.mjs";
 
 const root = new URL("../", import.meta.url);
 const text = (path) => readFile(new URL(path, root), "utf8");
 
 const socialImages = [
-  "public/social/portfolio-landing-v1.png",
-  "public/social/about-v1.png",
+  "public/social/portfolio-landing-v2.png",
+  "public/social/about-v2.png",
   "public/social/cursor-loves-indie-v1.png",
   "public/social/figma-sound-v1.png",
-  "public/social/codex-bookmarks-v1.png",
+  "public/social/codex-bookmarks-v2.png",
 ];
 
 const pngSize = (buffer) => {
   assert.deepEqual([...buffer.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
   return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
 };
+
+test("collages use five separate responsive windows with one Safari", () => {
+  assert.equal(COLLAGE_WINDOWS.length, 5);
+  assert.equal(COLLAGE_WINDOWS.filter(({ browser }) => browser === "safari").length, 1);
+  assert.equal(COLLAGE_WINDOWS.filter(({ browser }) => browser === "chrome").length, 4);
+  assert.equal(new Set(COLLAGE_WINDOWS.map(({ viewportWidth }) => viewportWidth)).size, 5);
+
+  for (const window of COLLAGE_WINDOWS) {
+    assert.ok(window.x >= 0 && window.y >= 0, window.name);
+    assert.ok(window.x + window.width <= SOCIAL_CANVAS.width, window.name);
+    assert.ok(window.y + window.height <= SOCIAL_CANVAS.height, window.name);
+  }
+
+  for (let index = 0; index < COLLAGE_WINDOWS.length; index += 1) {
+    for (let otherIndex = index + 1; otherIndex < COLLAGE_WINDOWS.length; otherIndex += 1) {
+      const left = COLLAGE_WINDOWS[index];
+      const right = COLLAGE_WINDOWS[otherIndex];
+      const horizontalGap = Math.max(
+        right.x - (left.x + left.width),
+        left.x - (right.x + right.width),
+      );
+      const verticalGap = Math.max(
+        right.y - (left.y + left.height),
+        left.y - (right.y + right.height),
+      );
+      assert.ok(horizontalGap > 0 || verticalGap > 0, `${left.name} overlaps or touches ${right.name}`);
+    }
+  }
+});
+
+test("Codex social capture removes only the page framing around the poster", () => {
+  assert.match(CODEX_FULL_BLEED_CSS, /slide\[data-slide=["']01["']\]\s*\{[^}]*padding:\s*0/s);
+  assert.match(CODEX_FULL_BLEED_CSS, /hx-frame\s*\{[^}]*inset:\s*0/s);
+  assert.match(CODEX_FULL_BLEED_CSS, /concept-credit\s*\{[^}]*display:\s*none/s);
+});
 
 test("all social preview assets are 1200 by 630 PNGs", async () => {
   for (const path of socialImages) {
@@ -58,13 +98,13 @@ test("first-party navigation uses the clean About URL", async () => {
 });
 
 const metadata = [
-  ["index.html", "https://pranaviram.com/social/portfolio-landing-v1.png", "Pranavi Ram’s portfolio shown in responsive browser windows."],
-  ["about/index.html", "https://pranaviram.com/social/about-v1.png", "Pranavi Ram’s About page shown in responsive browser windows."],
-  ["public/surprise-rail/index.html", "https://pranaviram.com/social/portfolio-landing-v1.png", "Pranavi Ram’s portfolio shown in responsive browser windows."],
-  ["public/mixr/index.html", "https://pranaviram.com/social/portfolio-landing-v1.png", "Pranavi Ram’s portfolio shown in responsive browser windows."],
+  ["index.html", "https://pranaviram.com/social/portfolio-landing-v2.png", "Pranavi Ram’s portfolio shown in responsive browser windows."],
+  ["about/index.html", "https://pranaviram.com/social/about-v2.png", "Pranavi Ram’s About page shown in responsive browser windows."],
+  ["public/surprise-rail/index.html", "https://pranaviram.com/social/portfolio-landing-v2.png", "Pranavi Ram’s portfolio shown in responsive browser windows."],
+  ["public/mixr/index.html", "https://pranaviram.com/social/portfolio-landing-v2.png", "Pranavi Ram’s portfolio shown in responsive browser windows."],
   ["public/cursor/index.html", "https://pranaviram.com/social/cursor-loves-indie-v1.png", "Thin white looping letterforms spell cursor loves indie across a black background."],
   ["public/figma/index.html", "https://pranaviram.com/social/figma-sound-v1.png", "Figma Sound wordmark surrounded by colorful hand-drawn sound icons on a dark dotted grid."],
-  ["public/codex/index.html", "https://pranaviram.com/social/codex-bookmarks-v1.png", "Blue Codex Bookmarks poster with a pink bookmark and a doodled terminal cloud."],
+  ["public/codex/index.html", "https://pranaviram.com/social/codex-bookmarks-v2.png", "Blue Codex Bookmarks poster with a pink bookmark and a doodled terminal cloud."],
 ];
 
 test("every shareable endpoint declares its approved large image", async () => {
@@ -95,6 +135,23 @@ test("tracked HTML has no social image metadata pointing to the profile picture"
         && /about\/Profile(?:%20| )picture\.png/i.test(tag)) {
         staleReferences.push(path);
       }
+    }
+  }
+
+  assert.deepEqual(staleReferences, []);
+});
+
+test("tracked HTML no longer points to replaced v1 social artwork", async () => {
+  const paths = execFileSync("git", ["ls-files", "-z", "--", "*.html"], {
+    cwd: new URL("../", import.meta.url),
+    encoding: "utf8",
+  }).split("\0").filter(Boolean);
+  const staleReferences = [];
+
+  for (const path of paths) {
+    const html = await text(path);
+    if (/social\/(?:portfolio-landing|about|codex-bookmarks)-v1\.png/.test(html)) {
+      staleReferences.push(path);
     }
   }
 
