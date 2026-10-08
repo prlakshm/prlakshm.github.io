@@ -27,8 +27,8 @@ const FADE_LARGE = { duration: 0.5, ease: [0.33, 0, 0.2, 1] as const };
 const SETTLE_LARGE = { duration: 0.7, ease: [0.16, 1, 0.3, 1] as const };
 // A single large focal object needs slightly more time than a repeating card
 // rail, but keeps the same decisive easing and entrance distance.
-const FADE_HEAVY = { duration: 0.65, ease: [0.33, 0, 0.2, 1] as const };
-const SETTLE_HEAVY = { duration: 0.9, ease: [0.16, 1, 0.3, 1] as const };
+const FADE_HEAVY = { duration: 0.725, ease: [0.33, 0, 0.2, 1] as const };
+const SETTLE_HEAVY = { duration: 1.0, ease: [0.16, 1, 0.3, 1] as const };
 // Rows inside a group (the hero's sub lines, About's paragraphs and table
 // rows) ripple in this close behind one another: close enough to read as one
 // block arriving, apart enough to feel it cascade. The next group waits for

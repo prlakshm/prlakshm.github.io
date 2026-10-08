@@ -428,10 +428,14 @@
   line-height: 0.98;
   letter-spacing: -0.035em;
   text-align: left;
-  /* lifted off the page by a soft shadow (no border: her call). A filter, not
-     text-shadow: with a clipped fill, text-shadow paints over the painting */
-  filter: drop-shadow(0 0 0.85px rgba(23, 23, 23, 0.42)); /* a touch more than the hero: the lilies are lighter */
-  background-image: url("/home/footer/water-lilies-5b-smooth.webp");
+  /* Preserve the footer painting; cap only its brightest fill colors.
+     Darken blending leaves darker detail intact without outlining the type.
+     Half-strength grading preserves the lilies’ luminous color. */
+  --title-highlight-cap: rgb(214 214 214 / 50%);
+  background-image:
+    linear-gradient(var(--title-highlight-cap), var(--title-highlight-cap)),
+    url("/home/footer/water-lilies-5b-smooth.webp");
+  background-blend-mode: darken;
   background-size: cover;
   background-position: 30% 45%;
   /* room for the descenders (p, y, g) inside the painted box; see .hero-title */
@@ -470,10 +474,10 @@
   opacity: var(--title-shine-a);
   background-image: radial-gradient(
     ellipse var(--title-shine-w) var(--title-shine-reach) at var(--title-shine-x) var(--title-shine-y),
-    rgba(255, 248, 220, 0.86) 0%,
-    rgba(255, 231, 166, 0.44) 34%,
-    rgba(255, 222, 139, 0.17) 62%,
-    transparent 100%
+    rgba(255, 251, 235, 1) 0%,
+    rgba(255, 244, 205, 0.92) 22%,
+    rgba(255, 224, 149, 0.62) 48%,
+    transparent 88%
   );
 }
 
@@ -481,9 +485,10 @@
   opacity: var(--title-light-a);
   background-image: radial-gradient(
     ellipse clamp(68px, 9vw, 125px) clamp(48px, 7vw, 96px) at var(--title-light-x) var(--title-light-y),
-    rgba(255, 248, 218, 0.86) 0%,
-    rgba(255, 224, 149, 0.34) 42%,
-    transparent 76%
+    rgba(255, 251, 235, 1) 0%,
+    rgba(255, 244, 205, 0.92) 22%,
+    rgba(255, 224, 149, 0.62) 48%,
+    transparent 88%
   );
 }
 
@@ -639,4 +644,11 @@
     inset 0 0 0 1px rgba(255, 255, 255, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.45),
     inset 0 -1px 0 rgba(0, 0, 0, 0.16);
+}
+
+/* Smaller letterforms need a slightly lower highlight ceiling. */
+@media (max-width: 767px) {
+  .ab-heading {
+    --title-highlight-cap: rgb(196 196 196 / 50%);
+  }
 }

@@ -141,10 +141,13 @@
 /* The title is a window onto the skyline (her idea): the painting fills the
    letters, in its true colours; they stay real text. */
 .hero-title {
-  /* lifted off the page by a soft shadow (no border: her call). A filter, not
-     text-shadow: with a clipped fill, text-shadow paints over the painting */
-  filter: drop-shadow(0 0 0.6px rgba(23, 23, 23, 0.32));
-  background-image: url("/home/footer/skyline-d.webp"); /* the footer's city (option A) */
+  /* Preserve the footer painting; cap only its brightest fill colors.
+     Darken blending leaves darker detail intact without outlining the type. */
+  --title-highlight-cap: #d6d6d6;
+  background-image:
+    linear-gradient(var(--title-highlight-cap), var(--title-highlight-cap)),
+    url("/home/footer/skyline-d.webp");
+  background-blend-mode: darken;
   /* zoomed in on the lower left, where the brick low-rises meet the towers
      (her pick, B, for "accents of red and brick"); the towers alone read grey */
   background-size: 150% auto;
@@ -188,10 +191,10 @@
   opacity: var(--title-shine-a);
   background-image: radial-gradient(
     ellipse var(--title-shine-w) var(--title-shine-reach) at var(--title-shine-x) var(--title-shine-y),
-    rgba(255, 248, 220, 0.96) 0%,
-    rgba(255, 231, 166, 0.5) 34%,
-    rgba(255, 222, 139, 0.2) 62%,
-    transparent 100%
+    rgba(255, 251, 235, 1) 0%,
+    rgba(255, 244, 205, 0.92) 22%,
+    rgba(255, 224, 149, 0.62) 48%,
+    transparent 88%
   );
 }
 
@@ -199,9 +202,10 @@
   opacity: var(--title-light-a);
   background-image: radial-gradient(
     ellipse clamp(76px, 11vw, 150px) clamp(52px, 8vw, 112px) at var(--title-light-x) var(--title-light-y),
-    rgba(255, 248, 218, 0.95) 0%,
-    rgba(255, 224, 149, 0.42) 42%,
-    transparent 76%
+    rgba(255, 251, 235, 1) 0%,
+    rgba(255, 244, 205, 0.92) 22%,
+    rgba(255, 224, 149, 0.62) 48%,
+    transparent 88%
   );
 }
 
@@ -1562,5 +1566,12 @@
     mask-position: 22% 92%;
     -webkit-mask-size: auto 250%;
     -webkit-mask-position: 22% 92%;
+  }
+}
+
+/* Smaller letterforms need a slightly lower highlight ceiling. */
+@media (max-width: 767px) {
+  .hero-title {
+    --title-highlight-cap: #c4c4c4;
   }
 }

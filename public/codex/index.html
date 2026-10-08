@@ -428,20 +428,21 @@
         // the plank under "Codex": a soft spring under the landing's kick — it
         // tips just as fast, then keeps sinking into the bookmark's hit
         const CODEX_TIP = { to: -12, kick: -55, stiffness: 18, damping: 7.64 };
-        // Every landing moves the tower in exact proportion to how heavy the
-        // falling piece looks. Visual weight = size × value contrast: the summed
+        // Landing reactions are guided by how heavy the
+        // falling piece looks, with extra angular impulse for the final two hits.
+        // Visual weight = size × value contrast: the summed
         // L* (lightness) difference each piece makes against the real
         // background (measure-weight.cjs). Cloud 100%, "Bookmarks" 58.7%,
         // "Codex" 16.9%, bookmark 10.6%, sparkle 1.0% — each lighter than the
         // one before, so each sway is smaller than the one before:
         //   cloud sway   "Bookmarks" knock 26.5° → "Codex" 7.6° → bookmark 4.8°
-        //   plank sway   "Codex" 13.1° → bookmark 8.2° (→ 4.9° → 0.9°) → sparkle 0.8°
+        //   plank sway   strongest at the word, then bookmark, then sparkle
         // WEIGHT also scales the secondary reactions (cloud squash, the resting
         // sparkles' pulse).
         const WEIGHT = { marks: 0.587, codex: 0.169, bookmark: 0.106, sparkle: 0.01 };
-        // the teeter after the bookmark's hit: 8.2° toward the right (16.9 → 10.6
-        // of "Codex"'s 13.1°), a smaller swing back, a smaller one still, home
-        const TEETER = { kick: 62, stiffness: 30, damping: 4.8 };
+        // Add a stronger angular impulse at contact while retaining incoming
+        // velocity and damping: a deeper first tip, then diminishing swings.
+        const TEETER = { kick: 95.0208, stiffness: 30, damping: 4.8 };
         // The bookmark lands on the right end and pushes the cloud back toward
         // upright — 4.8° in the first moment — and it eases the rest of the way
         // home, no throw past upright: one smooth curve.
@@ -747,8 +748,8 @@
                 const v = await fallOnto("spTR", T, { lean: 12, spin: 34, drift: -30, stretch: 0.05, drag: BOOKMARK_DRAG });
                 if (!live()) return;
                 impact("spTR", v, { squash: 0.2 });
-                // its 1% weight taps the right end down 0.8° (13.1° × 1.0 / 16.9)
-                anim(tap, 0, { type: "spring", velocity: 16.5, stiffness: 120, damping: 2 * Math.sqrt(120) * 0.6 });
+                // A lighter secondary impulse follows the bookmark’s main impact.
+                anim(tap, 0, { type: "spring", velocity: 21, stiffness: 120, damping: 2 * Math.sqrt(120) * 0.6 });
                 settle("spTR");
                 const s = S.spTR, up = 12, t = Math.sqrt((2 * up) / G); // one small bounce, same gravity
                 await anim(0, up, { duration: t, ease: (x) => 1 - (1 - x) * (1 - x), onUpdate: (q) => { s.off = q; draw(); } });
