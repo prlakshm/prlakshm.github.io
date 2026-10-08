@@ -4,7 +4,7 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import {
   CODEX_FULL_BLEED_CSS,
-  COLLAGE_WINDOWS,
+  PAGE_PREVIEWS,
   SOCIAL_CANVAS,
 } from "../scripts/social-preview-layout.mjs";
 
@@ -12,8 +12,8 @@ const root = new URL("../", import.meta.url);
 const text = (path) => readFile(new URL(path, root), "utf8");
 
 const socialImages = [
-  "public/social/portfolio-landing-v2.png",
-  "public/social/about-v2.png",
+  "public/social/portfolio-landing-v3.png",
+  "public/social/about-v3.png",
   "public/social/cursor-loves-indie-v1.png",
   "public/social/figma-sound-v1.png",
   "public/social/codex-bookmarks-v2.png",
@@ -24,33 +24,15 @@ const pngSize = (buffer) => {
   return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
 };
 
-test("collages use five separate responsive windows with one Safari", () => {
-  assert.equal(COLLAGE_WINDOWS.length, 5);
-  assert.equal(COLLAGE_WINDOWS.filter(({ browser }) => browser === "safari").length, 1);
-  assert.equal(COLLAGE_WINDOWS.filter(({ browser }) => browser === "chrome").length, 4);
-  assert.equal(new Set(COLLAGE_WINDOWS.map(({ viewportWidth }) => viewportWidth)).size, 5);
+test("Home and About social artwork are direct page captures without browser chrome", async () => {
+  assert.deepEqual(PAGE_PREVIEWS, [
+    { name: "portfolio-landing-v3.png", url: "/" },
+    { name: "about-v3.png", url: "/about/" },
+  ]);
+  assert.deepEqual(SOCIAL_CANVAS, { width: 1200, height: 630 });
 
-  for (const window of COLLAGE_WINDOWS) {
-    assert.ok(window.x >= 0 && window.y >= 0, window.name);
-    assert.ok(window.x + window.width <= SOCIAL_CANVAS.width, window.name);
-    assert.ok(window.y + window.height <= SOCIAL_CANVAS.height, window.name);
-  }
-
-  for (let index = 0; index < COLLAGE_WINDOWS.length; index += 1) {
-    for (let otherIndex = index + 1; otherIndex < COLLAGE_WINDOWS.length; otherIndex += 1) {
-      const left = COLLAGE_WINDOWS[index];
-      const right = COLLAGE_WINDOWS[otherIndex];
-      const horizontalGap = Math.max(
-        right.x - (left.x + left.width),
-        left.x - (right.x + right.width),
-      );
-      const verticalGap = Math.max(
-        right.y - (left.y + left.height),
-        left.y - (right.y + right.height),
-      );
-      assert.ok(horizontalGap > 0 || verticalGap > 0, `${left.name} overlaps or touches ${right.name}`);
-    }
-  }
+  const generator = await text("scripts/generate-social-previews.mjs");
+  assert.doesNotMatch(generator, /browser__chrome|safari-toolbar|chrome-toolbar|const collage/);
 });
 
 test("Codex social capture removes only the page framing around the poster", () => {
@@ -98,10 +80,10 @@ test("first-party navigation uses the clean About URL", async () => {
 });
 
 const metadata = [
-  ["index.html", "https://pranaviram.com/social/portfolio-landing-v2.png", "Pranavi Ram’s portfolio shown in responsive browser windows."],
-  ["about/index.html", "https://pranaviram.com/social/about-v2.png", "Pranavi Ram’s About page shown in responsive browser windows."],
-  ["public/surprise-rail/index.html", "https://pranaviram.com/social/portfolio-landing-v2.png", "Pranavi Ram’s portfolio shown in responsive browser windows."],
-  ["public/mixr/index.html", "https://pranaviram.com/social/portfolio-landing-v2.png", "Pranavi Ram’s portfolio shown in responsive browser windows."],
+  ["index.html", "https://pranaviram.com/social/portfolio-landing-v3.png", "Pranavi Ram’s portfolio landing page."],
+  ["about/index.html", "https://pranaviram.com/social/about-v3.png", "Pranavi Ram’s About page."],
+  ["public/surprise-rail/index.html", "https://pranaviram.com/social/portfolio-landing-v3.png", "Pranavi Ram’s portfolio landing page."],
+  ["public/mixr/index.html", "https://pranaviram.com/social/portfolio-landing-v3.png", "Pranavi Ram’s portfolio landing page."],
   ["public/cursor/index.html", "https://pranaviram.com/social/cursor-loves-indie-v1.png", "Thin white looping letterforms spell cursor loves indie across a black background."],
   ["public/figma/index.html", "https://pranaviram.com/social/figma-sound-v1.png", "Figma Sound wordmark surrounded by colorful hand-drawn sound icons on a dark dotted grid."],
   ["public/codex/index.html", "https://pranaviram.com/social/codex-bookmarks-v2.png", "Blue Codex Bookmarks poster with a pink bookmark and a doodled terminal cloud."],
@@ -141,7 +123,7 @@ test("tracked HTML has no social image metadata pointing to the profile picture"
   assert.deepEqual(staleReferences, []);
 });
 
-test("tracked HTML no longer points to replaced v1 social artwork", async () => {
+test("tracked HTML no longer points to replaced framed page previews", async () => {
   const paths = execFileSync("git", ["ls-files", "-z", "--", "*.html"], {
     cwd: new URL("../", import.meta.url),
     encoding: "utf8",
@@ -150,7 +132,7 @@ test("tracked HTML no longer points to replaced v1 social artwork", async () => 
 
   for (const path of paths) {
     const html = await text(path);
-    if (/social\/(?:portfolio-landing|about|codex-bookmarks)-v1\.png/.test(html)) {
+    if (/social\/(?:portfolio-landing|about)-v[12]\.png/.test(html)) {
       staleReferences.push(path);
     }
   }
@@ -158,12 +140,13 @@ test("tracked HTML no longer points to replaced v1 social artwork", async () => 
   assert.deepEqual(staleReferences, []);
 });
 
-test("About describes its responsive collage rather than the retired portrait preview", async () => {
+test("About describes the page rather than the retired portrait or browser collage", async () => {
   const html = await text("about/index.html");
-  const alt = "Pranavi Ram’s About page shown in responsive browser windows.";
+  const alt = "Pranavi Ram’s About page.";
   assert.match(html, new RegExp(`property=["']og:image:alt["'] content=["']${alt}["']`));
   assert.match(html, new RegExp(`name=["']twitter:image:alt["'] content=["']${alt}["']`));
   assert.doesNotMatch(html, /image:alt["'] content=["']A portrait of Pranavi Ram/i);
+  assert.doesNotMatch(html, /responsive browser windows/i);
 });
 
 test("tracked first-party source no longer generates the retired hash About URL", () => {

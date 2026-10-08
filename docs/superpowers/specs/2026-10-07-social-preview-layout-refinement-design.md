@@ -4,13 +4,11 @@
 
 Refine the approved social-sharing artwork without changing page design or metadata routing.
 
-## Browser collages
+## Direct page captures
 
-The Home/case-study preview and About preview remain 1200 × 630 PNGs on the existing `#EBEBED` gray background. Each collage contains exactly five responsive captures of its page. The five browser windows form an asymmetrical desktop spread with visible gray gutters between every window; their rectangles may not touch or overlap.
+The Home/case-study preview and About preview remain 1200 × 630 PNGs. Each is a direct screenshot of the corresponding page at a 1200 × 630 viewport, with no simulated browser window, tabs, chrome, border, or external background.
 
-One window uses recognizable Safari chrome. The other four use recognizable Chrome chrome, and every Chrome window contains exactly one portfolio tab. The five captures use distinct viewport widths so the artwork communicates real responsive behavior rather than repeated scaling of one screenshot.
-
-The layout data is separated from the renderer so automated tests can prove the window count, browser mix, viewport variety, canvas containment, and lack of overlap.
+Home, Surprise Rail, and Mixr use the landing-page capture. About uses the About-page capture. Page-preview configuration is separated from the renderer so automated tests can verify the exact routes and filenames and ensure the synthetic browser renderer does not return.
 
 ## Codex poster
 
@@ -18,12 +16,12 @@ The Codex preview remains a 1200 × 630 PNG but shows the animated poster frame 
 
 ## Unchanged scope
 
-Cursor and Figma artwork, page metadata, site behavior, and visual styling outside generated social assets remain unchanged.
+Cursor, Figma, and Codex artwork, site behavior, and visual styling outside generated social assets remain unchanged.
 
 ## Verification
 
-- Automated layout checks cover five windows, one Safari/four Chrome, distinct viewport widths, no overlap, and canvas bounds.
+- Automated checks cover the two direct page routes, 1200 × 630 canvas, and absence of browser-chrome rendering code.
 - Automated source checks cover the Codex full-bleed capture override.
 - Existing social metadata and 1200 × 630 PNG checks continue to pass.
-- Both regenerated collages and the Codex preview receive visual inspection before push.
+- Both regenerated page captures receive visual inspection before push.
 - The production build, full test suite, deployed metadata, and deployed image URLs are verified.
