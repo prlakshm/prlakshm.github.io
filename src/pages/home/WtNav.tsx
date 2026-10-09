@@ -6,7 +6,8 @@ import { attachUnderlineWipe, prefersReducedMotion, SPRING } from "./interaction
 import "./chrome.css";
 
 /* The site nav. Top-left is the hidden-interactions card (it replaced the
-   wordmark), then WORK · GALLERY · ABOUT · RESUME.
+   wordmark), then GALLERY (Home, the curated work) · EVERYTHING (the
+   canvas) · ABOUT · RESUME; on phones the menu opens from MAP.
    NavBar is the bar itself and knows nothing of the router; WtNav (Home,
    About) hands it router-aware WORK and ABOUT items, and the static case
    studies hand it plain links (src/static-chrome.tsx). */
@@ -242,7 +243,7 @@ export function NavBar({ work, about, autoHide = false, onHome }: NavBarProps) {
           aria-controls={menuId}
           onClick={() => setMobileOpen((open) => !open)}
         >
-          INDEX
+          MAP
           <span className="nav-rule" aria-hidden="true" />
         </button>
         <nav
@@ -258,7 +259,7 @@ export function NavBar({ work, about, autoHide = false, onHome }: NavBarProps) {
             <li>{work}</li>
             <li>
               <a href="/gallery/" aria-current={onGalleryPage() ? "page" : undefined}>
-                GALLERY
+                EVERYTHING
                 <span className="nav-rule" aria-hidden="true" />
               </a>
             </li>
@@ -301,7 +302,7 @@ export default function WtNav() {
       onHome={goHome}
       work={
         <button type="button" onClick={goHome}>
-          WORK
+          GALLERY
           <span className="nav-rule" aria-hidden="true" />
         </button>
       }

@@ -268,9 +268,9 @@ export default function Gallery() {
       const navBottom = phone ? Math.max(56, document.querySelector(".wt-nav")?.getBoundingClientRect().bottom ?? 72) : 0;
       const side = phone ? 16 : 48, top = phone ? navBottom + 16 : 48, bottom = phone ? 16 : 12;
       const zw = (r.width - side * 2) / b.w, zh = (r.height - top - bottom) / b.h;
-      // desktop sits 5% further out than a tight fit, for air; a phone uses
-      // every pixel it has
-      const z = Math.min(Z_MAX, Math.max(Z_MIN, Math.min(zw, zh) * (phone ? 1 : 0.953)));
+      // a little further out than a tight fit, for air: 5% on desktop, ~7% on
+      // a phone
+      const z = Math.min(Z_MAX, Math.max(Z_MIN, Math.min(zw, zh) * (phone ? 0.927 : 0.953)));
       // bagel (world 0, 0) at its spot, then keep the whole canvas in view
       const keepIn = (want: number, lo: number, size: number, min: number, max: number) => {
         const a = want + lo * z, span = size * z;
@@ -284,7 +284,7 @@ export default function Gallery() {
       // phone arrangement already sets the bagel a touch right of centre)
       cam.x = phone ? (r.width - b.w * z) / 2 - b.x * z : keepIn(r.width * BAGEL_AT.x, b.x, b.w, side, r.width - side);
       cam.y = phone
-        ? navBottom + (r.height - navBottom - b.h * z) / 2 - b.y * z // centred in the space under the nav
+        ? navBottom + (r.height - navBottom - b.h * z) * 0.28 - b.y * z // under the nav, a touch above centre
         : keepIn(r.height * BAGEL_AT.y, b.y, b.h, top, r.height - bottom);
       draw();
     };
