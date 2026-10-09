@@ -257,7 +257,7 @@ export default function Gallery() {
        - if a narrow or short window would push the canvas past an edge, it
          slides back in (the bagel gives way, never the content).
        0 returns here. */
-    const BAGEL_AT = { x: 0.5175, y: 0.4156 }; // of the window, measured from her framing
+    const BAGEL_AT = { x: 0.5175, y: 0.44 }; // of the window, measured from her framing
     const fit = () => {
       const b = pieceBounds(live.current.pieces);
       const r = view.getBoundingClientRect();
