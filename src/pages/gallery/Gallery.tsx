@@ -266,12 +266,11 @@ export default function Gallery() {
       // on a phone: equal space between the nav's bottom edge and the canvas,
       // and between the canvas and the bottom of the screen
       const navBottom = phone ? Math.max(56, document.querySelector(".wt-nav")?.getBoundingClientRect().bottom ?? 72) : 0;
-      const side = phone ? 24 : 48, top = phone ? navBottom + 20 : 48, bottom = phone ? 20 : 12;
-      // a phone holds the bagel at a fixed spot, so it fits each side of that
-      // line separately rather than the whole width
-      const PX = 0.535; // the bagel's spot across a phone (see cam.x below)
-      const zw = phone ? Math.min((r.width * PX - side) / Math.max(1, -b.x), (r.width * (1 - PX) - side) / Math.max(1, b.x + b.w)) : (r.width - side * 2) / b.w, zh = (r.height - top - bottom) / b.h;
-      const z = Math.min(Z_MAX, Math.max(Z_MIN, Math.min(zw, zh) * 0.953));
+      const side = phone ? 16 : 48, top = phone ? navBottom + 16 : 48, bottom = phone ? 16 : 12;
+      const zw = (r.width - side * 2) / b.w, zh = (r.height - top - bottom) / b.h;
+      // desktop sits 5% further out than a tight fit, for air; a phone uses
+      // every pixel it has
+      const z = Math.min(Z_MAX, Math.max(Z_MIN, Math.min(zw, zh) * (phone ? 1 : 0.953)));
       // bagel (world 0, 0) at its spot, then keep the whole canvas in view
       const keepIn = (want: number, lo: number, size: number, min: number, max: number) => {
         const a = want + lo * z, span = size * z;
@@ -281,9 +280,9 @@ export default function Gallery() {
         return want;
       };
       cam.z = z;
-      // phone: a touch right of centre too, since the bagel and its burst read
-      // as leaning toward the exclamation
-      cam.x = keepIn(r.width * (phone ? PX : BAGEL_AT.x), b.x, b.w, side, r.width - side);
+      // phone: the whole canvas centred, as large as the width allows (her
+      // phone arrangement already sets the bagel a touch right of centre)
+      cam.x = phone ? (r.width - b.w * z) / 2 - b.x * z : keepIn(r.width * BAGEL_AT.x, b.x, b.w, side, r.width - side);
       cam.y = phone
         ? navBottom + (r.height - navBottom - b.h * z) / 2 - b.y * z // centred in the space under the nav
         : keepIn(r.height * BAGEL_AT.y, b.y, b.h, top, r.height - bottom);
