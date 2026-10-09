@@ -227,7 +227,7 @@ export default function Gallery() {
       draw();
     };
     /* Open on the bagel, framed by eye rather than by box:
-       - zoomed to fit everything, then ~10% further out for air;
+       - zoomed to fit everything, then ~5% further out for air;
        - the bagel placed at its optical centre, not the window's geometric
          one: a little ABOVE the middle (a focal object dead centre reads as
          sagging) and a little right of it, because the bagel's heavy body
@@ -237,13 +237,13 @@ export default function Gallery() {
        - if a narrow or short window would push the canvas past an edge, it
          slides back in (the bagel gives way, never the content).
        0 returns here. */
-    const BAGEL_AT = { x: 0.52, y: 0.415 }; // of the window, measured from her framing
+    const BAGEL_AT = { x: 0.5175, y: 0.4156 }; // of the window, measured from her framing
     const fit = () => {
       const b = pieceBounds(live.current.pieces);
       const r = view.getBoundingClientRect();
       const side = 48, top = 48, bottom = 12;
       const zw = (r.width - side * 2) / b.w, zh = (r.height - top - bottom) / b.h;
-      const z = Math.min(Z_MAX, Math.max(Z_MIN, Math.min(zw, zh) * 0.9025));
+      const z = Math.min(Z_MAX, Math.max(Z_MIN, Math.min(zw, zh) * 0.953));
       // bagel (world 0, 0) at its spot, then keep the whole canvas in view
       const keepIn = (want: number, lo: number, size: number, min: number, max: number) => {
         const a = want + lo * z, span = size * z;
