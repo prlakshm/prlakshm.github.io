@@ -102,6 +102,7 @@ function siteChrome(): Plugin {
             input: {
               main: resolve(__dirname, "index.html"),
               about: resolve(__dirname, "about/index.html"),
+              gallery: resolve(__dirname, "gallery/index.html"),
               "static-chrome": resolve(__dirname, CHROME_ENTRY),
             },
           },
@@ -163,6 +164,44 @@ function siteChrome(): Plugin {
   };
 }
 
+/* Gallery arranging, dev only: moving or deleting a piece on localhost/gallery/
+   saves straight into src/pages/gallery/layout.json, which the built page
+   imports. The file is left out of the watcher so a save doesn't reload the
+   page mid-arrangement; the page reads it fresh from here instead. */
+const GALLERY_LAYOUT = resolve(__dirname, "src/pages/gallery/layout.json");
+
+function galleryLayout(): Plugin {
+  return {
+    name: "gallery-layout",
+    apply: "serve",
+    config: () => ({ server: { watch: { ignored: [GALLERY_LAYOUT] } } }),
+    configureServer(server) {
+      server.middlewares.use("/__gallery/layout", (req, res) => {
+        if (req.method === "POST") {
+          let body = "";
+          req.on("data", (c) => (body += c));
+          req.on("end", () => {
+            try {
+              const l = JSON.parse(body);
+              if (typeof l !== "object" || !l || typeof l.items !== "object" || !Array.isArray(l.deleted)) throw new Error("bad layout");
+              writeFileSync(GALLERY_LAYOUT, JSON.stringify(l, null, 2) + "\n");
+              res.statusCode = 204;
+              res.end();
+            } catch {
+              res.statusCode = 400;
+              res.end();
+            }
+          });
+          return;
+        }
+        res.setHeader("Content-Type", "application/json");
+        res.setHeader("Cache-Control", "no-store");
+        res.end(readFileSync(GALLERY_LAYOUT, "utf8"));
+      });
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react(), publicDirIndexes(), siteChrome()],
+  plugins: [react(), publicDirIndexes(), siteChrome(), galleryLayout()],
 });

@@ -1,0 +1,452 @@
+/* GALLERY: the one page that is literally a canvas. Cool white ground with
+   dots in the same cool family (slate), so the dots read as the surface, not
+   as a pattern laid over it. The dot spacing and offset are written by
+   Gallery.tsx so the grid moves with the camera. */
+
+.wt--gallery {
+  --gx-ground: #f8fafc;
+  --gx-dot: #cbd5e1; /* slate 300: the ground's own cool, a few steps down */
+  --gx-dot-size: 1.2px;
+  --gx-ink: #171717;
+  --gx-frame: rgb(15 23 42 / 0.08);
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--gx-ground);
+}
+
+/* The canvas fills the window under the nav. (home.css makes every direct
+   child of .wt position: relative; this restates it at higher specificity.) */
+.wt--gallery > .gx {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+/* a soft fade under the nav, so pieces sliding beneath it don't fight it */
+.gx::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 96px;
+  pointer-events: none;
+  background: linear-gradient(var(--gx-ground) 30%, color-mix(in srgb, var(--gx-ground) 0%, transparent));
+}
+
+.gx-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.gx-view {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none; /* the canvas handles pan and pinch itself */
+  outline: none;
+  background-color: var(--gx-ground);
+  background-image: radial-gradient(
+    circle,
+    var(--gx-dot) var(--gx-dot-size),
+    transparent calc(var(--gx-dot-size) + 0.5px)
+  );
+  background-size: 24px 24px;
+}
+
+.gx-view.is-grabbing {
+  cursor: grabbing;
+}
+
+.gx-view:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--gx-ink);
+}
+
+.gx-world {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+/* A piece: a print laid on the canvas, with a soft contact shadow. */
+.gx-piece {
+  position: absolute;
+  margin: 0;
+  transform-origin: 50% 50%;
+  box-shadow:
+    0 1px 2px rgb(15 23 42 / 0.12),
+    0 14px 30px -14px rgb(15 23 42 / 0.32);
+  background: #fff;
+  user-select: none;
+}
+
+.gx-piece img,
+.gx-piece video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* Sequinned objects are cut-outs: no paper behind them, a shadow that
+   follows their own edge. */
+.gx-piece--sticker {
+  background: none;
+  box-shadow: none;
+  filter: drop-shadow(0 6px 10px rgb(15 23 42 / 0.22));
+}
+
+.gx-piece--sticker img {
+  object-fit: contain;
+}
+
+/* The bagel is part of the canvas: under every piece, never picked up. Two
+   layers cut from one frame (they line up exactly); the bagel sits on top of
+   the exclamation so the tail is born underneath it. Only the bagel and its
+   bubble (two hit areas) answer the pointer, so pressing anywhere else on the
+   art still pans. */
+.gx-bagel {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.gx-bagel img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+
+
+.gx-bagel-hit {
+  position: absolute;
+  left: 1%;
+  top: 36%;
+  width: 49%;
+  height: 58%;
+  border-radius: 50%;
+  pointer-events: auto;
+}
+
+.gx-view.is-carrying,
+.gx-view.is-carrying .gx-piece {
+  cursor: grabbing;
+}
+
+/* Selection, as in a Figma file but in grey: a hairline box with square
+   corner handles and the piece's name above its top-left corner. Line, handles
+   and name stay the same size on screen at every zoom. */
+.wt--gallery {
+  --gx-sel: #8e8e93;
+}
+
+.gx-sel {
+  position: absolute;
+  z-index: 100000;
+  pointer-events: none;
+  box-shadow: 0 0 0 calc(1.5px / var(--gx-zoom, 1)) var(--gx-sel);
+}
+
+.gx-sel-name {
+  position: absolute;
+  left: 0;
+  bottom: 100%;
+  transform-origin: 0 100%;
+  transform: scale(calc(1 / var(--gx-zoom, 1))) translateY(-6px);
+  font-family: var(--font-text);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--gx-sel);
+  white-space: nowrap;
+}
+
+.gx-sel-h {
+  position: absolute;
+  width: calc(8px / var(--gx-zoom, 1));
+  height: calc(8px / var(--gx-zoom, 1));
+  background: #fff;
+  box-shadow: 0 0 0 calc(1.5px / var(--gx-zoom, 1)) var(--gx-sel);
+}
+
+.gx-sel-h--tl { left: 0; top: 0; transform: translate(-50%, -50%); }
+.gx-sel-h--tr { right: 0; top: 0; transform: translate(50%, -50%); }
+.gx-sel-h--bl { left: 0; bottom: 0; transform: translate(-50%, 50%); }
+.gx-sel-h--br { right: 0; bottom: 0; transform: translate(50%, 50%); }
+
+/* With several pieces selected, each gets its own hairline and the handles
+   go on one box round the lot (as in Figma). */
+.gx-sel--item {
+  box-shadow: 0 0 0 calc(1px / var(--gx-zoom, 1)) var(--gx-sel);
+}
+
+/* The bubble's own area: resting on the line counts as resting on the bagel. */
+.gx-bagel-hit--burst {
+  left: 30%;
+  top: 0;
+  width: 70%;
+  height: 56%;
+  border-radius: 40%;
+}
+
+/* Corner handles resize a single selected piece (Gallery.tsx), so they take
+   the pointer, with the matching diagonal cursor. With several pieces
+   selected the handles only mark the group. */
+.gx-sel-h {
+  pointer-events: auto;
+}
+
+.gx-sel-h--tl,
+.gx-sel-h--br {
+  cursor: nwse-resize;
+}
+
+.gx-sel-h--tr,
+.gx-sel-h--bl {
+  cursor: nesw-resize;
+}
+
+.gx-sel:has(~ .gx-sel--item) .gx-sel-h,
+.gx-sel--item ~ .gx-sel .gx-sel-h {
+  pointer-events: none;
+  cursor: default;
+}
+
+/* a generous invisible grab area round each little square */
+.gx-sel-h::after {
+  content: "";
+  position: absolute;
+  inset: -100%;
+}
+
+/* Guides while something is in hand: dotted grey, drawn in the canvas's own
+   dot language rather than a tool's bright line. They mark the edges and
+   centres the piece now shares with others; a dotted outline marks a piece
+   whose width or height a resize matched. Hairlines at every zoom. */
+.gx-guides {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 100001;
+  pointer-events: none;
+}
+
+.gx-guide,
+.gx-guide-match {
+  position: absolute;
+  display: block;
+}
+
+.gx-guide--v {
+  width: 0;
+  border-left: calc(1.5px / var(--gx-zoom, 1)) dotted var(--gx-sel);
+  transform: translateX(-50%);
+}
+
+.gx-guide--h {
+  height: 0;
+  border-top: calc(1.5px / var(--gx-zoom, 1)) dotted var(--gx-sel);
+  transform: translateY(-50%);
+}
+
+.gx-guide-match {
+  outline: calc(1.5px / var(--gx-zoom, 1)) dotted var(--gx-sel);
+}
+
+/* Shift + drag on the ground: a faint grey wash with a hairline edge. */
+.gx-marquee {
+  display: none;
+  position: absolute;
+  z-index: 100002;
+  pointer-events: none;
+  background: rgb(142 142 147 / 0.08);
+  box-shadow: 0 0 0 calc(1px / var(--gx-zoom, 1)) var(--gx-sel);
+}
+
+/* Contact sheet (localhost, /gallery/#sheet): a scrolling sheet laid over the
+   canvas, every piece as a thumbnail with its name to edit. */
+/* (.wt--gallery > for the same reason as .gx: home.css makes every direct
+   child of .wt position: relative) */
+.wt--gallery > .gx-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow: auto;
+  padding: 104px 48px 80px;
+  background: var(--gx-ground);
+  font-family: var(--font-text);
+  color: var(--gx-ink);
+}
+
+.gx-sheet-head h1 {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.gx-sheet-head p {
+  margin: 6px 0 28px;
+  font-size: 13px;
+  color: #666;
+}
+
+.gx-sheet-head a {
+  color: inherit;
+}
+
+.gx-sheet-sub {
+  margin: 48px 0 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #666;
+}
+
+.gx-sheet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(176px, 1fr));
+  gap: 24px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gx-sheet-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.gx-sheet-thumb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  background: #fff;
+  box-shadow: 0 0 0 1px var(--gx-frame);
+}
+
+.gx-sheet-thumb img {
+  max-width: 88%;
+  max-height: 88%;
+  object-fit: contain;
+}
+
+.gx-sheet-tag {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #666;
+}
+
+.gx-sheet-input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--gx-frame);
+  border-radius: 4px;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+  color: var(--gx-ink);
+}
+
+.gx-sheet-input:focus {
+  outline: none;
+  border-color: var(--gx-sel);
+}
+
+.gx-sheet-input.is-edited {
+  border-color: var(--gx-sel);
+}
+
+.gx-sheet-id {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #999;
+}
+
+.gx-sheet-grid--gone .gx-sheet-thumb {
+  opacity: 0.5;
+}
+
+.gx-sheet-name {
+  font-size: 13px;
+  color: #666;
+}
+
+.gx-sheet-card button {
+  align-self: flex-start;
+  padding: 4px 10px;
+  border: 1px solid var(--gx-frame);
+  border-radius: 4px;
+  background: #fff;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* Cursor slides 1 and 9 on hover: the live wordmark over the image's letters
+   (Gallery.tsx LiveWordmark). Hidden until mounted. */
+.gx-live {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+.gx-live.is-live {
+  display: block;
+}
+
+.gx-live-cover {
+  position: absolute;
+  background: #000;
+}
+
+.gx-live-host {
+  position: absolute;
+  color: #fff;
+}
+
+.gx-live-host svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* the deck draws its strokes a fixed 1.25 screen px; here they scale with the
+   canvas like the image they replace */
+.gx-live-host path {
+  stroke: #e4e4e4; /* the image's antialiased white, so the swap is quiet */
+  stroke-width: var(--gx-live-stroke, 1);
+  vector-effect: none;
+}
+
+/* A loop's full-resolution layer, laid over its small copy once the piece is
+   big on screen (Gallery.tsx syncVideos); shown only once it has caught up. */
+.gx-piece video.gx-full {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
