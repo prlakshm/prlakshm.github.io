@@ -220,7 +220,7 @@ export const PIECES: Piece[] = [
 export type Layout = {
   items: Record<string, { x: number; y: number; z: number; w?: number }>;
   deleted: string[];
-  names?: Record<string, string>; // renamed on the contact sheet (/gallery/#sheet)
+  names?: Record<string, string>; // renamed on the contact sheet (/everything/#sheet)
   phone?: Record<string, { x: number; y: number; w?: number }>; // placed by hand on a phone-shaped screen
 };
 

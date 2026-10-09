@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PIECES, type Layout } from "./clusters.js";
 
-/* CONTACT SHEET (localhost only, /gallery/#sheet): every piece on the canvas
+/* CONTACT SHEET (localhost only, /everything/#sheet): every piece on the canvas
    as a thumbnail with its name in a box. Rename and it saves into layout.json
    as you type (the canvas shows the new name next time it loads). Removed
    pieces wait at the end, each with a way back. */

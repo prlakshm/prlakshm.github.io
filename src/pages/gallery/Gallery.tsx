@@ -39,7 +39,7 @@ const Z_MAX = 4;
 const DOT_STEP = 24; // world px between dots at 100%
 const DRAG_SLOP = 3; // screen px before a press becomes a drag
 const DEV = import.meta.env.DEV;
-// localhost only: /gallery/#sheet is the contact sheet for renaming pieces
+// localhost only: /everything/#sheet is the contact sheet for renaming pieces
 const SHEET = DEV && typeof location !== "undefined" && location.hash === "#sheet";
 
 type Camera = { x: number; y: number; z: number };
@@ -265,7 +265,9 @@ export default function Gallery() {
       const phone = window.matchMedia("(orientation: portrait) and (max-width: 900px)").matches;
       // on a phone: equal space between the nav's bottom edge and the canvas,
       // and between the canvas and the bottom of the screen
-      const navBottom = phone ? Math.max(56, document.querySelector(".wt-nav")?.getBoundingClientRect().bottom ?? 72) : 0;
+      // the nav bar's bottom edge: the space under it and the space under the
+      // canvas are kept equal (phones and desktop alike)
+      const navBottom = Math.max(56, document.querySelector(".wt-nav")?.getBoundingClientRect().bottom ?? 78);
       const side = phone ? 16 : 48, top = phone ? navBottom + 16 : 48, bottom = phone ? 16 : 12;
       const zw = (r.width - side * 2) / b.w, zh = (r.height - top - bottom) / b.h;
       // a little further out than a tight fit, for air: 5% on desktop, ~7% on
@@ -285,7 +287,7 @@ export default function Gallery() {
       cam.x = phone ? (r.width - b.w * z) / 2 - b.x * z : keepIn(r.width * BAGEL_AT.x, b.x, b.w, side, r.width - side);
       cam.y = phone
         ? navBottom + (r.height - navBottom - b.h * z) * 0.28 - b.y * z // under the nav, a touch above centre
-        : keepIn(r.height * BAGEL_AT.y, b.y, b.h, top, r.height - bottom);
+        : navBottom + (r.height - navBottom - b.h * z) / 2 - b.y * z; // equal space above and below
       draw();
     };
 

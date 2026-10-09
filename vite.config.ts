@@ -102,7 +102,7 @@ function siteChrome(): Plugin {
             input: {
               main: resolve(__dirname, "index.html"),
               about: resolve(__dirname, "about/index.html"),
-              gallery: resolve(__dirname, "gallery/index.html"),
+              everything: resolve(__dirname, "everything/index.html"),
               "static-chrome": resolve(__dirname, CHROME_ENTRY),
             },
           },

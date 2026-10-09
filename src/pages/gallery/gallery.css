@@ -274,7 +274,7 @@
   box-shadow: 0 0 0 calc(1px / var(--gx-zoom, 1)) var(--gx-sel);
 }
 
-/* Contact sheet (localhost, /gallery/#sheet): a scrolling sheet laid over the
+/* Contact sheet (localhost, /everything/#sheet): a scrolling sheet laid over the
    canvas, every piece as a thumbnail with its name to edit. */
 /* (.wt--gallery > for the same reason as .gx: home.css makes every direct
    child of .wt position: relative) */

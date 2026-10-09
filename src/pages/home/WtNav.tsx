@@ -47,9 +47,9 @@ type NavBarProps = {
   onHome?: () => void;
 };
 
-// the gallery is its own page (/gallery/), like About
+// the canvas is its own page (/everything/), like About
 const onGalleryPage = () =>
-  typeof window !== "undefined" && window.location.pathname.replace(/\/+$/, "") === "/gallery";
+  typeof window !== "undefined" && window.location.pathname.replace(/\/+$/, "") === "/everything";
 
 export function NavBar({ work, about, autoHide = false, onHome }: NavBarProps) {
   const rootRef = useRef<HTMLElement>(null);
@@ -258,7 +258,7 @@ export function NavBar({ work, about, autoHide = false, onHome }: NavBarProps) {
           <ul className="wt-nav-links">
             <li>{work}</li>
             <li>
-              <a href="/gallery/" aria-current={onGalleryPage() ? "page" : undefined}>
+              <a href="/everything/" aria-current={onGalleryPage() ? "page" : undefined}>
                 EVERYTHING
                 <span className="nav-rule" aria-hidden="true" />
               </a>
