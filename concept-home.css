@@ -32,6 +32,10 @@
 .concept-home:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
 
 .concept-home-label { position: relative; }
+/* The rule is the text's own ink one quiet step down. 48% suits the gray
+   links; on white over the near-black slide it mixes to a mid gray, so the
+   white link keeps a lighter step and the rule still reads as white. */
+.concept-home--final .concept-home-rule { background: color-mix(in srgb, currentColor 75%, transparent); }
 .concept-home-rule {
   position: absolute;
   left: 0;

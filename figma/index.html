@@ -138,10 +138,11 @@
          above the fixed sound toggle so they never block it */
       .sound-title .concept-credit { color: var(--sound-ink); }
       .credit-above-toggle { bottom: calc(clamp(14px, 2vw, 28px) + 46px); }
+      /* tucked just under the Back Home link (its 44px tap row) */
       .figma-mark {
         left: clamp(18px, 3vw, 48px);
         position: absolute;
-        top: calc(max(10px, env(safe-area-inset-top)) + 44px + 12px);
+        top: calc(max(10px, env(safe-area-inset-top)) + 48px);
         z-index: 2;
       }
       .figma-mark svg { display: block; }
