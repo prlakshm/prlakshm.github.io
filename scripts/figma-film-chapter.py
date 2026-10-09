@@ -9,7 +9,7 @@ Run once from the repo root: python3 scripts/figma-film-chapter.py, then node sc
 import re
 from pathlib import Path
 
-P = Path(__file__).resolve().parent.parent / "public/branding/index.html"
+P = Path(__file__).resolve().parent.parent / "decks/branding-source.html"
 h = P.read_text()
 
 

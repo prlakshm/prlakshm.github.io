@@ -26,10 +26,22 @@ function publicDirIndexes() {
     name: "public-dir-indexes",
     configureServer(server: import("vite").ViteDevServer) {
       if (!existsSync(root)) return;
-      server.middlewares.use((req, _res, next) => {
+      server.middlewares.use((req, res, next) => {
         const url = req.url;
         if (url) {
           const [path, query] = url.split("?");
+          /* GitHub Pages answers a bare directory (/about, /mixr) with a 301 to
+             its slash; without one, dev served the app's Home instead. */
+          const bare = /^\/([\w.-]+)$/.exec(path)?.[1];
+          if (
+            bare &&
+            (existsSync(resolve(root, bare, "index.html")) || existsSync(resolve(__dirname, bare, "index.html")))
+          ) {
+            res.statusCode = 301;
+            res.setHeader("Location", `/${bare}/${query ? `?${query}` : ""}`);
+            res.end();
+            return;
+          }
           const name = /^\/([^/]+)\/$/.exec(path)?.[1];
           /* Segment is slash-free by construction, but ".." would still climb
              out of public/ once resolve() got hold of it. */

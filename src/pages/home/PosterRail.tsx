@@ -424,7 +424,7 @@ export default function PosterRail({
                   if (geo.spread && e.currentTarget.matches(":focus-visible")) setOpen(i);
                 }}
                 onClick={(e) => go(item, e.currentTarget, e)}
-                onAuxClick={(e) => go(item, e.currentTarget, e)}
+                onAuxClick={(e) => e.button === 1 && go(item, e.currentTarget, e)}
                 {...linkProps(item)}
               >
                 {item.everything ? (
@@ -454,7 +454,7 @@ export default function PosterRail({
           tabIndex={-1}
           aria-hidden="true"
           onClick={(e) => go(current, e.currentTarget, e)}
-          onAuxClick={(e) => go(current, e.currentTarget, e)}
+          onAuxClick={(e) => e.button === 1 && go(current, e.currentTarget, e)}
           {...linkProps(current)}
         >
           {items.map((item, i) => (
@@ -488,7 +488,7 @@ export default function PosterRail({
         {/* Open: the project on screen, and the switcher. */}
         <div className="pr-bar" ref={barRef} aria-hidden={open === null}>
           <div className="pr-bar-text" ref={barTextRef}>
-            <a className="pr-title" href={current.href} tabIndex={-1} onClick={(e) => go(current, e.currentTarget, e)} onAuxClick={(e) => go(current, e.currentTarget, e)} {...linkProps(current)}>
+            <a className="pr-title" href={current.href} tabIndex={-1} onClick={(e) => go(current, e.currentTarget, e)} onAuxClick={(e) => e.button === 1 && go(current, e.currentTarget, e)} {...linkProps(current)}>
               {current.title}
             </a>
             <span className="pr-tag">

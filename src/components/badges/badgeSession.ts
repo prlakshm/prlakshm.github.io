@@ -26,7 +26,7 @@ type SessionMessage =
   | { type: "hello"; from: string }
   | { type: "snapshot"; from: string; to: string; records: BadgeRecord[] }
   | { type: "earn"; from: string; record: BadgeRecord }
-  | { type: "reset"; from: string };
+  | { type: "reset"; from: string; at?: number };
 
 type BadgeSessionOptions = {
   storage: StorageLike | null;
@@ -34,6 +34,8 @@ type BadgeSessionOptions = {
   tabId?: string;
   now?: () => number;
   makeEventId?: () => string;
+  /** Runs on every reset, this tab's or another's (to clear related keys). */
+  onReset?: () => void;
 };
 
 const randomId = () => {
@@ -70,12 +72,14 @@ const orderedUnique = (records: BadgeRecord[]) => {
 };
 
 const load = (storage: StorageLike | null) => {
-  if (!storage) return [];
+  if (!storage) return { records: [] as BadgeRecord[], resetAt: 0 };
   try {
     const value = JSON.parse(storage.getItem(SESSION_KEY) || "null");
-    return Array.isArray(value?.records) ? orderedUnique(value.records) : [];
+    const resetAt = typeof value?.resetAt === "number" ? value.resetAt : 0;
+    const records = Array.isArray(value?.records) ? orderedUnique(value.records) : [];
+    return { records: records.filter((r) => r.foundAt > resetAt), resetAt };
   } catch {
-    return [];
+    return { records: [] as BadgeRecord[], resetAt: 0 };
   }
 };
 
@@ -86,7 +90,13 @@ export function createBadgeSession(options: BadgeSessionOptions) {
   const now = options.now ?? Date.now;
   const makeEventId = options.makeEventId ?? randomId;
   const tabId = options.tabId ?? randomId();
-  let records = load(options.storage);
+  const loaded = load(options.storage);
+  let records = loaded.records;
+  // When the collection was last reset (here or in another tab). Anything
+  // found before it is stale: a snapshot another tab sent just before the
+  // reset reached it must not bring the stars back.
+  let resetAt = loaded.resetAt;
+  const fresh = (record: BadgeRecord) => record.foundAt > resetAt;
   const stateListeners = new Set<() => void>();
   const earnListeners = new Set<(event: SessionEarnEvent) => void>();
   let closed = false;
@@ -96,7 +106,7 @@ export function createBadgeSession(options: BadgeSessionOptions) {
     try {
       options.storage.setItem(
         SESSION_KEY,
-        JSON.stringify({ found: records.map(({ id }) => id), records }),
+        JSON.stringify({ found: records.map(({ id }) => id), records, resetAt }),
       );
     } catch {
       // Blocked storage still leaves a working in-memory collection.
@@ -107,13 +117,22 @@ export function createBadgeSession(options: BadgeSessionOptions) {
 
   const merge = (incoming: BadgeRecord[]) => {
     const before = records.map(({ id, eventId }) => `${id}:${eventId}`).join("|");
-    const next = orderedUnique([...records, ...incoming]);
+    const next = orderedUnique([...records, ...incoming.filter(fresh)]);
     const after = next.map(({ id, eventId }) => `${id}:${eventId}`).join("|");
     if (before === after) return false;
     records = next;
     save();
     notifyState();
     return true;
+  };
+
+  const clear = (at: number) => {
+    resetAt = Math.max(resetAt, at);
+    const had = records.length > 0;
+    records = [];
+    save();
+    options.onReset?.();
+    if (had) notifyState();
   };
 
   let channel: ChannelLike | null = null;
@@ -128,17 +147,10 @@ export function createBadgeSession(options: BadgeSessionOptions) {
       return;
     }
     if (data.type === "reset") {
-      if (!records.length) return;
-      records = [];
-      try {
-        options.storage?.removeItem(SESSION_KEY);
-      } catch {
-        // Keep the in-memory reset even when storage is blocked.
-      }
-      notifyState();
+      clear(typeof data.at === "number" ? data.at : now());
       return;
     }
-    if (data.type === "earn" && isRecord(data.record)) {
+    if (data.type === "earn" && isRecord(data.record) && fresh(data.record)) {
       const alreadyFound = records.some(({ id }) => id === data.record.id);
       if (alreadyFound) return;
       earnListeners.forEach((listener) => listener({ id: data.record.id, remote: true }));
@@ -160,7 +172,8 @@ export function createBadgeSession(options: BadgeSessionOptions) {
     getFound: () => records.map(({ id }) => id),
     earn(id: string) {
       if (records.some((record) => record.id === id)) return false;
-      const record = { id, eventId: makeEventId(), foundAt: now() };
+      // strictly after any reset, even within the same millisecond
+      const record = { id, eventId: makeEventId(), foundAt: Math.max(now(), resetAt + 1) };
       earnListeners.forEach((listener) => listener({ id, remote: false }));
       records = orderedUnique([...records, record]);
       save();
@@ -169,14 +182,10 @@ export function createBadgeSession(options: BadgeSessionOptions) {
       return true;
     },
     reset() {
-      records = [];
-      try {
-        options.storage?.removeItem(SESSION_KEY);
-      } catch {
-        // Keep the in-memory reset even when storage is blocked.
-      }
+      const at = now();
+      clear(at);
       notifyState();
-      channel?.postMessage({ type: "reset", from: tabId });
+      channel?.postMessage({ type: "reset", from: tabId, at });
     },
     subscribeState(listener: () => void) {
       stateListeners.add(listener);

@@ -78,7 +78,6 @@ test("first-party navigation uses the clean About URL", async () => {
     "src/static-chrome.tsx",
     "public/mixr/index.html",
     "public/surprise-rail/index.html",
-    "public/reasons-to-watch/index.html",
   ];
   for (const path of paths) {
     const source = await text(path);

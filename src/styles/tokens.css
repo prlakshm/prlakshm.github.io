@@ -105,11 +105,43 @@
   --dur-hover: 620ms;
   --dur-leave: 460ms;
   --dur-nav: 180ms;
+  /* Entrances: the case studies' reveal (public/mixr .rv), shared by Home and
+     About. One curve (--ease-settle), one duration, a small rise. */
+  --enter-dur: 0.72s;
+  --enter-rise: 16px;
+  --enter-step: 0.09s;
+  --enter-dur-slow: 1.1s; /* big blocks of art (the poster wall) */
+}
+
+/* A block that comes in once, when it scrolls into view (src/motion/reveal.ts
+   adds .is-in). Hidden from the first paint, so nothing flashes; CSS
+   transitions run off the main thread. html raises it over rules that reset
+   transition on the same elements (app.css a, gallery.css .gl-card). */
+html .enter {
+  opacity: 0;
+  transform: translateY(var(--enter-rise));
+  transition:
+    opacity var(--enter-dur) var(--ease-settle),
+    transform var(--enter-dur) var(--ease-settle);
+}
+html .enter.is-in {
+  opacity: 1;
+  transform: none;
+}
+/* Big, dark blocks (the posters) are a large change on the light page: they
+   take longer, so they glide in instead of popping. */
+html .enter.enter--slow {
+  transition-duration: var(--enter-dur-slow);
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root {
     --dur-hover: 160ms;
     --dur-leave: 160ms;
+  }
+  /* fewer, gentler: keep the fade, drop the rise */
+  html .enter {
+    transform: none;
+    transition: opacity 0.2s ease;
   }
 }

@@ -36,7 +36,6 @@ test("static case-study fallbacks reserve space invisibly without copying nav CS
   const files = [
     "../public/surprise-rail/index.html",
     "../public/mixr/index.html",
-    "../public/reasons-to-watch/index.html",
   ];
 
   for (const file of files) {

@@ -246,7 +246,7 @@ function WorkCard({ work, variant }: { work: Work; variant: CardVariant }) {
       ref={cardRef}
       href={work.href}
       onClick={onOpen}
-      onAuxClick={onOpen}
+      onAuxClick={(e) => e.button === 1 && onOpen(e)}
       {...(work.external ? { target: "_blank", rel: "noreferrer" } : {})}
     >
       <div

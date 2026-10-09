@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { animate } from "motion";
-import { decoded, enterOnView, fontsReady, lineCount, type Step } from "../../motion/entrance.js";
+import { revealOnView } from "../../motion/reveal.js";
 import "../../styles/tokens.css";
 import "./home.css";
 import ContactIcons from "./ContactIcons.js";
@@ -29,39 +29,28 @@ function Home() {
     if (wantsWork) scrollToId("work");
   }, [pathname, state]);
 
-  /* The hero reads as one composed reveal: copy begins first, the above-fold
-     poster rail joins while the second subheading line is arriving, and the
-     contact row closes the sequence. A wall below the fold still waits until
-     it is seen. Hidden before paint; cleanup always leaves everything at rest. */
-  useLayoutEffect(() => {
+  /* Entrance, the case studies' way (src/motion/reveal.ts): the hero comes in
+     as one block, then the poster wall in chunks: each section (its placard
+     and prints) arrives together, the next a step later, never print by
+     print. The wall is big, so it glides slower (.enter--slow) and waits for
+     all its images first. Hidden by CSS (.enter) from the first paint;
+     nothing waits for fonts. */
+  useEffect(() => {
     const hero = heroRef.current;
-    if (!hero || prefersReducedMotion()) return;
-
-    const title = hero.querySelector<HTMLElement>(".hero-title");
-    const sub = Array.from(hero.querySelectorAll<HTMLElement>(".line"));
-    const contacts = Array.from(hero.querySelectorAll<HTMLElement>(".wt-tiles--hero"));
+    const block = hero?.querySelector<HTMLElement>(".hero-block");
+    if (!hero || !block) return;
     const wall = Array.from(document.querySelectorAll<HTMLElement>(".gl-placard, .gl-card"));
-    const wallRoot = wall[0]?.closest<HTMLElement>(".gl-wall") ?? null;
-    const aboveFold = !!wallRoot && wallRoot.getBoundingClientRect().top < window.innerHeight * 0.9;
-    const heroSteps = (): Step[] => {
-      const out: Step[] = [];
-      if (title) out.push({ el: title, beats: lineCount(title), at: 0 });
-      if (sub.length) out.push({ el: sub, rows: true, at: 0.14 });
-      if (aboveFold && wall.length) out.push({ el: wall, rows: 0.04, large: true, at: 0.26 });
-      if (contacts.length) out.push({ el: contacts, at: 0.4 });
-      return out;
-    };
-    const stops = [enterOnView(hero, heroSteps, () => fontsReady())];
-
-    // If the rail begins below the opening composition, reveal it on view.
-    if (wall.length && !aboveFold)
-      stops.push(
-        enterOnView(wallRoot ?? wall[0], () => [{ el: wall, rows: 0.04, large: true }], () =>
-          decoded(Array.from(document.querySelectorAll<HTMLImageElement>(".gl-print img")), 250)
-        )
-      );
-
-    return () => stops.forEach((stop) => stop());
+    const images = Array.from(document.querySelectorAll<HTMLImageElement>(".gl-print img"));
+    const groups = Array.from(document.querySelectorAll<HTMLElement>(".gl-group"));
+    // the wall follows the hero by one step when they come in together
+    const withHero = wall.length > 0 && wall[0].getBoundingClientRect().top < window.innerHeight * 0.9;
+    return revealOnView([
+      { el: block },
+      ...wall.map((el) => {
+        const section = groups.indexOf(el.closest<HTMLElement>(".gl-group")!);
+        return { el, delay: (withHero ? 0.09 : 0) + Math.max(0, section) * 0.15, image: images };
+      }),
+    ]);
   }, []);
 
   /* Underline wipes (nav links + the @handle) and the pronunciation tooltip.
@@ -223,7 +212,7 @@ function Home() {
           {/* hero-block width is driven only by the title; intro uses
               width:0;min-width:100% so it shares those left/right edges
               without expanding the block past the title. */}
-          <div className="hero-block">
+          <div className="hero-block enter">
             <h1 className="hero-title">
               hi, i&rsquo;m pranavi ram
               <span className="hero-title-gold hero-title-gold--auto" aria-hidden="true">hi, i&rsquo;m pranavi ram</span>
