@@ -332,39 +332,316 @@
     "deck-p-6"
   ],
   "names": {
-    "sr-poster": "Case Study Poster \u00b7 1",
-    "mixr-poster": "Case Study Poster \u00b7 2",
-    "pin-poster": "Case Study Poster \u00b7 3",
-    "fs-poster": "Case Study Poster \u00b7 4",
-    "codex-poster": "Case Study Poster \u00b7 5",
+    "sr-poster": "Case Study Poster · 1",
+    "mixr-poster": "Case Study Poster · 2",
+    "pin-poster": "Case Study Poster · 3",
+    "fs-poster": "Case Study Poster · 4",
+    "codex-poster": "Case Study Poster · 5",
     "fs-film": "Figma Sound",
     "fs-girl": "Girl Animation Loop",
-    "cursor-1": "Cursor Loves Indie \u00b7 1",
-    "cursor-2": "Cursor Loves Indie \u00b7 2",
-    "cursor-3": "Cursor Loves Indie \u00b7 3",
-    "cursor-4": "Cursor Loves Indie \u00b7 4",
-    "cursor-5": "Cursor Loves Indie \u00b7 5",
-    "cursor-6": "Cursor Loves Indie \u00b7 6",
-    "cursor-7": "Cursor Loves Indie \u00b7 7",
-    "cursor-8": "Cursor Loves Indie \u00b7 8",
-    "cursor-9": "Cursor Loves Indie \u00b7 9",
-    "deck-p-1": "Lilac Deck Template \u00b7 1",
-    "deck-p-2": "Lilac Deck Template \u00b7 2",
-    "deck-p-3": "Lilac Deck Template \u00b7 3",
-    "deck-p-4": "Lilac Deck Template \u00b7 4",
-    "deck-p-5": "Lilac Deck Template \u00b7 5",
-    "deck-w-1": "Black & White Deck Template \u00b7 1",
-    "deck-w-2": "Black & White Deck Template \u00b7 2",
-    "deck-w-3": "Black & White Deck Template \u00b7 3",
-    "deck-w-4": "Black & White Deck Template \u00b7 4",
-    "deck-w-5": "Black & White Deck Template \u00b7 5",
-    "deck-w-6": "Black & White Deck Template \u00b7 6",
-    "deck-w-7": "Black & White Deck Template \u00b7 7",
-    "deck-w-8": "Black & White Deck Template \u00b7 8",
-    "deck-w-9": "Black & White Deck Template \u00b7 9",
+    "cursor-1": "Cursor Loves Indie · 1",
+    "cursor-2": "Cursor Loves Indie · 2",
+    "cursor-3": "Cursor Loves Indie · 3",
+    "cursor-4": "Cursor Loves Indie · 4",
+    "cursor-5": "Cursor Loves Indie · 5",
+    "cursor-6": "Cursor Loves Indie · 6",
+    "cursor-7": "Cursor Loves Indie · 7",
+    "cursor-8": "Cursor Loves Indie · 8",
+    "cursor-9": "Cursor Loves Indie · 9",
+    "deck-p-1": "Lilac Deck Template · 1",
+    "deck-p-2": "Lilac Deck Template · 2",
+    "deck-p-3": "Lilac Deck Template · 3",
+    "deck-p-4": "Lilac Deck Template · 4",
+    "deck-p-5": "Lilac Deck Template · 5",
+    "deck-w-1": "Black & White Deck Template · 1",
+    "deck-w-2": "Black & White Deck Template · 2",
+    "deck-w-3": "Black & White Deck Template · 3",
+    "deck-w-4": "Black & White Deck Template · 4",
+    "deck-w-5": "Black & White Deck Template · 5",
+    "deck-w-6": "Black & White Deck Template · 6",
+    "deck-w-7": "Black & White Deck Template · 7",
+    "deck-w-8": "Black & White Deck Template · 8",
+    "deck-w-9": "Black & White Deck Template · 9",
     "tx-1-original": "Swan Midjourney Image",
     "tx-2-original": "Fruit Midjourney Image",
     "tx-3-original": "Tulip Midjourney Image",
     "gsc-alts": "Alternative Objects"
+  },
+  "phone": {
+    "petal-1": {
+      "x": 207,
+      "y": 710,
+      "w": 258
+    },
+    "petal-2": {
+      "x": 496,
+      "y": 710,
+      "w": 258
+    },
+    "petal-3": {
+      "x": 785,
+      "y": 710,
+      "w": 258
+    },
+    "petal-4": {
+      "x": 1074,
+      "y": 710,
+      "w": 258
+    },
+    "shell-1": {
+      "x": -331,
+      "y": 1343,
+      "w": 258
+    },
+    "shell-2": {
+      "x": -42,
+      "y": 1343,
+      "w": 258
+    },
+    "shell-3": {
+      "x": 247,
+      "y": 1343,
+      "w": 258
+    },
+    "shell-5": {
+      "x": 536,
+      "y": 1343,
+      "w": 258
+    },
+    "tx-1-original": {
+      "x": -1371,
+      "y": -734,
+      "w": 224
+    },
+    "tx-1": {
+      "x": -1115,
+      "y": -734,
+      "w": 224
+    },
+    "tx-2-original": {
+      "x": -1371,
+      "y": -553,
+      "w": 224
+    },
+    "tx-2": {
+      "x": -1115,
+      "y": -553,
+      "w": 224
+    },
+    "tx-3": {
+      "x": -1115,
+      "y": -372,
+      "w": 224
+    },
+    "tx-3-original": {
+      "x": -1371,
+      "y": -372,
+      "w": 224
+    },
+    "cursor-1": {
+      "x": -1398,
+      "y": 1063,
+      "w": 312
+    },
+    "cursor-2": {
+      "x": -1055,
+      "y": 1063,
+      "w": 312
+    },
+    "cursor-3": {
+      "x": -1398,
+      "y": 1269,
+      "w": 312
+    },
+    "cursor-4": {
+      "x": -1055,
+      "y": 1269,
+      "w": 312
+    },
+    "cursor-5": {
+      "x": -1398,
+      "y": 1476,
+      "w": 312
+    },
+    "cursor-6": {
+      "x": -1055,
+      "y": 1476,
+      "w": 312
+    },
+    "cursor-7": {
+      "x": -1398,
+      "y": 1683,
+      "w": 312
+    },
+    "cursor-8": {
+      "x": -1055,
+      "y": 1683,
+      "w": 312
+    },
+    "cursor-9": {
+      "x": -1398,
+      "y": 1890,
+      "w": 312
+    },
+    "deck-p-1": {
+      "x": -224,
+      "y": 1876,
+      "w": 246
+    },
+    "deck-p-2": {
+      "x": 54,
+      "y": 1876,
+      "w": 246
+    },
+    "deck-p-3": {
+      "x": -224,
+      "y": 2047,
+      "w": 246
+    },
+    "deck-p-4": {
+      "x": 54,
+      "y": 2047,
+      "w": 246
+    },
+    "deck-p-5": {
+      "x": -224,
+      "y": 2216,
+      "w": 246
+    },
+    "deck-w-1": {
+      "x": 435,
+      "y": 1876,
+      "w": 246
+    },
+    "deck-w-2": {
+      "x": 712,
+      "y": 1876,
+      "w": 246
+    },
+    "deck-w-3": {
+      "x": 990,
+      "y": 1876,
+      "w": 246
+    },
+    "deck-w-4": {
+      "x": 435,
+      "y": 2047,
+      "w": 246
+    },
+    "deck-w-5": {
+      "x": 712,
+      "y": 2047,
+      "w": 246
+    },
+    "deck-w-6": {
+      "x": 990,
+      "y": 2047,
+      "w": 246
+    },
+    "deck-w-9": {
+      "x": 990,
+      "y": 2216,
+      "w": 246
+    },
+    "deck-w-8": {
+      "x": 712,
+      "y": 2216,
+      "w": 246
+    },
+    "deck-w-7": {
+      "x": 435,
+      "y": 2216,
+      "w": 246
+    },
+    "gsc-alts": {
+      "x": -1081,
+      "y": -1510,
+      "w": 459
+    },
+    "gsc-promo": {
+      "x": -512,
+      "y": -1458,
+      "w": 616
+    },
+    "sq-pom": {
+      "x": -1390,
+      "y": -1214,
+      "w": 190
+    },
+    "sq-giraffe": {
+      "x": -1169,
+      "y": -1214,
+      "w": 190
+    },
+    "sq-rocket": {
+      "x": -947,
+      "y": -1214,
+      "w": 190
+    },
+    "sr-poster": {
+      "x": -1226,
+      "y": -2362,
+      "w": 224
+    },
+    "mixr-poster": {
+      "x": -970,
+      "y": -2362,
+      "w": 224
+    },
+    "pin-poster": {
+      "x": -715,
+      "y": -2362,
+      "w": 224
+    },
+    "fs-poster": {
+      "x": -460,
+      "y": -2362,
+      "w": 224
+    },
+    "codex-poster": {
+      "x": -204,
+      "y": -2362,
+      "w": 224
+    },
+    "mixr-plain": {
+      "x": -970,
+      "y": -2050,
+      "w": 224
+    },
+    "codex-flag": {
+      "x": -204,
+      "y": -2050,
+      "w": 224
+    },
+    "codex-peekaboo": {
+      "x": 51,
+      "y": -2050,
+      "w": 224
+    },
+    "codex-tabs": {
+      "x": 306,
+      "y": -2050,
+      "w": 224
+    },
+    "codex-app-icon": {
+      "x": 562,
+      "y": -2050,
+      "w": 224
+    },
+    "fs-film": {
+      "x": 529,
+      "y": -1529,
+      "w": 573
+    },
+    "fs-storyboard": {
+      "x": 771,
+      "y": -1139,
+      "w": 863
+    },
+    "fs-girl": {
+      "x": 976,
+      "y": -1529,
+      "w": 258
+    }
   }
 }

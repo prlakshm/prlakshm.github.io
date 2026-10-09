@@ -7,7 +7,7 @@ import "./gallery.css";
 import WtNav from "../home/WtNav.js";
 import { prefersReducedMotion } from "../home/interactions.js";
 import { earn } from "../../components/badges/badgeStore.js";
-import { BAGEL, PIECES, applyLayout, pieceBounds, type Layout, type Piece } from "./clusters.js";
+import { BAGEL, PIECES, applyLayout, applyPhone, pieceBounds, portraitLayout, type Layout, type Piece } from "./clusters.js";
 import SAVED from "./layout.json";
 import Sheet from "./Sheet.js";
 
@@ -57,7 +57,27 @@ export default function Gallery() {
   const bagelCheck = useRef<(x: number, y: number) => void>(() => {});
   const [layout, setLayout] = useState<Layout>(SAVED as Layout);
   const [selected, setSelected] = useState<string[]>([]);
-  const pieces = useMemo(() => applyLayout(PIECES, layout), [layout]);
+  // phones (portrait): the same clusters re-stacked taller round the bagel
+  const PORTRAIT = "(orientation: portrait) and (max-width: 900px)";
+  const [portrait, setPortrait] = useState(() => typeof window !== "undefined" && window.matchMedia(PORTRAIT).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(PORTRAIT);
+    const on = () => setPortrait(mq.matches);
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+  const arranged = useMemo(() => applyLayout(PIECES, layout), [layout]);
+  const pieces = useMemo(
+    () => (portrait ? applyPhone(portraitLayout(arranged), layout.phone) : arranged),
+    [portrait, arranged, layout.phone],
+  );
+  // how far each piece was moved for the portrait arrangement, so a drop or
+  // resize there is stored in the saved (desktop) layout's own coordinates
+  const shift = useMemo(() => {
+    const m: Record<string, { dx: number; dy: number }> = {};
+    pieces.forEach((p, i) => (m[p.id] = { dx: p.x - arranged[i].x, dy: p.y - arranged[i].y }));
+    return m;
+  }, [pieces, arranged]);
   const [sheet, setSheet] = useState(SHEET);
   useEffect(() => {
     if (!DEV) return;
@@ -67,8 +87,8 @@ export default function Gallery() {
   }, []);
 
   // the effect below is mounted once; it reads the latest state through refs
-  const live = useRef({ pieces, layout, selected });
-  live.current = { pieces, layout, selected };
+  const live = useRef({ pieces, layout, selected, shift, portrait });
+  live.current = { pieces, layout, selected, shift, portrait };
   const history = useRef<Layout[]>([]);
 
   const commit = (next: Layout) => {
@@ -241,8 +261,16 @@ export default function Gallery() {
     const fit = () => {
       const b = pieceBounds(live.current.pieces);
       const r = view.getBoundingClientRect();
-      const side = 48, top = 48, bottom = 12;
-      const zw = (r.width - side * 2) / b.w, zh = (r.height - top - bottom) / b.h;
+      // a phone's star card and INDEX take more of the top
+      const phone = window.matchMedia("(orientation: portrait) and (max-width: 900px)").matches;
+      // on a phone: equal space between the nav's bottom edge and the canvas,
+      // and between the canvas and the bottom of the screen
+      const navBottom = phone ? Math.max(56, document.querySelector(".wt-nav")?.getBoundingClientRect().bottom ?? 72) : 0;
+      const side = phone ? 24 : 48, top = phone ? navBottom + 20 : 48, bottom = phone ? 20 : 12;
+      // a phone holds the bagel at a fixed spot, so it fits each side of that
+      // line separately rather than the whole width
+      const PX = 0.535; // the bagel's spot across a phone (see cam.x below)
+      const zw = phone ? Math.min((r.width * PX - side) / Math.max(1, -b.x), (r.width * (1 - PX) - side) / Math.max(1, b.x + b.w)) : (r.width - side * 2) / b.w, zh = (r.height - top - bottom) / b.h;
       const z = Math.min(Z_MAX, Math.max(Z_MIN, Math.min(zw, zh) * 0.953));
       // bagel (world 0, 0) at its spot, then keep the whole canvas in view
       const keepIn = (want: number, lo: number, size: number, min: number, max: number) => {
@@ -253,8 +281,12 @@ export default function Gallery() {
         return want;
       };
       cam.z = z;
-      cam.x = keepIn(r.width * BAGEL_AT.x, b.x, b.w, side, r.width - side);
-      cam.y = keepIn(r.height * BAGEL_AT.y, b.y, b.h, top, r.height - bottom);
+      // phone: a touch right of centre too, since the bagel and its burst read
+      // as leaning toward the exclamation
+      cam.x = keepIn(r.width * (phone ? PX : BAGEL_AT.x), b.x, b.w, side, r.width - side);
+      cam.y = phone
+        ? navBottom + (r.height - navBottom - b.h * z) / 2 - b.y * z // centred in the space under the nav
+        : keepIn(r.height * BAGEL_AT.y, b.y, b.h, top, r.height - bottom);
       draw();
     };
 
@@ -352,11 +384,19 @@ export default function Gallery() {
         return;
       }
       const { layout: l, pieces: ps } = live.current;
+      if (live.current.portrait) {
+        // on a phone-shaped screen, moves are the phone arrangement's own
+        const phone = { ...(l.phone ?? {}) };
+        c.held.forEach((hd) => (phone[hd.id] = { x: Math.round(hd.px + c.wx), y: Math.round(hd.py + c.wy), w: Math.round(hd.w) }));
+        commit({ ...l, phone });
+        return;
+      }
       let z = Math.max(...ps.map((q) => q.z)); // what you just moved lands on top, in its own order
       const items = { ...l.items };
       [...c.held].sort((a, b) => (ps.find((q) => q.id === a.id)?.z ?? 0) - (ps.find((q) => q.id === b.id)?.z ?? 0)).forEach((hd) => {
         // keep anything else saved for it (a resized width)
-        items[hd.id] = { ...items[hd.id], x: Math.round(hd.px + c.wx), y: Math.round(hd.py + c.wy), z: ++z };
+        const sh = live.current.shift[hd.id] ?? { dx: 0, dy: 0 };
+        items[hd.id] = { ...items[hd.id], x: Math.round(hd.px + c.wx - sh.dx), y: Math.round(hd.py + c.wy - sh.dy), z: ++z };
       });
       commit({ ...l, items });
     };
@@ -534,7 +574,12 @@ export default function Gallery() {
         view.classList.remove("is-resizing");
         clearGuides();
         const l = live.current.layout, q = live.current.pieces.find((x) => x.id === rz.id);
-        if (q && Math.abs(rz.w - q.w) > 0.5) commit({ ...l, items: { ...l.items, [rz.id]: { x: Math.round(rz.x), y: Math.round(rz.y), z: q.z, w: Math.round(rz.w) } } });
+        const sh = live.current.shift[rz.id] ?? { dx: 0, dy: 0 };
+        if (q && Math.abs(rz.w - q.w) > 0.5 && live.current.portrait) {
+          commit({ ...l, phone: { ...(l.phone ?? {}), [rz.id]: { x: Math.round(rz.x), y: Math.round(rz.y), w: Math.round(rz.w) } } });
+          return;
+        }
+        if (q && Math.abs(rz.w - q.w) > 0.5) commit({ ...l, items: { ...l.items, [rz.id]: { x: Math.round(rz.x - sh.dx), y: Math.round(rz.y - sh.dy), z: q.z, w: Math.round(rz.w) } } });
         return;
       }
       const wasPan = !carry && pointers.size === 1;
@@ -564,7 +609,7 @@ export default function Gallery() {
       switch (e.key) {
         case "Escape": setSelected([]); return;
         case "Delete": case "Backspace":
-          if (DEV && sel.length) {
+          if (DEV && sel.length && !live.current.portrait) { // removing is a desktop decision
             const l = live.current.layout;
             commit({ items: Object.fromEntries(Object.entries(l.items).filter(([k]) => !sel.includes(k))), deleted: [...l.deleted, ...sel] });
             setSelected([]);
@@ -629,6 +674,12 @@ export default function Gallery() {
     window.addEventListener("pageshow", onShow);
     return () => window.removeEventListener("pageshow", onShow);
   }, []);
+
+  // turning the phone swaps arrangements: frame the new one
+  useEffect(() => {
+    touched.current = false;
+    fitRef.current();
+  }, [portrait]);
 
   useEffect(() => {
     if (!touched.current) fitRef.current();

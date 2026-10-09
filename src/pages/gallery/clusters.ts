@@ -221,7 +221,19 @@ export type Layout = {
   items: Record<string, { x: number; y: number; z: number; w?: number }>;
   deleted: string[];
   names?: Record<string, string>; // renamed on the contact sheet (/gallery/#sheet)
+  phone?: Record<string, { x: number; y: number; w?: number }>; // placed by hand on a phone-shaped screen
 };
+
+// pieces she placed by hand in the phone arrangement keep exactly that spot
+export function applyPhone(list: Piece[], phone: Layout["phone"]): Piece[] {
+  if (!phone) return list;
+  return list.map(p => {
+    const o = phone[p.id];
+    if (!o) return p;
+    const w = o.w ?? p.w;
+    return { ...p, x: o.x, y: o.y, w, h: w * p.aspect };
+  });
+}
 
 // a saved width resizes the piece with its proportions kept; a saved name
 // replaces the default one
@@ -241,4 +253,96 @@ export function pieceBounds(list: Piece[]) {
   const x0 = Math.min(...all.map(p => p.x - p.w / 2)), x1 = Math.max(...all.map(p => p.x + p.w / 2));
   const y0 = Math.min(...all.map(p => p.y - p.h / 2)), y1 = Math.max(...all.map(p => p.y + p.h / 2));
   return { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+}
+
+/* PHONES (portrait): the desktop arrangement is wide, so phones get their own,
+   placed by hand on a phone-shaped screen and saved in layout.json (phone).
+   Anything not placed there (a piece added later) falls back to the
+   composition below: every cluster at 56%, the bagel at full size, hung on
+   the bagel's centre line. */
+const GROUP_OF = (id: string) =>
+  /^(sr-|mixr-|pin-|fs-poster|codex-)/.test(id) ? "case"
+  : /^(gsc-|sq-)/.test(id) ? "gsc"
+  : /^fs-/.test(id) ? "fs"
+  : /^tx-/.test(id) ? "tx"
+  : /^petal-/.test(id) ? "petal"
+  : /^shell-/.test(id) ? "shell"
+  : /^cursor-/.test(id) ? "cursor"
+  : /^deck-/.test(id) ? "decks"
+  : "other";
+
+/* Her phone composition (from J): everything hangs on the bagel's centre line.
+     case-study posters                 (centred)
+     Girls Should Cook · Figma Sound    (centred pair)
+                [ the bagel ]           (centred)
+     textile  |  petal                  (either side of the centre line)
+     Cursor ┐   seashell posters        (seashells offset right; Cursor rises
+            │   deck templates           into the notch they leave, decks
+            ┘                            tucked under the seashells) */
+function framedLayout(list: Piece[]): Piece[] {
+  const G = 260;
+  type B = { l: number; t: number; r: number; b: number };
+  const box: Record<string, B> = {};
+  for (const p of list) {
+    const g = GROUP_OF(p.id), o = box[g], l = p.x - p.w / 2, t = p.y - p.h / 2, r = p.x + p.w / 2, bt = p.y + p.h / 2;
+    box[g] = o ? { l: Math.min(o.l, l), t: Math.min(o.t, t), r: Math.max(o.r, r), b: Math.max(o.b, bt) } : { l, t, r, b: bt };
+  }
+  const W = (g: string) => (box[g] ? box[g].r - box[g].l : 0), H = (g: string) => (box[g] ? box[g].b - box[g].t : 0);
+  const bh = (BAGEL.w * BAGEL.aspect) / 2;
+  const to: Record<string, { x: number; y: number }> = {}; // new top-left
+  // above the bagel, centred
+  const pairW = W("gsc") + G + W("fs"), pairH = Math.max(H("gsc"), H("fs"));
+  let y = -bh - G - pairH;
+  to.gsc = { x: -pairW / 2, y: y + (pairH - H("gsc")) / 2 };
+  to.fs = { x: -pairW / 2 + W("gsc") + G, y: y + (pairH - H("fs")) / 2 };
+  to.case = { x: -W("case") / 2, y: y - G - H("case") };
+  // below: textile and petal either side of the centre line, tops level
+  y = bh + G;
+  to.tx = { x: -G / 2 - W("tx"), y };
+  to.petal = { x: G / 2, y };
+  y += Math.max(H("tx"), H("petal")) + G;
+  // seashells offset right; Cursor rises into the notch on their left
+  const shellL = -W("shell") / 2 + W("shell") * 0.3;
+  to.shell = { x: shellL, y };
+  to.cursor = { x: shellL - G - W("cursor"), y };
+  to.decks = { x: shellL, y: y + H("shell") + G };
+  /* Settle toward the bagel: the bagel's frame has two empty corners (its
+     body fills the bottom-left, the burst the top-right), so clusters above
+     slide down and clusters below slide up, nearest first, each until it
+     meets the bagel's actual shapes or a cluster already settled. */
+  const bw = BAGEL.w, bH = BAGEL.w * BAGEL.aspect, L0 = -bw / 2, T0 = -bH / 2;
+  // body and burst, as fractions of the bagel image (bagel-body/-shout.webp)
+  const shapes: B[] = [
+    { l: L0, t: T0 + bH * 0.348, r: L0 + bw * 0.5, b: T0 + bH },
+    { l: L0 + bw * 0.293, t: T0, r: L0 + bw, b: T0 + bH * 0.561 },
+  ];
+  const rectOf = (g: string): B => ({ l: to[g].x, t: to[g].y, r: to[g].x + W(g), b: to[g].y + H(g) });
+  const hits = (a: B, o: B, gap: number) => a.l < o.r + gap && a.r > o.l - gap && a.t < o.b + gap && a.b > o.t - gap;
+  const settled: B[] = [...shapes];
+  const settle = (g: string, dir: 1 | -1) => {
+    if (!to[g]) return;
+    const others = settled.filter(o => !shapes.includes(o));
+    for (let i = 0; i < 400; i++) {
+      to[g].y += dir * 10;
+      const r = rectOf(g);
+      if (shapes.some(o => hits(r, o, G * 0.6)) || others.some(o => hits(r, o, G))) { to[g].y -= dir * 10; break; }
+    }
+    settled.push(rectOf(g));
+  };
+  for (const g of ["gsc", "fs", "case"]) settle(g, 1);
+  for (const g of ["tx", "petal", "shell", "cursor", "decks"]) settle(g, -1);
+  return list.map(p => {
+    const g = GROUP_OF(p.id), b = box[g], t = to[g];
+    return b && t ? { ...p, x: p.x + t.x - b.l, y: p.y + t.y - b.t } : p;
+  });
+}
+
+const PHONE_SCALE = 0.56;
+
+export function portraitLayout(list0: Piece[]): Piece[] {
+  // clusters shrink about their own top-left; the bagel keeps its size
+  const tl: Record<string, { l: number; t: number }> = {};
+  for (const p of list0) { const g = GROUP_OF(p.id), l = p.x - p.w / 2, t = p.y - p.h / 2; tl[g] = tl[g] ? { l: Math.min(tl[g].l, l), t: Math.min(tl[g].t, t) } : { l, t }; }
+  const s = PHONE_SCALE;
+  return framedLayout(list0.map(p => { const o = tl[GROUP_OF(p.id)]; return { ...p, x: o.l + (p.x - o.l) * s, y: o.t + (p.y - o.t) * s, w: p.w * s, h: p.h * s }; }));
 }
