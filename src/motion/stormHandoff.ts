@@ -6,10 +6,18 @@
    the storm (everything/index.html + gallery.css). Both pages have to opt in,
    so this opts every page in, then cancels the transition for any other
    destination: only the way into Everything changes; every other navigation
-   is exactly as it was. Browsers without cross-page transitions (Firefox,
-   for now) just load the page and the storm plays over a blank canvas. */
+   is exactly as it was.
+   Desktop Chromium only, the same test as everything/index.html (keep the
+   two in step): on iPhones the storm ran Safari out of memory, and
+   everywhere else the canvas simply loads with no transition at all. */
 
-if (typeof document !== "undefined" && !document.getElementById("gx-vt-optin")) {
+const stormable = () => {
+  const ua = navigator.userAgent;
+  return /Chrome\//.test(ua) && !/Mobile|Android|CriOS|FxiOS|EdgiOS/.test(ua)
+    && matchMedia("(pointer: fine) and (min-width: 1024px)").matches;
+};
+
+if (typeof document !== "undefined" && !document.getElementById("gx-vt-optin") && stormable()) {
   const style = document.createElement("style");
   style.id = "gx-vt-optin";
   style.textContent = "@view-transition { navigation: auto; }";
