@@ -565,6 +565,11 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
   const confetti = useCallback(() => {
     [popRef.current, miniRef.current].forEach((root) => {
       const svg = root?.querySelector<SVGSVGElement>(".bc-popper") ?? null;
+      // tuck the confetti into the mouth now, so the popper's first frame is
+      // the start of the burst, never the finished confetti for a beat
+      svg?.querySelectorAll<SVGGElement>(".bc-bit").forEach((bit) => {
+        animate(bit, { x: MOUTH.x - Number(bit.dataset.x), y: MOUTH.y - Number(bit.dataset.y), scale: 0.2, opacity: 0 }, { duration: 0 });
+      });
       window.setTimeout(() => popConfetti(svg, true), 250);
     });
   }, []);
