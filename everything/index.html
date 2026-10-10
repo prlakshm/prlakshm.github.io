@@ -29,21 +29,28 @@
          came from. Not on a reload or Back/Forward. Decided here, before the
          first frame, so nothing flashes in place first. ?slow=4 plays it in
          slow motion.
-         Desktop Chromium only (Chrome, Edge, Arc, Brave): ~60 tiles flying
-         close to the camera in 3D become huge GPU layers, and on iPhones that
-         ran Safari out of memory (the page crashed and reloaded in a loop).
-         Everyone else simply gets the canvas. Keep in step with
-         src/motion/stormHandoff.ts. -->
+         Everywhere but Firefox, on one clock. Desktop Chromium (Chrome, Edge,
+         Arc) draws it in real 3D; Safari and every phone or tablet get the
+         same flight drawn flat (gx-storm-flat): in WebKit the 3D tiles became
+         huge layers and ran iPhones out of memory (the page crashed and
+         reloaded in a loop). The sweep of the page you came from is a
+         cross-page view transition, Chromium only: Safari freezes the
+         arriving page into a still during one, so the whole fly-in happened
+         unseen behind it; there the pieces fly in over the cool white
+         instead. Keep in step with src/motion/stormHandoff.ts. -->
     <script>
       (function () {
         var d = document.documentElement;
         var ua = navigator.userAgent;
-        var able = /Chrome\//.test(ua) && !/Mobile|Android|CriOS|FxiOS|EdgiOS/.test(ua)
+        var able = !/Firefox\/|FxiOS/.test(ua);
+        var deep = /Chrome\//.test(ua) && !/Mobile|Android|CriOS|EdgiOS/.test(ua)
           && matchMedia("(pointer: fine) and (min-width: 1024px)").matches;
         var nav = performance.getEntriesByType("navigation")[0];
         var storm = able && (!nav || nav.type === "navigate") && !matchMedia("(prefers-reduced-motion: reduce)").matches;
-        if (able) { var vt = document.createElement("style"); vt.textContent = "@view-transition { navigation: auto; }"; document.head.appendChild(vt); }
+        var chromium = /Chrome\//.test(ua);
+        if (able && chromium) { var vt = document.createElement("style"); vt.textContent = "@view-transition { navigation: auto; }"; document.head.appendChild(vt); }
         if (storm) d.classList.add("gx-storm", "gx-storm-air");
+        if (storm && !deep) d.classList.add("gx-storm-flat");
         var slow = parseFloat(new URLSearchParams(location.search).get("slow")) || 1;
         d.style.setProperty("--gx-slow", String(slow));
         addEventListener("pagereveal", function (e) {

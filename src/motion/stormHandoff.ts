@@ -7,15 +7,12 @@
    so this opts every page in, then cancels the transition for any other
    destination: only the way into Everything changes; every other navigation
    is exactly as it was.
-   Desktop Chromium only, the same test as everything/index.html (keep the
-   two in step): on iPhones the storm ran Safari out of memory, and
-   everywhere else the canvas simply loads with no transition at all. */
+   Chromium only (Chrome, Edge, Arc; desktop and Android), the same test as
+   everything/index.html; keep the two in step. Safari freezes the arriving
+   page into a still during a cross-page transition, which hid the storm's
+   whole fly-in, so there the storm plays without the sweep. */
 
-const stormable = () => {
-  const ua = navigator.userAgent;
-  return /Chrome\//.test(ua) && !/Mobile|Android|CriOS|FxiOS|EdgiOS/.test(ua)
-    && matchMedia("(pointer: fine) and (min-width: 1024px)").matches;
-};
+const stormable = () => /Chrome\//.test(navigator.userAgent);
 
 if (typeof document !== "undefined" && !document.getElementById("gx-vt-optin") && stormable()) {
   const style = document.createElement("style");
