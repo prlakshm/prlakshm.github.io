@@ -67,15 +67,31 @@ export function mountPortraitPop(fig: HTMLElement, photo: HTMLElement, reduced: 
     return { p, el, inner, lit, imgs, tucked, open };
   });
 
-  // The sprites wait until the page has settled (or the first hover), so the
-  // frame never competes with the manifesto and portrait for the first paint.
+  // The sprites (58 images) wait until the portrait has come in and the page
+  // is idle (or the first hover or tap), so they never load in the middle of
+  // its entrance: on a fixed 1.6s timer they landed mid-way through it on
+  // phones, where the portrait comes in as it's scrolled to, and it stuttered.
   let loaded = false;
   const load = () => {
     if (loaded) return;
     loaded = true;
     pieces.forEach((q) => q.imgs.forEach((i) => (i.el.src = i.src)));
   };
-  const idle = window.setTimeout(load, 1600);
+  let idle = 0;
+  const ENTRANCE_MS = 1700; // the portrait's develop (about.css), and a beat
+  const whenIdle = () => {
+    const ric = (window as unknown as { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+    if (ric) ric(load, { timeout: 2000 });
+    else load();
+  };
+  const settled = () => { idle = window.setTimeout(whenIdle, ENTRANCE_MS); };
+  const entered = new MutationObserver(() => {
+    if (!fig.classList.contains("is-in")) return;
+    entered.disconnect();
+    settled();
+  });
+  if (fig.classList.contains("is-in")) settled();
+  else entered.observe(fig, { attributes: true, attributeFilter: ["class"] });
 
   let isOpen = false;
   let glintUntil = 0;
@@ -158,6 +174,7 @@ export function mountPortraitPop(fig: HTMLElement, photo: HTMLElement, reduced: 
     },
     destroy() {
       window.clearTimeout(idle);
+      entered.disconnect();
       stopSway();
       fig.removeEventListener("pointermove", lamp);
       layer.remove();

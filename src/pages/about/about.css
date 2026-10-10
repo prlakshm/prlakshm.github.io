@@ -349,9 +349,11 @@
   z-index: 1;
 }
 
+/* No standing will-change: 52 pieces each held as a GPU layer at rest
+   (hidden behind the photo) made the portrait heavy on phones. The browser
+   promotes them while Motion actually moves them. */
 .ab-pc {
   position: absolute;
-  will-change: transform;
 }
 
 .ab-pc-in {

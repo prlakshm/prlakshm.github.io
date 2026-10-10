@@ -11,8 +11,10 @@ import { mountPortraitGlass } from "./portraitGlass.js";
 import { prefersReducedMotion } from "../home/interactions.js";
 import { mountTitleGoldLight } from "../home/titleGoldLight.js";
 
-// public/about/"Profile picture.webp" — space encoded for the URL.
-const PORTRAIT = "/about/Profile%20picture.webp";
+// public/about/profile-picture.webp: the same photo, saved lossy (q88). The
+// original lossless webp was 1.5 MB, so on a phone it nearly always ran out
+// the reveal's 1.2 s image wait before the photo could come in.
+const PORTRAIT = "/about/profile-picture.webp";
 
 const EXPERIENCE: { org: string; kind?: string; role: string; year: string }[] = [
   { org: "HBO Max, Warner Bros. Discovery", role: "AI Product Design", year: "2025" },
@@ -62,16 +64,26 @@ function About() {
   /* Entrance, the case studies' way (src/motion/reveal.ts): the text column
      comes in as one block, the photo one step after it, once its image has
      loaded. Stacked under the table (phones), the photo comes in when it is
-     scrolled to. Hidden by CSS (.enter) from the first paint. */
+     scrolled to, starting the moment it enters the screen. Hidden by CSS
+     (.enter) from the first paint. */
   useEffect(() => {
     const about = aboutRef.current;
     const text = about?.querySelector<HTMLElement>(".ab-text");
     const portrait = portraitRef.current;
     if (!text || !portrait) return;
     const beside = portrait.getBoundingClientRect().top < text.getBoundingClientRect().bottom;
+    const photo = portrait.querySelector<HTMLImageElement>(".ab-glass > img"); // the photo, not a pop-out piece (those load late)
+    photo?.decode?.().catch(() => {}); // ready to paint long before it's scrolled to
+    if (!beside) {
+      // stacked (phones): the portrait starts as it comes onto the screen, not
+      // once it's 10% up it, so the biggest change happens as it appears
+      const stopText = revealOnView([{ el: text }]);
+      const stopPortrait = revealOnView([{ el: portrait, image: photo }], { rootMargin: "0px", threshold: 0 });
+      return () => { stopText(); stopPortrait(); };
+    }
     return revealOnView([
       { el: text },
-      { el: portrait, delay: beside ? 0.09 : 0, image: portrait.querySelector<HTMLImageElement>("img") },
+      { el: portrait, delay: 0.09, image: photo },
     ]);
   }, []);
 
@@ -180,6 +192,8 @@ function About() {
                   <img
                     src={PORTRAIT}
                     alt="Pranavi Ram, smiling, on the Brown University campus green."
+                    loading="eager"
+                    {...{ fetchpriority: "high" }}
                     decoding="async"
                   />
                   <span className="ab-sheen" aria-hidden="true" />

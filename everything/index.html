@@ -25,23 +25,44 @@
     <link rel="icon" href="/favicon.ico?v=gold-frame-2" sizes="any" />
     <link rel="apple-touch-icon" href="/icons/frame-apple-touch-icon.png?v=gold-frame-2" />
     <!-- The storm: arriving here (a click, or a link from elsewhere) the pieces
-         fly in from the edges, spiral through a tight eye and swoop down into
-         place, washing out the page you came from. Not on a reload or
-         Back/Forward. Decided here, before the first frame, so nothing flashes
-         in place first. ?slow=4 plays it in slow motion. -->
-    <style>@view-transition { navigation: auto; }</style>
+         fall through a gravity well into place, sweeping away the page you
+         came from. Not on a reload or Back/Forward. Decided here, before the
+         first frame, so nothing flashes in place first. ?slow=4 plays it in
+         slow motion.
+         Everywhere but Firefox, on one clock. Desktop Chromium (Chrome, Edge,
+         Arc) draws it in real 3D; Safari and every phone or tablet get the
+         same flight drawn flat (gx-storm-flat): in WebKit the 3D tiles became
+         huge layers and ran iPhones out of memory (the page crashed and
+         reloaded in a loop). The sweep of the page you came from is a
+         cross-page view transition, Chromium only: Safari freezes the
+         arriving page into a still during one, so the whole fly-in happened
+         unseen behind it; there the pieces fly in over the cool white
+         instead. Phones and portrait tablets get neither: a ripple out from
+         the bagel, the case studies' rise (gx-storm-ripple). Keep in step
+         with src/motion/stormHandoff.ts. -->
     <script>
       (function () {
         var d = document.documentElement;
+        var ua = navigator.userAgent;
+        var able = !/Firefox\/|FxiOS/.test(ua);
+        var deep = /Chrome\//.test(ua) && !/Mobile|Android|CriOS|EdgiOS/.test(ua)
+          && matchMedia("(pointer: fine) and (min-width: 1024px)").matches;
         var nav = performance.getEntriesByType("navigation")[0];
-        var storm = (!nav || nav.type === "navigate") && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var storm = able && (!nav || nav.type === "navigate") && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var chromium = /Chrome\//.test(ua);
+        if (able && chromium) { var vt = document.createElement("style"); vt.textContent = "@view-transition { navigation: auto; }"; document.head.appendChild(vt); }
         if (storm) d.classList.add("gx-storm", "gx-storm-air");
+        // phones and portrait tablets get the ripple instead (Gallery.tsx), with
+        // no cross-page sweep; the same test as the canvas's phone layout
+        var ripple = storm && matchMedia("(orientation: portrait) and (max-width: 900px)").matches;
+        if (ripple) d.classList.add("gx-storm-ripple");
+        else if (storm && !deep) d.classList.add("gx-storm-flat");
         var slow = parseFloat(new URLSearchParams(location.search).get("slow")) || 1;
         d.style.setProperty("--gx-slow", String(slow));
         addEventListener("pagereveal", function (e) {
           if (!e.viewTransition) return;
           var vt = e.viewTransition; [vt.ready, vt.finished, vt.updateCallbackDone].forEach(function (p) { p && p.catch(function () {}); });
-          if (!storm) { e.viewTransition.skipTransition(); return; }
+          if (!storm || ripple) { e.viewTransition.skipTransition(); return; }
           window.__gxStormVT = e.viewTransition;
         });
       })();

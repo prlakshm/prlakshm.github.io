@@ -6,10 +6,15 @@
    the storm (everything/index.html + gallery.css). Both pages have to opt in,
    so this opts every page in, then cancels the transition for any other
    destination: only the way into Everything changes; every other navigation
-   is exactly as it was. Browsers without cross-page transitions (Firefox,
-   for now) just load the page and the storm plays over a blank canvas. */
+   is exactly as it was.
+   Chromium only (Chrome, Edge, Arc; desktop and Android), the same test as
+   everything/index.html; keep the two in step. Safari freezes the arriving
+   page into a still during a cross-page transition, which hid the storm's
+   whole fly-in, so there the storm plays without the sweep. */
 
-if (typeof document !== "undefined" && !document.getElementById("gx-vt-optin")) {
+const stormable = () => /Chrome\//.test(navigator.userAgent);
+
+if (typeof document !== "undefined" && !document.getElementById("gx-vt-optin") && stormable()) {
   const style = document.createElement("style");
   style.id = "gx-vt-optin";
   style.textContent = "@view-transition { navigation: auto; }";

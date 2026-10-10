@@ -659,6 +659,52 @@ export default function Gallery() {
       const root = document.documentElement;
       if (!root.classList.contains("gx-storm")) { root.classList.remove("gx-storm-air"); return; }
       const slow = parseFloat(getComputedStyle(root).getPropertyValue("--gx-slow")) || 1;
+      /* THE RIPPLE (phones and portrait tablets). On a small screen 60 tiles
+         crossing it read as busy rather than as a story, and Safari can't keep
+         the page you came from on screen to be swept away. So here it's the
+         case studies' entrance, told from the bagel: it settles first, the
+         dots wash in, then every piece rises into its place (16px, .72s, the
+         site's settle curve) in a wave outward from the bagel, by distance.
+         ~1.4s in all. Any tap or key lands it at once. */
+      if (root.classList.contains("gx-storm-ripple")) {
+        const settle = "cubic-bezier(0.22, 0.61, 0.36, 1)"; // --ease-settle
+        storming = true;
+        syncVideos();
+        const sky = document.createElement("div");
+        sky.className = "gx-storm-sky";
+        view.insertBefore(sky, world);
+        const ground = document.createElement("div");
+        ground.className = "gx-storm-ground";
+        ground.style.backgroundSize = view.style.backgroundSize;
+        ground.style.backgroundPosition = view.style.backgroundPosition;
+        view.insertBefore(ground, world);
+        const groundIn = ground.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600 * slow, delay: 80 * slow, easing: settle, fill: "both" });
+        storm.push(groundIn);
+        const bagelEl = world.querySelector<HTMLElement>(".gx-bagel");
+        if (bagelEl) storm.push(bagelEl.animate([{ opacity: 0, transform: "scale(0.96)" }, { opacity: 1, transform: "none" }], { duration: 720 * slow, easing: settle, fill: "backwards" }));
+        const ps = live.current.pieces;
+        const far = Math.max(1, ...ps.map((q) => Math.hypot(q.x, q.y)));
+        ps.forEach((p) => {
+          const el = world.querySelector<HTMLElement>(`.gx-piece[data-id="${p.id}"]`);
+          if (!el) return;
+          const delay = (120 + 550 * (Math.hypot(p.x, p.y) / far)) * slow;
+          // the rise is in screen pixels; the world is scaled by the camera
+          storm.push(el.animate([{ opacity: 0, transform: `translateY(${(16 / cam.z).toFixed(1)}px)` }, { opacity: 1, transform: "none" }], { duration: 720 * slow, delay, easing: settle, fill: "backwards" }));
+        });
+        root.classList.remove("gx-storm");
+        const skip = () => storm.forEach((a) => a.finish());
+        const skipOn = ["pointerdown", "wheel", "keydown"] as const;
+        skipOn.forEach((ev) => window.addEventListener(ev, skip, { capture: true, once: true }));
+        Promise.all(storm.map((a) => a.finished)).then(() => {
+          skipOn.forEach((ev) => window.removeEventListener(ev, skip, { capture: true }));
+          root.classList.remove("gx-storm-air");
+          ground.remove();
+          sky.remove();
+          storming = false;
+          syncVideos();
+        }, () => {});
+        return;
+      }
       /* THE GRAVITY WELL. Each piece stays in its own vertical slice through
          the bagel (no circling): from above it's a starburst collapsing and
          bursting. One clock for everyone, so the field reads as one motion;
@@ -697,9 +743,20 @@ export default function Gallery() {
       const R0 = Math.hypot(Math.max(eye.x, r.width - eye.x), Math.max(eye.y, r.height - eye.y)) + 120;
       storming = true;
       syncVideos();
-      view.style.perspective = "1400px";
-      view.style.perspectiveOrigin = `${eye.x}px ${eye.y}px`;
-      world.style.transformStyle = "preserve-3d";
+      /* FLAT (Safari and every phone): the same flight drawn in 2D. Each
+         piece's path is already worked out on screen, so depth only ever
+         changed its size; here that size is a plain scale, with the loom
+         capped on small screens, and the bagel kept under the pieces by
+         stacking order instead of by sitting at the back of a 3D scene. In
+         real 3D, WebKit draws every looming tile (and the bagel, pushed back
+         and scaled up) as a huge layer, which ran iPhones out of memory. */
+      const FLAT = root.classList.contains("gx-storm-flat");
+      if (!FLAT) {
+        view.style.perspective = "1400px";
+        view.style.perspectiveOrigin = `${eye.x}px ${eye.y}px`;
+        world.style.transformStyle = "preserve-3d";
+      }
+      const LOOM_MAX = FLAT && Math.min(r.width, r.height) < 700 ? 1.6 : 2.6; // the closest a piece comes, as a size
       // the portfolio's cool white behind the storm, as its own layer under the ground
       const sky = document.createElement("div");
       sky.className = "gx-storm-sky";
@@ -781,10 +838,21 @@ export default function Gallery() {
           const t = k / (N - 1), tt = t * end;
           const { rad, zc, sc, tilt } = at(tt);
           const op = Math.min(1, tt / 0.07);
-          const radW = (rad * (PERSP - zc)) / PERSP;
-          const px = eye.x + ux * radW, py = eye.y + uy * radW;
-          const ox = (px - sx) / cam.z, oy = (py - sy) / cam.z;
-          const kf: Keyframe = { offset: t, opacity: op, transform: `translate3d(${ox.toFixed(1)}px, ${oy.toFixed(1)}px, ${zc.toFixed(1)}px) rotate3d(${(-uy).toFixed(3)}, ${ux.toFixed(3)}, 0, ${tilt.toFixed(1)}deg) scale(${sc.toFixed(3)})` };
+          let kf: Keyframe;
+          if (FLAT) {
+            // where perspective would have drawn it, and how big
+            const near = Math.min(LOOM_MAX, PERSP / (PERSP - zc));
+            const px = eye.x + ux * rad, py = eye.y + uy * rad;
+            const ox = (px - sx) / cam.z, oy = (py - sy) / cam.z;
+            // the 3D lean, as a slight turn toward its line of travel
+            const turn = (tilt * 0.35) * (ux >= 0 ? 1 : -1);
+            kf = { offset: t, opacity: op, transform: `translate(${ox.toFixed(1)}px, ${oy.toFixed(1)}px) rotate(${turn.toFixed(2)}deg) scale(${(sc * near).toFixed(3)})` };
+          } else {
+            const radW = (rad * (PERSP - zc)) / PERSP;
+            const px = eye.x + ux * radW, py = eye.y + uy * radW;
+            const ox = (px - sx) / cam.z, oy = (py - sy) / cam.z;
+            kf = { offset: t, opacity: op, transform: `translate3d(${ox.toFixed(1)}px, ${oy.toFixed(1)}px, ${zc.toFixed(1)}px) rotate3d(${(-uy).toFixed(3)}, ${ux.toFixed(3)}, 0, ${tilt.toFixed(1)}deg) scale(${sc.toFixed(3)})` };
+          }
           frames.push(kf);
         }
         storm.push(el.animate(frames, { duration: Ti, easing: "linear", fill: "backwards" }));
@@ -815,9 +883,12 @@ export default function Gallery() {
         // how far its furthest part (the speech bubble included) reaches from its centre
         const bc = bagelEl.getBoundingClientRect(), bcx = bc.left + bc.width / 2, bcy = bc.top + bc.height / 2;
         const rFull = 1.02 * Math.max(...[bagelEl, ...bagelEl.querySelectorAll<HTMLElement>("*")].map((n) => { const q = n.getBoundingClientRect(); return q.width ? Math.max(Math.hypot(q.left - bcx, q.top - bcy), Math.hypot(q.right - bcx, q.top - bcy), Math.hypot(q.left - bcx, q.bottom - bcy), Math.hypot(q.right - bcx, q.bottom - bcy)) : 0; }));
-        bagelEl.style.transform = "translateZ(-1600px)";
-        const w1 = bagelEl.getBoundingClientRect().width;
-        bagelEl.style.transform = w0 && w1 ? `translateZ(-1600px) scale(${(w0 / w1).toFixed(4)})` : "";
+        if (FLAT) bagelEl.style.zIndex = "-1"; // under every piece
+        else {
+          bagelEl.style.transform = "translateZ(-1600px)";
+          const w1 = bagelEl.getBoundingClientRect().width;
+          bagelEl.style.transform = w0 && w1 ? `translateZ(-1600px) scale(${(w0 / w1).toFixed(4)})` : "";
+        }
         /* the bagel is the payoff: it starts growing open from its centre
            just after the orb (once the pack is 10% of the way out) and takes
            the whole flight to do it, a steadier grow than the pack's sharp
@@ -835,7 +906,7 @@ export default function Gallery() {
         const endM = 0.93 + 0.07 * (rMid / rFar);
         const bStart = MID + from * (endM - MID);
         const bg = storm.push(bagelEl.animate(grow, { duration: (endM - bStart) * T, delay: bStart * T, easing: "linear", fill: "backwards" }));
-        storm[bg - 1].finished.then(() => { bagelEl.style.transform = ""; }, () => {});
+        storm[bg - 1].finished.then(() => { bagelEl.style.transform = ""; bagelEl.style.zIndex = ""; }, () => {});
       }
       /* The page being left is swept away by the pieces as they come in: it
          stays in place, at full strength, but only what's inside their

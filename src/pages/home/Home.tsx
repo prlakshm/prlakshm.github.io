@@ -34,7 +34,14 @@ function Home() {
      and prints) arrives together, the next a step later, never print by
      print. The wall is big, so it glides slower (.enter--slow) and waits for
      all its images first. Hidden by CSS (.enter) from the first paint;
-     nothing waits for fonts. */
+     nothing waits for fonts.
+     On a phone it's the case studies' cascade instead: the hero arrives
+     line by line (name, then the copy, then PREV, then the links, a step
+     apart), and each row of posters arrives together, with its placard, the
+     moment it comes onto the screen, including the cards still off to the
+     side of the swipeable row, so you never swipe into an empty slot. Each
+     card waits only for its own print. Same look as before (.enter--slow);
+     only when it starts changed. */
   useEffect(() => {
     const hero = heroRef.current;
     const block = hero?.querySelector<HTMLElement>(".hero-block");
@@ -42,6 +49,34 @@ function Home() {
     const wall = Array.from(document.querySelectorAll<HTMLElement>(".gl-placard, .gl-card"));
     const images = Array.from(document.querySelectorAll<HTMLImageElement>(".gl-print img"));
     const groups = Array.from(document.querySelectorAll<HTMLElement>(".gl-group"));
+    if (window.matchMedia("(max-width: 767px)").matches) {
+      const lines = [
+        block.querySelector<HTMLElement>(".hero-title"),
+        block.querySelector<HTMLElement>(".hero-col--copy"),
+        block.querySelector<HTMLElement>(".hero-col--prev"),
+        block.querySelector<HTMLElement>(".wt-tiles--hero"),
+      ].filter((el): el is HTMLElement => !!el);
+      // hand the hidden state from the block to its lines, in one frame
+      block.style.transition = "none";
+      lines.forEach((el) => el.classList.add("enter"));
+      block.classList.remove("enter");
+      return revealOnView(
+        [
+          ...lines.map((el, i) => ({ el, delay: i * 0.09, trigger: block })),
+          ...groups.flatMap((group) => {
+            const placard = group.querySelector<HTMLElement>(".gl-placard");
+            const cards = Array.from(group.querySelectorAll<HTMLElement>(".gl-card"));
+            const trigger = placard ?? group;
+            return [
+              ...(placard ? [{ el: placard, trigger }] : []),
+              ...cards.map((el) => ({ el, trigger, image: el.querySelector<HTMLImageElement>(".gl-print img") })),
+            ];
+          }),
+        ],
+        // as soon as it's on the screen, not 10% up it
+        { rootMargin: "0px", threshold: 0 }
+      );
+    }
     // the wall follows the hero by one step when they come in together
     const withHero = wall.length > 0 && wall[0].getBoundingClientRect().top < window.innerHeight * 0.9;
     return revealOnView([
