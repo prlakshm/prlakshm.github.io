@@ -463,9 +463,11 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
       if ((on && now === 1) || (!on && now === 0)) return;
       animate(el, { opacity: on ? 1 : 0 }, reduced ? { duration: 0 } : { duration: on ? 0.16 : 0.22 });
     };
-    fade(pop.querySelector(".bc-tip"), hintOpen);
-    pop.querySelectorAll(".bc-star-tip").forEach((el, i) => fade(el, i === tipAt));
-  }, [hintOpen, tipAt, reduced]);
+    // the bulb's hint is the next empty star's own tip, shown where it always
+    // sits, above that star (the next badge to find is the one it names)
+    const next = landed.length;
+    pop.querySelectorAll(".bc-star-tip").forEach((el, i) => fade(el, i === tipAt || (hintOpen && tipAt === null && i === next)));
+  }, [hintOpen, tipAt, reduced, landed.length]);
 
   /* --- star tips ------------------------------------------------------------ */
   /* Found stars in the order they were found, then the missing badges in
@@ -501,7 +503,7 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
      jobs. On touch a tapped star shows its tip instead. */
   const onCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const t = e.target as Element;
-    if (t.closest(".bc-hint, .bc-tip")) return;
+    if (t.closest(".bc-hint")) return;
     const slot = t.closest<HTMLElement>(".bc-slot");
     if (slot && fromTouch(e)) {
       const i = Number(slot.dataset.i);
@@ -864,11 +866,6 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
           starTips={{ tips, at: tipAt, set: showTip }}
           light
         />
-        {hint && (
-          <span className="bc-tip wt-tip" aria-hidden="true">
-            {hintOf(hint)}
-          </span>
-        )}
       </div>
 
       <p className="bc-sr" aria-live="polite">

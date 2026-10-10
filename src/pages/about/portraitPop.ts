@@ -25,6 +25,10 @@ const pct = (n: number) => `${+n.toFixed(3)}%`;
 export function mountPortraitPop(fig: HTMLElement, photo: HTMLElement, reduced: boolean) {
   const layer = document.createElement("div");
   layer.className = "ab-pop";
+  // At rest every piece is tucked out of sight behind the photo, so the layer
+  // isn't drawn at all until the frame opens: 52 pieces with shadow filters,
+  // drawn for nothing, slowed the photo's own first paint on a phone.
+  layer.style.visibility = "hidden";
   layer.setAttribute("aria-hidden", "true");
   fig.insertBefore(layer, fig.firstChild);
 
@@ -118,6 +122,7 @@ export function mountPortraitPop(fig: HTMLElement, photo: HTMLElement, reduced: 
     if (isOpen) return;
     isOpen = true;
     load();
+    layer.style.visibility = "";
     if (reduced) {
       // no travel: the frame is simply there, faded in
       pieces.forEach((q) => animate(q.el, q.open, { duration: 0 }));
@@ -143,14 +148,17 @@ export function mountPortraitPop(fig: HTMLElement, photo: HTMLElement, reduced: 
         if (isOpen) return;
         pieces.forEach((q) => animate(q.el, q.tucked, { duration: 0 }));
         layer.style.opacity = "";
+        layer.style.visibility = "hidden";
       });
       return;
     }
     stopSway();
     animate(photo, { rotate: 0, scale: 1, y: 0 }, PHOTO_GLIDE);
     const n = pieces.length;
-    pieces.forEach((q, i) =>
-      animate(q.el, q.tucked, { type: "spring", bounce: 0, duration: 0.5, delay: (n - 1 - i) * 0.004 }));
+    const tucking = pieces.map((q, i) =>
+      animate(q.el, q.tucked, { type: "spring", bounce: 0, duration: 0.5, delay: (n - 1 - i) * 0.004 }).finished);
+    // all tucked away behind the photo again: stop drawing them
+    Promise.all(tucking).then(() => { if (!isOpen) layer.style.visibility = "hidden"; }, () => {});
     pieces.forEach((q) => q.lit && animate(q.lit, { opacity: 0 }, { duration: 0.2 }));
   };
 
