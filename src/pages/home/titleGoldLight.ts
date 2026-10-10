@@ -25,13 +25,26 @@ export function mountTitleGoldLight(el: HTMLElement, options: TitleGoldLightOpti
   let running = false;
   let started = 0;
   let last = 0;
+  let wrote = 0;
+  let box = { width: 0, height: 0, left: 0, top: 0 };
+  // At rest (no glint, no cursor) the lamp only drifts on 11 s and 15 s
+  // cycles: redrawing it ~15 times a second looks the same as every frame,
+  // and each redraw repaints the painted text.
+  const QUIET_MS = 66;
+  let glinting = false;
 
   const paint = () => {
     const now = performance.now();
-    const dt = Math.min(0.05, (now - last) / 1000);
-    last = now;
-    const box = el.getBoundingClientRect();
     const t = (now - started) / 1000;
+    const settled = Math.abs(lamp.on - idle.on) < 0.02;
+    if (!pointer && !glinting && settled && now - wrote < QUIET_MS) {
+      // still sample, so a glint starts on time
+      glinting = !!shine.sample(t, { w: box.width, h: box.height });
+      if (!glinting) return;
+    }
+    const dt = Math.min(0.1, (now - last) / 1000);
+    last = wrote = now;
+    box = el.getBoundingClientRect();
     idle.x = box.width * (0.5 + 0.34 * Math.sin((t * 2 * Math.PI) / 11));
     idle.y = box.height * (0.5 + 0.22 * Math.sin((t * 2 * Math.PI) / 15 + 0.9));
     if (pointer) {
@@ -42,6 +55,7 @@ export function mountTitleGoldLight(el: HTMLElement, options: TitleGoldLightOpti
     stepGoldLamp(lamp, target, dt);
 
     const auto = shine.sample(t, { w: box.width, h: box.height });
+    glinting = !!auto;
     autoLayer.style.setProperty("--title-shine-a", `${auto?.[3] ?? 0}`);
     if (auto) {
       autoLayer.style.setProperty("--title-shine-x", `${auto[0]}px`);
@@ -57,8 +71,8 @@ export function mountTitleGoldLight(el: HTMLElement, options: TitleGoldLightOpti
   const start = () => {
     if (running) return;
     running = true;
-    started = last = performance.now();
-    const box = el.getBoundingClientRect();
+    started = last = wrote = performance.now();
+    box = el.getBoundingClientRect();
     lamp.x = box.width * 0.5;
     lamp.y = box.height * 0.5;
     shine.reset(0);
@@ -73,8 +87,8 @@ export function mountTitleGoldLight(el: HTMLElement, options: TitleGoldLightOpti
   };
 
   const place = (event: PointerEvent) => {
-    const box = el.getBoundingClientRect();
-    pointer = { x: event.clientX - box.left, y: event.clientY - box.top };
+    const at = el.getBoundingClientRect();
+    pointer = { x: event.clientX - at.left, y: event.clientY - at.top };
   };
   const enter = (event: PointerEvent) => {
     if (event.pointerType === "touch") return;

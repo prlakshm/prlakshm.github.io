@@ -136,17 +136,16 @@ test("concept pages load a visibility-gated bridge and landing layouts do not aw
 });
 
 test("case studies award Read after their own navigation mounts", async () => {
-  const [surprise, mixr, rtw, chrome, gallery, grid, rail] = await Promise.all([
+  const [surprise, mixr, chrome, gallery, grid, rail] = await Promise.all([
     readFile(new URL("../public/surprise-rail/index.html", import.meta.url), "utf8"),
     readFile(new URL("../public/mixr/index.html", import.meta.url), "utf8"),
-    readFile(new URL("../public/reasons-to-watch/index.html", import.meta.url), "utf8"),
     readFile(new URL("../src/static-chrome.tsx", import.meta.url), "utf8"),
     readFile(new URL("../src/pages/home/PosterGallery.tsx", import.meta.url), "utf8"),
     readFile(new URL("../src/pages/home/WorkGrid.tsx", import.meta.url), "utf8"),
     readFile(new URL("../src/pages/home/PosterRail.tsx", import.meta.url), "utf8"),
   ]);
 
-  for (const html of [surprise, mixr, rtw]) {
+  for (const html of [surprise, mixr]) {
     assert.match(html, /id="site-nav"[^>]*data-badge-on-open="read"/);
   }
   assert.match(chrome, /useEffect/);

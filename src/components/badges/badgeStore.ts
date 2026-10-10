@@ -41,6 +41,16 @@ const makeChannel = (name: string) => {
 const session = createBadgeSession({
   storage: typeof window === "undefined" ? null : window.sessionStorage,
   channelFactory: typeof BroadcastChannel === "undefined" ? null : makeChannel,
+  // a reset (from any tab) also replays the intro and drops a half-made
+  // concept visit
+  onReset: () => {
+    try {
+      sessionStorage.removeItem("pr-badge-intro");
+      sessionStorage.removeItem("pr-badge-concept-journey-v2");
+    } catch {
+      // Storage may be blocked; the collection itself is still reset.
+    }
+  },
 });
 
 const listeners = new Set<() => void>();
@@ -133,13 +143,5 @@ if (typeof window !== "undefined") {
     // Storage may be blocked; the new in-memory/session behavior still works.
   }
 
-  (window as unknown as { resetBadges: () => void }).resetBadges = () => {
-    session.reset();
-    try {
-      sessionStorage.removeItem("pr-badge-intro");
-      sessionStorage.removeItem("pr-badge-concept-journey-v2");
-    } catch {
-      // Keep the live reset even when storage is blocked.
-    }
-  };
+  (window as unknown as { resetBadges: () => void }).resetBadges = () => session.reset();
 }

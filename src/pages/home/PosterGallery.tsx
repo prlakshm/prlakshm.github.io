@@ -243,7 +243,7 @@ export default function PosterGallery({ groups }: { groups: GalleryGroup[] }) {
           col += g.items.length + 1;
           return (
             <div className="gl-group" key={g.index} style={{ "--n": g.items.length } as React.CSSProperties}>
-              <h2 className="gl-placard" style={{ "--c": `${start} / span ${g.items.length}` } as React.CSSProperties}>
+              <h2 className="gl-placard enter enter--slow" style={{ "--c": `${start} / span ${g.items.length}` } as React.CSSProperties}>
                 <span className="gl-index">{g.index}</span>
                 <span className="gl-placard-title">{g.title}</span>
               </h2>
@@ -252,7 +252,7 @@ export default function PosterGallery({ groups }: { groups: GalleryGroup[] }) {
                 return (
                   <a
                     key={item.id}
-                    className="gl-card"
+                    className="gl-card enter enter--slow"
                     style={{ "--c": start + j } as React.CSSProperties}
                     href={item.href}
                     aria-label={`${name}: ${item.title}`}
@@ -260,7 +260,7 @@ export default function PosterGallery({ groups }: { groups: GalleryGroup[] }) {
                     onPointerMove={(e) => onMove(item, e)}
                     onPointerLeave={() => onLeave(item)}
                     onClick={(e) => onOpen(item, e)}
-                    onAuxClick={(e) => onOpen(item, e)}
+                    onAuxClick={(e) => e.button === 1 && onOpen(item, e)}
                     {...(item.external ? { target: "_blank", rel: "noreferrer" } : {})}
                   >
                     <span

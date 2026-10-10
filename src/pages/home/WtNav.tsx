@@ -6,7 +6,8 @@ import { attachUnderlineWipe, prefersReducedMotion, SPRING } from "./interaction
 import "./chrome.css";
 
 /* The site nav. Top-left is the hidden-interactions card (it replaced the
-   wordmark), then WORK · GALLERY · ABOUT · RESUME.
+   wordmark), then GALLERY (Home, the curated work) · EVERYTHING (the
+   canvas) · ABOUT · RESUME; on phones the menu opens from MAP.
    NavBar is the bar itself and knows nothing of the router; WtNav (Home,
    About) hands it router-aware WORK and ABOUT items, and the static case
    studies hand it plain links (src/static-chrome.tsx). */
@@ -45,6 +46,10 @@ type NavBarProps = {
       router-aware version; the static pages fall back to loading /#/. */
   onHome?: () => void;
 };
+
+// the canvas is its own page (/everything/), like About
+const onGalleryPage = () =>
+  typeof window !== "undefined" && window.location.pathname.replace(/\/+$/, "") === "/everything";
 
 export function NavBar({ work, about, autoHide = false, onHome }: NavBarProps) {
   const rootRef = useRef<HTMLElement>(null);
@@ -129,39 +134,6 @@ export function NavBar({ work, about, autoHide = false, onHome }: NavBarProps) {
         resume.removeEventListener("pointerleave", off);
         resume.removeEventListener("focusin", on);
         resume.removeEventListener("focusout", off);
-      });
-    }
-
-    // GALLERY (everything else, on the dot canvas) is a mock for now: it says
-    // so instead of doing nothing.
-    const mock = root.querySelector<HTMLElement>(".nav-mock");
-    const soon = root.querySelector<HTMLElement>(".nav-soon");
-    if (mock && soon) {
-      const reduced = prefersReducedMotion();
-      let hideTimer = 0;
-      const show = (on: boolean) =>
-        animate(soon, { opacity: on ? 1 : 0 }, reduced ? { duration: 0 } : { duration: on ? 0.16 : 0.22 });
-      const on = () => {
-        window.clearTimeout(hideTimer);
-        show(true);
-      };
-      const off = () => show(false);
-      const tap = () => {
-        on();
-        hideTimer = window.setTimeout(off, 1600);
-      };
-      mock.addEventListener("pointerenter", on);
-      mock.addEventListener("pointerleave", off);
-      mock.addEventListener("focus", on);
-      mock.addEventListener("blur", off);
-      mock.addEventListener("click", tap);
-      cleanups.push(() => {
-        window.clearTimeout(hideTimer);
-        mock.removeEventListener("pointerenter", on);
-        mock.removeEventListener("pointerleave", off);
-        mock.removeEventListener("focus", on);
-        mock.removeEventListener("blur", off);
-        mock.removeEventListener("click", tap);
       });
     }
 
@@ -271,7 +243,7 @@ export function NavBar({ work, about, autoHide = false, onHome }: NavBarProps) {
           aria-controls={menuId}
           onClick={() => setMobileOpen((open) => !open)}
         >
-          INDEX
+          MAP
           <span className="nav-rule" aria-hidden="true" />
         </button>
         <nav
@@ -285,14 +257,11 @@ export function NavBar({ work, about, autoHide = false, onHome }: NavBarProps) {
         >
           <ul className="wt-nav-links">
             <li>{work}</li>
-            <li className="nav-soon-wrap">
-              <button type="button" className="nav-mock" aria-describedby="nav-soon">
-                GALLERY
+            <li>
+              <a href="/everything/" aria-current={onGalleryPage() ? "page" : undefined}>
+                EVERYTHING
                 <span className="nav-rule" aria-hidden="true" />
-              </button>
-              <span id="nav-soon" role="tooltip" className="nav-soon wt-tip">
-                Coming soon
-              </span>
+              </a>
             </li>
             <li>{about}</li>
             <li>
@@ -313,11 +282,13 @@ export default function WtNav() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const onCleanAbout = window.location.pathname.replace(/\/+$/, "") === "/about";
+  // About and the gallery are their own pages: going home means loading it
+  const onOwnPage = onCleanAbout || onGalleryPage();
 
   /* The star card goes home: from another page it opens Home at the top
      (Home keeps no scroll of its own); on Home it glides back to the top. */
   const goHome = () => {
-    if (onCleanAbout) {
+    if (onOwnPage) {
       window.location.assign("/#/");
       return;
     }
@@ -331,7 +302,7 @@ export default function WtNav() {
       onHome={goHome}
       work={
         <button type="button" onClick={goHome}>
-          WORK
+          GALLERY
           <span className="nav-rule" aria-hidden="true" />
         </button>
       }

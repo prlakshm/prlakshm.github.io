@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { animate } from "motion";
+import { animate, cubicBezier } from "motion";
 import {
   armBadges,
   BADGES,
@@ -218,8 +218,7 @@ function FlyingBadge({
   const ref = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     const el = ref.current;
-    const rect = target();
-    if (!el || !rect) {
+    if (!el || !target()) {
       onLanded(flight);
       return;
     }
@@ -228,19 +227,34 @@ function FlyingBadge({
     const sy = flight.from.y - size / 2;
     el.style.left = `${sx}px`;
     el.style.top = `${sy}px`;
-    const tx = rect.left + rect.width / 2 - size / 2 - sx;
-    const ty = rect.top + rect.height / 2 - size / 2 - sy;
-    const land = rect.height / size; // lands at the slot's star size
-    const controls = animate(
-      el,
-      {
-        x: [0, tx * 0.08, tx],
-        y: [0, -54, ty],
-        scale: [0.2, 2.1, land],
-        rotate: [-28, 10, CROOKED[flight.slot] ?? 0],
+    const tilt = CROOKED[flight.slot] ?? 0;
+    // One progress value drives a thrown arc: across at an even, eased pace,
+    // down with gravity (u²) under a small lift. The slot is re-read every
+    // frame, so the star lands true even while the card is still opening, and
+    // it can leave at once. One transform string per frame.
+    const across = cubicBezier(0.45, 0, 0.25, 1);
+    const LIFT = 56;
+    let last = target();
+    const controls = animate(0, 1, {
+      duration: 0.65,
+      ease: "linear",
+      onUpdate: (u) => {
+        const rect = target() ?? last;
+        if (!rect) return;
+        last = rect;
+        const tx = rect.left + rect.width / 2 - size / 2 - sx;
+        const ty = rect.top + rect.height / 2 - size / 2 - sy;
+        const land = rect.height / size; // lands at the slot's star size
+        const x = tx * across(u);
+        const y = ty * u * u - LIFT * 4 * u * (1 - u);
+        // pops to 1.35 by u = 0.3 (ease-out), then shrinks into the slot
+        const grow = 1 - Math.pow(1 - Math.min(1, u / 0.3), 2);
+        const shrink = u <= 0.3 ? 0 : (u - 0.3) / 0.7;
+        const scale = u <= 0.3 ? 0.6 + 0.75 * grow : 1.35 + (land - 1.35) * shrink * shrink;
+        const r = -24 + (tilt + 24) * (1 - Math.pow(1 - u, 3));
+        el.style.transform = `translate(${x}px, ${y}px) rotate(${r}deg) scale(${scale})`;
       },
-      { duration: 1, times: [0, 0.3, 1], ease: [0.3, 0.7, 0.2, 1] }
-    );
+    });
     controls.finished.then(() => onLanded(flight)).catch(() => onLanded(flight));
     return () => controls.stop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -515,21 +529,51 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
         }, 120);
         return;
       }
-      // Let the card finish growing before the stamp aims at it.
-      window.setTimeout(() => {
-        flightKey.current += 1;
-        setFlights((f) => [...f, { key: flightKey.current, id, slot: getFound().indexOf(id), from: start }]);
-      }, 380);
+      // It leaves at once: the flight re-aims at the slot every frame, so it
+      // lands true while the card is still opening.
+      flightKey.current += 1;
+      setFlights((f) => [...f, { key: flightKey.current, id, slot: getFound().indexOf(id), from: start }]);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [sync]
   );
 
+  // A star found in another tab while this one was in the background goes
+  // straight onto the card here, without its landing (see showQueued).
+  const quietLanding = useRef(false);
+
+  /* The landing glint: the stamp flashes and, with the light layer, a light
+     crosses it. */
+  const glint = useCallback((i: number) => {
+    [
+      slotCells.current[i]?.querySelector<HTMLElement>(".bc-stamp"),
+      miniRef.current?.querySelectorAll<HTMLElement>(".bc-slot")[i]?.querySelector<HTMLElement>(".bc-stamp"),
+    ].forEach((el) => {
+      if (!el) return;
+      el.classList.remove("is-landing");
+      void el.offsetWidth; // restart the flash
+      el.classList.add("is-landing");
+    });
+    window.setTimeout(() => {
+      lights.current.mini?.flash(i);
+      lights.current.card?.flash(i);
+    }, 120);
+  }, []);
+
+  const confetti = useCallback(() => {
+    [popRef.current, miniRef.current].forEach((root) => {
+      const svg = root?.querySelector<SVGSVGElement>(".bc-popper") ?? null;
+      window.setTimeout(() => popConfetti(svg, true), 250);
+    });
+  }, []);
+
   useEffect(
     () =>
       onEarn(({ id, from, remote }) => {
         if (remote && document.visibilityState === "hidden") {
-          inFlight.current.add(id);
+          // already on the card when the visitor comes back: the find was
+          // celebrated in the tab it happened in
+          quietLanding.current = true;
           queuedRemote.current.push(id);
           sync();
           return;
@@ -539,16 +583,24 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
     [celebrate, sync]
   );
 
-  /* A background tab receives the shared state immediately, but waits to show
-     the flight until the visitor can actually see it. Snapshot joins do not
-     enter this queue, so duplicating a tab never replays old celebrations. */
+  /* A background tab takes another tab's finds straight onto its card, with
+     no flight or tooltip (that find was already celebrated where it
+     happened). When the visitor comes back, each new stamp just glints once,
+     so they can see what changed; completing the set still pops the confetti
+     here, once. Snapshot joins never enter this queue, so opening or
+     duplicating a tab never replays old finds. */
   useEffect(() => {
     const showQueued = () => {
       if (document.visibilityState === "hidden" || !queuedRemote.current.length) return;
       const queued = queuedRemote.current.splice(0);
+      quietLanding.current = false;
+      if (reduced) return;
+      const order = getFound().filter((f) => !inFlight.current.has(f));
       queued.forEach((id, index) => {
-        window.setTimeout(() => celebrate(id, null), index * 180);
+        const i = order.indexOf(id);
+        if (i >= 0) window.setTimeout(() => glint(i), 250 + index * 180);
       });
+      if (order.length >= TOTAL) window.setTimeout(confetti, 250 + queued.length * 180);
     };
     document.addEventListener("visibilitychange", showQueued);
     window.addEventListener("focus", showQueued);
@@ -556,7 +608,7 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
       document.removeEventListener("visibilitychange", showQueued);
       window.removeEventListener("focus", showQueued);
     };
-  }, [celebrate]);
+  }, [glint, confetti, reduced]);
 
   /* A stamp just landed: its star's tooltip names what was found, so the
      visitor knows what they did, then card and tip go together. */
@@ -585,33 +637,23 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
   /* Stamp: the slot that just filled presses in and catches the light. */
   const prevCount = useRef(landed.length);
   useLayoutEffect(() => {
+    if (quietLanding.current) {
+      prevCount.current = landed.length;
+      return;
+    }
     if (landed.length > prevCount.current && !reduced) {
       const i = landed.length - 1;
-      const stamps = [
+      [
         slotCells.current[i]?.querySelector<HTMLElement>(".bc-stamp"),
         miniRef.current?.querySelectorAll<HTMLElement>(".bc-slot")[i]?.querySelector<HTMLElement>(".bc-stamp"),
-      ];
-      stamps.forEach((el) => {
-        if (!el) return;
-        animate(el, { scale: [1.45, 0.92, 1] }, { duration: 0.55, ease: [0.2, 0.8, 0.2, 1] });
-        el.classList.remove("is-landing");
-        void el.offsetWidth; // restart the flash
-        el.classList.add("is-landing");
+      ].forEach((el) => {
+        if (el) animate(el, { scale: [1.45, 0.92, 1] }, { duration: 0.55, ease: [0.2, 0.8, 0.2, 1] });
       });
-      // with the light layer, the landing flash is a light crossing that stamp
-      window.setTimeout(() => {
-        lights.current.mini?.flash(i);
-        lights.current.card?.flash(i);
-      }, 120);
+      glint(i);
     }
-    if (landed.length >= TOTAL && prevCount.current < TOTAL && !reduced) {
-      [popRef.current, miniRef.current].forEach((root) => {
-        const svg = root?.querySelector<SVGSVGElement>(".bc-popper") ?? null;
-        window.setTimeout(() => popConfetti(svg, true), 250);
-      });
-    }
+    if (landed.length >= TOTAL && prevCount.current < TOTAL && !reduced) confetti();
     prevCount.current = landed.length;
-  }, [landed.length, reduced]);
+  }, [landed.length, reduced, glint, confetti]);
 
   /* --- first-visit intro --------------------------------------------------- */
   useLayoutEffect(() => {

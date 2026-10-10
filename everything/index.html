@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Everything | Pranavi Ram</title>
+    <meta name="description" content="Everything else Pranavi Ram makes: posters, decks and design work, laid out on one canvas." />
+    <link rel="canonical" href="https://pranaviram.com/everything/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://pranaviram.com/everything/" />
+    <meta property="og:title" content="Everything · Pranavi Ram" />
+    <meta property="og:description" content="Everything else Pranavi Ram makes: posters, decks and design work, laid out on one canvas." />
+    <meta property="og:image" content="https://pranaviram.com/social/everything-v1.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Pranavi Ram’s Everything canvas: posters, decks and design work arranged around a bagel." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Everything · Pranavi Ram" />
+    <meta name="twitter:description" content="Everything else Pranavi Ram makes: posters, decks and design work, laid out on one canvas." />
+    <meta name="twitter:image" content="https://pranaviram.com/social/everything-v1.png" />
+    <meta name="twitter:image:alt" content="Pranavi Ram’s Everything canvas: posters, decks and design work arranged around a bagel." />
+    <link rel="icon" type="image/svg+xml" href="/icons/frame-favicon.svg?v=gold-frame-2" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/frame-favicon-32.png?v=gold-frame-2" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/frame-favicon-16.png?v=gold-frame-2" />
+    <link rel="icon" href="/favicon.ico?v=gold-frame-2" sizes="any" />
+    <link rel="apple-touch-icon" href="/icons/frame-apple-touch-icon.png?v=gold-frame-2" />
+    <!-- The storm: arriving here (a click, or a link from elsewhere) the pieces
+         fly in from the edges, spiral through a tight eye and swoop down into
+         place, washing out the page you came from. Not on a reload or
+         Back/Forward. Decided here, before the first frame, so nothing flashes
+         in place first. ?slow=4 plays it in slow motion. -->
+    <style>@view-transition { navigation: auto; }</style>
+    <script>
+      (function () {
+        var d = document.documentElement;
+        var nav = performance.getEntriesByType("navigation")[0];
+        var storm = (!nav || nav.type === "navigate") && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (storm) d.classList.add("gx-storm", "gx-storm-air");
+        var slow = parseFloat(new URLSearchParams(location.search).get("slow")) || 1;
+        d.style.setProperty("--gx-slow", String(slow));
+        addEventListener("pagereveal", function (e) {
+          if (!e.viewTransition) return;
+          var vt = e.viewTransition; [vt.ready, vt.finished, vt.updateCallbackDone].forEach(function (p) { p && p.catch(function () {}); });
+          if (!storm) { e.viewTransition.skipTransition(); return; }
+          window.__gxStormVT = e.viewTransition;
+        });
+      })();
+    </script>
+  </head>
+  <body style="margin:0;background:#f8fafc;min-height:100vh;overflow:hidden;" class="gx-body">
+    <div id="root"></div>
+    <script type="module" src="/src/gallery-main.tsx"></script>
+  </body>
+</html>

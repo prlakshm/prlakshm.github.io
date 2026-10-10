@@ -1,0 +1,647 @@
+{
+  "items": {
+    "fs-girl": {
+      "x": 2992,
+      "y": -9,
+      "z": 183,
+      "w": 460.8
+    },
+    "sq-rocket": {
+      "x": -1832,
+      "y": -1052,
+      "z": 199
+    },
+    "sq-pom": {
+      "x": -2624,
+      "y": -1052,
+      "z": 197
+    },
+    "sq-giraffe": {
+      "x": -2228,
+      "y": -1052,
+      "z": 198
+    },
+    "tx-3": {
+      "x": -2858,
+      "y": 237.1,
+      "z": 109
+    },
+    "tx-1": {
+      "x": -2858,
+      "y": -408.6,
+      "z": 110
+    },
+    "tx-2": {
+      "x": -2858,
+      "y": -85.7,
+      "z": 111
+    },
+    "fs-film": {
+      "x": 2194,
+      "y": -9,
+      "z": 182,
+      "w": 1024
+    },
+    "petal-1": {
+      "x": -3648,
+      "y": 1087.5,
+      "z": 134,
+      "w": 460
+    },
+    "petal-2": {
+      "x": -3132,
+      "y": 1087.5,
+      "z": 135,
+      "w": 460
+    },
+    "petal-3": {
+      "x": -2616,
+      "y": 1087.5,
+      "z": 136,
+      "w": 460
+    },
+    "petal-4": {
+      "x": -2100,
+      "y": 1087.5,
+      "z": 137,
+      "w": 460
+    },
+    "gsc-alts": {
+      "x": -2072,
+      "y": -1582,
+      "z": 196
+    },
+    "gsc-promo": {
+      "x": -1056,
+      "y": -1489,
+      "z": 195,
+      "w": 1100
+    },
+    "sr-poster": {
+      "x": 444,
+      "y": -1829,
+      "z": 161
+    },
+    "mixr-poster": {
+      "x": 900,
+      "y": -1829,
+      "z": 162
+    },
+    "pin-poster": {
+      "x": 1356,
+      "y": -1829,
+      "z": 163
+    },
+    "fs-poster": {
+      "x": 1812,
+      "y": -1829,
+      "z": 164
+    },
+    "codex-poster": {
+      "x": 2268,
+      "y": -1829,
+      "z": 165
+    },
+    "codex-flag": {
+      "x": 2268,
+      "y": -1273,
+      "z": 166
+    },
+    "codex-peekaboo": {
+      "x": 2724,
+      "y": -1273,
+      "z": 167
+    },
+    "codex-tabs": {
+      "x": 3180,
+      "y": -1273,
+      "z": 168
+    },
+    "codex-app-icon": {
+      "x": 3636,
+      "y": -1273,
+      "z": 169
+    },
+    "mixr-plain": {
+      "x": 900,
+      "y": -1273,
+      "z": 170
+    },
+    "shell-1": {
+      "x": -506,
+      "y": 1467.5,
+      "z": 133,
+      "w": 460
+    },
+    "shell-2": {
+      "x": 10,
+      "y": 1467.5,
+      "z": 132,
+      "w": 460
+    },
+    "shell-3": {
+      "x": 526,
+      "y": 1467.5,
+      "z": 131,
+      "w": 460
+    },
+    "shell-5": {
+      "x": 1042,
+      "y": 1467.5,
+      "z": 130,
+      "w": 460
+    },
+    "cursor-1": {
+      "x": -2302,
+      "y": 1919,
+      "z": 160,
+      "w": 557
+    },
+    "cursor-2": {
+      "x": -1689,
+      "y": 1919,
+      "z": 152,
+      "w": 557
+    },
+    "cursor-3": {
+      "x": -2302,
+      "y": 2288,
+      "z": 155,
+      "w": 557
+    },
+    "cursor-4": {
+      "x": -1689,
+      "y": 2288,
+      "z": 153,
+      "w": 557
+    },
+    "cursor-5": {
+      "x": -2302,
+      "y": 2657,
+      "z": 156,
+      "w": 557
+    },
+    "cursor-6": {
+      "x": -1689,
+      "y": 2657,
+      "z": 154,
+      "w": 557
+    },
+    "cursor-7": {
+      "x": -2302,
+      "y": 3027,
+      "z": 157,
+      "w": 557
+    },
+    "cursor-8": {
+      "x": -1689,
+      "y": 3027,
+      "z": 158,
+      "w": 557
+    },
+    "cursor-9": {
+      "x": -2302,
+      "y": 3396,
+      "z": 159,
+      "w": 557
+    },
+    "deck-p-1": {
+      "x": 966,
+      "y": 2298,
+      "z": 138
+    },
+    "deck-p-2": {
+      "x": 1462,
+      "y": 2298,
+      "z": 139
+    },
+    "deck-p-3": {
+      "x": 966,
+      "y": 2602,
+      "z": 140
+    },
+    "deck-p-4": {
+      "x": 1462,
+      "y": 2602,
+      "z": 141
+    },
+    "deck-p-5": {
+      "x": 966,
+      "y": 2905,
+      "z": 142
+    },
+    "deck-w-1": {
+      "x": 2142,
+      "y": 2298,
+      "z": 143
+    },
+    "deck-w-2": {
+      "x": 2638,
+      "y": 2298,
+      "z": 144
+    },
+    "deck-w-3": {
+      "x": 3134,
+      "y": 2298,
+      "z": 145
+    },
+    "deck-w-4": {
+      "x": 2142,
+      "y": 2602,
+      "z": 146
+    },
+    "deck-w-5": {
+      "x": 2638,
+      "y": 2602,
+      "z": 147
+    },
+    "deck-w-6": {
+      "x": 3134,
+      "y": 2602,
+      "z": 148
+    },
+    "deck-w-9": {
+      "x": 3134,
+      "y": 2905,
+      "z": 149
+    },
+    "deck-w-8": {
+      "x": 2638,
+      "y": 2905,
+      "z": 150
+    },
+    "deck-w-7": {
+      "x": 2142,
+      "y": 2905,
+      "z": 151
+    },
+    "fs-storyboard": {
+      "x": 2627,
+      "y": 687,
+      "z": 184,
+      "w": 1540.8
+    },
+    "tx-1-original": {
+      "x": -3314,
+      "y": -408.6,
+      "z": 1
+    },
+    "tx-2-original": {
+      "x": -3314,
+      "y": -85.7,
+      "z": 1
+    },
+    "tx-3-original": {
+      "x": -3314,
+      "y": 237.1,
+      "z": 1
+    }
+  },
+  "deleted": [
+    "gsc-sequins",
+    "gsc-motion",
+    "gsc-graph",
+    "gsc-bowl",
+    "gsc-globe-americas",
+    "gsc-notebook",
+    "gsc-satellite-antenna",
+    "gsc-globe-meridians",
+    "gsc-compass",
+    "gsc-calc",
+    "gsc-microscope",
+    "gsc-abacus",
+    "gsc-satellite",
+    "fs-sb-12",
+    "fs-sb-3",
+    "fs-sb-10",
+    "fs-sb-8",
+    "fs-sb-1",
+    "fs-sb-5",
+    "fs-sb-6",
+    "fs-sb-2",
+    "fs-sb-4",
+    "fs-sb-7",
+    "fs-sb-9",
+    "fs-sb-11",
+    "tx-4",
+    "tx-5",
+    "tx-v2",
+    "tx-6",
+    "tx-v1",
+    "tx-lilies",
+    "deck-p-6"
+  ],
+  "names": {
+    "sr-poster": "Case Study Poster · 1",
+    "mixr-poster": "Case Study Poster · 2",
+    "pin-poster": "Case Study Poster · 3",
+    "fs-poster": "Case Study Poster · 4",
+    "codex-poster": "Case Study Poster · 5",
+    "fs-film": "Figma Sound",
+    "fs-girl": "Girl Animation Loop",
+    "cursor-1": "Cursor Loves Indie · 1",
+    "cursor-2": "Cursor Loves Indie · 2",
+    "cursor-3": "Cursor Loves Indie · 3",
+    "cursor-4": "Cursor Loves Indie · 4",
+    "cursor-5": "Cursor Loves Indie · 5",
+    "cursor-6": "Cursor Loves Indie · 6",
+    "cursor-7": "Cursor Loves Indie · 7",
+    "cursor-8": "Cursor Loves Indie · 8",
+    "cursor-9": "Cursor Loves Indie · 9",
+    "deck-p-1": "Lilac Deck Template · 1",
+    "deck-p-2": "Lilac Deck Template · 2",
+    "deck-p-3": "Lilac Deck Template · 3",
+    "deck-p-4": "Lilac Deck Template · 4",
+    "deck-p-5": "Lilac Deck Template · 5",
+    "deck-w-1": "Black & White Deck Template · 1",
+    "deck-w-2": "Black & White Deck Template · 2",
+    "deck-w-3": "Black & White Deck Template · 3",
+    "deck-w-4": "Black & White Deck Template · 4",
+    "deck-w-5": "Black & White Deck Template · 5",
+    "deck-w-6": "Black & White Deck Template · 6",
+    "deck-w-7": "Black & White Deck Template · 7",
+    "deck-w-8": "Black & White Deck Template · 8",
+    "deck-w-9": "Black & White Deck Template · 9",
+    "tx-1-original": "Swan Midjourney Image",
+    "tx-2-original": "Fruit Midjourney Image",
+    "tx-3-original": "Tulip Midjourney Image",
+    "gsc-alts": "Alternative Objects"
+  },
+  "phone": {
+    "petal-1": {
+      "x": 207,
+      "y": 710,
+      "w": 258
+    },
+    "petal-2": {
+      "x": 496,
+      "y": 710,
+      "w": 258
+    },
+    "petal-3": {
+      "x": 794,
+      "y": 710,
+      "w": 258
+    },
+    "petal-4": {
+      "x": 1074,
+      "y": 710,
+      "w": 258
+    },
+    "shell-1": {
+      "x": -331,
+      "y": 1343,
+      "w": 258
+    },
+    "shell-2": {
+      "x": -42,
+      "y": 1343,
+      "w": 258
+    },
+    "shell-3": {
+      "x": 247,
+      "y": 1343,
+      "w": 258
+    },
+    "shell-5": {
+      "x": 536,
+      "y": 1343,
+      "w": 258
+    },
+    "tx-1-original": {
+      "x": -1371,
+      "y": -734,
+      "w": 224
+    },
+    "tx-1": {
+      "x": -1115,
+      "y": -734,
+      "w": 224
+    },
+    "tx-2-original": {
+      "x": -1371,
+      "y": -553,
+      "w": 224
+    },
+    "tx-2": {
+      "x": -1115,
+      "y": -553,
+      "w": 224
+    },
+    "tx-3": {
+      "x": -1115,
+      "y": -372,
+      "w": 224
+    },
+    "tx-3-original": {
+      "x": -1371,
+      "y": -372,
+      "w": 224
+    },
+    "cursor-1": {
+      "x": -1398,
+      "y": 1063,
+      "w": 312
+    },
+    "cursor-2": {
+      "x": -1055,
+      "y": 1063,
+      "w": 312
+    },
+    "cursor-3": {
+      "x": -1398,
+      "y": 1269,
+      "w": 312
+    },
+    "cursor-4": {
+      "x": -1055,
+      "y": 1269,
+      "w": 312
+    },
+    "cursor-5": {
+      "x": -1398,
+      "y": 1476,
+      "w": 312
+    },
+    "cursor-6": {
+      "x": -1055,
+      "y": 1476,
+      "w": 312
+    },
+    "cursor-7": {
+      "x": -1398,
+      "y": 1683,
+      "w": 312
+    },
+    "cursor-8": {
+      "x": -1055,
+      "y": 1683,
+      "w": 312
+    },
+    "cursor-9": {
+      "x": -1398,
+      "y": 1890,
+      "w": 312
+    },
+    "deck-p-1": {
+      "x": -224,
+      "y": 1876,
+      "w": 246
+    },
+    "deck-p-2": {
+      "x": 54,
+      "y": 1876,
+      "w": 246
+    },
+    "deck-p-3": {
+      "x": -224,
+      "y": 2047,
+      "w": 246
+    },
+    "deck-p-4": {
+      "x": 54,
+      "y": 2047,
+      "w": 246
+    },
+    "deck-p-5": {
+      "x": -224,
+      "y": 2216,
+      "w": 246
+    },
+    "deck-w-1": {
+      "x": 435,
+      "y": 1876,
+      "w": 246
+    },
+    "deck-w-2": {
+      "x": 712,
+      "y": 1876,
+      "w": 246
+    },
+    "deck-w-3": {
+      "x": 990,
+      "y": 1876,
+      "w": 246
+    },
+    "deck-w-4": {
+      "x": 435,
+      "y": 2047,
+      "w": 246
+    },
+    "deck-w-5": {
+      "x": 712,
+      "y": 2047,
+      "w": 246
+    },
+    "deck-w-6": {
+      "x": 990,
+      "y": 2047,
+      "w": 246
+    },
+    "deck-w-9": {
+      "x": 990,
+      "y": 2216,
+      "w": 246
+    },
+    "deck-w-8": {
+      "x": 712,
+      "y": 2216,
+      "w": 246
+    },
+    "deck-w-7": {
+      "x": 435,
+      "y": 2216,
+      "w": 246
+    },
+    "gsc-alts": {
+      "x": -1081,
+      "y": -1510,
+      "w": 459
+    },
+    "gsc-promo": {
+      "x": -512,
+      "y": -1458,
+      "w": 616
+    },
+    "sq-pom": {
+      "x": -1390,
+      "y": -1214,
+      "w": 190
+    },
+    "sq-giraffe": {
+      "x": -1169,
+      "y": -1214,
+      "w": 190
+    },
+    "sq-rocket": {
+      "x": -947,
+      "y": -1214,
+      "w": 190
+    },
+    "sr-poster": {
+      "x": -1226,
+      "y": -2362,
+      "w": 224
+    },
+    "mixr-poster": {
+      "x": -970,
+      "y": -2362,
+      "w": 224
+    },
+    "pin-poster": {
+      "x": -715,
+      "y": -2362,
+      "w": 224
+    },
+    "fs-poster": {
+      "x": -460,
+      "y": -2362,
+      "w": 224
+    },
+    "codex-poster": {
+      "x": -204,
+      "y": -2362,
+      "w": 224
+    },
+    "mixr-plain": {
+      "x": -970,
+      "y": -2050,
+      "w": 224
+    },
+    "codex-flag": {
+      "x": -204,
+      "y": -2050,
+      "w": 224
+    },
+    "codex-peekaboo": {
+      "x": 51,
+      "y": -2050,
+      "w": 224
+    },
+    "codex-tabs": {
+      "x": 306,
+      "y": -2050,
+      "w": 224
+    },
+    "codex-app-icon": {
+      "x": 562,
+      "y": -2050,
+      "w": 224
+    },
+    "fs-film": {
+      "x": 529,
+      "y": -1529,
+      "w": 573
+    },
+    "fs-storyboard": {
+      "x": 771,
+      "y": -1139,
+      "w": 863
+    },
+    "fs-girl": {
+      "x": 976,
+      "y": -1529,
+      "w": 258
+    }
+  }
+}

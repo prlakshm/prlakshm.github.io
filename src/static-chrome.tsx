@@ -4,6 +4,7 @@ import "./styles/tokens.css";
 import { awardOnArrival } from "./components/badges/badgeStore.js";
 import { NavBar } from "./pages/home/WtNav.js";
 import SiteFooter from "./pages/home/SiteFooter.js";
+import "./motion/stormHandoff.js"; // the way into EVERYTHING (cross-page storm)
 
 /* The site's nav and footer for the static case studies in public/.
 
@@ -36,7 +37,7 @@ function StaticNav({ badgeOnOpen }: { badgeOnOpen?: string }) {
   return (
     <NavBar
       autoHide
-      work={<a href="/#/">WORK{rule}</a>}
+      work={<a href="/#/">GALLERY{rule}</a>}
       about={<a href="/about/">ABOUT{rule}</a>}
     />
   );

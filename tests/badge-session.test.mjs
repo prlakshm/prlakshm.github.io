@@ -164,3 +164,40 @@ test("the badge adapter has no permanent collection or generic pending-return fl
   assert.doesNotMatch(source, /\bPENDING\b|takePending/);
   assert.match(source, /awardOnArrival/);
 });
+
+test("a snapshot sent before a reset cannot bring the stars back", () => {
+  let clock = 100;
+  const now = () => clock;
+  const bus = createChannelBus();
+  // a bus that only this test drives, to deliver a stale snapshot late
+  let late = null;
+  const a = createBadgeSession({ storage: new MemoryStorage(), channelFactory: bus, tabId: "a", now, makeEventId: createIds("a") });
+  const resets = [];
+  const b = createBadgeSession({
+    storage: new MemoryStorage(),
+    channelFactory: (name) => {
+      const ch = bus(name);
+      late = (data) => ch.listeners.forEach((l) => l({ data }));
+      return ch;
+    },
+    tabId: "b",
+    now,
+    makeEventId: createIds("b"),
+    onReset: () => resets.push("b"),
+  });
+
+  a.earn("name");
+  assert.deepEqual(b.getFound(), ["name"]);
+  const stale = { type: "snapshot", from: "a", to: "b", records: [{ id: "name", eventId: "a-1", foundAt: 100 }] };
+
+  clock = 200;
+  a.reset();
+  assert.deepEqual(b.getFound(), []);
+  assert.deepEqual(resets, ["b"]);
+
+  late(stale);
+  assert.deepEqual(b.getFound(), []);
+
+  b.earn("bagel");
+  assert.deepEqual(a.getFound(), ["bagel"]);
+});

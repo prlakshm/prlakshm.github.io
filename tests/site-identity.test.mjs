@@ -6,13 +6,10 @@ const root = new URL("../", import.meta.url);
 const entryPoints = [
   "index.html",
   "public/mixr/index.html",
-  "public/reasons-to-watch/index.html",
   "public/surprise-rail/index.html",
   "public/figma/index.html",
   "public/codex/index.html",
   "public/cursor/index.html",
-  "public/branding/index.html",
-  "public/branding/v2/index.html",
 ];
 const version = "gold-frame-2";
 

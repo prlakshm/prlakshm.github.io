@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
-import { BEAT, decoded, enterOnView, fontsReady, lineCount, type Step } from "../../motion/entrance.js";
+import { revealOnView } from "../../motion/reveal.js";
 import "../../styles/tokens.css";
 import "../home/home.css";
 import "./about.css";
@@ -10,7 +10,6 @@ import { mountPortraitPop } from "./portraitPop.js";
 import { mountPortraitGlass } from "./portraitGlass.js";
 import { prefersReducedMotion } from "../home/interactions.js";
 import { mountTitleGoldLight } from "../home/titleGoldLight.js";
-import { DEFAULT_ORANGE_PREVIEW, orangePreviewFromSearch } from "./orangePreview.js";
 
 // public/about/"Profile picture.webp" — space encoded for the URL.
 const PORTRAIT = "/about/Profile%20picture.webp";
@@ -60,37 +59,20 @@ function About() {
     return () => ro.disconnect();
   }, []);
 
-  /* Entrance, in groups, in the site's rhythm (src/motion/entrance.ts): the
-     title (a beat per line it wraps to), with the beside photo joining on its
-     final line, then the body and table. Stacked under the table
-     (phones) the photo comes in when it scrolls into view. Waits for the
-     fonts, so the lines are counted and the table sized before anything
-     moves. */
-  useLayoutEffect(() => {
+  /* Entrance, the case studies' way (src/motion/reveal.ts): the text column
+     comes in as one block, the photo one step after it, once its image has
+     loaded. Stacked under the table (phones), the photo comes in when it is
+     scrolled to. Hidden by CSS (.enter) from the first paint. */
+  useEffect(() => {
     const about = aboutRef.current;
-    if (!about || prefersReducedMotion()) return;
-    const q = (sel: string) => Array.from(about.querySelectorAll<HTMLElement>(sel));
-    const portrait = q(".ab-portrait")[0];
-    const text = q(".ab-text")[0];
-    const beside = !!portrait && !!text && portrait.getBoundingClientRect().top < text.getBoundingClientRect().bottom;
-    const steps = (): Step[] => {
-      const heading = q(".ab-heading")[0];
-      const portraitAt = heading ? BEAT * Math.max(0, lineCount(heading) - 1) + 0.05 : 0;
-      const out: Step[] = [];
-      if (heading) out.push({ el: heading, beats: lineCount(heading) });
-      out.push({ el: q(".ab-body .line"), rows: true });
-      if (beside && portrait) out.push({ el: portrait, large: true, weight: "heavy", at: portraitAt });
-      out.push({ el: q(".ab-exp-h, .ab-exp-row"), rows: true });
-      return out;
-    };
-    const ready = () =>
-      fontsReady().then(
-        () => new Promise((r) => requestAnimationFrame(() => r(null)))
-      );
-    const stops = [enterOnView(text ?? about, steps, ready)];
-    if (portrait && !beside)
-      stops.push(enterOnView(portrait, () => [{ el: portrait, large: true, weight: "heavy" }], () => decoded(q(".ab-portrait img") as HTMLImageElement[])));
-    return () => stops.forEach((stop) => stop());
+    const text = about?.querySelector<HTMLElement>(".ab-text");
+    const portrait = portraitRef.current;
+    if (!text || !portrait) return;
+    const beside = portrait.getBoundingClientRect().top < text.getBoundingClientRect().bottom;
+    return revealOnView([
+      { el: text },
+      { el: portrait, delay: beside ? 0.09 : 0, image: portrait.querySelector<HTMLImageElement>("img") },
+    ]);
   }, []);
 
   /* Celebrate design: the portrait tilts up and the party frame tucked under
@@ -101,8 +83,7 @@ function About() {
     const pane = fig?.querySelector<HTMLElement>(".ab-pane");
     const glassEl = fig?.querySelector<HTMLElement>(".ab-glass");
     if (!fig || !pane || !glassEl) return;
-    const orangePreview = orangePreviewFromSearch(window.location.search) ?? DEFAULT_ORANGE_PREVIEW;
-    const pop = mountPortraitPop(fig, pane, prefersReducedMotion(), orangePreview);
+    const pop = mountPortraitPop(fig, pane, prefersReducedMotion());
     const glass = mountPortraitGlass(fig, glassEl, prefersReducedMotion());
     let touch = false;
     const celebrate = (e: PointerEvent | MouseEvent) => earn("celebrate", { x: e.clientX, y: e.clientY });
@@ -156,7 +137,7 @@ function About() {
       <main>
         <section className="ab ab--page" id="about" ref={aboutRef} aria-labelledby="ab-title">
           <div className="ab-grid">
-            <div className="ab-text">
+            <div className="ab-text enter">
               {/* "designer" takes the second line when the two don't fit */}
               <h1 className="ab-heading" id="ab-title">
                 an&nbsp;interdisciplinary designer
@@ -191,7 +172,7 @@ function About() {
                 </ul>
               </section>
             </div>
-            <figure className="ab-portrait" ref={portraitRef}>
+            <figure className="ab-portrait enter" ref={portraitRef}>
               {/* the pane lifts for the celebration; the glass inside it leans
                   toward the cursor and catches the light, as the posters do */}
               <div className="ab-pane">

@@ -1,6 +1,5 @@
 import { animate } from "motion";
 import { ART, PH, framePieces, type Piece } from "./portraitFrame.js";
-import type { OrangePreview } from "./orangePreview.js";
 
 /* The frame under the About portrait, live. Every piece sits hidden under the
    photo; when the photo tilts up they bloom out on critically damped springs
@@ -10,8 +9,6 @@ import type { OrangePreview } from "./orangePreview.js";
    is a percentage of each piece's own size, so it scales with the portrait. */
 
 const PHOTO_GLIDE = { type: "spring", bounce: 0, duration: 0.7 } as const;
-const SVG_NS = "http://www.w3.org/2000/svg";
-let previewFilterCount = 0;
 
 type Live = {
   p: Piece;
@@ -25,31 +22,11 @@ type Live = {
 
 const pct = (n: number) => `${+n.toFixed(3)}%`;
 
-export function mountPortraitPop(fig: HTMLElement, photo: HTMLElement, reduced: boolean, orangePreview: OrangePreview | null = null) {
+export function mountPortraitPop(fig: HTMLElement, photo: HTMLElement, reduced: boolean) {
   const layer = document.createElement("div");
   layer.className = "ab-pop";
   layer.setAttribute("aria-hidden", "true");
   fig.insertBefore(layer, fig.firstChild);
-
-  let filterId: string | null = null;
-  if (orangePreview && orangePreview.index !== 1) {
-    filterId = `ab-orange-preview-${++previewFilterCount}`;
-    const svg = document.createElementNS(SVG_NS, "svg");
-    svg.setAttribute("width", "0");
-    svg.setAttribute("height", "0");
-    svg.classList.add("ab-preview-filter");
-    const defs = document.createElementNS(SVG_NS, "defs");
-    const filter = document.createElementNS(SVG_NS, "filter");
-    filter.id = filterId;
-    filter.setAttribute("color-interpolation-filters", "sRGB");
-    const matrix = document.createElementNS(SVG_NS, "feColorMatrix");
-    matrix.setAttribute("type", "matrix");
-    matrix.setAttribute("values", orangePreview.matrix);
-    filter.appendChild(matrix);
-    defs.appendChild(filter);
-    svg.appendChild(defs);
-    layer.appendChild(svg);
-  }
 
   const pieces: Live[] = framePieces().map((p) => {
     const el = document.createElement("div");
@@ -66,13 +43,12 @@ export function mountPortraitPop(fig: HTMLElement, photo: HTMLElement, reduced: 
     inner.className = "ab-pc-in";
     el.appendChild(inner);
     const imgs: Live["imgs"] = [];
-    const sprite = (name: string, cls: string, orange = false) => {
+    const sprite = (name: string, cls: string) => {
       const img = document.createElement("img");
       img.className = cls;
       img.alt = "";
       img.decoding = "async";
       img.draggable = false;
-      if (orange && filterId) img.style.filter = `url(#${filterId})`;
       inner.appendChild(img);
       imgs.push({ el: img, src: `${ART}${name}.webp` });
       return img;
@@ -80,8 +56,7 @@ export function mountPortraitPop(fig: HTMLElement, photo: HTMLElement, reduced: 
     let lit: HTMLElement | null = null;
     if (p.kind === "curl") inner.innerHTML = p.svg!;
     else {
-      const orange = p.kind === "tissue" && p.s?.includes("-oepeach");
-      sprite(p.s!, "rest", orange);
+      sprite(p.s!, "rest");
       if (p.kind === "gold") lit = sprite(`${p.s}-lit`, "lit");
     }
     layer.appendChild(el);

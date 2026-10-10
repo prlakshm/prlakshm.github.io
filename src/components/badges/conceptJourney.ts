@@ -10,8 +10,15 @@ type ChannelLike = {
   close(): void;
 };
 
+// A click opens the concept page within moments; a page opened later in the
+// tab (typed, bookmarked) is not that click's visit. And a visit never
+// finished does not wait forever for a return.
+export const OPEN_WINDOW_MS = 2 * 60 * 1000;
+export const JOURNEY_TTL_MS = 30 * 60 * 1000;
+
 type Journey = {
   id: string;
+  startedAt: number;
   origin: string;
   target: string;
   opened: boolean;
@@ -44,7 +51,9 @@ const readJourney = (storage: StorageLike | null): Journey | null => {
       typeof value.origin !== "string" ||
       typeof value.target !== "string" ||
       typeof value.opened !== "boolean" ||
-      typeof value.leftOrigin !== "boolean"
+      typeof value.leftOrigin !== "boolean" ||
+      typeof value.startedAt !== "number" ||
+      Date.now() - value.startedAt > JOURNEY_TTL_MS
     ) {
       return null;
     }
@@ -87,7 +96,13 @@ export function createConceptJourney(options: JourneyOptions) {
 
   const confirmOpened = (path: string) => {
     const journey = readJourney(options.storage);
-    if (!journey || journey.target !== normalizePath(path) || journey.opened) return false;
+    if (
+      !journey ||
+      journey.target !== normalizePath(path) ||
+      journey.opened ||
+      Date.now() - journey.startedAt > OPEN_WINDOW_MS
+    )
+      return false;
     writeJourney(options.storage, { ...journey, opened: true });
     completeIfReturned();
     return true;
@@ -114,6 +129,7 @@ export function createConceptJourney(options: JourneyOptions) {
     begin(target: string, { newTab = false }: { newTab?: boolean } = {}) {
       const journey: Journey = {
         id: makeId(),
+        startedAt: Date.now(),
         origin: normalizePath(options.currentPath()),
         target: normalizePath(target),
         opened: false,

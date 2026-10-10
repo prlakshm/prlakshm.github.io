@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Poster rail banner</title>
+<style>
+  html, body { margin: 0; background: #222; }
+  .frame { position: relative; overflow: hidden; background: #f8fafc; }
+  .frame.dark { background: #0a0a0a; }
+  .rail { position: absolute; display: flex; }
+  .rail img { display: block; object-fit: cover; }
+  .soft img { border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.12); }
+  .guide { position: absolute; border-radius: 50%; border: 3px dashed #ff2d55; background: rgba(255,45,85,.12); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const q = new URLSearchParams(location.search);
+const v = q.get("v") || "R1";
+const size = q.get("size") || "li";
+const guides = q.get("guides") === "1";
+const li = size === "li";
+const [W, H] = li ? [1584, 396] : [1500, 500];
+// the Home gallery's order
+const P = ["surprise-rail", "mixr", "pinnables", "figma-sound", "codex-bookmarks"].map(n => n + "-poster.webp");
+
+const f = document.createElement("div");
+f.className = "frame" + (v === "R3" ? " dark" : "");
+f.style.width = W + "px"; f.style.height = H + "px";
+document.getElementById("root").appendChild(f);
+
+const rail = document.createElement("div"); rail.className = "rail";
+let h, gap, x, y;
+if (v === "R2") {
+  // full bleed: posters touch top and bottom, hairline gaps, run off both edges
+  h = H; gap = 4; const w = h * 0.8;
+  const total = 5 * w + 4 * gap;
+  x = Math.round((W - total) / 2); y = 0;
+} else {
+  // contained: a row to the right of the avatar, equal margins top and bottom
+  h = li ? 264 : 264; gap = 18;
+  const w = h * 0.8, total = 5 * w + 4 * gap;
+  x = li ? Math.round(W - total - (W - total - 352) / 2) : W - total - 40; y = Math.round((H - h) / 2);
+  rail.classList.add("soft");
+}
+rail.style.left = x + "px"; rail.style.top = y + "px"; rail.style.gap = gap + "px";
+P.forEach(src => {
+  const i = document.createElement("img"); i.src = src;
+  i.style.height = h + "px"; i.style.width = Math.round(h * 0.8) + "px";
+  rail.appendChild(i);
+});
+f.appendChild(rail);
+
+if (guides) {
+  const g = document.createElement("div"); g.className = "guide";
+  const [cx, cy, r] = li ? [200, 396, 152] : [205, 500, 168];
+  Object.assign(g.style, { left: cx - r + "px", top: cy - r + "px", width: 2 * r + "px", height: 2 * r + "px" });
+  f.appendChild(g);
+}
+</script>
+</body>
+</html>

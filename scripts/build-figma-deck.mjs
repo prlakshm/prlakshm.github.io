@@ -1,5 +1,6 @@
 /* Builds public/figma/index.html — the Figma Sound chapter of the branding
-   deck as its own standalone deck — from public/branding/index.html.
+   deck as its own standalone deck — from decks/branding-source.html (the old all-chapters page, kept as
+   source only; it is no longer published, and its assets stay in public/branding/).
 
    The branding deck stays the single source of truth: rerun this script after
    editing it (`node scripts/build-figma-deck.mjs`). It
@@ -17,7 +18,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const src = resolve(root, "public/branding/index.html");
+const src = resolve(root, "decks/branding-source.html");
 const out = resolve(root, "public/figma/index.html");
 
 let html = readFileSync(src, "utf8");

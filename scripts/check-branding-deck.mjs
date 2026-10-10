@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 
 const deckPath = "public/branding/deck.html";
-const indexPath = "public/branding/index.html";
+const indexPath = "decks/branding-source.html";
 
 if (!existsSync(deckPath)) {
   throw new Error(`${deckPath} is missing`);

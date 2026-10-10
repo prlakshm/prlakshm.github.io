@@ -64,33 +64,33 @@ test("masked titles keep a faint idle gold drift and use a readable shine durati
   assert.match(shared, /duration\s*\?/);
 });
 
-test("homepage overlaps the above-fold poster wall with the second subheading line", () => {
+test("Home enters the case studies' way: the hero as one block, then the wall", () => {
   const home = read("src/pages/home/Home.tsx");
-  const entrance = read("src/motion/entrance.ts");
+  const reveal = read("src/motion/reveal.ts");
+  const tokens = read("src/styles/tokens.css");
   const gallery = read("src/pages/home/PosterGallery.tsx");
 
-  assert.match(home, /at:\s*0\.14/);
-  assert.match(home, /at:\s*0\.26/);
-  assert.match(home, /rows:\s*0\.04/);
-  assert.match(home, /at:\s*0\.4/);
+  assert.match(home, /className="hero-block enter"/);
+  assert.match(gallery, /className="gl-placard enter enter--slow"/);
+  assert.match(gallery, /className="gl-card enter enter--slow"/);
+  assert.match(home, /revealOnView\(/);
   assert.match(home, /getBoundingClientRect\(\)\.top\s*<\s*window\.innerHeight \* 0\.9/);
-  assert.match(entrance, /at\?:\s*number/);
-  assert.match(entrance, /duration:\s*0\.5/);
-  assert.match(entrance, /duration:\s*0\.7/);
+  // the wall waits for its images together, so it ripples evenly
+  assert.match(home, /image:\s*images/);
+  assert.match(reveal, /rootMargin:\s*"0px 0px -10% 0px",\s*threshold:\s*0\.06/);
+  assert.match(tokens, /--enter-dur:\s*0\.72s/);
+  assert.match(tokens, /--enter-rise:\s*16px/);
+  assert.match(tokens, /html \.enter\s*\{/);
   assert.match(gallery, /loading="eager"/);
   assert.match(gallery, /fetchpriority:\s*"high"/);
 });
 
-test("the larger About portrait settles more slowly than poster cards", () => {
+test("About enters as the text column, then the photo once its image loads", () => {
   const about = read("src/pages/about/About.tsx");
-  const entrance = read("src/motion/entrance.ts");
 
-  assert.match(about, /import \{[^}]*BEAT[^}]*\} from "\.\.\/\.\.\/motion\/entrance\.js"/);
-  assert.match(about, /const portraitAt = heading \? BEAT \* Math\.max\(0, lineCount\(heading\) - 1\) \+ 0\.05 : 0/);
-  assert.match(about, /el:\s*portrait,\s*large:\s*true,\s*weight:\s*"heavy",\s*at:\s*portraitAt/);
-  assert.match(entrance, /weight\?:\s*"heavy"/);
-  assert.match(entrance, /FADE_HEAVY\s*=\s*\{\s*duration:\s*0\.65/);
-  assert.match(entrance, /SETTLE_HEAVY\s*=\s*\{\s*duration:\s*0\.9/);
+  assert.match(about, /className="ab-text enter"/);
+  assert.match(about, /className="ab-portrait enter"/);
+  assert.match(about, /delay:\s*beside \? 0\.09 : 0/);
 });
 
 test("title light is clipped to the paintings' gold masks", () => {

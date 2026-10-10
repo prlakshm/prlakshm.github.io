@@ -448,7 +448,7 @@
         const WEIGHT = { marks: 0.587, codex: 0.169, bookmark: 0.106, sparkle: 0.01 };
         // Add a stronger angular impulse at contact while retaining incoming
         // velocity and damping: a deeper first tip, then diminishing swings.
-        const TEETER = { kick: 95.971008, stiffness: 30, damping: 4.8 };
+        const TEETER = { kick: 84, stiffness: 22, damping: 2.97 };
         // The bookmark lands on the right end and pushes the cloud back toward
         // upright — 4.8° in the first moment — and it eases the rest of the way
         // home, no throw past upright: one smooth curve.
@@ -490,7 +490,7 @@
           const stop = phi.on("change", () => {
             if (!live()) return stop();
             const sign = Math.sign(vel(phi));
-            if (sign && last && sign !== last && ++turns === 3) {
+            if (sign && last && sign !== last && ++turns === 4) {
               stop();
               anim(phi, PHI_FINAL, { type: "spring", velocity: vel(phi), stiffness: 90, damping: 2 * Math.sqrt(90) });
             }
@@ -755,7 +755,7 @@
                 if (!live()) return;
                 impact("spTR", v, { squash: 0.2 });
                 // A lighter secondary impulse follows the bookmark’s main impact.
-                anim(tap, 0, { type: "spring", velocity: 21, stiffness: 120, damping: 2 * Math.sqrt(120) * 0.6 });
+                anim(tap, 0, { type: "spring", velocity: 60, stiffness: 120, damping: 2 * Math.sqrt(120) * 0.6 });
                 settle("spTR");
                 const s = S.spTR, up = 12, t = Math.sqrt((2 * up) / G); // one small bounce, same gravity
                 await anim(0, up, { duration: t, ease: (x) => 1 - (1 - x) * (1 - x), onUpdate: (q) => { s.off = q; draw(); } });

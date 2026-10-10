@@ -10,7 +10,6 @@ import { animate } from 'motion';
 import Header from './components/Header.js';
 import Footer from './components/Footer.js';
 import Home from './pages/home/Home.js';
-import About from './pages/about/About.js';
 import {
   normalizeRoutePath,
   normalizeRouteSearch,
@@ -116,14 +115,22 @@ function Shell() {
             Kept routed, not linked, so the exhibition-room treatment is not lost. */}
         <Route path="/surprise-rail-v1" element={<SurpriseRailV1 />} />
         <Route path="/hbo-max-rtw" element={<CaseStudyHBOMax2 />} />
-        {/* About is its own page: the manifesto and the portrait. */}
-        <Route path="/about" element={<About />} />
+        {/* About is its own page now (/about/, with its own link preview):
+            old hash-route About links go there, not to a second copy. */}
+        <Route path="/about" element={<ToCleanAbout />} />
       </Routes>
       </Suspense>
       </div>
       {!ownsChrome && <Footer />}
     </>
   );
+}
+
+function ToCleanAbout() {
+  useEffect(() => {
+    window.location.replace("/about/");
+  }, []);
+  return null;
 }
 
 function App() {

@@ -2,6 +2,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.js";
+import "./motion/stormHandoff.js"; // the way into EVERYTHING (cross-page storm)
 
 
 // Use ReactDOM.createRoot to render your app into the root element in "index.html".
