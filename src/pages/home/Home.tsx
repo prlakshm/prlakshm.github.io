@@ -37,11 +37,11 @@ function Home() {
      nothing waits for fonts.
      On a phone it's the case studies' cascade instead: the hero arrives
      line by line (name, then the copy, then PREV, then the links, a step
-     apart), and each row of posters arrives as one gesture the moment its
-     placard comes onto the screen: the placard, then its cards a step apart,
-     including the ones still off to the side of the swipeable row, so you
-     never swipe into an empty slot. Each card waits only for its own print,
-     and develops as the About portrait does (gallery.css). */
+     apart), and each row of posters arrives together, with its placard, the
+     moment it comes onto the screen, including the cards still off to the
+     side of the swipeable row, so you never swipe into an empty slot. Each
+     card waits only for its own print. Same look as before (.enter--slow);
+     only when it starts changed. */
   useEffect(() => {
     const hero = heroRef.current;
     const block = hero?.querySelector<HTMLElement>(".hero-block");
@@ -69,7 +69,7 @@ function Home() {
             const trigger = placard ?? group;
             return [
               ...(placard ? [{ el: placard, trigger }] : []),
-              ...cards.map((el, i) => ({ el, delay: (i + 1) * 0.09, trigger, image: el.querySelector<HTMLImageElement>(".gl-print img") })),
+              ...cards.map((el) => ({ el, trigger, image: el.querySelector<HTMLImageElement>(".gl-print img") })),
             ];
           }),
         ],

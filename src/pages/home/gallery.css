@@ -290,19 +290,3 @@
     transition: none;
   }
 }
-
-/* Phone entrance: each card develops exactly as the About portrait does
-   (about.css): it fades over .9s while it rises and settles from a touch
-   larger (1.04) over 1.6s, on the same curve, starting as its row comes
-   onto the screen (Home.tsx). Big art reads best as a print easing into
-   place; a plain rise barely registered on a card this size. */
-@media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
-  html .gl-card.enter {
-    transition:
-      opacity 0.9s var(--ease-settle),
-      transform 1.6s var(--ease-settle);
-  }
-  html .gl-card.enter:not(.is-in) {
-    transform: translateY(var(--enter-rise)) scale(1.04);
-  }
-}

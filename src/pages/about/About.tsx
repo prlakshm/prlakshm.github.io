@@ -64,10 +64,8 @@ function About() {
   /* Entrance, the case studies' way (src/motion/reveal.ts): the text column
      comes in as one block, the photo one step after it, once its image has
      loaded. Stacked under the table (phones), the photo comes in when it is
-     scrolled to, and develops (about.css): it rises with the text's rise and
-     settles from a touch larger, like a print easing into its frame, as the
-     Figma Sound case study's art does. Hidden by CSS (.enter) from the first
-     paint. */
+     scrolled to, starting the moment it enters the screen. Hidden by CSS
+     (.enter) from the first paint. */
   useEffect(() => {
     const about = aboutRef.current;
     const text = about?.querySelector<HTMLElement>(".ab-text");
