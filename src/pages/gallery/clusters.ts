@@ -61,10 +61,13 @@ const SPECS: Spec[] = [
   { id: "cursor", title: "Cursor Loves Indie", cols: 2, items: Array.from({ length: 9 }, (_, i) => img("cursor-" + (i + 1), `Cursor Loves Indie Slides · ${i + 1}`, `/home/decks/cursor/slide-0${i + 1}.webp`, 460, S)) },
   { id: "decks", title: "Slide templates · Disney deck", cols: 2, groups: [LILAC, BW], groupCols: [2, 3], items: [...LILAC, ...BW] },
   { id: "seashell", title: "Seashell posters", row: true, items: [
-    vid("shell-1", "Seashell Poster · 1", "shell-01-stamp-blue", 380, P),
+    // Shell Drop · Single (Disney Deck, Seashell Line Art 1083:55866): one big stamp, a drop rises and becomes each shell
+    vid("shell-1", "Seashell Poster · 1", "shell-01-shell-drop", 380, P),
     vid("shell-2", "Seashell Poster · 2", "shell-02-coastal-press", 380, P),
-    vid("shell-3", "Seashell Poster · 3", "shell-03-full-sheet", 380, P),
-    vid("shell-5", "Seashell Poster · 4", "shell-05-conveyor-belt", 380, P),
+    // Full Sheet and Conveyor Belt: their prototype motion (variant shuffle; the
+    // 22s cross carousel) rebuilt as video from the Figma file
+    vid("shell-3", "Seashell Poster · 3", "shell-03-sheet-shuffle", 380, P),
+    vid("shell-5", "Seashell Poster · 4", "shell-05-conveyor", 380, P),
   ] },
   { id: "petal", title: "Petal posters", row: true, items: [
     vid("petal-1", "Petal Poster · 1", "petal-01-petal-press", 380, P),

@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Banner stack</title>
+<style>
+  @font-face { font-family: "General Sans"; src: url(GeneralSans-Variable.woff2) format("woff2"); font-weight: 200 700; }
+  @font-face { font-family: "JB Mono"; src: url(JetBrainsMono-Variable.woff2) format("woff2"); font-weight: 100 800; }
+  .url { position: absolute; font: 500 22px/1 "JB Mono", monospace; letter-spacing: .06em; color: #666; white-space: nowrap; }
+  html, body { margin: 0; background: #222; }
+  .frame { position: relative; overflow: hidden; background: #f8fafc; }
+  .rail { position: absolute; display: flex; }
+  .rail img { display: block; object-fit: cover; border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 10px 28px rgba(0,0,0,.14); }
+  /* the Home hero's title: a window onto the skyline, brightest fill capped */
+  .title { position: absolute; margin: 0; white-space: nowrap;
+    font-family: "General Sans"; font-weight: 700; letter-spacing: -.035em; line-height: .97;
+    padding-block: .04em .2em;
+    background-image: linear-gradient(#d6d6d6, #d6d6d6), url(skyline-d.webp);
+    background-blend-mode: darken;
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .m { position: absolute; background: #fdfdfb; color: #141414; white-space: nowrap;
+    font: 400 44px/1 "Times New Roman", Times, serif; padding: 9px 13px 8px;
+    box-shadow: 0 1px 0 rgba(0,0,0,.06), 1px 2px 2px rgba(0,0,0,.18), 3px 6px 10px rgba(0,0,0,.16); }
+  .guide { position: absolute; border-radius: 50%; border: 3px dashed #ff2d55; background: rgba(255,45,85,.12); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const q = new URLSearchParams(location.search);
+const v = q.get("v") || "T";
+const li = (q.get("size") || "li") === "li";
+const guides = q.get("guides") === "1";
+const [W, H] = li ? [1584, 396] : [1500, 500];
+const bgSize = q.get("bs") || "150%", bgPos = q.get("bp") || "11.9% 92.2%";
+const P = ["surprise-rail", "mixr", "pinnables", "figma-sound", "codex-bookmarks"].map(n => n + "-poster.webp");
+const f = document.createElement("div"); f.className = "frame";
+f.style.width = W + "px"; f.style.height = H + "px";
+document.getElementById("root").appendChild(f);
+const px = n => Math.round(n) + "px";
+
+// rail along the bottom, ~84% of each poster showing, clear of the avatar
+const h = li ? 264 : 236, w = h * 0.8, gap = 16, total = 5 * w + 4 * gap;
+const shown = 0.84;
+const x0 = li ? 352 + (W - 352 - total) / 2 : W - total - 40;
+const rail = document.createElement("div"); rail.className = "rail";
+// X magnets: the same layout lifted a little (rail and magnets together)
+const lift = !li && v === "M" ? 12 : 0;
+const railTop = H - h * shown - lift;
+const railNudge = lift ? 12 : 0; // X: posters a tad higher, magnets stay
+Object.assign(rail.style, { left: px(x0), top: px(railTop - railNudge), gap: gap + "px" });
+P.forEach(src => { const i = document.createElement("img"); i.src = src; i.style.width = px(w); i.style.height = px(h); rail.appendChild(i); });
+f.appendChild(rail);
+
+Promise.all([document.fonts.load("700 100px \"General Sans\""), document.fonts.load("500 18px \"JB Mono\"")]).then(() => {
+if (v === "T") {
+  const t = document.createElement("h1"); t.className = "title"; t.textContent = "product designer";
+  const fs = li ? 102 : 128;
+  Object.assign(t.style, { fontSize: fs + "px", backgroundSize: bgSize + " auto", backgroundPosition: bgPos });
+  f.appendChild(t);
+  // centred over the rail, in the band above it
+  const tw = t.offsetWidth, th = fs * .97;
+  t.style.left = px(x0 + (total - tw) / 2);
+  t.style.top = px((railTop - th) / 2 - fs * .14);
+  const u = document.createElement("div"); u.className = "url"; u.textContent = "pranaviram.com";
+  if (!li) u.style.fontSize = "20px";
+  f.appendChild(u);
+  u.style.left = px(x0 + total - u.offsetWidth);
+  u.style.top = px(railTop - u.offsetHeight - (li ? 14 : 22));
+} else {
+  const words = ["product designer", "pranaviram.com"];
+  const rot = [-2, 1.5];
+  const els = words.map((t, i) => { const e = document.createElement("div"); e.className = "m"; e.textContent = t; e.style.transform = `rotate(${rot[i]}deg)`; if (!li) e.style.fontSize = "52px"; f.appendChild(e); return e; });
+  const gapM = li ? 26 : 22, rowW = els.reduce((s, e) => s + e.offsetWidth, 0) + (words.length - 1) * gapM;
+  let x = x0 + (total - rowW) / 2;
+  els.forEach((e, i) => { e.style.left = px(x); e.style.top = px((railTop + lift - e.offsetHeight) / 2 - lift + [0, 5][i]); x += e.offsetWidth + gapM; });
+}
+});
+
+if (guides) {
+  const [cx, cy, r] = li ? [200, 396, 152] : [205, 500, 168];
+  const g = document.createElement("div"); g.className = "guide";
+  Object.assign(g.style, { left: px(cx - r), top: px(cy - r), width: px(2 * r), height: px(2 * r) });
+  f.appendChild(g);
+}
+</script>
+</body>
+</html>

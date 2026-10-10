@@ -55,6 +55,8 @@ export default function Gallery() {
   const touched = useRef(false);
   const ioRef = useRef<IntersectionObserver | null>(null);
   const bagelCheck = useRef<(x: number, y: number) => void>(() => {});
+  // dev reads layout.json fresh; the storm waits for it so nothing re-lands
+  const layoutReady = useRef<Promise<unknown>>(Promise.resolve());
   const [layout, setLayout] = useState<Layout>(SAVED as Layout);
   const [selected, setSelected] = useState<string[]>([]);
   // phones (portrait): the same clusters re-stacked taller round the bagel
@@ -104,12 +106,12 @@ export default function Gallery() {
   // this tab's older copy over it
   useEffect(() => {
     if (!DEV) return;
-    const pull = () => {
+    const pull = (): Promise<unknown> => {
       // a save still on its way (or one sent after this read began) is newer
       // than whatever the read brings back, so the read is dropped
-      if (saving.n) return;
+      if (saving.n) return Promise.resolve();
       const asked = saving.sent;
-      fetch("/__gallery/layout", { cache: "no-store" })
+      return fetch("/__gallery/layout", { cache: "no-store" })
         .then((r) => (r.ok ? r.json() : null))
         .then((l: Layout | null) => {
           if (!l || saving.n || saving.sent !== asked) return;
@@ -117,7 +119,7 @@ export default function Gallery() {
         })
         .catch(() => {});
     };
-    pull();
+    layoutReady.current = pull();
     const onFocus = () => document.visibilityState === "visible" && pull();
     window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", onFocus);
@@ -201,7 +203,9 @@ export default function Gallery() {
         f.pause();
       }
     };
+    let storming = false;
     const syncVideos = () => {
+      if (storming) { world.querySelectorAll("video").forEach((v) => v.pause()); return; }
       const moving = !document.hidden && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       world.querySelectorAll<HTMLVideoElement>("video:not(.gx-full)").forEach((v) => {
         const play = moving && onScreen.has(v);
@@ -633,6 +637,255 @@ export default function Gallery() {
 
     fitRef.current = fit;
     fit();
+
+    /* THE STORM. Arriving at Everything (a click, or a link from elsewhere;
+       not a reload or Back/Forward: everything/index.html decides, and sets
+       html.gx-storm), every piece falls into a gravity well and out again:
+         in    from beyond the edges, looming close to the camera as it
+               crosses the top of a C, slowing, then tipping downhill and
+               speeding up into the bottom of the well; the page you came
+               from stays put and is swept away inside their closing ring;
+         orb   every piece reaches one loose ball at the centre at the same
+               instant, and passes straight through (no pause);
+         out   flung back out on its own straight line, dipping a little
+               deeper, then up into place, slowing all the way; the far
+               ones land a touch after the near ones; the dots wash in
+               behind the pack, and the bagel grows open from its centre
+               alongside it, whole as they land.
+       Any click, scroll or key lands everything at once. ?slow=4 slows it. */
+    const storm: Animation[] = [];
+    let stormTimer = 0;
+    const runStorm = () => {
+      const root = document.documentElement;
+      if (!root.classList.contains("gx-storm")) { root.classList.remove("gx-storm-air"); return; }
+      const slow = parseFloat(getComputedStyle(root).getPropertyValue("--gx-slow")) || 1;
+      /* THE GRAVITY WELL. Each piece stays in its own vertical slice through
+         the bagel (no circling): from above it's a starburst collapsing and
+         bursting. One clock for everyone, so the field reads as one motion;
+         a piece's size sets how far it travels in depth (big ones fly lower
+         and dip less, so they move calmer). Everyone starts on one circle
+         beyond the screen's corners.
+         No blur on the pieces: filtering ~60 moving tiles (videos among
+         them) cost 66-149ms frames right after the orb, where it felt laggy. */
+      /* Thought of as physics, on one clock for everyone. Flung in: all the
+         momentum is at the start, and it bleeds away as the pieces cross the
+         top of the C (close, looming, slowing) for about three quarters of
+         the way in. Then they tip over the crest and fall downhill into the
+         well, gravity speeding them up again, through the orb (at MID, one
+         instant for all) and out on that momentum, dipping a little deeper
+         before they rise into place, slowing only over the last stretch. */
+      const table = (v: (x: number) => number) => {
+        const G = [0];
+        for (let i = 1; i <= 400; i++) G.push(G[i - 1] + v((i - 0.5) / 400));
+        return (x: number) => { const f = Math.min(400, Math.max(0, x * 400)), i = Math.min(399, Math.floor(f)); return (G[i] + (G[i + 1] - G[i]) * (f - i)) / G[400]; };
+      };
+      const CREST = 0.72; // share of the way-in spent slowing before the plunge
+      const inU = table((x) => x < CREST ? 0.28 + 0.72 * Math.pow(1 - x / CREST, 1.6) : 0.28 + 0.8 * Math.pow((x - CREST) / (1 - CREST), 2));
+      // out: fastest the moment it leaves the orb, then only ever slowing (no
+      // brake and pick-up again), in a long glide you can watch: ~0.6s to
+      // be nearly there, ~0.85s to settle
+      const outW = table((x) => Math.pow(1 - x, 1.6));
+      const T = 1950 * slow, MID = 0.458; // the orb at ~890ms; ~1050ms out
+      const along = (t: number) => t <= MID ? 0.5 * inU(t / MID) : 0.5 + 0.5 * outW((t - MID) / (1 - MID));
+      const r = view.getBoundingClientRect();
+      const eye = { x: cam.x, y: cam.y }; // the bagel's centre on screen
+      root.style.setProperty("--gx-eye-x", `${(eye.x / r.width) * 100}%`);
+      root.style.setProperty("--gx-eye-y", `${(eye.y / r.height) * 100}%`);
+      const rOrb = Math.min(r.width, r.height) * 0.12; // the orb: just closed, no gap in the middle, not crushed
+      // everyone starts on one circle round the bagel, just beyond the
+      // screen's furthest corner, so the field falls in as a ring, not a box
+      const R0 = Math.hypot(Math.max(eye.x, r.width - eye.x), Math.max(eye.y, r.height - eye.y)) + 120;
+      storming = true;
+      syncVideos();
+      view.style.perspective = "1400px";
+      view.style.perspectiveOrigin = `${eye.x}px ${eye.y}px`;
+      world.style.transformStyle = "preserve-3d";
+      // the portfolio's cool white behind the storm, as its own layer under the ground
+      const sky = document.createElement("div");
+      sky.className = "gx-storm-sky";
+      view.insertBefore(sky, world);
+      // the ground, as its own layer, so it can wash in
+      const ground = document.createElement("div");
+      ground.className = "gx-storm-ground";
+      ground.style.backgroundSize = view.style.backgroundSize;
+      ground.style.backgroundPosition = view.style.backgroundPosition;
+      ground.style.opacity = "0";
+      view.insertBefore(ground, world);
+      const hash = (str: string) => { let h = 2166136261; for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 16777619); return ((h >>> 0) % 1000) / 1000; };
+      const ps = live.current.pieces;
+      // weight from on-screen area, 0 (lightest) .. 1 (heaviest), smoothly
+      const areas = ps.map((p) => Math.sqrt(p.w * p.h));
+      const aMin = Math.min(...areas), aMax = Math.max(...areas);
+      const rFar = Math.max(1, ...ps.map((q) => Math.hypot(q.x, q.y) * cam.z));
+      /* Where every piece's edges are on screen through the flight, sampled
+         on the shared clock, so the page masks can follow the pack exactly:
+         its inner edge on the way in, its outer edge on the way out. */
+      const K = 96, inner: number[][] = Array.from({ length: K + 1 }, () => []), outer: number[][] = Array.from({ length: K + 1 }, () => []);
+      ps.forEach((p, i) => {
+        const el = world.querySelector<HTMLElement>(`.gx-piece[data-id="${p.id}"]`);
+        if (!el) return;
+        const wgt = (areas[i] - aMin) / Math.max(1, aMax - aMin);
+        const sx = eye.x + p.x * cam.z, sy = eye.y + p.y * cam.z;
+        let dx = sx - eye.x, dy = sy - eye.y;
+        const rF = Math.hypot(dx, dy);
+        if (rF < 1) { const a = hash(p.id) * Math.PI * 2; dx = Math.cos(a); dy = Math.sin(a); }
+        const ux = dx / (Math.hypot(dx, dy) || 1), uy = dy / (Math.hypot(dx, dy) || 1);
+        const r0 = Math.max(R0, rF + 60);
+        // its place in the orb: anywhere across the disc, at its own depth, so
+        // together they make a solid ball
+        const k1 = hash(p.id + "r"), k2 = hash(p.id + "z");
+        const rB = rOrb * Math.sqrt(k1);
+        const zTop = 900 * (1 - 0.35 * wgt); // close enough to loom (about 2.5x) at the top of the C
+        const zBot = -560 * (1 - 0.45 * wgt) + rOrb * 1.6 * Math.sqrt(1 - k1) * (k2 < 0.5 ? -1 : 1);
+        // everyone meets in the orb at one instant, but the far ones land a
+        // touch later than the near ones (they've further to go), so the
+        // field lands as a ripple, not a stamp
+        const Ti = T * (0.93 + 0.07 * (rF / rFar)), end = Ti / T;
+        const PERSP = 1400, half = 0.5 * Math.sqrt(p.w * p.h) * cam.z;
+        // where it is at tt (a share of the shared clock, T)
+        const at = (tt: number) => {
+          const g = tt <= MID ? along(tt) : 0.5 + 0.5 * outW(Math.min(1, (tt - MID) / (end - MID)));
+          let rad, z, tilt;
+          if (g <= 0.5) {
+            const u = g / 0.5; // down the side of the well
+            rad = r0 + (rB - r0) * u;
+            // the C: still climbing as it comes in, cresting about three
+            // quarters of the way, then down the slope to the bottom
+            const h = u < CREST ? 0.45 + 0.55 * Math.sin((Math.PI / 2) * (u / CREST)) : (() => { const x = (u - CREST) / (1 - CREST); return (1 - x) * (1 - x) * (1 + 2 * x); })();
+            z = zBot + (zTop - zBot) * h;
+            tilt = 16 * Math.sin(Math.PI * u);
+          } else {
+            const w = (g - 0.5) / 0.5; // and straight back out, gliding into place
+            rad = rB + (rF - rB) * w;
+            // carried on down, deeper, then up into place from below; it leaves
+            // the bottom level, as it arrived, so the C has no kink
+            z = zBot * (1 - w) * (1 - w) * (1 + 2 * w) - 6 * Math.abs(zBot) * w * w * (1 - w) * (1 - w);
+            tilt = -10 * Math.sin(Math.PI * w);
+          }
+          const depth = Math.max(0, -z / Math.abs(zBot || 1));
+          const sc = 1 - 0.35 * depth;
+          // rad is where it should be ON SCREEN; perspective pushes anything
+          // near the camera out from the eye (and pulls deep things in), so
+          // undo that, letting depth change only its size, never its path
+          const zc = Math.min(z, PERSP - 250);
+          return { rad, zc, sc, tilt, size: half * sc * (PERSP / (PERSP - zc)) };
+        };
+        for (let k = 0; k <= K; k++) {
+          const q = at(k / K);
+          inner[k].push(q.rad - q.size);
+          outer[k].push(q.rad + q.size);
+        }
+        const frames: Keyframe[] = [];
+        const N = 64;
+        for (let k = 0; k < N; k++) {
+          const t = k / (N - 1), tt = t * end;
+          const { rad, zc, sc, tilt } = at(tt);
+          const op = Math.min(1, tt / 0.07);
+          const radW = (rad * (PERSP - zc)) / PERSP;
+          const px = eye.x + ux * radW, py = eye.y + uy * radW;
+          const ox = (px - sx) / cam.z, oy = (py - sy) / cam.z;
+          const kf: Keyframe = { offset: t, opacity: op, transform: `translate3d(${ox.toFixed(1)}px, ${oy.toFixed(1)}px, ${zc.toFixed(1)}px) rotate3d(${(-uy).toFixed(3)}, ${ux.toFixed(3)}, 0, ${tilt.toFixed(1)}deg) scale(${sc.toFixed(3)})` };
+          frames.push(kf);
+        }
+        storm.push(el.animate(frames, { duration: Ti, easing: "linear", fill: "backwards" }));
+      });
+      /* The new page comes in the way the old one went out, mirrored: a
+         circle opening from the orb behind the pieces as they fly out,
+         revealing the dots (and, at its centre, the bagel), reaching the
+         furthest corner as they land. Nothing at all until the orb. */
+      const Rc = Math.hypot(Math.max(eye.x, r.width - eye.x), Math.max(eye.y, r.height - eye.y));
+      const outAt = (t: number) => Math.max(0, (along(t) - 0.5) / 0.5);
+      const pct = (xs: number[], q: number) => { const v = [...xs].sort((m, n) => m - n); return v[Math.min(v.length - 1, Math.floor(q * v.length))] ?? 0; };
+      const sample = (rows: number[][], q: number, t: number) => { const f = Math.min(K, Math.max(0, t * K)), i = Math.min(K - 1, Math.floor(f)); const a = pct(rows[i], q), b = pct(rows[i + 1], q); return a + (b - a) * (f - i); };
+      // its edge rides the outer edge of the pack as it flies out (as the old
+      // page's rode its inner edge coming in), then reaches the corners as
+      // they settle
+      const ring = (t: number) => { if (t <= MID) return 0; const w = outAt(t); return Math.max(0, sample(outer, 0.85, t)) + Math.max(0, Rc * 1.02 - rFar) * w ** 4; };
+      const ringFrames = (toClip: (rad: number) => Keyframe, size: (t: number) => number = ring) => {
+        const out: Keyframe[] = [];
+        for (let k = 0; k <= 60; k++) { const t = MID + ((1 - MID) * k) / 60; out.push({ offset: k / 60, ...toClip(size(t)) }); }
+        return out;
+      };
+      const opts = { duration: (1 - MID) * T, delay: MID * T, easing: "linear", fill: "backwards" as const };
+      const bagelEl = world.querySelector<HTMLElement>(".gx-bagel");
+      if (bagelEl) {
+        /* it sits at the very back of the well for the storm (scaled up so it
+           looks exactly as it will), so the pieces pass in front of it */
+        const w0 = bagelEl.getBoundingClientRect().width;
+        // how far its furthest part (the speech bubble included) reaches from its centre
+        const bc = bagelEl.getBoundingClientRect(), bcx = bc.left + bc.width / 2, bcy = bc.top + bc.height / 2;
+        const rFull = 1.02 * Math.max(...[bagelEl, ...bagelEl.querySelectorAll<HTMLElement>("*")].map((n) => { const q = n.getBoundingClientRect(); return q.width ? Math.max(Math.hypot(q.left - bcx, q.top - bcy), Math.hypot(q.right - bcx, q.top - bcy), Math.hypot(q.left - bcx, q.bottom - bcy), Math.hypot(q.right - bcx, q.bottom - bcy)) : 0; }));
+        bagelEl.style.transform = "translateZ(-1600px)";
+        const w1 = bagelEl.getBoundingClientRect().width;
+        bagelEl.style.transform = w0 && w1 ? `translateZ(-1600px) scale(${(w0 / w1).toFixed(4)})` : "";
+        /* the bagel is the payoff: it starts growing open from its centre
+           just after the orb (once the pack is 10% of the way out) and takes
+           the whole flight to do it, a steadier grow than the pack's sharp
+           burst, so it opens alongside them and is whole as they land */
+        const rMid = (() => { const v = ps.map((q) => Math.hypot(q.x, q.y) * cam.z).sort((m, n) => m - n); return v[Math.floor(v.length / 2)] || rFull * 2; })(); // the median piece's clock (below)
+        const at0 = 0.1; // how far out the pack is when it starts
+        let from = 0;
+        while (from < 1 && outW(from) < at0) from += 0.0025;
+        const grow: Keyframe[] = [];
+        // a steady ease-out over its own span (not the pack's front-loaded
+        // curve, which from this early would fling it open and then crawl)
+        for (let k = 0; k <= 40; k++) { const s = k / 40, q = 1 - Math.pow(1 - s, 2); grow.push({ offset: k / 40, clipPath: `circle(${((rFull * q) / cam.z).toFixed(1)}px at 50% 50%)` }); }
+        // on the median piece's own clock (it lands with its neighbours, not
+        // with the furthest piece)
+        const endM = 0.93 + 0.07 * (rMid / rFar);
+        const bStart = MID + from * (endM - MID);
+        const bg = storm.push(bagelEl.animate(grow, { duration: (endM - bStart) * T, delay: bStart * T, easing: "linear", fill: "backwards" }));
+        storm[bg - 1].finished.then(() => { bagelEl.style.transform = ""; }, () => {});
+      }
+      /* The page being left is swept away by the pieces as they come in: it
+         stays in place, at full strength, but only what's inside their
+         closing ring is left, until it's gone as they reach the orb. Then,
+         on the way down and out, the new page washes in behind them. This
+         takes over the view transition's own animation, and ends it at the
+         orb (the old page is gone by then): from there the cool white is the
+         new page's own layer. */
+      const oldPage = document.getAnimations().find((a) => (a.effect as KeyframeEffect | null)?.pseudoElement === "::view-transition-old(root)");
+      if (oldPage?.effect instanceof KeyframeEffect) {
+        const cx = r.left + eye.x, cy = r.top + eye.y;
+        const wash: Keyframe[] = [];
+        for (let k = 0; k <= 64; k++) {
+          const t = (k / 64) * MID, u = Math.min(1, along(t) / 0.5); // how far in the pieces are
+          const rad = t >= MID ? 0 : Math.max(0, sample(inner, 0.3, t)); // the inner edge of the pack
+          // a clip, not a mask: it animates cheaply (a gradient mask or a blur
+          // over the whole page stalls the frame), and its edge stays hidden
+          // under the front of the pieces
+          wash.push({ offset: k / 64, opacity: u < 1 ? 1 : 0, clipPath: `circle(${Math.max(0, rad).toFixed(1)}px at ${cx.toFixed(0)}px ${cy.toFixed(0)}px)` });
+        }
+        oldPage.effect.setKeyframes(wash);
+        oldPage.effect.updateTiming({ delay: 0, duration: MID * T, easing: "linear", fill: "both" });
+        oldPage.currentTime = 0;
+      }
+      // while the transition runs, its own background is the cool white
+      // (anything in the new page would tint the old one); at the orb this
+      // takes over
+      if (oldPage) storm.push(sky.animate([{ opacity: 0 }, { opacity: 0, offset: MID }, { opacity: 1, offset: MID + 0.0001 }, { opacity: 1 }], { duration: T, fill: "both" }));
+      ground.style.opacity = "1";
+      const groundIn = ground.animate(ringFrames((rad) => ({ clipPath: `circle(${rad.toFixed(1)}px at ${eye.x.toFixed(1)}px ${eye.y.toFixed(1)}px)` })), { ...opts, fill: "both" });
+      storm.push(groundIn);
+      groundIn.finished.then(() => root.classList.remove("gx-storm-air"), () => root.classList.remove("gx-storm-air"));
+      root.classList.remove("gx-storm"); // from here each piece is held by its own flight (the page stays see-through until the ground is in)
+      const vt = (window as unknown as { __gxStormVT?: { skipTransition(): void } }).__gxStormVT;
+      const skip = () => { storm.forEach((a) => a.finish()); vt?.skipTransition(); };
+      const skipOn = ["pointerdown", "wheel", "keydown"] as const;
+      skipOn.forEach((ev) => window.addEventListener(ev, skip, { capture: true, once: true }));
+      Promise.all(storm.map((a) => a.finished)).then(() => {
+        skipOn.forEach((ev) => window.removeEventListener(ev, skip, { capture: true }));
+        ground.remove();
+        sky.remove();
+        view.style.perspective = "";
+        world.style.transformStyle = "";
+        storming = false;
+        syncVideos();
+      }, () => {});
+    };
+    // started a moment later (and cancelled on cleanup), so a re-run of this
+    // effect can't start it twice; in dev it waits for layout.json
+    stormTimer = window.setTimeout(() => layoutReady.current.then(() => requestAnimationFrame(runStorm)), 0);
     const ro = new ResizeObserver(() => draw());
     ro.observe(view);
     view.addEventListener("wheel", wheel, { passive: false });
@@ -643,6 +896,8 @@ export default function Gallery() {
     view.addEventListener("pointercancel", up);
     window.addEventListener("keydown", key);
     return () => {
+      window.clearTimeout(stormTimer);
+      storm.forEach((a) => a.cancel());
       cancelAnimationFrame(frame);
       io.disconnect();
       ro.disconnect();

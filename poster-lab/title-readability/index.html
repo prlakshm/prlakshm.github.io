@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Painted titles · readability</title>
+<style>
+  @font-face { font-family: "General Sans"; src: url("/fonts/general-sans/GeneralSans-Variable.woff2") format("woff2"); font-weight: 200 700; }
+  @font-face { font-family: "Berkeley Mono"; src: url("/fonts/berkeley/BerkeleyMonoTrial-Regular.otf"); }
+  :root { --page: #f8fafc; --ink: #171717; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #eceef1; font-family: "Berkeley Mono", ui-monospace, monospace; color: #444; }
+  header { padding: 28px 32px 8px; }
+  header h1 { margin: 0 0 6px; font: 600 18px/1.3 "General Sans", sans-serif; color: var(--ink); }
+  header p { margin: 0; max-width: 980px; font-size: 12px; line-height: 1.6; }
+  header button { margin-top: 12px; font: inherit; font-size: 12px; padding: 6px 12px; border: 1px solid #c8ccd2; background: #fff; cursor: pointer; }
+  h2 { margin: 26px 32px 0; font: 600 13px/1.4 "General Sans", sans-serif; letter-spacing: .04em; text-transform: uppercase; color: #737373; }
+  main { display: grid; grid-template-columns: repeat(auto-fill, minmax(660px, 1fr)); gap: 16px; padding: 12px 32px 24px; }
+  .cell { background: var(--page); border: 1px solid #dde1e6; padding: 18px 22px 22px; }
+  .cell h3 { margin: 0; font: 600 14px/1.35 "General Sans", sans-serif; color: var(--ink); }
+  .cell p { margin: 4px 0 0; font-size: 11px; line-height: 1.55; color: #666; max-width: 600px; }
+  .score { margin-top: 8px; font-size: 11px; letter-spacing: .02em; }
+  .score b { font-weight: 400; padding: 1px 6px; border-radius: 3px; }
+  .ok { background: #dcf3e4; color: #145c2e; } .meh { background: #fbf0d0; color: #6b4e00; } .bad { background: #fadcdc; color: #7a1b1b; }
+  .stage { margin-top: 18px; display: grid; gap: 18px; }
+  .title { position: relative; isolation: isolate; width: max-content; max-width: 100%; margin: 0;
+    font-family: "General Sans", sans-serif; font-weight: 700; letter-spacing: -0.035em; color: var(--ink);
+    padding-block: 0.04em 0.2em; }
+  .title.home { font-size: 70px; line-height: .97; }
+  .title.about { font-size: 58px; line-height: .98; width: 9.4em; }
+  .title.track { letter-spacing: -0.008em; }
+  .fill { -webkit-background-clip: text; background-clip: text; color: transparent; background-repeat: no-repeat; }
+  .home .fill, .home.fill { background-size: 150% auto; background-position: 11.9% 92.2%; }
+  .about .fill, .about.fill { background-size: cover; background-position: 30% 45%; }
+  .edge { filter: drop-shadow(0 0 0.5px rgba(23,23,23,.6)) drop-shadow(0 1px 1.5px rgba(23,23,23,.16)); }
+  /* overlay copy: the painting revealed by a brush (cursor) or a sweep (load) */
+  .over { position: absolute; inset: 0; padding-block: inherit; pointer-events: none; z-index: 1;
+    -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
+  .brush .over { --mx: -999px; --my: -999px; --ba: 0;
+    -webkit-mask-image: radial-gradient(circle 110px at var(--mx) var(--my), rgba(0,0,0,var(--ba)) 0%, rgba(0,0,0,calc(var(--ba) * .85)) 40%, transparent 100%);
+    mask-image: radial-gradient(circle 110px at var(--mx) var(--my), rgba(0,0,0,var(--ba)) 0%, rgba(0,0,0,calc(var(--ba) * .85)) 40%, transparent 100%); }
+  .sweep .over.sw { --sx: -40%;
+    -webkit-mask-image: linear-gradient(100deg, #000 0%, #000 calc(var(--sx) - 14%), transparent var(--sx));
+    mask-image: linear-gradient(100deg, #000 0%, #000 calc(var(--sx) - 14%), transparent var(--sx)); }
+  .tip { font-size: 10px; color: #8a8f96; margin-top: 2px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Painted titles: readability options</h1>
+  <p>Each card shows the Home and About titles on the real page white. The score is measured, not guessed: the share of each title's letter area whose colour is under 3:1 contrast against the page (the WCAG floor for large text), and the median contrast. Lower % is easier to read. Edge shadows help the eye but aren't counted. Hover the cards marked "hover"; "replay sweeps" replays the load animations. The gold glint and cursor light sit on top of whichever you pick.</p>
+  <button id="replay">Replay sweeps</button>
+</header>
+<div id="root"></div>
+<script type="module">
+const IMG = {
+  home: { orig: "/home/footer/skyline-d.webp", dark: "./skyline-dark.webp", mid: "./skyline-mid.webp", origSoft: "./skyline-orig-soft.webp", darkSoft: "./skyline-dark-soft.webp" },
+  about: { orig: "/home/footer/water-lilies-5b-smooth.webp", dark: "./lilies-dark.webp", mid: "./lilies-mid.webp", origSoft: "./lilies-orig-soft.webp", darkSoft: "./lilies-dark-soft.webp" },
+};
+const CAP = { home: [214, 214, 214, 1], about: [214, 214, 214, 0.5] }; // Codex's darken caps
+const TEXT = { home: "hi, i’m pranavi ram", about: "an interdisciplinary designer" };
+
+const SECTIONS = [
+  ["Where we are", [
+    { id: "now", title: "Now (Codex): highlight cap", note: "The painting in true colour, its brightest values capped at #d6d6d6 (About at half strength). Pale sky and highlights still drop toward the page white.", fill: "orig", cap: true },
+    { id: "orig", title: "Reference: no cap (your original)", note: "The painting untouched. Prettiest; hardest to read.", fill: "orig" },
+  ]],
+  ["Single fixes", [
+    { id: "1", title: "1 · Dark remap", note: "Every value of the painting compressed into a dark band (Lab L 16–46) with hue and chroma kept: the sky goes deep blue, the lilies jewel-toned. No patch can approach the page white.", fill: "dark" },
+    { id: "1m", title: "1′ · Mid remap (lighter)", note: "The same remap with a lighter band (L 22–58): more of the painting's glow, a little less contrast.", fill: "mid" },
+    { id: "2", title: "2 · Soft fill", note: "The painting blurred slightly inside the letters (edges stay sharp): fine marks stop breaking up the shapes. Colour as now.", fill: "origSoft", cap: true },
+    { id: "3", title: "3 · Edge shading", note: "A tight soft shadow hugging the letters, not a stroke: the letter's own shade. Fill as now.", fill: "orig", cap: true, edge: true },
+    { id: "4", title: "4 · Open tracking", note: "General Sans is already at its heaviest (700), so instead the letters get a little air (−0.035em → −0.008em). Fill as now.", fill: "orig", cap: true, track: true },
+    { id: "5", title: "5 · Ink at rest, painting on hover (your idea)", note: "Solid near-black type; the cursor uncovers the painting under a soft brush. Perfect to read, but the painting is hidden until hovered, and phones never hover.", fill: "ink", brush: "orig", hover: true },
+  ]],
+  ["Combinations", [
+    { id: "12", title: "1 + 2 · Dark remap, soft", note: "Dark and calm: reads as painted colour, not texture.", fill: "darkSoft" },
+    { id: "13", title: "1 + 3 · Dark remap, edge shading", note: "The detail stays; the edge does the defining.", fill: "dark", edge: true },
+    { id: "123", title: "1 + 2 + 3", note: "The most legible painted version.", fill: "darkSoft", edge: true },
+    { id: "124", title: "1 + 2 + 4", note: "Dark, soft, with open tracking for a touch more air.", fill: "darkSoft", track: true },
+    { id: "12B", title: "1 + 2 + brush reveal  ·  my pick", note: "Dark soft painting at rest; the cursor wipes the varnish off and shows the painting's full bright colour around it. Plus one sweep on load, so phones get the reveal too.", fill: "darkSoft", brush: "orig", sweepTo: "orig", hover: true },
+    { id: "123B", title: "1 + 2 + 3 + brush reveal", note: "My pick with edge shading added, if any letter still loses its edge.", fill: "darkSoft", edge: true, brush: "orig", sweepTo: "orig", hover: true },
+    { id: "5S", title: "5 + paint-in · ink that paints itself", note: "Your idea, kept visible: ink at first, then the dark painting sweeps in on load and stays. Hover brightens it under the cursor.", fill: "ink", scoreFill: "darkSoft", sweepTo: "darkSoft", brush: "orig", hover: true, stay: true },
+    { id: "1mB", title: "1′ + 2 + brush reveal", note: "The lighter remap with the brush: more glow at rest, the full painting under the cursor.", fill: "mid", brush: "orig", sweepTo: "orig", hover: true },
+  ]],
+];
+
+const root = document.getElementById("root");
+const bg = (kind, key) => `url("${IMG[kind][key]}")`;
+const capLayer = (kind) => { const [r, g, b, a] = CAP[kind]; return `linear-gradient(rgb(${r} ${g} ${b} / ${a}), rgb(${r} ${g} ${b} / ${a}))`; };
+
+function title(kind, v) {
+  const el = document.createElement("h4");
+  el.className = `title ${kind}${v.track ? " track" : ""}${v.edge ? " edge" : ""}${v.brush ? " brush" : ""}${v.sweepTo ? " sweep" : ""}`;
+  el.textContent = TEXT[kind];
+  if (v.fill !== "ink") {
+    el.classList.add("fill");
+    el.style.backgroundImage = v.cap ? `${capLayer(kind)}, ${bg(kind, v.fill)}` : bg(kind, v.fill);
+    if (v.cap) el.style.backgroundBlendMode = "darken";
+  }
+  const over = (key, cls) => {
+    const o = document.createElement("span");
+    o.className = `over fill ${cls}`;
+    o.setAttribute("aria-hidden", "true");
+    o.textContent = TEXT[kind];
+    o.style.backgroundImage = bg(kind, key);
+    el.appendChild(o);
+    return o;
+  };
+  if (v.sweepTo) el._sweep = over(v.sweepTo, "sw");
+  if (v.brush) el._brush = over(v.brush, "br");
+  return el;
+}
+
+for (const [heading, list] of SECTIONS) {
+  const h = document.createElement("h2"); h.textContent = heading; root.appendChild(h);
+  const grid = document.createElement("main"); root.appendChild(grid);
+  for (const v of list) {
+    const cell = document.createElement("section"); cell.className = "cell";
+    cell.innerHTML = `<h3>${v.title}</h3><p>${v.note}</p><div class="score">measuring…</div>${v.hover ? '<div class="tip">hover the titles</div>' : ""}`;
+    const stage = document.createElement("div"); stage.className = "stage";
+    const titles = [title("home", v), title("about", v)];
+    titles.forEach((t) => stage.appendChild(t));
+    cell.appendChild(stage); grid.appendChild(cell);
+    v.cell = cell; v.titles = titles;
+  }
+}
+
+/* --- brush: the overlay is masked to a soft circle at the cursor ----------- */
+document.querySelectorAll(".title.brush").forEach((el) => {
+  const o = el._brush;
+  // the brush overlay must not be clipped by the sweep's mask
+  o.classList.remove("sw");
+  o.parentElement.classList.add("brush");
+  let a = 0, target = 0, raf = 0;
+  const tick = () => { a += (target - a) * 0.14; o.style.setProperty("--ba", a.toFixed(3)); if (Math.abs(target - a) > 0.004) raf = requestAnimationFrame(tick); else raf = 0; };
+  const go = () => { if (!raf) raf = requestAnimationFrame(tick); };
+  el.addEventListener("pointermove", (e) => { const r = el.getBoundingClientRect(); o.style.setProperty("--mx", `${e.clientX - r.left}px`); o.style.setProperty("--my", `${e.clientY - r.top}px`); target = 1; go(); });
+  el.addEventListener("pointerleave", () => { target = 0; go(); });
+});
+// brush overlay keeps its own radial mask even when the title also sweeps
+const style = document.createElement("style");
+style.textContent = `.title .over.br { -webkit-mask-image: radial-gradient(circle 110px at var(--mx,-999px) var(--my,-999px), rgba(0,0,0,var(--ba,0)) 0%, rgba(0,0,0,calc(var(--ba,0) * .85)) 40%, transparent 100%); mask-image: radial-gradient(circle 110px at var(--mx,-999px) var(--my,-999px), rgba(0,0,0,var(--ba,0)) 0%, rgba(0,0,0,calc(var(--ba,0) * .85)) 40%, transparent 100%); }`;
+document.head.appendChild(style);
+
+/* --- sweep: a wet band crosses once on load ---------------------------------
+   "stay" (ink that paints itself) keeps the painting; otherwise the bright
+   painting crosses and the title settles back to its resting fill. */
+function sweepAll() {
+  SECTIONS.flatMap(([, l]) => l).filter((v) => v.sweepTo).forEach((v, k) => {
+    v.titles.forEach((el, i) => {
+      const o = el._sweep; const t0 = performance.now() + 400 + i * 260; const dur = 1500;
+      o.style.opacity = "1";
+      const step = (now) => {
+        const q = Math.min(1, Math.max(0, (now - t0) / dur));
+        const e = q < 0.5 ? 2 * q * q : 1 - Math.pow(-2 * q + 2, 2) / 2;
+        if (v.stay) o.style.setProperty("--sx", `${-20 + e * 150}%`);
+        else {
+          // a band: leading edge at sx, trailing fade 30% behind
+          o.style.setProperty("--sx", `${-20 + e * 150}%`);
+          o.style.webkitMaskImage = o.style.maskImage = `linear-gradient(100deg, transparent calc(var(--sx) - 34%), #000 calc(var(--sx) - 16%), #000 calc(var(--sx) - 8%), transparent var(--sx))`;
+        }
+        if (q < 1) requestAnimationFrame(step);
+        else if (!v.stay) o.style.opacity = "0";
+      };
+      if (v.stay) o.style.webkitMaskImage = o.style.maskImage = "";
+      requestAnimationFrame(step);
+    });
+  });
+}
+document.getElementById("replay").addEventListener("click", sweepAll);
+
+/* --- the score: render each title's letters into a canvas, fill them the way
+   CSS does (same size/position/crop, the cap's darken blend), and measure each
+   letter pixel's contrast against the page white. ------------------------- */
+const lum = (r, g, b) => { const f = (c) => { c /= 255; return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+const PAGE = lum(248, 250, 252);
+const load = (src) => new Promise((res) => { const i = new Image(); i.onload = () => res(i); i.src = src; });
+
+async function score(v) {
+  const fill = v.scoreFill ?? v.fill;
+  if (fill === "ink") return { under: 0, median: (PAGE + 0.05) / (lum(23, 23, 23) + 0.05) };
+  let under = 0, total = 0; const all = [];
+  for (const el of v.titles) {
+    const kind = el.classList.contains("home") ? "home" : "about";
+    const r = el.getBoundingClientRect(); const W = Math.round(r.width), H = Math.round(r.height);
+    const c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d", { willReadFrequently: true });
+    const img = await load(IMG[kind][fill]);
+    // background-size / position, as in the CSS
+    let iw, ih; if (kind === "home") { iw = W * 1.5; ih = iw * img.height / img.width; } else { const s = Math.max(W / img.width, H / img.height); iw = img.width * s; ih = img.height * s; }
+    const [px, py] = kind === "home" ? [0.119, 0.922] : [0.30, 0.45];
+    x.drawImage(img, (W - iw) * px, (H - ih) * py, iw, ih);
+    const fillPx = x.getImageData(0, 0, W, H).data;
+    // the letters: draw the same text and keep only covered pixels
+    const m = document.createElement("canvas"); m.width = W; m.height = H; const mx = m.getContext("2d");
+    const cs = getComputedStyle(el); mx.font = `700 ${cs.fontSize} "General Sans"`; mx.letterSpacing = cs.letterSpacing; mx.textBaseline = "alphabetic"; mx.fillStyle = "#000";
+    const fs = parseFloat(cs.fontSize), lh = parseFloat(cs.lineHeight) || fs, pt = parseFloat(cs.paddingTop);
+    // wrap like the DOM: measure words into lines of the element's content width
+    const words = TEXT[kind].split(" "); const lines = []; let line = "";
+    for (const w of words) { const t = line ? line + " " + w : w; if (mx.measureText(t).width > W && line) { lines.push(line); line = w; } else line = t; }
+    lines.push(line);
+    lines.forEach((l, k) => mx.fillText(l, 0, pt + k * lh + lh * 0.5 + fs * 0.36));
+    const mask = mx.getImageData(0, 0, W, H).data;
+    const [cr, cg, cb, ca] = CAP[kind];
+    for (let i = 0; i < mask.length; i += 4) {
+      if (mask[i + 3] < 200) continue;
+      let R = fillPx[i], G = fillPx[i + 1], B = fillPx[i + 2];
+      if (v.cap) { R = R + (Math.min(R, cr) - R) * ca; G = G + (Math.min(G, cg) - G) * ca; B = B + (Math.min(B, cb) - B) * ca; }
+      const L = lum(R, G, B); const ratio = (PAGE + 0.05) / (L + 0.05);
+      total++; all.push(ratio); if (ratio < 3) under++;
+    }
+  }
+  all.sort((a, b) => a - b);
+  return { under: under / Math.max(1, total), median: all[Math.floor(all.length / 2)] ?? 0 };
+}
+
+await document.fonts.load('700 76px "General Sans"');
+await document.fonts.ready;
+for (const v of SECTIONS.flatMap(([, l]) => l)) {
+  const s = await score(v);
+  const pct = Math.round(s.under * 100);
+  const cls = pct <= 5 ? "ok" : pct <= 20 ? "meh" : "bad";
+  v.cell.querySelector(".score").innerHTML = `<b class="${cls}">${pct}% of letter area under 3:1</b> &nbsp;median contrast ${s.median.toFixed(1)}:1${v.fill === "ink" && !v.stay ? " (at rest)" : v.stay ? " (once painted)" : ""}`;
+}
+sweepAll();
+</script>
+</body>
+</html>

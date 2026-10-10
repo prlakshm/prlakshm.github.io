@@ -450,3 +450,99 @@
   opacity: 0;
   pointer-events: none;
 }
+
+/* THE STORM (arriving at Everything; Gallery.tsx runStorm).
+   While html.gx-storm-air is set the page is see-through, so the page you
+   came from (the view transition's snapshot) shows underneath while the
+   pieces fly in over it; it lifts once the ground has washed back in. While
+   html.gx-storm is set, pieces and the bagel stay hidden until their own
+   flight takes them. */
+html.gx-storm-air,
+html.gx-storm-air body,
+html.gx-storm-air .wt--gallery {
+  background: transparent !important;
+}
+
+html.gx-storm-air .gx-view {
+  background-color: transparent;
+  background-image: none;
+}
+
+html.gx-storm-air .gx::after {
+  opacity: 0;
+}
+
+html.gx-storm .gx-piece,
+html.gx-storm .gx-bagel {
+  opacity: 0;
+}
+
+/* the portfolio's cool white behind the storm, once the page you came from
+   is gone (the page itself is see-through then) */
+.gx-storm-sky {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--gx-ground);
+}
+
+/* the ground, as its own layer for the storm, so it can wash in */
+.gx-storm-ground {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-color: var(--gx-ground);
+  background-image: radial-gradient(
+    circle,
+    var(--gx-dot) var(--gx-dot-size),
+    transparent calc(var(--gx-dot-size) + 0.5px)
+  );
+}
+
+/* The page you came from stays exactly where it is, at full strength, until
+   the storm takes this animation over (Gallery.tsx) and the pieces sweep it
+   away. Taking over waits for the canvas to be ready, so until then this
+   only holds it still; the late fade is just a fallback in case it never
+   does. */
+::view-transition {
+  background: #f8fafc; /* the portfolio's cool white (--gx-ground; these sit outside .wt--gallery) */
+}
+
+::view-transition-old(root) {
+  animation: gx-wash calc(2.4s * var(--gx-slow, 1)) linear both;
+}
+
+/* The new page arrives as one live layer that is always painted onto white,
+   and whatever the page draws later (the canvas, the pieces) only ever lives
+   in that layer. So it's blended onto the old page with multiply: its white
+   vanishes and the old page shows through untouched, while the pieces print
+   over it like ink. Once the old page has gone into the eye, what's under it
+   is plain white again and every colour is exact. */
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: multiply;
+}
+
+::view-transition-image-pair(root) {
+  isolation: auto;
+  /* the cool white has to be here, under the old page inside the pair, for
+     the multiplied new page to see it (the root background is outside the
+     blend, so without this the gap reads pure white) */
+  background: #f8fafc;
+}
+
+@keyframes gx-wash {
+  0%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root) {
+    animation: none;
+  }
+}

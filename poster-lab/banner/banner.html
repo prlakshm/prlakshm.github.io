@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Banner lab</title>
+<style>
+  @font-face { font-family: "General Sans"; src: url(GeneralSans-Variable.woff2) format("woff2"); font-weight: 200 700; }
+  @font-face { font-family: "JB Mono"; src: url(JetBrainsMono-Variable.woff2) format("woff2"); font-weight: 100 800; }
+  html, body { margin: 0; background: #222; }
+  .frame { position: relative; overflow: hidden; }
+  .bg { position: absolute; inset: 0; background-size: cover; }
+  .cluster { position: absolute; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .m {
+    display: inline-block; position: relative;
+    background: #fdfdfb; color: #141414;
+    font: 400 30px/1 "Times New Roman", Times, serif;
+    padding: 7px 10px 6px;
+    box-shadow: 0 1px 0 rgba(0,0,0,.06), 1px 2px 2px rgba(0,0,0,.18), 3px 6px 10px rgba(0,0,0,.16);
+    white-space: nowrap;
+  }
+  /* die-cut plastic: a hairline lighter edge */
+  .m::after { content: ""; position: absolute; inset: 0; border: 1px solid rgba(0,0,0,.07); pointer-events: none; }
+  .m.xl { font-size: 52px; padding: 10px 15px 9px; }
+  .m.big { font-size: 46px; padding: 9px 13px 8px; }
+  .m.gold {
+    color: #3a2a08;
+    background: linear-gradient(135deg, #f3dc95 0%, #c99a35 28%, #f8e7a8 46%, #b5852a 64%, #e9cd7b 82%, #a97a24 100%);
+  }
+  .m.gold::after { border-color: rgba(90,60,10,.25); }
+  .m.mono { font: 500 22px/1 "JB Mono", monospace; letter-spacing: .06em; text-transform: uppercase; padding: 9px 11px 8px; }
+  .m.ink { background: #171717; color: #fafafa; }
+  .guide { position: absolute; border-radius: 50%; border: 3px dashed #ff2d55; background: rgba(255,45,85,.12); }
+  .label { position: absolute; left: 8px; top: 6px; font: 600 14px "JB Mono", monospace; color: #ff2d55; background: #fff; padding: 2px 6px; }
+  /* fridge door (C) */
+  .door { position: absolute; inset: 0;
+    background:
+      linear-gradient(100deg, rgba(255,255,255,0) 30%, rgba(255,255,255,.55) 46%, rgba(255,255,255,0) 60%),
+      linear-gradient(180deg, #f4f5f3 0%, #e9ebe8 100%); }
+  .door::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 14px;
+    background: linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,0)); }
+  .postcard { position: absolute; background: #fff; padding: 10px 10px 10px;
+    box-shadow: 1px 2px 3px rgba(0,0,0,.15), 4px 10px 22px rgba(0,0,0,.18); }
+  .postcard div { width: 100%; height: 100%; background-size: cover; }
+  .star { position: absolute; width: 54px; height: 54px; filter: drop-shadow(1px 3px 3px rgba(0,0,0,.3)); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const q = new URLSearchParams(location.search);
+const v = q.get("v") || "A";
+const size = q.get("size") || "li";
+const guides = q.get("guides") === "1";
+const [W, H] = size === "li" ? [1584, 396] : [1500, 500];
+
+// [text, class, rotation, dx, dy]
+const words = {
+  A: [
+    [["pranavi","big",-2],["ram","big",1.5]],
+    [["product","",1],["designer","",-1.5],["in","",2],["nyc","gold",-3]],
+    [["reimagining","",-1],["the","",2],["interfaces","",0.5],["people","",-2],["love","",1.5]],
+    [["prev","mono ink",-1.5],["design","",1],["@","",-2],["hbo max","",2]],
+  ],
+};
+words.B = words.A; words.C = words.A;
+
+const stray = [
+  ["building","",6], ["&","",-8], ["animating","",-4], ["sharing","",3], ["pranaviram.com","mono",-2],
+];
+
+const root = document.getElementById("root");
+const f = document.createElement("div");
+f.className = "frame"; f.style.width = W + "px"; f.style.height = H + "px";
+root.appendChild(f);
+
+function tile([t, cls, r], extra = {}) {
+  const e = document.createElement("span");
+  e.className = "m " + cls; e.textContent = t;
+  e.style.transform = `rotate(${r}deg) translate(${extra.dx || 0}px, ${extra.dy || 0}px)`;
+  return e;
+}
+
+// background
+if (v === "A") {
+  const b = document.createElement("div"); b.className = "bg";
+  b.style.backgroundImage = "url(skyline-d.webp)";
+  b.style.backgroundPosition = size === "li" ? "30% 70%" : "30% 60%";
+  f.appendChild(b);
+} else if (v === "B") {
+  const b = document.createElement("div"); b.className = "bg";
+  b.style.backgroundImage = "url(water-lilies-5b.webp)";
+  b.style.backgroundPosition = "40% 50%";
+  f.appendChild(b);
+} else {
+  const d = document.createElement("div"); d.className = "door"; f.appendChild(d);
+}
+
+// three magnets: [text, class, rotation, x, y] (x, y as fractions of the frame)
+const li = size === "li";
+const spots = v === "D"
+  ? (li ? [[0.42, 0.20], [0.60, 0.44], [0.45, 0.68]] : [[0.40, 0.22], [0.58, 0.44], [0.43, 0.66]])
+  : v === "C"
+  ? (li ? [[0.30, 0.20], [0.50, 0.44], [0.33, 0.68]] : [[0.27, 0.22], [0.49, 0.44], [0.30, 0.66]])
+  : (li ? [[0.40, 0.14], [0.62, 0.38], [0.44, 0.62]] : [[0.38, 0.20], [0.61, 0.42], [0.42, 0.64]]);
+[["product designer","xl",-2],["nyc","xl",3],["pranaviram.com","xl",-1]].forEach((w, i) => {
+  const e = tile(w); e.style.position = "absolute";
+  e.style.left = Math.round(W * spots[i][0]) + "px";
+  e.style.top = Math.round(H * spots[i][1]) + "px";
+  if (!li) e.style.transform += " scale(1.1)";
+  f.appendChild(e);
+});
+
+// C: postcard of the skyline held by a gold star
+if (v === "C") {
+  const p = document.createElement("div"); p.className = "postcard";
+  const pw = size === "li" ? 400 : 400, ph = size === "li" ? 232 : 290;
+  p.style.width = pw + "px"; p.style.height = ph + "px";
+  p.style.left = (W - pw - 70) + "px"; p.style.top = (size === "li" ? 62 : 80) + "px";
+  p.style.transform = "rotate(3deg)";
+  p.innerHTML = '<div style="background-image:url(skyline-d.webp);background-position:38% 70%"></div>';
+  f.appendChild(p);
+  const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  s.setAttribute("viewBox", "0 0 100 100"); s.classList.add("star");
+  s.innerHTML = `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#f6e3a1"/><stop offset=".35" stop-color="#c3922f"/>
+    <stop offset=".55" stop-color="#f3dc92"/><stop offset=".8" stop-color="#a8781f"/><stop offset="1" stop-color="#e0bf6a"/></linearGradient></defs>
+    <path d="M50 4 61 36 95 37 68 58 78 92 50 72 22 92 32 58 5 37 39 36Z" fill="url(#g)" stroke="#8a6318" stroke-width="1.5" stroke-linejoin="round"/>`;
+  s.style.left = (W - pw / 2 - 70 - 27) + "px"; s.style.top = (size === "li" ? 38 : 56) + "px";
+  f.appendChild(s);
+}
+
+// avatar guides
+if (guides) {
+  const g = document.createElement("div"); g.className = "guide";
+  const [cx, cy, r] = size === "li" ? [200, 396, 152] : [205, 500, 168];
+  Object.assign(g.style, { left: cx - r + "px", top: cy - r + "px", width: 2 * r + "px", height: 2 * r + "px" });
+  f.appendChild(g);
+  const l = document.createElement("div"); l.className = "label";
+  l.textContent = (size === "li" ? "LinkedIn 1584×396" : "X 1500×500") + " · avatar zone"; f.appendChild(l);
+}
+</script>
+</body>
+</html>
