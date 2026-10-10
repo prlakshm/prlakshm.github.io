@@ -290,3 +290,13 @@
     transition: none;
   }
 }
+
+/* Phone entrance: the cards are big there (most of the screen's width), so a
+   16px rise barely registers and they read as a fade. They rise further, on
+   the same curve and slow duration, so each one visibly glides up into place.
+   (Home.tsx starts each row the moment its placard is on screen.) */
+@media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+  html .gl-card.enter:not(.is-in) {
+    transform: translateY(28px);
+  }
+}

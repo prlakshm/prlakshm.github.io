@@ -660,3 +660,18 @@
 @media (max-width: 767px) {
   .ab--page .ab-portrait { margin-top: 0; }
 }
+
+/* Phone entrance: the portrait develops. It comes in on its own row, so it
+   gets more than the text's rise: it settles from a touch larger (1.04) over a
+   longer stroke while it fades and rises, like a print easing into its frame
+   (the Figma Sound case study's art does the same). Same curve as the rest. */
+@media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+  html .ab-portrait.enter {
+    transition:
+      opacity var(--enter-dur) var(--ease-settle),
+      transform 1.6s var(--ease-settle);
+  }
+  html .ab-portrait.enter:not(.is-in) {
+    transform: translateY(var(--enter-rise)) scale(1.04);
+  }
+}

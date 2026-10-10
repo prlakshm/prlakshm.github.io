@@ -659,6 +659,52 @@ export default function Gallery() {
       const root = document.documentElement;
       if (!root.classList.contains("gx-storm")) { root.classList.remove("gx-storm-air"); return; }
       const slow = parseFloat(getComputedStyle(root).getPropertyValue("--gx-slow")) || 1;
+      /* THE RIPPLE (phones and portrait tablets). On a small screen 60 tiles
+         crossing it read as busy rather than as a story, and Safari can't keep
+         the page you came from on screen to be swept away. So here it's the
+         case studies' entrance, told from the bagel: it settles first, the
+         dots wash in, then every piece rises into its place (16px, .72s, the
+         site's settle curve) in a wave outward from the bagel, by distance.
+         ~1.4s in all. Any tap or key lands it at once. */
+      if (root.classList.contains("gx-storm-ripple")) {
+        const settle = "cubic-bezier(0.22, 0.61, 0.36, 1)"; // --ease-settle
+        storming = true;
+        syncVideos();
+        const sky = document.createElement("div");
+        sky.className = "gx-storm-sky";
+        view.insertBefore(sky, world);
+        const ground = document.createElement("div");
+        ground.className = "gx-storm-ground";
+        ground.style.backgroundSize = view.style.backgroundSize;
+        ground.style.backgroundPosition = view.style.backgroundPosition;
+        view.insertBefore(ground, world);
+        const groundIn = ground.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600 * slow, delay: 80 * slow, easing: settle, fill: "both" });
+        storm.push(groundIn);
+        const bagelEl = world.querySelector<HTMLElement>(".gx-bagel");
+        if (bagelEl) storm.push(bagelEl.animate([{ opacity: 0, transform: "scale(0.96)" }, { opacity: 1, transform: "none" }], { duration: 720 * slow, easing: settle, fill: "backwards" }));
+        const ps = live.current.pieces;
+        const far = Math.max(1, ...ps.map((q) => Math.hypot(q.x, q.y)));
+        ps.forEach((p) => {
+          const el = world.querySelector<HTMLElement>(`.gx-piece[data-id="${p.id}"]`);
+          if (!el) return;
+          const delay = (120 + 550 * (Math.hypot(p.x, p.y) / far)) * slow;
+          // the rise is in screen pixels; the world is scaled by the camera
+          storm.push(el.animate([{ opacity: 0, transform: `translateY(${(16 / cam.z).toFixed(1)}px)` }, { opacity: 1, transform: "none" }], { duration: 720 * slow, delay, easing: settle, fill: "backwards" }));
+        });
+        root.classList.remove("gx-storm");
+        const skip = () => storm.forEach((a) => a.finish());
+        const skipOn = ["pointerdown", "wheel", "keydown"] as const;
+        skipOn.forEach((ev) => window.addEventListener(ev, skip, { capture: true, once: true }));
+        Promise.all(storm.map((a) => a.finished)).then(() => {
+          skipOn.forEach((ev) => window.removeEventListener(ev, skip, { capture: true }));
+          root.classList.remove("gx-storm-air");
+          ground.remove();
+          sky.remove();
+          storming = false;
+          syncVideos();
+        }, () => {});
+        return;
+      }
       /* THE GRAVITY WELL. Each piece stays in its own vertical slice through
          the bagel (no circling): from above it's a starburst collapsing and
          bursting. One clock for everyone, so the field reads as one motion;
