@@ -25,16 +25,24 @@
     <link rel="icon" href="/favicon.ico?v=gold-frame-2" sizes="any" />
     <link rel="apple-touch-icon" href="/icons/frame-apple-touch-icon.png?v=gold-frame-2" />
     <!-- The storm: arriving here (a click, or a link from elsewhere) the pieces
-         fly in from the edges, spiral through a tight eye and swoop down into
-         place, washing out the page you came from. Not on a reload or
-         Back/Forward. Decided here, before the first frame, so nothing flashes
-         in place first. ?slow=4 plays it in slow motion. -->
-    <style>@view-transition { navigation: auto; }</style>
+         fall through a gravity well into place, sweeping away the page you
+         came from. Not on a reload or Back/Forward. Decided here, before the
+         first frame, so nothing flashes in place first. ?slow=4 plays it in
+         slow motion.
+         Desktop Chromium only (Chrome, Edge, Arc, Brave): ~60 tiles flying
+         close to the camera in 3D become huge GPU layers, and on iPhones that
+         ran Safari out of memory (the page crashed and reloaded in a loop).
+         Everyone else simply gets the canvas. Keep in step with
+         src/motion/stormHandoff.ts. -->
     <script>
       (function () {
         var d = document.documentElement;
+        var ua = navigator.userAgent;
+        var able = /Chrome\//.test(ua) && !/Mobile|Android|CriOS|FxiOS|EdgiOS/.test(ua)
+          && matchMedia("(pointer: fine) and (min-width: 1024px)").matches;
         var nav = performance.getEntriesByType("navigation")[0];
-        var storm = (!nav || nav.type === "navigate") && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var storm = able && (!nav || nav.type === "navigate") && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (able) { var vt = document.createElement("style"); vt.textContent = "@view-transition { navigation: auto; }"; document.head.appendChild(vt); }
         if (storm) d.classList.add("gx-storm", "gx-storm-air");
         var slow = parseFloat(new URLSearchParams(location.search).get("slow")) || 1;
         d.style.setProperty("--gx-slow", String(slow));
@@ -46,11 +54,11 @@
         });
       })();
     </script>
-    <script type="module" crossorigin src="/assets/everything-BwGkRcXj.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/stormHandoff-Tz5J0m21.js">
-    <link rel="modulepreload" crossorigin href="/assets/home-YWEXI6Gd.js">
-    <link rel="stylesheet" crossorigin href="/assets/home-DbyQFBU5.css">
+    <script type="module" crossorigin src="/assets/everything-CTQDTY5c.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/stormHandoff-DH0X9OWD.js">
+    <link rel="modulepreload" crossorigin href="/assets/home-B-oY0gXb.js">
     <link rel="stylesheet" crossorigin href="/assets/stormHandoff-BmDmWVn9.css">
+    <link rel="stylesheet" crossorigin href="/assets/home-DbyQFBU5.css">
     <link rel="stylesheet" crossorigin href="/assets/everything-DxTZeO9V.css">
   </head>
   <body style="margin:0;background:#f8fafc;min-height:100vh;overflow:hidden;" class="gx-body">
