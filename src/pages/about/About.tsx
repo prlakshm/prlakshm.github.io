@@ -74,9 +74,18 @@ function About() {
     const portrait = portraitRef.current;
     if (!text || !portrait) return;
     const beside = portrait.getBoundingClientRect().top < text.getBoundingClientRect().bottom;
+    const photo = portrait.querySelector<HTMLImageElement>(".ab-glass > img"); // the photo, not a pop-out piece (those load late)
+    photo?.decode?.().catch(() => {}); // ready to paint long before it's scrolled to
+    if (!beside) {
+      // stacked (phones): the portrait starts as it comes onto the screen, not
+      // once it's 10% up it, so the biggest change happens as it appears
+      const stopText = revealOnView([{ el: text }]);
+      const stopPortrait = revealOnView([{ el: portrait, image: photo }], { rootMargin: "0px", threshold: 0 });
+      return () => { stopText(); stopPortrait(); };
+    }
     return revealOnView([
       { el: text },
-      { el: portrait, delay: beside ? 0.09 : 0, image: portrait.querySelector<HTMLImageElement>(".ab-glass > img") }, // the photo, not a pop-out piece (those load late)
+      { el: portrait, delay: 0.09, image: photo },
     ]);
   }, []);
 

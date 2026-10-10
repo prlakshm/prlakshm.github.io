@@ -349,9 +349,11 @@
   z-index: 1;
 }
 
+/* No standing will-change: 52 pieces each held as a GPU layer at rest
+   (hidden behind the photo) made the portrait heavy on phones. The browser
+   promotes them while Motion actually moves them. */
 .ab-pc {
   position: absolute;
-  will-change: transform;
 }
 
 .ab-pc-in {
@@ -668,7 +670,7 @@
 @media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
   html .ab-portrait.enter {
     transition:
-      opacity var(--enter-dur) var(--ease-settle),
+      opacity 0.9s var(--ease-settle),
       transform 1.6s var(--ease-settle);
   }
   html .ab-portrait.enter:not(.is-in) {
