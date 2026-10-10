@@ -1,4 +1,4 @@
-import{j as e,r as i,a as de}from"./stormHandoff-DH0X9OWD.js";const ce=[{id:"2074143950701494659",url:"https://x.com/pranavibuilds/status/2074143950701494659",name:"pranaviln",handle:"pranavibuilds",avatar:"/fun/avatar.png",text:`Hey X 👋
+import{j as e,r as i,a as de}from"./stormHandoff-D80xWpdT.js";const ce=[{id:"2074143950701494659",url:"https://x.com/pranavibuilds/status/2074143950701494659",name:"pranaviln",handle:"pranavibuilds",avatar:"/fun/avatar.png",text:`Hey X 👋
 
 If we haven't met, I'm pranavi (pronounced pren-uh-vee).
 
