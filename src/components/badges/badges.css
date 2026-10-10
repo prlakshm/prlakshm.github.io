@@ -436,24 +436,15 @@
   cursor: default;
 }
 
-/* Tooltips: the bulb's hint and each star's own tip. Their look is the
-   site's one tooltip (.wt-tip, chrome.css): no tails. Both fade like the nav's
-   "Coming soon" tip (BadgeCard.tsx); here is only where they sit. */
-.bc-tip,
+/* Tooltips: each star's own tip (the bulb shows the next empty star's). Their
+   look is the site's one tooltip (.wt-tip, chrome.css): no tails. They fade
+   like the nav's "Coming soon" tip (BadgeCard.tsx); here is only where they
+   sit. */
 .bc-star-tip {
   position: absolute;
   z-index: 5;
   opacity: 0;
   pointer-events: none;
-}
-
-/* The hint hangs under the bulb (its centre: the card's width, less the
-   border, the padding and half the bulb), as far below as "Coming soon"
-   hangs under GALLERY. */
-.bc-tip {
-  left: calc(356px - 1px - 18px - 28px - 5px);
-  top: calc(100% + 10px);
-  translate: -50% 0;
 }
 
 /* A star's tip sits above its star. The two end stars align the tip to their
@@ -584,9 +575,6 @@
     --slot: 40px;
     --stub: 18px;
     width: 288px;
-  }
-  .bc-tip {
-    left: calc(288px - 1px - 18px - 18px - 5px);
   }
 }
 

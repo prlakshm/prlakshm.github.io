@@ -581,16 +581,25 @@
   inset: 0;
 }
 
+/* The contact line as a box-shadow, not a drop-shadow filter: the pane is a
+   plain rectangle, so it draws the same, but a filter made Safari re-render
+   the whole photo into a separate buffer before it could show it, and on a
+   fast swipe the photo arrived late (iOS Simulator, 2026-10-10). */
 .ab-pane {
   z-index: 1;
-  filter: drop-shadow(0 1px 0 var(--shadow-contact));
+  box-shadow: 0 1px 0 var(--shadow-contact);
 }
 
+/* Under the photo, a 24px copy of it, inline (~497B), framed the same way:
+   Safari can always draw it at once, so if the real photo is a beat late on a
+   fast swipe you see her soft-focus portrait sharpen, never a hole (or the
+   pop-out pieces tucked behind it). Regenerate it if the photo changes. */
 .ab-glass {
   overflow: hidden;
   isolation: isolate;
   backface-visibility: hidden;
   transform-origin: 50% 50%;
+  background: url("data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAASABgDASIAAhEBAxEB/8QAFwABAQEBAAAAAAAAAAAAAAAAAAQFA//EACkQAAIBAwIEBQUAAAAAAAAAAAECAwAEEQUxBhIhURMUQWGBInFykdH/xAAWAQEBAQAAAAAAAAAAAAAAAAACAwT/xAAfEQACAQIHAAAAAAAAAAAAAAAAAQISMQMREyEyQXH/2gAMAwEAAhEDEQA/AKLuKSSNyyMrBujDA5h7j91PpeoxWMr28aIQspj8QkYV2yQMZyfQbb1HpqG/v1heVxGoLyuDso3x7+nzXfUtNM2pC100CCESLJIm+WA5icn4z9qya9MsmKKqW6LnaU3q3E03OmcMuxYfylZRlnaMskr8wOeVH370pLGkgtp9F3DIHk5jgZM8IJ7jJ6VPbktxhOCSR9W/5UpWKXOXhSFjU1lETVrgIqqPBDYAx170pSnGyJu5/9k=") 50% 42% / cover no-repeat;
 }
 
 .ab-portrait .ab-glass img {
