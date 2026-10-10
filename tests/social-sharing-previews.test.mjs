@@ -13,8 +13,9 @@ const root = new URL("../", import.meta.url);
 const text = (path) => readFile(new URL(path, root), "utf8");
 
 const socialImages = [
-  "public/social/portfolio-landing-v4.png",
-  "public/social/about-v4.png",
+  "public/social/portfolio-landing-v5.png",
+  "public/social/about-v5.png",
+  "public/social/everything-v1.png",
   "public/social/cursor-loves-indie-v1.png",
   "public/social/figma-sound-v1.png",
   "public/social/codex-bookmarks-v2.png",
@@ -25,10 +26,11 @@ const pngSize = (buffer) => {
   return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
 };
 
-test("Home and About social artwork are direct page captures without browser chrome", async () => {
+test("Home, About and Everything social artwork are direct page captures without browser chrome", async () => {
   assert.deepEqual(PAGE_PREVIEWS, [
-    { name: "portfolio-landing-v4.png", url: "/" },
-    { name: "about-v4.png", url: "/about/" },
+    { name: "portfolio-landing-v5.png", url: "/" },
+    { name: "about-v5.png", url: "/about/" },
+    { name: "everything-v1.png", url: "/everything/" },
   ]);
   assert.deepEqual(SOCIAL_CANVAS, { width: 1200, height: 630 });
 
@@ -88,10 +90,13 @@ test("first-party navigation uses the clean About URL", async () => {
 });
 
 const metadata = [
-  ["index.html", "https://pranaviram.com/social/portfolio-landing-v4.png", "Pranavi Ram’s portfolio landing page with three collected stars."],
-  ["about/index.html", "https://pranaviram.com/social/about-v4.png", "Pranavi Ram’s About page with three collected stars."],
-  ["public/surprise-rail/index.html", "https://pranaviram.com/social/portfolio-landing-v4.png", "Pranavi Ram’s portfolio landing page with three collected stars."],
-  ["public/mixr/index.html", "https://pranaviram.com/social/portfolio-landing-v4.png", "Pranavi Ram’s portfolio landing page with three collected stars."],
+  ["index.html", "https://pranaviram.com/social/portfolio-landing-v5.png", "Pranavi Ram’s portfolio landing page with three collected stars."],
+  ["about/index.html", "https://pranaviram.com/social/about-v5.png", "Pranavi Ram’s About page with three collected stars."],
+  ["everything/index.html", "https://pranaviram.com/social/everything-v1.png", "Pranavi Ram’s Everything canvas: posters, decks and design work arranged around a bagel."],
+  ["public/home/index.html", "https://pranaviram.com/social/portfolio-landing-v5.png", "Pranavi Ram’s portfolio landing page with three collected stars."],
+  ["public/gallery/index.html", "https://pranaviram.com/social/portfolio-landing-v5.png", "Pranavi Ram’s portfolio landing page with three collected stars."],
+  ["public/surprise-rail/index.html", "https://pranaviram.com/social/portfolio-landing-v5.png", "Pranavi Ram’s portfolio landing page with three collected stars."],
+  ["public/mixr/index.html", "https://pranaviram.com/social/portfolio-landing-v5.png", "Pranavi Ram’s portfolio landing page with three collected stars."],
   ["public/cursor/index.html", "https://pranaviram.com/social/cursor-loves-indie-v1.png", "Thin white looping letterforms spell cursor loves indie across a black background."],
   ["public/figma/index.html", "https://pranaviram.com/social/figma-sound-v1.png", "Figma Sound wordmark surrounded by colorful hand-drawn sound icons on a dark dotted grid."],
   ["public/codex/index.html", "https://pranaviram.com/social/codex-bookmarks-v2.png", "Blue Codex Bookmarks poster with a pink bookmark and a doodled terminal cloud."],
