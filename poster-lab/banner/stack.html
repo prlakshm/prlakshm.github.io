@@ -72,9 +72,10 @@ if (v === "T") {
   const words = ["product designer", "pranaviram.com"];
   const rot = [-2, 1.5];
   const els = words.map((t, i) => { const e = document.createElement("div"); e.className = "m"; e.textContent = t; e.style.transform = `rotate(${rot[i]}deg)`; if (!li) e.style.fontSize = "52px"; f.appendChild(e); return e; });
+  // X: magnets 30px lower, clear of the phone crop
   const gapM = li ? 26 : 22, rowW = els.reduce((s, e) => s + e.offsetWidth, 0) + (words.length - 1) * gapM;
   let x = x0 + (total - rowW) / 2;
-  els.forEach((e, i) => { e.style.left = px(x); e.style.top = px((railTop + lift - e.offsetHeight) / 2 - lift + [0, 5][i]); x += e.offsetWidth + gapM; });
+  els.forEach((e, i) => { e.style.left = px(x); e.style.top = px((railTop + lift - e.offsetHeight) / 2 - lift + (lift ? 30 : 0) + [0, 5][i]); x += e.offsetWidth + gapM; });
 }
 });
 

@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Skyline magnets</title>
+<style>
+  html, body { margin: 0; background: #222; }
+  .frame { position: relative; overflow: hidden; width: 1500px; height: 500px; background-size: 1500px auto; background-repeat: no-repeat; }
+  .m { position: absolute; background: #fdfdfb; color: #141414; white-space: nowrap;
+    font: 400 52px/1 "Times New Roman", Times, serif; padding: 9px 13px 8px;
+    box-shadow: 0 1px 0 rgba(0,0,0,.06), 1px 2px 2px rgba(0,0,0,.2), 3px 7px 12px rgba(0,0,0,.2); }
+  .guide { position: absolute; border-radius: 50%; border: 3px dashed #ff2d55; background: rgba(255,45,85,.12); }
+  /* where a phone crops the X header, roughly */
+  .crop { position: absolute; left: 0; right: 0; height: 60px; background: rgba(255,45,85,.10); border: 0 dashed #ff2d55; }
+</style>
+</head>
+<body>
+<div class="frame" id="f"></div>
+<script>
+const q = new URLSearchParams(location.search);
+const img = q.get("img") || "plain";          // plain | gold
+const lay = q.get("v") || "row";              // row | step | face | stack
+const guides = q.get("guides") === "1";
+const f = document.getElementById("f");
+// the painting is 2000×853: at 1500 wide it's 640 tall, so 140px has to go
+const offset = lay === "face" ? 90 : 0;       // sky layouts keep the top, "face" shows more city
+f.style.backgroundImage = `url(city-${img}.webp)`;
+f.style.backgroundPosition = `0 ${-offset}px`;
+const px = n => Math.round(n) + "px";
+
+const spots = {
+  row:  [[700, 112, -2], [1092, 117, 1.5]],
+  step: [[690, 92, -2.5], [1010, 186, 2]],
+  // on a phone (2.5:1 crop, x ~125-1375) pranaviram.com ends under the search button's right edge (~1322)
+  face: [[564, 300, -2], [956, 308, 1.5]],
+  stack: [[696, 86, -2], [724, 162, 1.5]], // both in the gap between the Chrysler and the Empire State
+}[lay];
+["product designer", "pranaviram.com"].forEach((t, i) => {
+  const e = document.createElement("div"); e.className = "m"; e.textContent = t;
+  const [x, y, r] = spots[i];
+  Object.assign(e.style, { left: px(x), top: px(y), transform: `rotate(${r}deg)` });
+  f.appendChild(e);
+});
+
+if (guides) {
+  const g = document.createElement("div"); g.className = "guide";
+  Object.assign(g.style, { left: "37px", top: "332px", width: "336px", height: "336px" });
+  f.appendChild(g);
+  for (const top of [0, 440]) { const c = document.createElement("div"); c.className = "crop"; c.style.top = top + "px"; f.appendChild(c); }
+}
+</script>
+</body>
+</html>
