@@ -24,14 +24,36 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/icons/frame-favicon-16.png?v=gold-frame-2" />
     <link rel="icon" href="/favicon.ico?v=gold-frame-2" sizes="any" />
     <link rel="apple-touch-icon" href="/icons/frame-apple-touch-icon.png?v=gold-frame-2" />
-    <script type="module" crossorigin src="/assets/everything-DjgQerHK.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/WtNav-CtGfiU_6.js">
-    <link rel="modulepreload" crossorigin href="/assets/home-wOh9NbLh.js">
-    <link rel="stylesheet" crossorigin href="/assets/WtNav-BmDmWVn9.css">
+    <!-- The storm: arriving here (a click, or a link from elsewhere) the pieces
+         fly in from the edges, spiral through a tight eye and swoop down into
+         place, washing out the page you came from. Not on a reload or
+         Back/Forward. Decided here, before the first frame, so nothing flashes
+         in place first. ?slow=4 plays it in slow motion. -->
+    <style>@view-transition { navigation: auto; }</style>
+    <script>
+      (function () {
+        var d = document.documentElement;
+        var nav = performance.getEntriesByType("navigation")[0];
+        var storm = (!nav || nav.type === "navigate") && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (storm) d.classList.add("gx-storm", "gx-storm-air");
+        var slow = parseFloat(new URLSearchParams(location.search).get("slow")) || 1;
+        d.style.setProperty("--gx-slow", String(slow));
+        addEventListener("pagereveal", function (e) {
+          if (!e.viewTransition) return;
+          var vt = e.viewTransition; [vt.ready, vt.finished, vt.updateCallbackDone].forEach(function (p) { p && p.catch(function () {}); });
+          if (!storm) { e.viewTransition.skipTransition(); return; }
+          window.__gxStormVT = e.viewTransition;
+        });
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/everything-BwGkRcXj.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/stormHandoff-Tz5J0m21.js">
+    <link rel="modulepreload" crossorigin href="/assets/home-YWEXI6Gd.js">
     <link rel="stylesheet" crossorigin href="/assets/home-DbyQFBU5.css">
-    <link rel="stylesheet" crossorigin href="/assets/everything-OYWuS5kR.css">
+    <link rel="stylesheet" crossorigin href="/assets/stormHandoff-BmDmWVn9.css">
+    <link rel="stylesheet" crossorigin href="/assets/everything-DxTZeO9V.css">
   </head>
-  <body style="margin:0;background:#f8fafc;min-height:100vh;overflow:hidden;">
+  <body style="margin:0;background:#f8fafc;min-height:100vh;overflow:hidden;" class="gx-body">
     <div id="root"></div>
   </body>
 </html>
