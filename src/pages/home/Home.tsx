@@ -41,7 +41,7 @@ function Home() {
      placard comes onto the screen: the placard, then its cards a step apart,
      including the ones still off to the side of the swipeable row, so you
      never swipe into an empty slot. Each card waits only for its own print,
-     and the cards rise further (gallery.css), as they're big there. */
+     and develops as the About portrait does (gallery.css). */
   useEffect(() => {
     const hero = heroRef.current;
     const block = hero?.querySelector<HTMLElement>(".hero-block");
