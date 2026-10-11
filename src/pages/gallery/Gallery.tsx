@@ -655,6 +655,7 @@ export default function Gallery() {
        Any click, scroll or key lands everything at once. ?slow=4 slows it. */
     const storm: Animation[] = [];
     let stormTimer = 0;
+    const stormTimers: number[] = [];
     const runStorm = () => {
       const root = document.documentElement;
       if (!root.classList.contains("gx-storm")) { root.classList.remove("gx-storm-air"); return; }
@@ -931,17 +932,19 @@ export default function Gallery() {
         oldPage.effect.updateTiming({ delay: 0, duration: MID * T, easing: "linear", fill: "both" });
         oldPage.currentTime = 0;
       }
-      // while the transition runs, its own background is the cool white
-      // (anything in the new page would tint the old one); this takes over
-      // on the frame the transition actually ends. A timed switch at MID
-      // could land a frame early, and the new page's cool white multiplied
-      // over the transition's gave a two-frame grey flash at the orb.
+      // While the transition runs, the cool white behind everything is the
+      // transition's own (gallery.css); the page's sky takes over just before
+      // the orb (the old page is all but gone by then). Both switch in the
+      // same instant: the sky comes on AND the transition's backing turns
+      // plain white, so the sky's cool white multiplied over it stays the
+      // same cool white. (Switched separately, a frame of overlap multiplied
+      // the two cool whites into a grey flash.)
       if (oldPage) {
         sky.style.opacity = "0";
-        const vtDone = (window as unknown as { __gxStormVT?: { finished: Promise<unknown> } }).__gxStormVT?.finished;
-        const showSky = () => { sky.style.opacity = "1"; };
-        if (vtDone) vtDone.then(showSky, showSky);
-        else oldPage.finished.then(showSky, showSky);
+        stormTimers.push(window.setTimeout(() => {
+          sky.style.opacity = "1";
+          root.classList.add("gx-sky-on");
+        }, Math.max(0, MID * T - 50)));
       }
       ground.style.opacity = "1";
       const groundIn = ground.animate(ringFrames((rad) => ({ clipPath: `circle(${rad.toFixed(1)}px at ${eye.x.toFixed(1)}px ${eye.y.toFixed(1)}px)` })), { ...opts, fill: "both" });
@@ -956,6 +959,7 @@ export default function Gallery() {
         skipOn.forEach((ev) => window.removeEventListener(ev, skip, { capture: true }));
         ground.remove();
         sky.remove();
+        root.classList.remove("gx-sky-on");
         view.style.perspective = "";
         world.style.transformStyle = "";
         storming = false;
@@ -982,6 +986,8 @@ export default function Gallery() {
     window.addEventListener("keydown", key);
     return () => {
       window.clearTimeout(stormTimer);
+      stormTimers.forEach((t) => window.clearTimeout(t));
+      document.documentElement.classList.remove("gx-sky-on");
       storm.forEach((a) => a.cancel());
       cancelAnimationFrame(frame);
       io.disconnect();
