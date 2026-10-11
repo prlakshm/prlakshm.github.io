@@ -932,9 +932,17 @@ export default function Gallery() {
         oldPage.currentTime = 0;
       }
       // while the transition runs, its own background is the cool white
-      // (anything in the new page would tint the old one); at the orb this
-      // takes over
-      if (oldPage) storm.push(sky.animate([{ opacity: 0 }, { opacity: 0, offset: MID }, { opacity: 1, offset: MID + 0.0001 }, { opacity: 1 }], { duration: T, fill: "both" }));
+      // (anything in the new page would tint the old one); this takes over
+      // on the frame the transition actually ends. A timed switch at MID
+      // could land a frame early, and the new page's cool white multiplied
+      // over the transition's gave a two-frame grey flash at the orb.
+      if (oldPage) {
+        sky.style.opacity = "0";
+        const vtDone = (window as unknown as { __gxStormVT?: { finished: Promise<unknown> } }).__gxStormVT?.finished;
+        const showSky = () => { sky.style.opacity = "1"; };
+        if (vtDone) vtDone.then(showSky, showSky);
+        else oldPage.finished.then(showSky, showSky);
+      }
       ground.style.opacity = "1";
       const groundIn = ground.animate(ringFrames((rad) => ({ clipPath: `circle(${rad.toFixed(1)}px at ${eye.x.toFixed(1)}px ${eye.y.toFixed(1)}px)` })), { ...opts, fill: "both" });
       storm.push(groundIn);
@@ -956,7 +964,13 @@ export default function Gallery() {
     };
     // started a moment later (and cancelled on cleanup), so a re-run of this
     // effect can't start it twice; in dev it waits for layout.json
-    stormTimer = window.setTimeout(() => layoutReady.current.then(() => requestAnimationFrame(runStorm)), 0);
+    // Prerendered on hover (stormHandoff.ts): hold it until the page is
+    // actually shown, or it would play out unseen in the background.
+    const shown = () =>
+      (document as Document & { prerendering?: boolean }).prerendering
+        ? new Promise<void>((done) => document.addEventListener("prerenderingchange", () => done(), { once: true }))
+        : Promise.resolve();
+    stormTimer = window.setTimeout(() => layoutReady.current.then(shown).then(() => requestAnimationFrame(runStorm)), 0);
     const ro = new ResizeObserver(() => draw());
     ro.observe(view);
     view.addEventListener("wheel", wheel, { passive: false });

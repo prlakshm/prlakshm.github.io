@@ -30,6 +30,21 @@ if (typeof document !== "undefined" && !document.getElementById("gx-vt-optin") &
     const to = e.activation?.entry?.url;
     if (!to || !new URL(to, location.href).pathname.startsWith("/everything")) e.viewTransition.skipTransition();
   });
+
+  /* Instant arrival: once the pointer rests on a link to Everything (or it's
+     pressed), Chrome prerenders the page in the background, so the click
+     swaps it in with nothing left to load and the storm starts at once.
+     Everything holds its storm until the page is actually shown
+     (everything/index.html, Gallery.tsx). Not from Everything itself: a page
+     can't prerender its own URL. */
+  if (!location.pathname.startsWith("/everything") && HTMLScriptElement.supports?.("speculationrules")) {
+    const rules = document.createElement("script");
+    rules.type = "speculationrules";
+    rules.textContent = JSON.stringify({
+      prerender: [{ where: { href_matches: "/everything/*" }, eagerness: "moderate" }],
+    });
+    document.head.appendChild(rules);
+  }
 }
 
 export {};
