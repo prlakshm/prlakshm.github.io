@@ -321,9 +321,13 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
   useLayoutEffect(() => {
     const pop = popRef.current;
     if (!pop) return;
+    // The full card IS the compact one, grown: hide the compact card while it's
+    // open, or its corner shows through the full card's bitten corner.
+    const mini = miniRef.current;
     if (open) {
       pop.style.visibility = "visible";
       pop.style.pointerEvents = "auto";
+      if (mini) animate(mini, { opacity: 0 }, { duration: reduced ? 0 : 0.12 });
       const c = animate(
         pop,
         { opacity: [0, 1], scale: [miniScale(), 1] },
@@ -334,6 +338,7 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
       return () => c.stop();
     }
     pop.style.pointerEvents = "none";
+    if (mini) animate(mini, { opacity: 1 }, { duration: reduced ? 0 : 0.18, ease: [0.4, 0, 0.6, 1] });
     const c = animate(
       pop,
       { opacity: 0, scale: miniScale() },
@@ -565,6 +570,11 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
   const confetti = useCallback(() => {
     [popRef.current, miniRef.current].forEach((root) => {
       const svg = root?.querySelector<SVGSVGElement>(".bc-popper") ?? null;
+      // tuck the confetti into the mouth now, so the popper's first frame is
+      // the start of the burst, never the finished confetti for a beat
+      svg?.querySelectorAll<SVGGElement>(".bc-bit").forEach((bit) => {
+        animate(bit, { x: MOUTH.x - Number(bit.dataset.x), y: MOUTH.y - Number(bit.dataset.y), scale: 0.2, opacity: 0 }, { duration: 0 });
+      });
       window.setTimeout(() => popConfetti(svg, true), 250);
     });
   }, []);

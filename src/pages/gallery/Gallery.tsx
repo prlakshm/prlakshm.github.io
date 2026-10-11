@@ -655,6 +655,7 @@ export default function Gallery() {
        Any click, scroll or key lands everything at once. ?slow=4 slows it. */
     const storm: Animation[] = [];
     let stormTimer = 0;
+    const stormTimers: number[] = [];
     const runStorm = () => {
       const root = document.documentElement;
       if (!root.classList.contains("gx-storm")) { root.classList.remove("gx-storm-air"); return; }
@@ -931,10 +932,20 @@ export default function Gallery() {
         oldPage.effect.updateTiming({ delay: 0, duration: MID * T, easing: "linear", fill: "both" });
         oldPage.currentTime = 0;
       }
-      // while the transition runs, its own background is the cool white
-      // (anything in the new page would tint the old one); at the orb this
-      // takes over
-      if (oldPage) storm.push(sky.animate([{ opacity: 0 }, { opacity: 0, offset: MID }, { opacity: 1, offset: MID + 0.0001 }, { opacity: 1 }], { duration: T, fill: "both" }));
+      // While the transition runs, the cool white behind everything is the
+      // transition's own (gallery.css); the page's sky takes over just before
+      // the orb (the old page is all but gone by then). Both switch in the
+      // same instant: the sky comes on AND the transition's backing turns
+      // plain white, so the sky's cool white multiplied over it stays the
+      // same cool white. (Switched separately, a frame of overlap multiplied
+      // the two cool whites into a grey flash.)
+      if (oldPage) {
+        sky.style.opacity = "0";
+        stormTimers.push(window.setTimeout(() => {
+          sky.style.opacity = "1";
+          root.classList.add("gx-sky-on");
+        }, Math.max(0, MID * T - 50)));
+      }
       ground.style.opacity = "1";
       const groundIn = ground.animate(ringFrames((rad) => ({ clipPath: `circle(${rad.toFixed(1)}px at ${eye.x.toFixed(1)}px ${eye.y.toFixed(1)}px)` })), { ...opts, fill: "both" });
       storm.push(groundIn);
@@ -948,6 +959,7 @@ export default function Gallery() {
         skipOn.forEach((ev) => window.removeEventListener(ev, skip, { capture: true }));
         ground.remove();
         sky.remove();
+        root.classList.remove("gx-sky-on");
         view.style.perspective = "";
         world.style.transformStyle = "";
         storming = false;
@@ -956,7 +968,13 @@ export default function Gallery() {
     };
     // started a moment later (and cancelled on cleanup), so a re-run of this
     // effect can't start it twice; in dev it waits for layout.json
-    stormTimer = window.setTimeout(() => layoutReady.current.then(() => requestAnimationFrame(runStorm)), 0);
+    // Prerendered on hover (stormHandoff.ts): hold it until the page is
+    // actually shown, or it would play out unseen in the background.
+    const shown = () =>
+      (document as Document & { prerendering?: boolean }).prerendering
+        ? new Promise<void>((done) => document.addEventListener("prerenderingchange", () => done(), { once: true }))
+        : Promise.resolve();
+    stormTimer = window.setTimeout(() => layoutReady.current.then(shown).then(() => requestAnimationFrame(runStorm)), 0);
     const ro = new ResizeObserver(() => draw());
     ro.observe(view);
     view.addEventListener("wheel", wheel, { passive: false });
@@ -968,6 +986,8 @@ export default function Gallery() {
     window.addEventListener("keydown", key);
     return () => {
       window.clearTimeout(stormTimer);
+      stormTimers.forEach((t) => window.clearTimeout(t));
+      document.documentElement.classList.remove("gx-sky-on");
       storm.forEach((a) => a.cancel());
       cancelAnimationFrame(frame);
       io.disconnect();

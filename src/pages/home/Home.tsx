@@ -261,7 +261,7 @@ function Home() {
               <div className="hero-col hero-col--copy">
                 <p className="line">Product Designer reimagining the interfaces people love</p>
                 <p className="line">
-                  Building, animating, and sharing on X{" "}
+                  Building and animating on X{" "}
                   <a href="https://x.com/pranavibuilds" target="_blank" rel="noreferrer">
                     @pranavibuilds
                     <span className="line-rule" aria-hidden="true" />

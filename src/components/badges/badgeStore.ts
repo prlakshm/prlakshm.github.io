@@ -10,11 +10,7 @@ export type BadgeId = "name" | "read" | "reimagine" | "celebrate" | "bagel";
 export const BADGES: ReadonlyArray<{ id: BadgeId; title: string; hint?: string }> = [
   { id: "name", title: "Learn my name" },
   { id: "read", title: "Read a case study" },
-  {
-    id: "reimagine",
-    title: "Reimagine",
-    hint: "Visit a reimagined product and come back",
-  },
+  { id: "reimagine", title: "Reimagine" },
   { id: "celebrate", title: "Celebrate design" },
   { id: "bagel", title: "Find my bagel" },
 ];

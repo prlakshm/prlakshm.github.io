@@ -531,6 +531,13 @@ html.gx-storm .gx-bagel {
   background: #f8fafc;
 }
 
+/* just before the orb the page's own sky takes over (Gallery.tsx), and this
+   turns plain white in the same instant, so the sky multiplied over it is
+   still exactly the cool white, never a darker grey */
+html.gx-sky-on::view-transition-image-pair(root) {
+  background: #fff;
+}
+
 @keyframes gx-wash {
   0%,
   80% {
