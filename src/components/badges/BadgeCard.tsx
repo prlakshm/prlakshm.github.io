@@ -735,9 +735,7 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
         }
         setIntro(false);
         armBadges(); // the hunt starts a moment after the ticket lands
-        // No pop on the compact card: the flight is the arrival, and the
-        // ticket hands over to it as it lands. (A 1.22 spring pop here came
-        // ~0.5s after the ticket had visibly arrived, a second, late beat.)
+        // (the landing press is timed to the handover, in fly())
       };
       if (!mini) {
         done();
@@ -753,8 +751,13 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
       )
         .finished.then(done)
         .catch(done);
-      // the full card hands over to the compact one as it arrives
+      // the full card hands over to the compact one as it arrives, and the
+      // compact card gives one small press right then, as the landing itself
+      // (not after the spring settles, which came as a late second beat)
       animate(card, { opacity: [1, 1, 0] }, { duration: 0.55, times: [0, 0.6, 1] });
+      window.setTimeout(() => {
+        if (miniRef.current) animate(miniRef.current, { scale: [1.06, 1] }, { duration: 0.28, ease: [0.23, 1, 0.32, 1] });
+      }, 380);
     };
 
     const onAny = () => fly();
