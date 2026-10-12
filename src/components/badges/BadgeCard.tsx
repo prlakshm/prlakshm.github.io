@@ -751,13 +751,13 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
       )
         .finished.then(done)
         .catch(done);
-      // the full card hands over to the compact one as it arrives, and the
-      // compact card gives one small press right then, as the landing itself
-      // (not after the spring settles, which came as a late second beat)
-      animate(card, { opacity: [1, 1, 0] }, { duration: 0.55, times: [0, 0.6, 1] });
-      window.setTimeout(() => {
-        if (miniRef.current) animate(miniRef.current, { scale: [1.06, 1] }, { duration: 0.28, ease: [0.23, 1, 0.32, 1] });
-      }, 380);
+      // the full card hands over to the compact one as it arrives...
+      // ...and only once the ticket has fully handed over (landed), the
+      // compact card swells a touch and settles: from its own size, never a
+      // jump to a bigger one
+      animate(card, { opacity: [1, 1, 0] }, { duration: 0.55, times: [0, 0.6, 1] }).finished.then(() => {
+        if (miniRef.current) animate(miniRef.current, { scale: [1, 1.06, 1] }, { duration: 0.32, times: [0, 0.35, 1], ease: "easeOut" });
+      }, () => {});
     };
 
     const onAny = () => fly();
