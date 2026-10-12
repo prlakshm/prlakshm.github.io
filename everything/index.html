@@ -2,7 +2,39 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+    <!-- A canvas, not a document: the canvas does its own pan and zoom, so the
+         page itself never zooms or scrolls (Safari pinching the nav or star
+         card zoomed the whole page, and remembered it on reload). Every
+         arrival, reload included, opens at the opening view. -->
+    <style>html, body { touch-action: none; overscroll-behavior: none; }</style>
+    <script>
+      (function () {
+        try { history.scrollRestoration = "manual"; } catch (e) {}
+        var stop = function (e) { e.preventDefault(); };
+        document.addEventListener("gesturestart", stop, { passive: false });
+        document.addEventListener("gesturechange", stop, { passive: false });
+        // a page zoom left over from before (Safari restores it on reload):
+        // nudging the viewport back to its limits snaps it to 1
+        // (Safari applies a remembered zoom after the page loads, so this
+        // keeps watching for the first couple of seconds)
+        var vv = window.visualViewport;
+        var unzoom = function () {
+          if (!vv || vv.scale <= 1.01) return;
+          var m = document.querySelector('meta[name="viewport"]');
+          var c = m.getAttribute("content");
+          m.setAttribute("content", "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, viewport-fit=cover");
+          window.scrollTo(0, 0);
+          setTimeout(function () { m.setAttribute("content", c); }, 400);
+        };
+        if (vv) {
+          vv.addEventListener("resize", unzoom);
+          setTimeout(function () { vv.removeEventListener("resize", unzoom); }, 2500);
+          [0, 300, 900, 1800].forEach(function (t) { setTimeout(unzoom, t); });
+        }
+        window.scrollTo(0, 0);
+      })();
+    </script>
     <title>Everything | Pranavi Ram</title>
     <meta name="description" content="Everything else Pranavi Ram makes: posters, decks and design work, laid out on one canvas." />
     <link rel="canonical" href="https://pranaviram.com/everything/" />

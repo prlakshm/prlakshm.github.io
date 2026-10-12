@@ -981,7 +981,10 @@ export default function Gallery() {
         ? new Promise<void>((done) => document.addEventListener("prerenderingchange", () => done(), { once: true }))
         : Promise.resolve();
     stormTimer = window.setTimeout(() => layoutReady.current.then(shown).then(() => requestAnimationFrame(runStorm)), 0);
-    const ro = new ResizeObserver(() => draw());
+    // Until the visitor moves the canvas, any change in its size (Safari's
+    // toolbars settling after a reload, a resized window) re-frames the
+    // opening view; after that, it only redraws
+    const ro = new ResizeObserver(() => (touched.current || storming ? draw() : fit()));
     ro.observe(view);
     view.addEventListener("wheel", wheel, { passive: false });
     window.addEventListener("pointermove", track);
