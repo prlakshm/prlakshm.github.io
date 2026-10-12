@@ -735,8 +735,9 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
         }
         setIntro(false);
         armBadges(); // the hunt starts a moment after the ticket lands
-        if (miniRef.current)
-          animate(miniRef.current, { scale: [1.22, 1] }, { type: "spring", stiffness: 520, damping: 16 });
+        // No pop on the compact card: the flight is the arrival, and the
+        // ticket hands over to it as it lands. (A 1.22 spring pop here came
+        // ~0.5s after the ticket had visibly arrived, a second, late beat.)
       };
       if (!mini) {
         done();
