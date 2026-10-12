@@ -44,6 +44,10 @@
 }
 
 .gx-view {
+  /* a canvas, not a document: dragging, resizing or marquee-selecting never
+     selects text (the selection's name label turned blue mid-resize) */
+  -webkit-user-select: none;
+  user-select: none;
   position: absolute;
   inset: 0;
   overflow: hidden;
@@ -170,6 +174,23 @@
   line-height: 1;
   color: var(--gx-sel);
   white-space: nowrap;
+  pointer-events: auto; /* double-click to rename (Gallery.tsx) */
+  cursor: text;
+}
+
+.gx-sel-name--edit {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  -webkit-user-select: text;
+  user-select: text;
+  caret-color: var(--gx-sel);
+}
+
+.gx-sel-name--edit::selection {
+  background: color-mix(in srgb, var(--gx-sel) 22%, transparent);
 }
 
 .gx-sel-h {
