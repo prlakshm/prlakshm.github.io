@@ -490,8 +490,32 @@
 }
 
 .bc-intro-card {
+  position: relative;
   opacity: 0;
   will-change: transform;
+}
+
+/* The compact card's contents only (its frame is the ticket's, morphing):
+   pinned to the ticket's top-left, which is where the compact card's sits
+   when the ticket lands. Faded in during the flight (BadgeCard.tsx fly()). */
+.bc-intro-compact {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.bc-intro-compact .bc-compact {
+  background: none;
+  box-shadow: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.bc-intro-compact .bc-compact::before,
+.bc-intro-compact .bc-compact::after {
+  display: none;
 }
 
 /* --- A stamp in flight ------------------------------------------------------ */

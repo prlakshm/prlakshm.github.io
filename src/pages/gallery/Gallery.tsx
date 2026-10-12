@@ -59,6 +59,10 @@ export default function Gallery() {
   const layoutReady = useRef<Promise<unknown>>(Promise.resolve());
   const [layout, setLayout] = useState<Layout>(SAVED as Layout);
   const [selected, setSelected] = useState<string[]>([]);
+  /* A hidden easter egg: double-click a selected piece's name to rename it.
+     Like moving and resizing, it's only for this visit (gone on reload). */
+  const [renames, setRenames] = useState<Record<string, string>>({});
+  const [renaming, setRenaming] = useState<string | null>(null);
   // phones (portrait): the same clusters re-stacked taller round the bagel
   const PORTRAIT = "(orientation: portrait) and (max-width: 900px)";
   const [portrait, setPortrait] = useState(() => typeof window !== "undefined" && window.matchMedia(PORTRAIT).matches);
@@ -409,6 +413,8 @@ export default function Gallery() {
 
     const down = (e: PointerEvent) => {
       if (e.button !== 0 && e.pointerType === "mouse") return;
+      // the name label is for double-click renaming, not for dragging
+      if (e.target instanceof Element && e.target.closest(".gx-sel-name")) return;
       // a mouse is one pointer: forget any press whose release went missing
       // (it would otherwise read as a second finger and swallow clicks)
       if (e.pointerType === "mouse") { pointers.clear(); pinch = null; }
@@ -1069,7 +1075,28 @@ export default function Gallery() {
             <div className="gx-marquee" aria-hidden="true" />
             {box && (
               <div className="gx-sel" ref={selRef} style={box} aria-hidden="true">
-                {sel.length === 1 && <span className="gx-sel-name">{sel[0].title}</span>}
+                {sel.length === 1 &&
+                  (renaming === sel[0].id ? (
+                    <NameField
+                      initial={renames[sel[0].id] ?? sel[0].title}
+                      onDone={(v) => {
+                        const id = sel[0].id;
+                        setRenaming(null);
+                        if (v === null) return;
+                        const name = v.trim();
+                        setRenames((r) => {
+                          const n = { ...r };
+                          if (!name || name === sel[0].title) delete n[id];
+                          else n[id] = name;
+                          return n;
+                        });
+                      }}
+                    />
+                  ) : (
+                    <span className="gx-sel-name" onDoubleClick={() => setRenaming(sel[0].id)}>
+                      {renames[sel[0].id] ?? sel[0].title}
+                    </span>
+                  ))}
                 <i className="gx-sel-h gx-sel-h--tl" data-corner="tl" />
                 <i className="gx-sel-h gx-sel-h--tr" data-corner="tr" />
                 <i className="gx-sel-h gx-sel-h--bl" data-corner="bl" />
@@ -1321,5 +1348,40 @@ function Bagel({ tap, check }: { tap: MutableRefObject<() => void>; check: Mutab
       <span className="gx-bagel-hit" ref={hitRef} aria-hidden="true" />
       <span className="gx-bagel-hit gx-bagel-hit--burst" ref={burstHitRef} aria-hidden="true" />
     </div>
+  );
+}
+
+/* The rename field: all of the name selected, ready to type over (as Figma
+   does). Enter, Esc or clicking away all keep it, as in Figma. 40
+   characters. */
+function NameField({ initial, onDone }: { initial: string; onDone: (v: string | null) => void }) {
+  const ref = useRef<HTMLInputElement>(null);
+  const done = useRef(false);
+  const finish = (v: string | null) => {
+    if (done.current) return;
+    done.current = true;
+    onDone(v);
+  };
+  useEffect(() => {
+    ref.current?.focus();
+    ref.current?.select();
+  }, []);
+  return (
+    <input
+      ref={ref}
+      className="gx-sel-name gx-sel-name--edit"
+      defaultValue={initial}
+      maxLength={40}
+      spellCheck={false}
+      aria-label="Rename"
+      size={Math.max(4, initial.length + 1)}
+      onInput={(e) => (e.currentTarget.size = Math.max(4, e.currentTarget.value.length + 1))}
+      onKeyDown={(e) => {
+        e.stopPropagation();
+        if (e.key === "Enter" || e.key === "Escape") finish(e.currentTarget.value);
+      }}
+      onBlur={(e) => finish(e.currentTarget.value)}
+      onPointerDown={(e) => e.stopPropagation()}
+    />
   );
 }

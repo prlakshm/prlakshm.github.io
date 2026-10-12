@@ -97,9 +97,10 @@ const Count = ({ n }: { n: number }) => (
   </span>
 );
 
-/* The five slots, filled in the order they were found. On the full card each
-   star has its own tip (hover, or a tap on touch): the badge found there, or
-   for an empty slot the hint for one still to find. */
+/* The five slots, filled in the order they were found. On the full card an
+   earned star shows its tip (hover, or a tap on touch): the badge found
+   there. Empty stars show nothing, so the finds stay hidden; the bulb is the
+   way to ask, and its hint appears above the leftmost empty star. */
 type StarTips = { tips: string[]; at: number | null; set: (i: number | null) => void };
 
 function Slots({
@@ -123,7 +124,7 @@ function Slots({
           data-i={i}
           style={{ "--tilt": `${CROOKED[i]}deg` } as React.CSSProperties}
           ref={cellRefs ? (el) => (cellRefs.current[i] = el) : undefined}
-          onPointerEnter={starTips ? (e) => e.pointerType === "mouse" && starTips.set(i) : undefined}
+          onPointerEnter={starTips && landed[i] ? (e) => e.pointerType === "mouse" && starTips.set(i) : undefined}
           onPointerLeave={starTips ? (e) => e.pointerType === "mouse" && starTips.set(null) : undefined}
         >
           {landed[i] ? <Stamp index={i} /> : <StarSlot />}
@@ -192,10 +193,10 @@ function CardFace({
 }
 
 /* Always visible in the nav: the slots, then the count and the bulb. */
-function CompactCard({ landed }: { landed: BadgeId[] }) {
+function CompactCard({ landed, light = true }: { landed: BadgeId[]; light?: boolean }) {
   return (
     <span className="bc-compact" aria-hidden="true">
-      <Slots landed={landed} light />
+      <Slots landed={landed} light={light} />
       <span className="bc-foot">
         <Count n={landed.length} />
         {landed.length >= TOTAL ? <Popper /> : <Bulb />}
@@ -318,6 +319,7 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
     return w / (popRef.current?.offsetWidth || CARD_W);
   };
 
+  const miniHidden = useRef(false);
   useLayoutEffect(() => {
     const pop = popRef.current;
     if (!pop) return;
@@ -328,6 +330,7 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
       pop.style.visibility = "visible";
       pop.style.pointerEvents = "auto";
       if (mini) animate(mini, { opacity: 0 }, { duration: reduced ? 0 : 0.12 });
+      miniHidden.current = true;
       const c = animate(
         pop,
         { opacity: [0, 1], scale: [miniScale(), 1] },
@@ -338,7 +341,11 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
       return () => c.stop();
     }
     pop.style.pointerEvents = "none";
-    if (mini) animate(mini, { opacity: 1 }, { duration: reduced ? 0 : 0.18, ease: [0.4, 0, 0.6, 1] });
+    // only after a real open (on mount this would undo the intro's hiding)
+    if (mini && miniHidden.current) {
+      miniHidden.current = false;
+      animate(mini, { opacity: 1 }, { duration: reduced ? 0 : 0.18, ease: [0.4, 0, 0.6, 1] });
+    }
     const c = animate(
       pop,
       { opacity: 0, scale: miniScale() },
@@ -445,12 +452,15 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
 
   /* --- hint --------------------------------------------------------------- */
   const hint = nextHint(landed);
+  // Every press of the bulb shows the hint, and a press while it's already up
+  // pops it again and restarts its time (it used to toggle it off, which read
+  // as the press not registering).
+  const [hintPop, setHintPop] = useState(0);
   const toggleHint = () => {
     window.clearTimeout(hintTimer.current);
-    setHintOpen((v) => {
-      if (!v) hintTimer.current = window.setTimeout(() => setHintOpen(false), 2600);
-      return !v;
-    });
+    setHintOpen(true);
+    setHintPop((n) => n + 1);
+    hintTimer.current = window.setTimeout(() => setHintOpen(false), 2600);
   };
   useEffect(() => {
     if (hintOpen && hint) setAnnounce(`Hint: ${hintOf(hint)}`);
@@ -462,17 +472,36 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
   useLayoutEffect(() => {
     const pop = popRef.current;
     if (!pop) return;
-    const fade = (el: Element | null, on: boolean) => {
-      if (!el) return;
-      const now = Number(getComputedStyle(el).opacity);
-      if ((on && now === 1) || (!on && now === 0)) return;
-      animate(el, { opacity: on ? 1 : 0 }, reduced ? { duration: 0 } : { duration: on ? 0.16 : 0.22 });
-    };
     // the bulb's hint is the next empty star's own tip, shown where it always
     // sits, above that star (the next badge to find is the one it names)
     const next = landed.length;
-    pop.querySelectorAll(".bc-star-tip").forEach((el, i) => fade(el, i === tipAt || (hintOpen && tipAt === null && i === next)));
+    const showing = (i: number) => i === tipAt || (hintOpen && tipAt === null && i === next);
+    const tips = pop.querySelectorAll(".bc-star-tip");
+    const anyOn = Array.from(tips).some((_, i) => showing(i));
+    // Only ever one tip at a time: they sit close enough to overlap, so when
+    // another star's tip takes over (sweeping along the row), the old one goes
+    // at once; it only fades out when nothing replaces it.
+    const fade = (el: Element, on: boolean) => {
+      const now = Number(getComputedStyle(el).opacity);
+      if ((on && now === 1) || (!on && now === 0)) return;
+      animate(el, { opacity: on ? 1 : 0 }, reduced || (!on && anyOn) ? { duration: 0 } : { duration: on ? 0.16 : 0.22 });
+    };
+    tips.forEach((el, i) => fade(el, showing(i)));
   }, [hintOpen, tipAt, reduced, landed.length]);
+
+  // a press while the hint is already up: acknowledge it
+  const hintPopped = useRef(0);
+  useLayoutEffect(() => {
+    if (hintPop === hintPopped.current) return;
+    const again = hintPopped.current > 0 && hintOpen;
+    hintPopped.current = hintPop;
+    if (!again || reduced || tipAt !== null) return;
+    const el = popRef.current?.querySelectorAll(".bc-star-tip")[landed.length];
+    // Feedback, not a second entrance: the hint hasn't changed, so it never
+    // leaves. It dips to 40% and settles from a touch smaller, fast (0.2s),
+    // so the press visibly registers and the text stays readable throughout.
+    if (el) animate(el, { opacity: [null, 0.4, 1], scale: [null, 0.97, 1] }, { duration: 0.2, times: [0, 0.35, 1], ease: [0.23, 1, 0.32, 1] });
+  }, [hintPop, hintOpen, reduced, tipAt, landed.length]);
 
   /* --- star tips ------------------------------------------------------------ */
   /* Found stars in the order they were found, then the missing badges in
@@ -512,6 +541,7 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
     const slot = t.closest<HTMLElement>(".bc-slot");
     if (slot && fromTouch(e)) {
       const i = Number(slot.dataset.i);
+      if (i >= landed.length) return; // an empty star keeps its secret
       showTip(tipAt === i ? null : i);
       tipTimer.current = window.setTimeout(() => setTipAt(null), TIP_MS);
       return;
@@ -686,6 +716,10 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
     let holdTimer = 0;
 
     holdBadges(); // nothing counts while the ticket is up (badgeStore.ts)
+    // one card only: the compact card waits while the ticket is up and
+    // flies home to become it (fly())
+    const miniEl = miniRef.current;
+    if (miniEl) miniEl.style.opacity = "0";
     card.style.transformOrigin = "50% 50%";
     const enter = animate(
       card,
@@ -711,25 +745,76 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
         }
         setIntro(false);
         armBadges(); // the hunt starts a moment after the ticket lands
-        if (miniRef.current)
-          animate(miniRef.current, { scale: [1.22, 1] }, { type: "spring", stiffness: 520, damping: 16 });
+        // (the landing press is timed to the handover, in fly())
       };
       if (!mini) {
+        if (miniRef.current) miniRef.current.style.opacity = "";
         done();
         return;
       }
       enter.complete();
+      /* THE TRANSFORMATION. One card: the ticket flies home and becomes the
+         compact card on the way. Its frame narrows from the ticket's shape
+         (~2:1) to the compact's (~3:1) as it goes, the bites and tear lines
+         resizing with it (--k, --stub), while inside it the welcome note and
+         big stars fade out (first 40%) and the compact row fades in (last
+         half). It arrives looking exactly like the compact card, which then
+         takes over in the same frame and gives its small press. All on the
+         flight's one spring. */
+      const face = card.querySelector<HTMLElement>(".bc-card");
+      const compactLayer = card.querySelector<HTMLElement>(".bc-intro-compact");
+      const fullBits = face ? Array.from(face.children) as HTMLElement[] : [];
+      // freeze the welcome contents at their size, so they never rewrap
+      fullBits.forEach((el) => {
+        const r = el.getBoundingClientRect();
+        el.style.width = `${r.width}px`;
+        el.style.flexShrink = "0";
+      });
+      const W0 = from.width, H0 = from.height, W1 = mini.width, H1 = mini.height;
+      const dx = mini.left - from.left, dy = mini.top - from.top;
+      // Pin the ticket where it is first. It was centred in the intro
+      // overlay, so as it narrowed in flight the overlay re-centred it, and
+      // its starting point slid under the flight: a visible jump, worse on
+      // some screen sizes. Pinned, its top-left is fixed, so the path is
+      // exact at any size: from its own top-left to the compact card's.
+      Object.assign(card.style, { position: "fixed", left: `${from.left}px`, top: `${from.top}px`, margin: "0" });
       card.style.transformOrigin = "0 0";
-      const s = mini.width / from.width;
-      animate(
-        card,
-        { x: mini.left - from.left, y: mini.top - from.top, scale: s, rotate: [0, -4, 0] },
-        { type: "spring", stiffness: 150, damping: 21, mass: 0.9 }
-      )
-        .finished.then(done)
-        .catch(done);
-      // the full card hands over to the compact one as it arrives
-      animate(card, { opacity: [1, 1, 0] }, { duration: 0.55, times: [0, 0.6, 1] });
+      if (face) {
+        face.style.boxSizing = "border-box";
+        face.style.width = `${W0}px`;
+        face.style.height = `${H0}px`;
+      }
+      const clamp = (v: number) => Math.min(1, Math.max(0, v));
+      let landedNow = false;
+      const land = () => {
+        if (landedNow) return;
+        landedNow = true;
+        if (miniRef.current) miniRef.current.style.opacity = "";
+        done();
+        if (miniRef.current) animate(miniRef.current, { scale: [1, 1.06, 1] }, { duration: 0.32, times: [0, 0.35, 1], ease: "easeOut" });
+      };
+      animate(0, 1, {
+        type: "spring",
+        stiffness: 150,
+        damping: 21,
+        mass: 0.9,
+        onUpdate: (v) => {
+          const lerp = (a: number, b: number) => a + (b - a) * v;
+          card.style.transform = `translate(${lerp(0, dx)}px, ${lerp(0, dy)}px) rotate(${(-4 * Math.sin(Math.PI * clamp(v))).toFixed(2)}deg)`;
+          if (face) {
+            face.style.width = `${lerp(W0, W1)}px`;
+            face.style.height = `${lerp(H0, H1)}px`;
+            face.style.setProperty("--k", lerp(1, 0.55).toFixed(3));
+            face.style.setProperty("--stub", `${lerp(28, 15.2).toFixed(2)}px`);
+          }
+          const out = (1 - clamp(v / 0.4)).toFixed(3);
+          fullBits.forEach((el) => (el.style.opacity = out));
+          if (compactLayer) compactLayer.style.opacity = clamp((v - 0.5) / 0.4).toFixed(3);
+          if (v >= 0.998) land(); // home: hand over now, not when the spring finally rests
+        },
+      })
+        .finished.then(land)
+        .catch(land);
     };
 
     const onAny = () => fly();
@@ -751,6 +836,7 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
       detach();
       enter.stop();
       if (!flown) armBadges();
+      if (miniRef.current) miniRef.current.style.opacity = "";
     };
   }, [intro]);
 
@@ -890,6 +976,11 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
                 <div className="bc-intro-veil" ref={introVeilRef} />
                 <div className="bc-intro-card" ref={introCardRef}>
                   <CardFace landed={landed} />
+                  {/* the compact card's contents, faded in as the ticket
+                      becomes it in flight (fly(), below) */}
+                  <span className="bc-intro-compact">
+                    <CompactCard landed={landed} light={false} />
+                  </span>
                 </div>
               </div>
             )}
