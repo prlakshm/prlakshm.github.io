@@ -7,7 +7,7 @@ import "./gallery.css";
 import WtNav from "../home/WtNav.js";
 import { prefersReducedMotion } from "../home/interactions.js";
 import { earn } from "../../components/badges/badgeStore.js";
-import { BAGEL, PIECES, applyLayout, applyPhone, pieceBounds, portraitLayout, type Layout, type Piece } from "./clusters.js";
+import { BAGEL, PIECES, applyLayout, applyPhone, pieceBounds, portraitLayout, thumbOf, type Layout, type Piece } from "./clusters.js";
 import SAVED from "./layout.json";
 import Sheet from "./Sheet.js";
 
@@ -208,7 +208,23 @@ export default function Gallery() {
       }
     };
     let storming = false;
+    /* Images open as light copies (thumbOf) and swap to the original once a
+       piece is shown big enough to need it, loaded and decoded first so the
+       swap can't be seen. They never swap back. */
+    const FULL_AT = 260; // device px across (the light copies are 280)
+    const syncImages = () => {
+      world.querySelectorAll<HTMLImageElement>("img[data-full]").forEach((img) => {
+        if (img.dataset.swapped) return;
+        const across = (img.parentElement?.offsetWidth ?? 0) * cam.z * dpr();
+        if (across < FULL_AT) return;
+        img.dataset.swapped = "1";
+        const full = new Image();
+        full.src = img.dataset.full!;
+        full.decode().then(() => { img.src = full.src; }, () => {});
+      });
+    };
     const syncVideos = () => {
+      syncImages();
       if (storming) { world.querySelectorAll("video").forEach((v) => v.pause()); return; }
       const moving = !document.hidden && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       world.querySelectorAll<HTMLVideoElement>("video:not(.gx-full)").forEach((v) => {
@@ -980,7 +996,16 @@ export default function Gallery() {
       (document as Document & { prerendering?: boolean }).prerendering
         ? new Promise<void>((done) => document.addEventListener("prerenderingchange", () => done(), { once: true }))
         : Promise.resolve();
-    stormTimer = window.setTimeout(() => layoutReady.current.then(shown).then(() => requestAnimationFrame(runStorm)), 0);
+    // ...and until the canvas's light copies are ready to draw (capped), so
+    // pieces never fly or rise in half-loaded
+    const imagesReady = () =>
+      Promise.race([
+        Promise.all(
+          Array.from(world.querySelectorAll<HTMLImageElement>(".gx-piece img")).map((i) => (i.decode ? i.decode().catch(() => {}) : Promise.resolve()))
+        ),
+        new Promise((done) => window.setTimeout(done, 1200)), // a cold, direct arrival: wait a beat, not a long blank pause
+      ]);
+    stormTimer = window.setTimeout(() => layoutReady.current.then(shown).then(imagesReady).then(() => requestAnimationFrame(runStorm)), 0);
     // Until the visitor moves the canvas, any change in its size (Safari's
     // toolbars settling after a reload, a resized window) re-frames the
     // opening view; after that, it only redraws
@@ -1243,7 +1268,7 @@ function PieceView({ piece: p }: { piece: Piece }) {
         <video
           src={p.small ?? p.src}
           data-full={p.small ? p.src : undefined}
-          poster={p.poster}
+          poster={p.poster ? thumbOf(p.poster) : undefined}
           muted
           loop
           playsInline
@@ -1254,7 +1279,15 @@ function PieceView({ piece: p }: { piece: Piece }) {
     );
   return (
     <figure className={cls} style={style} data-id={p.id}>
-      <img src={p.src} alt={p.title} loading="lazy" decoding="async" draggable={false} />
+      <img
+        src={thumbOf(p.src)}
+        data-full={p.src}
+        alt={p.title}
+        decoding="async"
+        draggable={false}
+        // a missing light copy falls back to the original
+        onError={(e) => { const i = e.currentTarget; if (i.src.includes("/gallery/thumb/")) i.src = p.src; }}
+      />
       {LIVE[p.id] && <LiveWordmark id={p.id} slideW={p.w} />}
     </figure>
   );

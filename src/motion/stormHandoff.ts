@@ -37,4 +37,27 @@ if (typeof document !== "undefined" && !document.getElementById("gx-vt-optin") &
      page being left whited out at the click instead of being swept away. */
 }
 
+/* Warm the canvas: once this page has settled (and the visitor isn't
+   saving data), quietly fetch the Everything canvas's light copies (~0.4MB,
+   scripts/gallery-thumbs.mjs), so tapping EVERYTHING finds them already
+   there instead of the pieces rising in half-loaded. Low priority, idle
+   time only. */
+if (typeof window !== "undefined" && !location.pathname.startsWith("/everything")) {
+  const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+  const thrifty = conn?.saveData || /(^|-)2g$/.test(conn?.effectiveType ?? "");
+  const warm = () =>
+    fetch("/gallery/thumb/index.json")
+      .then((r) => (r.ok ? r.json() : []))
+      // plain low-priority fetches land in the HTTP cache in every browser
+      // (Safari has no <link rel=prefetch>)
+      .then((list: string[]) => list.forEach((href) => fetch(href, { priority: "low" } as RequestInit).catch(() => {})))
+      .catch(() => {});
+  const ric = (window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+  const later = () => window.setTimeout(() => (ric ? ric(warm, { timeout: 4000 }) : warm()), 1500);
+  if (!thrifty) {
+    if (document.readyState === "complete") later();
+    else window.addEventListener("load", later, { once: true });
+  }
+}
+
 export {};

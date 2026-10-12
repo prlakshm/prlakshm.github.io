@@ -178,6 +178,10 @@ function scatter(spec: Spec, seed: number): { items: Item[]; r: number } {
    in two layers cut from the same frame (Figma "Final Bagel"), so the
    exclamation can burst out of it. ORIGIN is the tail's tip, hidden under the
    bagel, as a fraction of the image: the point the shout grows from. */
+/* The light copy of an image (scripts/gallery-thumbs.mjs): what the canvas
+   shows while a piece is small on screen. */
+export const thumbOf = (src: string) => "/gallery/thumb" + src.replace(/\.[a-z0-9]+$/i, ".webp");
+
 export const BAGEL = {
   body: I + "bagel-body.webp",
   shout: I + "bagel-shout.webp",
