@@ -1,0 +1,26 @@
+<!doctype html><meta charset="utf-8"><style>
+html,body{margin:0;background:#f8fafc;width:1080px;height:1350px;overflow:hidden}
+.p{position:absolute;left:50%;top:50%;width:760px;height:950px;margin:-475px 0 0 -380px;box-shadow:0 0 0 1px rgb(15 23 42/.14),0 1px 2px rgb(15 23 42/.18),0 18px 44px rgb(15 23 42/.16);backface-visibility:hidden;background-size:cover}
+</style><div id=s></div><script>
+const ids=["surprise-rail","mixr","pinnables","figma-sound","codex-bookmarks"];
+const tilt=[-3,7.5,-9,2.5,-5.5]; // every poster its own angle, alternating sides
+const s=document.getElementById("s");
+const els=ids.map((id,i)=>{const d=document.createElement("div");d.className="p";d.style.backgroundImage=`url(/home/work/${id}-poster.webp)`;s.appendChild(d);return d});
+/* no loop: the first poster holds alone, then the rest drop onto the pile,
+   quicker each time (the pile gathers momentum), each landing with a small
+   press; then the full stack holds */
+const START=[0,460,870,1230,1560]; // the first one drops onto the empty table too, then holds
+const ease=t=>1-Math.pow(1-t,3);
+window.render=(ms)=>{
+  els.forEach((el,i)=>{
+    el.style.zIndex=String(i);
+    const age=ms-START[i];
+    if(age<0){el.style.opacity=0;return;}
+    const D=380,u=Math.min(1,age/D),e=ease(u);
+    // a small press after it lands: down to .985, back to 1 over 160ms
+    const p=age>D?Math.max(0,1-(age-D)/200):0, press=1-(i===els.length-1?0.005:0.015)*Math.sin(Math.PI*(1-p))*(age>D?1:0);
+    el.style.opacity=Math.min(1,u*4);
+    el.style.transform=`translateY(${-120*(1-e)}px) rotate(${tilt[i]+(1-e)*(i%2?9:-9)}deg) scale(${(1.15-0.15*e)*press})`;
+  });};
+render(0);
+</script>
