@@ -31,7 +31,12 @@ import "./badges.css";
 const TOTAL = BADGES.length;
 const INTRO_KEY = "pr-badge-intro";
 const CARD_W = 356; // .bc-card width — the compact card scales to/from this
-const HOLD_MS = 1600; // how long the intro card sits before flying home (2.9s felt long)
+// how long the intro card stays open after it lands: enough to take in its
+// line (1.6s wasn't, 3.5s held a beat too long); any scroll, tap or key
+// folds it early, so it never holds anyone up
+const HOLD_MS = 2500;
+// after a tap on it, or the pointer leaving it: a little longer, not the full time
+const TAP_HOLD_MS = 1700;
 const FOUND_TIP_MS = 2400; // how long a freshly stamped card stays open, its new star's tooltip naming the find
 const STAMP_SPRITE = "/home/card/stamps.webp";
 const LIGHT_PAD = 6; // the light layer overhangs the row, so tilted corners are lit too
@@ -288,7 +293,6 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
   const miniRef = useRef<HTMLSpanElement>(null);
   const popRef = useRef<HTMLDivElement>(null);
   const introCardRef = useRef<HTMLDivElement>(null);
-  const introVeilRef = useRef<HTMLDivElement>(null);
   const slotCells = useRef<Array<HTMLSpanElement | null>>([]);
   const hovering = useRef(false);
   const closeTimer = useRef(0);
@@ -720,14 +724,19 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
     // flies home to become it (fly())
     const miniEl = miniRef.current;
     if (miniEl) miniEl.style.opacity = "0";
-    card.style.transformOrigin = "50% 50%";
+    /* In place, not a takeover: the ticket opens where the card lives (its
+       top-left on the compact card's), over the page, which stays usable
+       underneath (no veil). It settles in with a small drop, reads for a
+       few seconds, then folds into the compact card right there (fly()). */
+    const home = miniRef.current?.getBoundingClientRect();
+    if (home) Object.assign(card.style, { position: "fixed", left: `${home.left}px`, top: `${home.top}px`, margin: "0" });
+    card.style.transformOrigin = "0 0";
     const enter = animate(
       card,
-      { opacity: [0, 1], y: [34, 0], scale: [0.92, 1], rotateX: [18, 0] },
-      { type: "spring", stiffness: 160, damping: 20, opacity: { duration: 0.3 } }
+      { opacity: [0, 1], y: [-10, 0], scale: [0.96, 1] },
+      // an entrance: strong ease-out on the fade, a spring with no bounce on the drop
+      { type: "spring", duration: 0.45, bounce: 0, opacity: { duration: 0.2, ease: [0.23, 1, 0.32, 1] } }
     );
-    const veil = introVeilRef.current;
-    if (veil) animate(veil, { opacity: [0, 1] }, { duration: 0.35 });
 
     const fly = () => {
       if (flown) return;
@@ -736,7 +745,6 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
       detach();
       const mini = miniRef.current?.getBoundingClientRect();
       const from = card.getBoundingClientRect();
-      if (introVeilRef.current) animate(introVeilRef.current, { opacity: 0 }, { duration: 0.45 });
       const done = () => {
         try {
           sessionStorage.setItem(INTRO_KEY, "1");
@@ -791,16 +799,19 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
         landedNow = true;
         if (miniRef.current) miniRef.current.style.opacity = "";
         done();
-        if (miniRef.current) animate(miniRef.current, { scale: [1, 1.06, 1] }, { duration: 0.32, times: [0, 0.35, 1], ease: "easeOut" });
+        if (miniRef.current) animate(miniRef.current, { scale: [1, 1.06, 1] }, { duration: 0.32, times: [0, 0.35, 1], ease: [0.23, 1, 0.32, 1] });
       };
+      // a morph on the spot: quicker than the old flight across the screen
+      // (no distance to cover), no bounce, so it settles once
       animate(0, 1, {
         type: "spring",
-        stiffness: 150,
-        damping: 21,
-        mass: 0.9,
+        duration: 0.5,
+        bounce: 0,
         onUpdate: (v) => {
           const lerp = (a: number, b: number) => a + (b - a) * v;
-          card.style.transform = `translate(${lerp(0, dx)}px, ${lerp(0, dy)}px) rotate(${(-4 * Math.sin(Math.PI * clamp(v))).toFixed(2)}deg)`;
+          // a lean only when it actually travels (it folds in place now)
+          const lean = Math.min(1, Math.hypot(dx, dy) / 200) * -4 * Math.sin(Math.PI * clamp(v));
+          card.style.transform = `translate(${lerp(0, dx)}px, ${lerp(0, dy)}px) rotate(${lean.toFixed(2)}deg)`;
           if (face) {
             face.style.width = `${lerp(W0, W1)}px`;
             face.style.height = `${lerp(H0, H1)}px`;
@@ -817,18 +828,47 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
         .catch(land);
     };
 
-    const onAny = () => fly();
+    /* Interest keeps it open. A tap on the card isn't a dismissal: it gives
+       a small press back (like a star's tip does) and restarts the time, and
+       a pointer resting on it holds it open (the time starts again when it
+       leaves). Anything else (a tap elsewhere, a scroll, a key) is
+       intent to use the page, and sends it home early. */
+    const onCard = (e: Event) => e.target instanceof Node && card.contains(e.target);
+    const restart = (ms = HOLD_MS) => {
+      window.clearTimeout(holdTimer);
+      holdTimer = window.setTimeout(fly, ms);
+    };
+    const onAny = (e: Event) => {
+      if (onCard(e)) return;
+      fly();
+    };
+    const onPress = (e: PointerEvent) => {
+      if (!onCard(e)) return fly();
+      if (!reduced) animate(card, { scale: [1, 0.97, 1] }, { duration: 0.2, times: [0, 0.35, 1], ease: [0.23, 1, 0.32, 1] });
+      restart(TAP_HOLD_MS);
+    };
+    const onEnter = (e: PointerEvent) => {
+      if (e.pointerType === "mouse") window.clearTimeout(holdTimer);
+    };
+    const onLeave = (e: PointerEvent) => {
+      if (e.pointerType === "mouse") restart(TAP_HOLD_MS); // a little longer from here
+    };
     const detach = () => {
       window.removeEventListener("wheel", onAny);
       window.removeEventListener("touchmove", onAny);
       window.removeEventListener("keydown", onAny);
-      window.removeEventListener("pointerdown", onAny);
+      window.removeEventListener("pointerdown", onPress);
+      card.removeEventListener("pointerenter", onEnter);
+      card.removeEventListener("pointerleave", onLeave);
+      card.style.pointerEvents = "";
     };
-    // Any intent to use the page sends the card home early.
+    card.style.pointerEvents = "auto"; // it can be touched (the overlay around it passes through)
     window.addEventListener("wheel", onAny, { passive: true });
     window.addEventListener("touchmove", onAny, { passive: true });
     window.addEventListener("keydown", onAny);
-    window.addEventListener("pointerdown", onAny);
+    window.addEventListener("pointerdown", onPress);
+    card.addEventListener("pointerenter", onEnter);
+    card.addEventListener("pointerleave", onLeave);
     holdTimer = window.setTimeout(fly, HOLD_MS);
 
     return () => {
@@ -949,7 +989,13 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
       <div
         className="bc-pop"
         ref={popRef}
-        onPointerDown={(e) => (lastPointer.current = e.pointerType)}
+        onPointerDown={(e) => {
+          lastPointer.current = e.pointerType;
+          // the press registers: the card gives a little (the bulb has its own)
+          if (reduced || (e.target as Element).closest(".bc-hint")) return;
+          const face = popRef.current?.querySelector(".bc-card");
+          if (face) animate(face, { scale: [1, 0.97, 1] }, { duration: 0.2, times: [0, 0.35, 1], ease: [0.23, 1, 0.32, 1] });
+        }}
         onClick={onCardClick}
         onPointerMove={onCardMove}
         onPointerLeave={onCardLeave}
@@ -973,7 +1019,6 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
           <>
             {intro && (
               <div className="bc-intro" aria-hidden="true">
-                <div className="bc-intro-veil" ref={introVeilRef} />
                 <div className="bc-intro-card" ref={introCardRef}>
                   <CardFace landed={landed} />
                   {/* the compact card's contents, faded in as the ticket
