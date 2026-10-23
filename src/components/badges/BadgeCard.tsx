@@ -36,7 +36,9 @@ const CARD_W = 356; // .bc-card width — the compact card scales to/from this
 // folds it early, so it never holds anyone up
 const HOLD_MS = 2500;
 // after a tap on it, or the pointer leaving it: a little longer, not the full time
-const TAP_HOLD_MS = 1700;
+const TAP_HOLD_MS = 2000;
+// after a long hover, how long it waits once the pointer leaves
+const LEAVE_GRACE_MS = 300;
 const FOUND_TIP_MS = 2400; // how long a freshly stamped card stays open, its new star's tooltip naming the find
 const STAMP_SPRITE = "/home/card/stamps.webp";
 const LIGHT_PAD = 6; // the light layer overhangs the row, so tilted corners are lit too
@@ -847,11 +849,20 @@ export default function BadgeCard({ onHome }: { onHome?: () => void } = {}) {
       if (!reduced) animate(card, { scale: [1, 0.97, 1] }, { duration: 0.2, times: [0, 0.35, 1], ease: [0.23, 1, 0.32, 1] });
       restart(TAP_HOLD_MS);
     };
+    // A pointer resting on it holds it. Leaving after a real read (as long
+    // as a tap's extra time) folds it after a short grace, as the hover card
+    // closes when you leave it; a brief pass still gets the extra time, so it
+    // never vanishes before it's read. The grace forgives a pointer slipping
+    // off the edge.
+    let enteredAt = 0;
     const onEnter = (e: PointerEvent) => {
-      if (e.pointerType === "mouse") window.clearTimeout(holdTimer);
+      if (e.pointerType !== "mouse") return;
+      enteredAt = performance.now();
+      window.clearTimeout(holdTimer);
     };
     const onLeave = (e: PointerEvent) => {
-      if (e.pointerType === "mouse") restart(TAP_HOLD_MS); // a little longer from here
+      if (e.pointerType !== "mouse") return;
+      restart(performance.now() - enteredAt >= TAP_HOLD_MS ? LEAVE_GRACE_MS : TAP_HOLD_MS);
     };
     const detach = () => {
       window.removeEventListener("wheel", onAny);
