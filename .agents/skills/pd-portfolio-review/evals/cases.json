@@ -1,0 +1,308 @@
+{
+  "schema_version": 1,
+  "purpose": "Invented portfolio-review requests for the portfolio-review skill. Inputs (request, supplied_evidence, fixtures) are adapted from Karl Koch's hiring-manager-bar evals (MIT). Expected outcomes are rewritten for this skill.",
+  "follow_up": "When the skill asks for a URL and the case has no fixture, reply: 'I can't share a URL. Please review the supplied content.' When it asks for role or password, reply only with what the case supplies.",
+  "shared_criteria": [
+    "Asks for the URL first and does not guess, search or review from memory.",
+    "Every finding carries a Rendered, Source or Unverified tag. Rendered only if seen live. Unverified points sit in Open checks and cost no points.",
+    "Only red flags from the skill's list of 8 are marked present, and only with Rendered or Source evidence.",
+    "Any score is 0-100 with the area table, red flag deductions (3 each) and the verdict band (80+ ready to send, 60 to 79 send after fixes, 40 to 59 needs work first, under 40 rebuild). Locked or broken = 0.",
+    "Every UXfolio figure cited matches references/uxfolio-2026.md exactly. Nothing invented: no ownership, metrics, artefacts or hiring guarantees.",
+    "Facts only the designer knows go to Need from you, not into guessed copy. At most five fixes, each with a Done when check.",
+    "Plain British English, no em dashes."
+  ],
+  "cases": [
+    {
+      "id": "concise-complete",
+      "request": "Review the supplied homepage and project copy for hiring clarity for a senior product designer. This is a content-only review.",
+      "supplied_evidence": "Homepage: 'I design scheduling tools for clinical teams.' Two selected projects have descriptive links. Project A identifies nurses as users, explains the handoff problem, names the candidate's scheduling interaction ownership and engineering collaborator, and includes annotated final screens. It describes what changed after a usability study. Project B identifies its prototype status, intent, and personal contribution. Contact and CV links are supplied. Neither case study has a process essay.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "Lists the concise, specific case studies and annotated screens under What's working, plus a Worth keeping line.",
+        "Does not ask for longer case studies, extra projects or invented metrics (fairness rule). Only two projects is noted against ch. 3.3 (71% prefer three or four) as a judgement call, not a red flag.",
+        "No finding is tagged Rendered: nothing was seen live, so findings are Source (supplied copy or files) or Unverified. Layout, links and the 30-second scan go under Open checks with no points lost.",
+        "Score 0-100 with visible area table and a verdict band; weights stated as the skill's own."
+      ]
+    },
+    {
+      "id": "prototype-as-relevant-evidence",
+      "request": "I want interaction-focused design engineering roles. Should my self-built timeline prototype lead my work page, or should my employer projects lead?",
+      "supplied_evidence": "The prototype is labelled personal and unshipped, with a runnable demo, a keyboard interaction recording, implementation notes, and a specific account of the candidate's work. Employer projects show marketing layout work but little interaction or implementation ownership.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "Recommends the prototype leads because relevance drives which project is opened first (ch. 3.1, relevance 73%) and the first slot reads as best work (ch. 3.4, cited as 'about a third' or the 28% figure).",
+        "Keeps the honest 'personal, unshipped' label. Need from you asks only for facts the designer holds; no invented collaboration, production use or hiring guarantee.",
+        "If no full portfolio is supplied, says what cannot be scored instead of inventing a full report."
+      ]
+    },
+    {
+      "id": "team-result-without-personal-ownership",
+      "request": "Review this case-study copy for a senior product design application.",
+      "supplied_evidence": "All supplied project copy says: 'We rebuilt onboarding. We improved activation by 18%. We won an award.' The supplied role field says only 'Design team.' Screenshots show a complete onboarding flow; no personal decision or responsibility is described.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "What's costing you quotes 'We rebuilt onboarding' / 'Design team' and cites unclear ownership 33% (ch. 4.2, 4.4) and the 'done it all' quote (Bonus 6.4).",
+        "Need from you asks what the designer personally owned and decided, and their part in the 18%. Does not credit the team metric or flow to the designer.",
+        "Fix list gives a role line fix with a Done when check. Unclear ownership is not counted as one of the 8 red flags (it is not on the list)."
+      ]
+    },
+    {
+      "id": "specialist-role",
+      "request": "Review my portfolio positioning for a WebGL specialist role. The job asks for shader development, performance judgment, and collaboration with art directors.",
+      "supplied_evidence": "Three projects identify shader ownership, show rendered output, describe performance constraints and measured tradeoffs, and explain collaboration with an art director. The introduction states the candidate's graphics specialism. There is little general product discovery work.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "Judges against the WebGL role's responsibilities (shader work, performance, art direction), not a generalist product designer ideal.",
+        "Does not ask for product discovery case studies (Limits: judge against role).",
+        "Rendered output described in copy is tagged Source, not Rendered; runtime performance claims go to Open checks."
+      ]
+    },
+    {
+      "id": "public-screening-vs-interview",
+      "request": "Use the skill to assess my public portfolio copy. I also have a private interview deck. Should I publish the entire deck and working Figma files?",
+      "supplied_evidence": "The public copy already identifies users, work, contribution, selected decisions, results, and contact. The deck contains deeper explorations and confidential screens. Employer policy permits only the public material.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "Says the public site already covers what reviewers screen for and keeps confidential deck screens private.",
+        "Uses NDA guidance (ch. 4.5: 84% expect NDA work in some form; brief description and discuss in interview 35%) to suggest permitted ways, never publishing confidential files.",
+        "Does not demand public working Figma files."
+      ]
+    },
+    {
+      "id": "restrained-site-and-unsupported-ai-inference",
+      "request": "This portfolio uses a common template. Should that fail the hiring manager bar?",
+      "supplied_evidence": "The supplied content clearly identifies the role and ownership. Project artifacts include specific decisions and outcomes. A rendered desktop screenshot shows a restrained, familiar layout with legible type and visible project links. There is no evidence about authoring tools or mobile behavior.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "Template alone is not flagged (ch. 2.4: a template does not count against them on its own). Leftover placeholder text would be, but none is supplied.",
+        "Red flag 3 (obvious AI overuse) is marked unclear or no; style is not proof of AI (fairness rule).",
+        "Restrained layout listed under Worth keeping. Mobile behaviour is not assessed and goes to Open checks with no points lost."
+      ]
+    },
+    {
+      "id": "older-but-more-relevant",
+      "request": "Which of these two projects should lead for an enterprise accessibility design role?",
+      "supplied_evidence": "A 2021 enterprise workflow project identifies accessible interaction decisions, disabled-user research, collaboration, and implementation outcomes. A 2026 personal animation experiment is polished but does not address enterprise work or accessibility. Both are honestly dated.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "Recommends the 2021 enterprise accessibility project leads: relevance 73% (ch. 3.1), relevant case studies 89% (ch. 3.2), one relevant case study beats five generic ones (Bonus advice).",
+        "No fixed age rule. The experiment can stay lower in the list. Red flag 6 (irrelevant case studies, 20%) only if it leads."
+      ]
+    },
+    {
+      "id": "qualitative-evidence-under-confidentiality",
+      "request": "Improve the hiring clarity of this project summary without violating my NDA.",
+      "supplied_evidence": "The approved summary names the user's task, the candidate's responsibility, a constraint, and a design decision. It reports qualitative usability observations. Public product screens and revenue metrics cannot be shared. The candidate can create an approved schematic but has not done so yet.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "Accepts qualitative findings as outcome evidence and uses ch. 4.5 NDA options (anonymised visuals 31%, general terms 18%).",
+        "The schematic goes under Need from you. No invented metrics, screens or approval.",
+        "Confidentiality is not scored as weak ability."
+      ]
+    },
+    {
+      "id": "source-only-hover-gate",
+      "request": "Review the supplied project-card code for the hiring journey. There is no running preview available.",
+      "supplied_evidence": "The supplied artifact directory contains app/components/ProjectCard.tsx. Inspect this file. No running preview, screenshot, or executed interaction is available.",
+      "fixture": "fixtures/hover-gate",
+      "expected": [
+        "Treats the fixture path as the link and reads fixtures/hover-gate/app/components/ProjectCard.tsx.",
+        "Finding: card context (what, for whom, outcome) is hidden until hover, tagged Source. Cites cards without enough context 27% (ch. 3.5, Bonus #5) and outcome in preview 40% (ch. 3.1).",
+        "Fix shows the fields at rest, with a Done when check for touch, keyboard focus and narrow widths. Says the check was not run; runtime behaviour stays in Open checks.",
+        "Nothing tagged Rendered."
+      ]
+    },
+    {
+      "id": "senior-decision-buried",
+      "request": "My senior designer case study is being read as a small UI task. Review this supplied copy.",
+      "supplied_evidence": "The heading says 'Updated eight screens.' A later paragraph says the candidate identified a missed customer need through research, proposed changing the product approach, and worked with product and engineering to evaluate it. The team adopted that approach. The candidate did not own company strategy.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "Quotes 'Updated eight screens' and moves the research insight and proposed approach into the summary. Cites explanation of decisions 64% (ch. 4.1) and no explanation of thinking 49% (ch. 4.2).",
+        "Keeps shared ownership; no claim of company strategy. Judges seniority from scope and decisions, not polish."
+      ]
+    },
+    {
+      "id": "leadership-credit",
+      "request": "Review my portfolio summary for a design director role, using only this supplied content.",
+      "supplied_evidence": "A project credits two IC designers with the interface work. The candidate describes setting direction, negotiating scope with engineering, coaching the team through alternatives, and following up on delivery. The shipped screens are attributed to the team. The candidate does not claim to have coded them.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "Judges against director responsibilities: direction, scope negotiation, coaching. Lists these as strengths.",
+        "Keeps the IC designers' credit; a plain team/role line counts as clear ownership (ch. 4.4).",
+        "Does not ask the director to claim the UI or code."
+      ]
+    },
+    {
+      "id": "portfolio-success-is-not-causation",
+      "request": "Should I copy the featured portfolios' animation styles to guarantee more job offers?",
+      "supplied_evidence": "The only external evidence supplied is the curated Dive Club reference. No current portfolio or target job description is supplied.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only. With no portfolio supplied, says there is nothing to score.",
+        "Does not tell them to copy animation styles. Distracting animation is a stop reason for 35% (ch. 2.2) and red flag 7 (20%); clean beats impressive (ch. 5.3).",
+        "No hiring guarantee; does not invent a podcast reference the skill doesn't have."
+      ]
+    },
+    {
+      "id": "described-screenshot-only",
+      "request": "Review my portfolio for a product design role using this description. I cannot attach the screenshot or share the URL.",
+      "supplied_evidence": "I describe the desktop screen as follows: a legible serif heading, two project links, and a contact link. My project copy names users, my design contribution, decisions, and qualitative outcomes. No image, source file, or running page is provided.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only. The user says no URL can be shared.",
+        "Visual claims are attributed to the user's description and are never tagged Rendered; red flags 1, 2, 7, 8 marked unclear.",
+        "Content findings tagged Source; links, mobile, contrast and contact under Open checks with no points lost.",
+        "If it scores, says the score covers content only."
+      ]
+    },
+    {
+      "id": "unseen-copy-no-defect",
+      "request": "Can you improve my project summary? I can only describe its content for now; I cannot share the exact words or order.",
+      "supplied_evidence": "The summary includes the user task, my responsibility, an important constraint, my design decision, and a qualitative research observation. All are approved for sharing. No exact wording, file, image, or page is supplied.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "Says wording and order cannot be judged from a description.",
+        "Any wording suggestion is optional, uses only supplied facts, and is not in Fix these first.",
+        "No red flags marked present."
+      ]
+    },
+    {
+      "id": "inaccessible-private-work",
+      "request": "Assess whether my private portfolio is ready for senior product design applications. The case studies are password-protected, and I cannot supply the password here.",
+      "supplied_evidence": "Only the landing-page text is available: Alex, senior product designer, two named project links, and an email address. Project pages return an access gate. Employer permission for any additional public material is unknown.",
+      "expected": [
+        "Asks for the password once (section 1).",
+        "Locked with no password: score 0 and stop (override). Cites missing password 61% (ch. 2.2).",
+        "Lists what was visible (landing page) and what wasn't. Does not infer weak ownership or decisions from locked pages.",
+        "Top fix: open one case study, or share the password with the application, or add a public summary, without asking for protected material to be published."
+      ]
+    },
+    {
+      "id": "follow-linked-credit",
+      "request": "Review the supplied local portfolio content for ownership clarity for a product designer. Read the entry page and follow its local links. There is no browser preview; this is a source and content review.",
+      "supplied_evidence": "The artifact directory contains index.html, project.html, credits.html, and about.html. No additional pages or runtime evidence are available.",
+      "fixture": "fixtures/linked-credit",
+      "expected": [
+        "Treats the fixture folder as the link and follows index.html links before calling anything missing (reviewer path).",
+        "Finds the explicit scheduling-interaction ownership and credit to the researcher and engineer on credits.html.",
+        "If suggesting moving credit closer to the project, says it is hard to find, not missing. Tags Source; nothing Rendered."
+      ]
+    },
+    {
+      "id": "shipped-is-not-measured-value",
+      "request": "I no longer have analytics for a feature I designed. It is still live two years later. Can I say it created measurable business value in my portfolio?",
+      "supplied_evidence": "The only confirmed facts are the candidate designed the interaction, worked with an engineer, the team launched it, and it remains available. The original goal was to reduce scheduling errors. No outcome measurement, customer feedback, or evidence of competitor impact is available.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "Keeps the goal separate from outcomes. No measured impact inferred from the feature still being live.",
+        "Cites 'having nothing is better than putting something that is not real' (Bonus advice) and feels exaggerated 38% (ch. 4.2).",
+        "Need from you: any permitted outcome evidence. Suggests stating how success would have been measured (ch. 4.3)."
+      ]
+    },
+    {
+      "id": "polished-output-missing-problem",
+      "request": "Review the supplied copy for a senior product design role on complex operations software. The artifact presentation is polished; I want to know whether the project explanation is sufficient.",
+      "supplied_evidence": "The full project copy is: We redesigned twelve screens for Meridian. I owned interaction design and worked with an engineer. We shipped the flow. There is no description of who used it, their task or problem, why the work was prioritised, or a consequential decision. No image or live page is supplied.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "Flags missing users, problem and key decision in 'We redesigned twelve screens for Meridian': no problem statement 38%, no explanation of thinking 49% (ch. 4.2).",
+        "Asks for real facts (Need from you) before suggesting copy. No process essay, no invented metrics.",
+        "Polish is from the user's description: not Rendered, not used to judge ability."
+      ]
+    },
+    {
+      "id": "required-resume-and-work-first",
+      "request": "My portfolio clearly explains my work, contribution, decisions, and contact. The application I want explicitly asks for a CV. After Danny’s name-only résumé story, should I delete my CV and send a page with my name instead? Another hiring manager values a short relevant cover letter. Does that mean every application needs one?",
+      "supplied_evidence": "The application needs employment dates and a CV upload. The candidate has an accurate conventional CV and two relevant projects. No full portfolio, screenshot, or running page is supplied.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "Keeps the accurate CV the application asks for; portfolio and CV must match (ch. 1.6).",
+        "Work leads as evidence (ch. 1.1, 78% rely on the portfolio).",
+        "No rule for or against cover letters everywhere."
+      ]
+    },
+    {
+      "id": "taste-through-reasons",
+      "request": "A hiring manager asked which products I admire and why. My answer is an unglamorous tax application because it explains difficult choices clearly. Should I replace it with fashionable design tools and add a taste page to my portfolio?",
+      "supplied_evidence": "The candidate can explain one specific moment where the product clarified a confusing task, a tradeoff in how it presents information, and what they would improve. Their own work shows a related decision for a different audience. No actual screen is supplied.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "Values the reasoning over prestige: explaining why is reviewer advice (Bonus) and decisions 64% (ch. 4.1).",
+        "Does not ask for a taste page or fashionable brands; personal detail matters less (ch. 1.5)."
+      ]
+    },
+    {
+      "id": "design-engineer-actual-responsibilities",
+      "request": "Two openings both say design engineer. One asks for product exploration and interactive prototypes; the other asks for production frontend architecture, testing, and ongoing maintenance. How should I position the same project for them?",
+      "supplied_evidence": "The candidate used an AI coding tool to make a prototype. Their notes explain the user problem, alternatives rejected, corrections to generated output, and changes after feedback. It has not shipped, has no automated tests, and was made alone. No code or demo is attached.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "Matches the prototype to the exploration role's responsibilities, not the shared title.",
+        "Good AI disclosure (ch. 5.4): names the tool, shows corrections, separates their decisions. Unshipped status kept.",
+        "Names the gap for the production role (architecture, tests, maintenance). Code and demo unverified."
+      ]
+    },
+    {
+      "id": "brand-system-enables-others",
+      "request": "Review which evidence should lead my application for a brand designer role that includes enabling a marketing team. Should I show only the final campaign images?",
+      "supplied_evidence": "The approved project copy describes the candidate’s typography and layout rules, a template generator they designed with an engineer, and guardrails they refined after marketers made errors. Marketing colleagues then created a campaign with those templates. No measured time saving exists. The internal tool cannot be published, but approved final outputs and an explanatory schematic can be shown.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "Credits both brand craft and the template system, with clear collaborator credit (ch. 4.4).",
+        "Uses permitted outputs and schematic (ch. 4.5). No invented time-saving metric; Need from you asks for any real one."
+      ]
+    },
+    {
+      "id": "large-company-current-ability",
+      "request": "I spent nine years at a large technology company. Danny’s podcast mentioned hiring managers hesitating over that background. Should I hide the employer and make unpaid side projects to prove I’m current?",
+      "supplied_evidence": "The candidate has permitted recent employer work showing prototypes, feedback-driven iteration, specific ownership, engineering collaboration, and a released feature. There are no personal side projects, and no external hiring feedback about this candidate is supplied.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "Employer is context; famous employer is not proof either way (fairness rule).",
+        "Uses recent permitted work as evidence. No hidden history or required side projects."
+      ]
+    },
+    {
+      "id": "work-without-public-audience",
+      "request": "I have no public following and do not post side projects. After the Lovable story in Hiring Humans, do I need to build free custom projects for every employer before I can apply for product design roles?",
+      "supplied_evidence": "The candidate has permitted employer projects explaining user problems, personal decisions, collaboration, and a released product with qualitative feedback. They can discuss these privately where needed. They are not seeking a growth or creator role. No actual portfolio page, source, or hiring feedback is supplied.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "No following or side projects needed: relevant case studies 89% (ch. 3.2), NDA work in some form 84% (ch. 4.5).",
+        "No hiring guarantee."
+      ]
+    },
+    {
+      "id": "first-manager-with-relevant-evidence",
+      "request": "I am applying for my first design manager role. Should I hide my coaching and facilitation examples because I have never held a manager title, or make a separate public mentoring project first?",
+      "supplied_evidence": "The role asks for design direction, feedback, and team development, and will also include direct reports. Approved project copy explains how the candidate facilitated a cross-team decision, coached two peers through alternatives, and helped establish a recurring critique. The candidate has not formally managed performance, hiring, or compensation. No actual portfolio page or team outcome measurement is supplied.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "Judges against the manager role's responsibilities; coaching and facilitation count as relevant evidence without a prior title.",
+        "Keeps peer vs direct report distinction; formal management gaps named, team outcomes not invented (Need from you)."
+      ]
+    },
+    {
+      "id": "hosted-deck-format-and-access",
+      "request": "I heard someone on Design Discipline say they would reject a Figma portfolio. Must I rebuild mine as a custom website to pass this bar?",
+      "supplied_evidence": "The candidate describes a directly shared deck containing role positioning, three relevant projects, personal contribution, decisions, outcomes, and contact. They report that an external colleague could open it without signing in. No URL, screenshot, source, or actual deck is supplied, so its access and contents cannot be independently checked.",
+      "expected": [
+        "Asks for the portfolio URL (and optional role and password) first and stops. After the follow-up reply, continues with the supplied content only.",
+        "Does not fail a Figma deck for format: 72% prefer a website, but Figma prototype 30% is accepted (ch. 2.1).",
+        "Access and content are the user's claims: not scored until a link is opened; access check goes to Open checks or the deck is reviewed once a link is given.",
+        "Broken link or sign-in wall would score 0 (override)."
+      ]
+    },
+    {
+      "id": "source-content-extraction-and-team-credit",
+      "request": "Review this local portfolio for product-design hiring clarity, as a source and content review only. The reader extract says: Alex, product designer. Operational tools. Coverage planning. Northlight Lab. It shows no contact text. Inspect the actual HTML and follow the local links before reporting missing information. No browser or running page is available.",
+      "supplied_evidence": "The artifact directory contains the complete index.html, project-a.html, lab.html, and project-b.html. The extract is incomplete; the files are the available source evidence. There are no inspected images, actual page layouts, or executed contact actions.",
+      "fixture": "fixtures/extracted-links",
+      "expected": [
+        "Treats the fixture folder as the link and reads all four HTML files, not only the extract.",
+        "Finds the mailto contact in index.html; does not report contact as missing. Rendered discoverability stays in Open checks.",
+        "Credits Alex's Coverage planning work and Sam's and River's credit; does not give Alex Stock forecast or accuse a false claim.",
+        "Score, if given, says it covers source and content only. Nothing tagged Rendered."
+      ]
+    }
+  ]
+}
