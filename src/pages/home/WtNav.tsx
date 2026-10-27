@@ -12,7 +12,7 @@ import "./chrome.css";
    About) hands it router-aware WORK and ABOUT items, and the static case
    studies hand it plain links (src/static-chrome.tsx). */
 
-export const RESUME_URL = "/docs/Pranavi_Ram_Resume_2026.pdf";
+export const RESUME_URL = "/docs/Pranavi_Ram_Product_Designer_Resume_2026.pdf";
 
 export function ExternalArrow() {
   return (
