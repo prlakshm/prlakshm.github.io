@@ -294,7 +294,7 @@ export default function Gallery() {
       cam.x = r.width * (phone ? 0.53 : 0.529) - (b.w * z) / 2 - b.x * z; // a touch right of centre reads as centred, on both
       cam.y = phone
         ? navBottom + (r.height - navBottom - b.h * z) * 0.28 - b.y * z // under the nav, a touch above centre
-        : navBottom + (r.height - navBottom - b.h * z) / 2 - b.y * z; // equal space above and below
+        : navBottom + (r.height - navBottom - b.h * z) / 2 - b.y * z - r.height * 0.015; // centred under the nav, then lifted 1.5%
       draw();
     };
 
