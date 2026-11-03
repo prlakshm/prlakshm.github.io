@@ -291,7 +291,7 @@ export default function Gallery() {
       // fit, and sits a touch right of centre (its middle at 52.9% across)
       const z = Math.min(Z_MAX, Math.max(Z_MIN, phone ? Math.min(zw, zh) * 0.927 : Math.min((r.width * 0.791) / b.w, (r.height * 0.881) / b.h)));
       cam.z = z;
-      cam.x = (phone ? r.width / 2 : r.width * 0.529) - (b.w * z) / 2 - b.x * z;
+      cam.x = r.width * (phone ? 0.53 : 0.529) - (b.w * z) / 2 - b.x * z; // a touch right of centre reads as centred, on both
       cam.y = phone
         ? navBottom + (r.height - navBottom - b.h * z) * 0.28 - b.y * z // under the nav, a touch above centre
         : navBottom + (r.height - navBottom - b.h * z) / 2 - b.y * z; // equal space above and below
