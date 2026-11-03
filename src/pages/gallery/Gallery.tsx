@@ -270,8 +270,8 @@ export default function Gallery() {
       cam.y = 40 + (r.height - 40) / 2;
       draw();
     };
-    /* The opening view: zoomed to fit everything, then ~5% further out for
-       air, the whole canvas centred across. 0 returns here. */
+    /* The opening view: zoomed to fit everything with air round it. 0 returns
+       here. */
     const fit = () => {
       const b = pieceBounds(live.current.pieces);
       const r = view.getBoundingClientRect();
@@ -286,9 +286,12 @@ export default function Gallery() {
       const zw = (r.width - side * 2) / b.w, zh = (r.height - top - bottom) / b.h;
       // a little further out than a tight fit, for air: 5% on desktop, ~7% on
       // a phone
-      const z = Math.min(Z_MAX, Math.max(Z_MIN, Math.min(zw, zh) * (phone ? 0.927 : 0.953)));
+      // desktop, from her framing (2026-11-03): the canvas takes 85.5% of the
+      // window's height, or 77% of its width when the window is the narrower
+      // fit, and sits a touch right of centre (its middle at 52.9% across)
+      const z = Math.min(Z_MAX, Math.max(Z_MIN, phone ? Math.min(zw, zh) * 0.927 : Math.min((r.width * 0.768) / b.w, (r.height * 0.855) / b.h)));
       cam.z = z;
-      cam.x = (r.width - b.w * z) / 2 - b.x * z; // the whole canvas centred across
+      cam.x = (phone ? r.width / 2 : r.width * 0.529) - (b.w * z) / 2 - b.x * z;
       cam.y = phone
         ? navBottom + (r.height - navBottom - b.h * z) * 0.28 - b.y * z // under the nav, a touch above centre
         : navBottom + (r.height - navBottom - b.h * z) / 2 - b.y * z; // equal space above and below
