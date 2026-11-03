@@ -100,6 +100,13 @@ const SPECS: Spec[] = [
     // every alternative object, as they sit on their frame in the file
     img("gsc-alts", "Girls Should Cook Alt. Objects", I + "gsc-alts.webp", 820, 1446 / 2400),
   ] },
+  { id: "stamps", title: "Birth month stamps", items: [
+    vid("stamps-envelope", "Birth Month Stamps · Envelope", "stamps-envelope", 1000, 1080 / 1920),
+    // the Gold Foil Set (Figma HtA8howG6qsHmoXMbTUICp, 21:2)
+    ...["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].map(m =>
+      // cut-outs: cropped to the gold edge, no paper behind them
+      stk("stamp-" + m.slice(0, 3).toLowerCase(), `Birth Month Stamps · ${m}`, I + `stamp-${m.slice(0, 3).toLowerCase()}.webp`, 180, 1028 / 822)),
+  ] },
 ];
 
 // a small seeded random, so the drop is the same every time

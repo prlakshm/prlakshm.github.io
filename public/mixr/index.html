@@ -282,6 +282,16 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   padding:18px 20px;margin-top:26px;display:flex;flex-direction:column;gap:9px}
 .flag h3{color:var(--ink)}
 
+/* App Store link: the shipped icon, big, centred under the heading (.ship-head
+   is as wide as the heading); captioned
+   like the iPad and Mac figures */
+.ship-head{display:grid;width:max-content;max-width:100%}
+.ship{display:flex;flex-direction:column;align-items:center;gap:10px;margin:10px 0 22px;text-decoration:none;
+  font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.13em;text-transform:uppercase;color:#7f8694}
+.ship img{width:160px;height:160px;border-radius:36px;display:block}
+.ship .lbl{position:relative}
+.ship:hover .nav-rule,.ship:focus-visible .nav-rule{transform:scaleX(1)}
+
 /* two-column model comparison */
 .vs{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);border:1px solid var(--rule);
   margin:26px 0}
@@ -1672,10 +1682,10 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     <div><span>Role</span><span>Solo designer &amp; engineer</span></div>
     <div><span>Scope</span><span>Product, brand, iOS engineering</span></div>
     <div><span>Built with</span><span>SwiftUI, Claude Code, Cursor</span></div>
-    <div><span>Status</span><span>Beta testing</span></div>
+    <div><span>Status</span><span>Shipped</span></div>
   </div>
   <p class="links links--head">
-    <a href="https://x.com/pranavibuilds" target="_blank" rel="noreferrer"><i class="ico">🔗</i><span class="lbl">Read my Mixr journey on X<span class="nav-rule" aria-hidden="true"></span></span></a>
+    <a href="https://www.figma.com/design/cwC7rfRS2OmyFcQqZWXyfE/Mixr-Notes?node-id=0-1" target="_blank" rel="noreferrer"><i class="ico">🔗</i><span class="lbl">Figma Notes<span class="nav-rule" aria-hidden="true"></span></span></a>
   </p>
 </header>
 
@@ -2084,7 +2094,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     <h2>How I worked with coding agents.</h2></div>
 
   <div class="dec dec--lead rv d1">
-    <h3>I religiously used Plan Mode.</h3>
+    <h3>I used Plan Mode religiously.</h3>
     <p>For big tasks, I used Plan Mode. No code changes until I reviewed and approved the plan. I used this heavily for my last two phases: responsive layout and accessibility testing. Auditing stopped agents from undoing previous work and changing components I already finalized.</p>
   </div>
 
@@ -2117,17 +2127,23 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
 <!-- 06 -->
 <section id="results">
-  <div class="sechead rv"><p class="lab">06 &mdash; Results</p>
-    <h2>Finished building, waiting approval.</h2></div>
+  <div class="ship-head">
+    <div class="sechead rv"><p class="lab">06 &mdash; Results</p>
+      <h2>Shipped to App Store.</h2></div>
+    <a class="ship rv d2" href="https://apps.apple.com/us/app/mixr-dj-app/id6803221941" target="_blank" rel="noreferrer">
+      <img src="art/app-store-icon.webp" width="160" height="160" alt="The Mixr app icon: violet waveform bars on a dark square">
+      <span class="lbl">Mixr DJ App<span class="nav-rule" aria-hidden="true"></span></span>
+    </a>
+  </div>
 
   <div class="stack rv d2">
-    <p>The app is fully built. I&rsquo;m now waiting for approval from the Apple Developer Program to release TestFlight Beta. Everything so far reflects my own judgment. The real test is whether other people can use and understand Mixr.</p>
+    <p>Mixr is now live on the App Store! You can check it out <a href="https://apps.apple.com/us/app/mixr-dj-app/id6803221941" target="_blank" rel="noreferrer">here</a>. Try it and tell me what you think!</p>
   </div>
 
   <div class="flag rv d2">
-    <p>The intimidating part of learning a new skill is the interface scaring you away. Building Mixr taught me anyone can do it: not just DJing, but building an app. So get on a coding agent and make something that excites you!</p>
+    <p>The intimidating part of learning a new skill is the interface scaring you away. That's what designers are for! Building Mixr taught me anyone can build an app. So get on a coding agent and make something that excites you!</p>
     <p class="links">
-      <a href="https://x.com/pranavibuilds" target="_blank" rel="noreferrer"><i class="ico">🔗</i><span class="lbl">Read my Mixr journey on X<span class="nav-rule" aria-hidden="true"></span></span></a>
+      <a href="https://www.figma.com/design/cwC7rfRS2OmyFcQqZWXyfE/Mixr-Notes?node-id=0-1" target="_blank" rel="noreferrer"><i class="ico">🔗</i><span class="lbl">Figma Notes<span class="nav-rule" aria-hidden="true"></span></span></a>
       <span class="sep" aria-hidden="true">|</span>
       <span class="ff-wrap">
         <button type="button" class="ff" id="ff" aria-expanded="false" aria-controls="ff-tip">
@@ -2137,18 +2153,6 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       </span>
     </p>
   </div>
-
-  <form class="beta rv d2" id="beta" novalidate>
-    <h3>Get Mixr Beta</h3>
-    <p>Sign up for the mailing list to get Mixr Beta when it&rsquo;s released.</p>
-    <div class="beta-row">
-      <label class="visually-hidden" for="beta-email">Email address</label>
-      <input id="beta-email" name="email" type="email" inputmode="email" autocomplete="email"
-             placeholder="you@example.com" required>
-      <button type="submit">Notify me</button>
-    </div>
-    <p class="beta-note" id="beta-note" role="status" aria-live="polite"></p>
-  </form>
 </section>
 
 <div class="case-actions">
@@ -2225,7 +2229,11 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   var pctEl = document.getElementById("pct");
   function onScroll(){
     var y = window.scrollY + window.innerHeight*0.28, cur = -1;
-    secs.forEach(function(s,i){ if(s && s.offsetTop <= y) cur = i; });
+    // page position, not offsetTop: that one is measured from <main>, so every
+    // section read as lower down than it is
+    secs.forEach(function(s,i){ if(s && s.getBoundingClientRect().top + window.scrollY <= y) cur = i; });
+    // the last section is too short to reach the line; at the very bottom it's the one being read
+    if(window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) cur = secs.length - 1;
     links.forEach(function(a,i){ a.classList.toggle("on", i === cur); });
     var h = document.documentElement.scrollHeight - window.innerHeight;
     var p = h > 0 ? Math.min(100, Math.max(0, window.scrollY / h * 100)) : 0;
@@ -2237,6 +2245,31 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
   addEventListener("resize", onScroll);
   onScroll();
+
+  /* Reload lands where you left. The browser's own restore runs before the
+     footer mounts (src/static-chrome.tsx), while the page is ~330px short, so
+     it clamps: a reload from Results came back up in Coding Agents. So the
+     page keeps its own place and restores it once the page has its height. */
+  var SPOT = "mixr-scroll";
+  if("scrollRestoration" in history) history.scrollRestoration = "manual";
+  addEventListener("pagehide", function(){
+    try{ sessionStorage.setItem(SPOT, String(window.scrollY)); }catch(e){}
+  });
+  var spot = null, nav = (performance.getEntriesByType("navigation")[0] || {}).type;
+  // only a reload or back/forward; a fresh visit (or a #link) starts as normal
+  if(nav === "reload" || nav === "back_forward"){
+    try{ spot = sessionStorage.getItem(SPOT); }catch(e){}
+  }
+  if(spot !== null){
+    var want = +spot, tries = 0;
+    (function restore(){
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      window.scrollTo({top:Math.min(want, max), behavior:"instant"});
+      // keep at it until the page is tall enough (or ~3s pass)
+      if(max < want && ++tries < 60) setTimeout(restore, 50);
+      else onScroll();
+    })();
+  }
 
   /* Flow diagrams play once in view; scroll velocity sets the tempo so a reader
      who has stopped gets the full sequence and one breezing past still sees it. */
@@ -3397,6 +3430,10 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   var ff = document.getElementById("ff");
   if(ff){
     var ffTip = document.getElementById("ff-tip");
+    /* Fixed positioning goes relative to any transformed ancestor, and the box
+       it sits in slides in with a transform: hovered mid-reveal, the tip landed
+       thousands of px off. On <body> nothing can move it. */
+    document.body.appendChild(ffTip);
 
     /* Same behaviour as the landing page's pronunciation tip: the plate rides
        the pointer. Placed with fixed coordinates and clamped to the viewport,

@@ -270,18 +270,8 @@ export default function Gallery() {
       cam.y = 40 + (r.height - 40) / 2;
       draw();
     };
-    /* Open on the bagel, framed by eye rather than by box:
-       - zoomed to fit everything, then ~5% further out for air;
-       - the bagel placed at its optical centre, not the window's geometric
-         one: a little ABOVE the middle (a focal object dead centre reads as
-         sagging) and a little right of it, because the bagel's heavy body
-         sits on the left of its image and the light burst on the right, so
-         the body itself reads as centred; the nav and star card weigh on the
-         top band, which this also answers;
-       - if a narrow or short window would push the canvas past an edge, it
-         slides back in (the bagel gives way, never the content).
-       0 returns here. */
-    const BAGEL_AT = { x: 0.525, y: 0.4303 }; // of the window, measured from her framing
+    /* The opening view: zoomed to fit everything, then ~5% further out for
+       air, the whole canvas centred across. 0 returns here. */
     const fit = () => {
       const b = pieceBounds(live.current.pieces);
       const r = view.getBoundingClientRect();
@@ -297,18 +287,8 @@ export default function Gallery() {
       // a little further out than a tight fit, for air: 5% on desktop, ~7% on
       // a phone
       const z = Math.min(Z_MAX, Math.max(Z_MIN, Math.min(zw, zh) * (phone ? 0.927 : 0.953)));
-      // bagel (world 0, 0) at its spot, then keep the whole canvas in view
-      const keepIn = (want: number, lo: number, size: number, min: number, max: number) => {
-        const a = want + lo * z, span = size * z;
-        if (span > max - min) return want + (min + (max - min - span) / 2) - a; // can't fit: centre it
-        if (a < min) return want + (min - a);
-        if (a + span > max) return want - (a + span - max);
-        return want;
-      };
       cam.z = z;
-      // phone: the whole canvas centred, as large as the width allows (her
-      // phone arrangement already sets the bagel a touch right of centre)
-      cam.x = phone ? (r.width - b.w * z) / 2 - b.x * z : keepIn(r.width * BAGEL_AT.x, b.x, b.w, side, r.width - side);
+      cam.x = (r.width - b.w * z) / 2 - b.x * z; // the whole canvas centred across
       cam.y = phone
         ? navBottom + (r.height - navBottom - b.h * z) * 0.28 - b.y * z // under the nav, a touch above centre
         : navBottom + (r.height - navBottom - b.h * z) / 2 - b.y * z; // equal space above and below
