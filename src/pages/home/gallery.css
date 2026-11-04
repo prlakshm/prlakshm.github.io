@@ -42,8 +42,8 @@
 }
 
 .gl-index {
-  color: var(--mono-tertiary);
-  -webkit-text-stroke: 0.3px currentColor;
+  color: var(--mono-secondary); /* the nav's grey */
+  -webkit-text-stroke: 0.44px currentColor; /* the nav's 0.55px, scaled 15px -> 12px */
 }
 
 .gl-placard::after {
