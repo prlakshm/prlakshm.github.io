@@ -17,6 +17,7 @@ import { mountTitleGoldLight } from "../home/titleGoldLight.js";
 const PORTRAIT = "/about/profile-picture.webp";
 
 const EXPERIENCE: { org: string; kind?: string; role: string; year: string }[] = [
+  { org: "Village Values", kind: "Creative Agency", role: "Brand Design Fellow", year: "2026" },
   { org: "HBO Max, Warner Bros. Discovery", role: "AI Product Design", year: "2025" },
   { org: "CareerDay", kind: "Startup", role: "Product Design", year: "2024" },
   { org: "Mi Fonda", kind: "Startup", role: "Product Design", year: "2024" },

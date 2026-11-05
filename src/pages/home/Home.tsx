@@ -259,7 +259,7 @@ function Home() {
 
             <div className="hero-intro">
               <div className="hero-col hero-col--copy">
-                <p className="line">Product Designer reimagining the interfaces people love</p>
+                <p className="line">Product designer reimagining interfaces people love</p>
                 <p className="line">
                   Building and animating on X{" "}
                   <a href="https://x.com/pranavibuilds" target="_blank" rel="noreferrer">
@@ -270,8 +270,8 @@ function Home() {
               </div>
 
               <div className="hero-col hero-col--prev">
-                <p className="line line--label">Prev:</p>
-                <p className="line">Design @ hbo max</p>
+                <p className="line">Brand design @ village values</p>
+                <p className="line">Prev. Product design @ hbo max</p>
               </div>
 
               {/* Desktop: under copy. Stacked: below all text (copy → PREV → tiles). */}
