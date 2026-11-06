@@ -270,8 +270,8 @@ function Home() {
               </div>
 
               <div className="hero-col hero-col--prev">
-                <p className="line">Brand design @ village values</p>
-                <p className="line">Prev. AI product design @ hbo max</p>
+                <p className="line">Prev.</p>
+                <p className="line">AI product design @ hbo max</p>
               </div>
 
               {/* Desktop: under copy. Stacked: below all text (copy → PREV → tiles). */}
