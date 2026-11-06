@@ -259,7 +259,7 @@ function Home() {
 
             <div className="hero-intro">
               <div className="hero-col hero-col--copy">
-                <p className="line">Product designer reimagining interfaces people love</p>
+                <p className="line">Product designer reimagining apps people love</p>
                 <p className="line">
                   Building and animating on X{" "}
                   <a href="https://x.com/pranavibuilds" target="_blank" rel="noreferrer">
