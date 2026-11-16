@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Smart Mute · Mac prototype</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: #E9EBF0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  .abs { position: absolute; }
+  #win { position: absolute; left: 50%; top: 44px; width: 1000px; height: 640px; margin-left: -500px; transform: scale(1.4); transform-origin: 50% 0;
+    background: #fff; border-radius: 26px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,.18), 0 0 0 .5px rgba(0,0,0,.12); }
+  #side { position: absolute; left: 8px; top: 8px; width: 356px; height: 624px; border-radius: 20px; background: #F1F3F7; }
+  .row { position: absolute; left: 10px; width: 336px; height: 72px; border-radius: 12px; }
+  .av { position: absolute; left: 12px; top: 12px; width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(180deg, #A9B0D6, #7F88BF); color: #fff; font: 600 15px/40px -apple-system, system-ui; text-align: center; }
+  .nm { position: absolute; left: 62px; top: 10px; font: 600 13px/17px -apple-system, system-ui; color: #1D1D1F; }
+  .tm { position: absolute; right: 12px; top: 11px; font: 400 12px/16px -apple-system, system-ui; color: #86868B; }
+  .pv { position: absolute; left: 62px; top: 29px; font: 400 12.5px/16px -apple-system, system-ui; color: #86868B;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .sep { position: absolute; left: 62px; right: 0; bottom: 0; height: .5px; background: #DADCE2; }
+  .sel { background: #0A84FF; } .sel .nm, .sel .tm, .sel .pv { color: #fff; }
+  .bub { position: absolute; padding: 8px 14px; border-radius: 18px; font: 400 15px/20px -apple-system, system-ui; max-width: 420px; transform-origin: 0 100%; }
+  .them { background: #E9E9EB; color: #000; left: 436px; }
+  .me { background: #0A84FF; color: #fff; right: 24px; transform-origin: 100% 100%; }
+  .who { position: absolute; left: 450px; font: 400 11px/14px -apple-system, system-ui; color: #86868B; }
+  #menu { position: absolute; width: 214px; padding: 6px; border-radius: 12px; background: rgba(255,255,255,.98);
+    box-shadow: 0 10px 30px rgba(0,0,0,.16), 0 0 0 .5px rgba(0,0,0,.1); transform-origin: 0 0; z-index: 10; }
+  .it { position: relative; height: 24px; border-radius: 7px; display: flex; align-items: center; gap: 8px; padding: 0 16px 0 8px;
+    font: 400 13px/16px -apple-system, system-ui; color: #1D1D1F; }
+  .it .ck { width: 10px; height: 14px; }
+  .dv { height: 9px; display: flex; align-items: center; } .dv:after { content: ""; flex: 1; height: 1px; background: rgba(0,0,0,.1); margin: 0 4px; }
+  #cursor { position: absolute; z-index: 40; width: 22px; height: 32px; }
+  #note { position: absolute; right: 18px; top: 42px; width: 372px; border-radius: 22px; padding: 12px 16px 13px 62px; z-index: 50;
+    background: rgba(250,250,252,.96); box-shadow: 0 12px 34px rgba(0,0,0,.18), 0 0 0 .5px rgba(0,0,0,.08); }
+  .appicon { position: absolute; left: 14px; top: 13px; width: 36px; height: 36px; border-radius: 9px;
+    background: linear-gradient(180deg, #5BF675, #0CBD2A); display: flex; align-items: center; justify-content: center; }
+  .caption { position: absolute; left: 0; right: 0; top: 964px; text-align: center; font: 600 34px/42px -apple-system, system-ui; color: #1D1D1F; }
+  .sub { position: absolute; left: 0; right: 0; top: 1012px; text-align: center; font: 400 22px/28px -apple-system, system-ui; color: #86868B; }
+  #menubar { position: absolute; left: 0; right: 0; top: 0; height: 30px; display: flex; align-items: center; gap: 22px; padding: 0 18px;
+    font: 400 14px/18px -apple-system, system-ui; color: #1D1D1F; background: rgba(255,255,255,.55); }
+</style>
+</head>
+<body>
+<div id="menubar"><b style="font-weight:700">Messages</b><span>File</span><span>Edit</span><span>View</span><span>Conversation</span><span>Format</span><span>Window</span><span>Help</span><span style="margin-left:auto">Sat Nov 14&nbsp;&nbsp;9:41 AM</span></div>
+<div id="win">
+  <div id="side">
+    <div class="abs" style="left:14px;top:18px;width:13px;height:13px;border-radius:50%;background:#FF5F57"></div>
+    <div class="abs" style="left:34px;top:18px;width:13px;height:13px;border-radius:50%;background:#FEBC2E"></div>
+    <div class="abs" style="left:54px;top:18px;width:13px;height:13px;border-radius:50%;background:#28C840"></div>
+    <svg class="abs" style="right:22px;top:16px" width="18" height="18" viewBox="0 0 24 24"><path d="M4 7H20M7 12H17M10 17H14" stroke="#3C3C43" stroke-width="2" stroke-linecap="round"/></svg>
+    <div class="abs" style="left:14px;top:50px;width:328px;height:34px;border-radius:17px;background:#E4E6EC">
+      <svg class="abs" style="left:12px;top:9px" width="16" height="16" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="#6E6E73" stroke-width="2.2"/><path d="M15.5 15.5L20 20" stroke="#6E6E73" stroke-width="2.4" stroke-linecap="round"/></svg>
+      <div class="abs" style="left:34px;top:8px;font:400 14px/18px -apple-system,system-ui;color:#8A8A8E">Search</div>
+    </div>
+    <div id="rows"></div>
+  </div>
+  <div class="abs" style="left:392px;top:14px;width:588px;text-align:center">
+    <div class="av" style="position:relative;left:auto;top:auto;margin:0 auto">RM</div>
+    <div style="display:inline-block;margin-top:4px;padding:4px 10px;border-radius:12px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.1);font:600 12px/16px -apple-system,system-ui">Roomies ›</div>
+  </div>
+  <div class="abs" style="left:392px;top:104px;width:588px;text-align:center;font:500 11px/14px -apple-system,system-ui;color:#86868B">Today 9:38 AM</div>
+  <div id="thread"></div>
+  <svg class="abs" style="left:404px;top:591px" width="22" height="22" viewBox="0 0 24 24"><path d="M12 6V18M6 12H18" stroke="#3C3C43" stroke-width="2" stroke-linecap="round"/></svg>
+  <div class="abs" style="left:438px;top:584px;width:540px;height:36px;border-radius:18px;border:1px solid #D9D9DE;font:400 14px/34px -apple-system,system-ui;color:#A1A1A6;padding-left:14px">iMessage</div>
+  <div id="menu"></div>
+  <svg id="cursor" viewBox="0 0 22 32"><path d="M2 2V25L7.6 19.6L11.4 28.6L15 27.1L11.3 18.3H19L2 2Z" fill="#000" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>
+</div>
+<div id="note">
+  <div class="appicon"><svg width="22" height="20" viewBox="0 0 24 22"><path d="M12 1C5.9 1 1 5.1 1 10.1C1 12.9 2.5 15.4 4.9 17.1C4.7 18.6 3.9 19.9 2.8 20.8C5 20.8 7 20 8.4 18.8C9.5 19.1 10.7 19.2 12 19.2C18.1 19.2 23 15.1 23 10.1C23 5.1 18.1 1 12 1Z" fill="#fff"/></svg></div>
+  <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:600 14px/18px -apple-system,system-ui">Roomies</span><span style="font:400 12px/16px -apple-system,system-ui;color:#8A8A8E">now</span></div>
+  <div id="reason" style="display:flex;align-items:center;gap:5px;color:#5E5CE6;font:600 12px/16px -apple-system,system-ui;margin-top:1px"></div>
+  <div style="font:400 14px/18px -apple-system,system-ui;margin-top:1px">Maya: dinner moved to 8 tonight, can everyone still make it?</div>
+</div>
+<div class="caption" id="cap"></div>
+<div class="sub" id="sub"></div>
+<script src="icons.js"></script>
+<script>
+const { seg, out, inOut, spring, lerp, clamp } = TL;
+const $ = (id) => document.getElementById(id);
+const ROWS = [
+  ["Roomies","RM","Priya: ok who left the oven on lol. also is anyone home tonight?","9:41 AM"],
+  ["Mom","M","Call me when you land, love you","9:12 AM"],
+  ["Book Club","BC","Maya: chapter 7 was wild, no spoilers in here pls","Yesterday"],
+  ["Jamie Kim","JK","haha yes, see you then!","Yesterday"],
+  ["Dad","D","Sent the photos from Sunday","Wednesday"],
+  ["Alex Rivera","AR","You loved “that’s perfect”","Tuesday"],
+  ["Sam Ortiz","SO","Running 5 min late","Monday"],
+];
+$("rows").innerHTML = ROWS.map((r, i) => `
+  <div class="row ${i === 0 ? "sel" : ""}" id="r${i}" style="top:${96 + i * 74}px">
+    <div class="av" style="${r[1].length < 2 ? "font-size:17px" : ""}">${r[1]}</div>
+    <div class="nm">${r[0]}</div><div class="tm" id="tm${i}">${r[3]}</div>
+    <div class="pv" id="pv${i}" style="width:262px">${r[2]}</div>
+    ${i === 0 ? `<div class="abs" id="badge" style="right:12px;top:32px;color:#fff">${ICONS.smartMute(12, true)}</div>
+                 <div class="abs" id="ring" style="inset:0;border-radius:12px;box-shadow:inset 0 0 0 2.5px #0A84FF, inset 0 0 0 4px #fff"></div>` : `<div class="sep"></div>`}
+  </div>`).join("");
+const THREAD = [
+  ["Priya", "lol the smoke alarm is going off again", 142, 0],
+  ["Leo", "it was the toast this time", 188, 0],
+  ["Priya", "ok who left the oven on lol", 234, 0],
+  ["me", "not me!! I’m at work", 282, 0],
+  ["Priya", "also is anyone home tonight?", 330, 0],
+  ["Leo", "lmaooo it was the toast again", 376, 5.3],
+  ["Maya", "dinner moved to 8 tonight, can everyone still make it?", 422, 6.5],
+];
+$("thread").innerHTML = THREAD.map(([who, txt, y], i) =>
+  (who === "me" ? "" : `<div class="who" id="w${i}" style="top:${y - 16}px">${who}</div>`) +
+  `<div class="bub ${who === "me" ? "me" : "them"}" id="b${i}" style="top:${y}px">${txt}</div>`).join("");
+$("reason").innerHTML = ICONS.sparkle(10) + "Plan changed";
+
+const PIN = '<svg width="14" height="14" viewBox="0 0 24 24"><path d="M9 3H15M10 3V9L7 13H17L14 9V3M12 13V21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const UNREAD = '<svg width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18.5" cy="5.5" r="3.2" fill="currentColor"/></svg>';
+const WIN = '<svg width="14" height="14" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 9.5H20.5" stroke="currentColor" stroke-width="1.8"/></svg>';
+const CK = '<svg class="ck" viewBox="0 0 10 14"><path d="M1 7.5L3.8 10.5L9 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const ITEMS = [["Pin", PIN], 0, ["Mark as Unread", UNREAD], ["Hide Alerts", ICONS.bellSlash(14, false)], ["Smart Mute", ICONS.smartMute(14, false)], 0, ["Open in New Window", WIN], 0, ["Delete…", ICONS.trash(14, false)]];
+$("menu").innerHTML = ITEMS.map((it, i) => it ? `<div class="it" id="m${i}"><span class="ck" id="ck${i}"></span>${it[1]}<span>${it[0]}</span></div>` : `<div class="dv"></div>`).join("");
+// item centre y inside the menu: 6 padding, items 24, dividers 9
+const ITEM_Y = {}; { let y = 6; ITEMS.forEach((it, i) => { if (it) { ITEM_Y[i] = y + 12; y += 24; } else y += 9; }); }
+
+const BEATS = [
+  [0, "Right-click the loud group chat", "Smart Mute sits right under Hide Alerts"],
+  [2.75, "Choose Smart Mute", "The badge lands on the row"],
+  [3.7, "Checked, like Hide Alerts", "Easy to see it’s on, easy to turn off"],
+  [5.2, "Banter arrives quietly", "No notification"],
+  [6.4, "Plans get through", "With the reason it pinged you"],
+];
+const DURATION = 9.6;
+const menuAt = { x: 186, y: 140 };
+
+function render(t) {
+  // cursor path (window coords)
+  const keys = [
+    [0, 760, 520], [0.4, 760, 520], [1.15, 180, 128], // to Roomies
+    [1.35, 180, 128], [1.55, 196, menuAt.y + ITEM_Y[2]], [1.8, 196, menuAt.y + ITEM_Y[3]], [2.1, 200, menuAt.y + ITEM_Y[4]], [2.75, 200, menuAt.y + ITEM_Y[4]],
+    [3.2, 176, 132], [3.75, 176, 132], [4.05, 290, menuAt.y + ITEM_Y[4] - 4], [4.6, 290, menuAt.y + ITEM_Y[4] - 4], [5.0, 610, 470], [9.6, 610, 470],
+  ];
+  let cx = keys[0][1], cy = keys[0][2];
+  for (let i = 0; i < keys.length - 1; i++) {
+    const [ta, xa, ya] = keys[i], [tb, xb, yb] = keys[i + 1];
+    if (t >= ta && t <= tb) { const p = inOut(seg(t, ta, tb)); cx = lerp(xa, xb, p); cy = lerp(ya, yb, p); break; }
+    if (t > tb) { cx = xb; cy = yb; }
+  }
+  const press = (a) => (t >= a && t < a + 0.12 ? 0.86 : 1);
+  $("cursor").style.transform = `translate(${cx - 2}px, ${cy - 2}px) scale(${press(1.2) * press(2.6) * press(3.65) * press(4.95)})`;
+
+  // menu: open at 1.2–2.75, again 3.65–4.95
+  const open1 = t >= 1.2 && t < 2.95, open2 = t >= 3.65 && t < 5.1;
+  const appear = open1 ? seg(t, 1.2, 1.32) : open2 ? seg(t, 3.65, 3.77) : 0;
+  const fade = open1 ? 1 - seg(t, 2.78, 2.95) : open2 ? 1 - seg(t, 4.95, 5.1) : 0;
+  const m = $("menu");
+  m.style.left = menuAt.x + "px"; m.style.top = menuAt.y + "px";
+  m.style.opacity = Math.min(appear, fade);
+  m.style.transform = `scale(${lerp(0.97, 1, out(appear))})`;
+  const hovered = (() => {
+    if (!(open1 || open2)) return -1;
+    let best = -1; for (const k in ITEM_Y) if (Math.abs(menuAt.y + ITEM_Y[k] - cy) < 12 && cx > menuAt.x && cx < menuAt.x + 214) best = +k;
+    return best;
+  })();
+  const blink = open1 && t >= 2.6 && t < 2.68; // macOS flashes the chosen item
+  for (const k in ITEM_Y) {
+    const on = +k === hovered && !blink;
+    $("m" + k).style.background = on ? "#0A84FF" : "transparent";
+    $("m" + k).style.color = on ? "#fff" : "#1D1D1F";
+  }
+  $("ck4").innerHTML = t >= 3.0 ? CK.replace('class="ck"', 'class="ck" style="display:block"') : "";
+  $("ring").style.opacity = open1 || open2 ? 1 : 0;
+
+  // badge on the selected row
+  const b = t < 2.9 ? 0 : spring(t - 2.9, 14, 0.24);
+  $("badge").style.transform = `scale(${0.3 + 0.7 * b})`; $("badge").style.opacity = clamp(b * 1.5);
+  $("pv0").style.width = (t < 2.9 ? 262 : 242) + "px";
+
+  // thread + preview
+  THREAD.forEach(([who, txt, y, at], i) => {
+    const s = at ? (t < at ? 0 : spring(t - at, 15, 0.2)) : 1;
+    $("b" + i).style.opacity = clamp(s * 2); $("b" + i).style.transform = `scale(${lerp(0.6, 1, s)})`;
+    if ($("w" + i)) $("w" + i).style.opacity = clamp(s * 2);
+  });
+  if (t >= 6.5) { $("pv0").textContent = "Maya: dinner moved to 8 tonight, can everyone still make it?"; $("tm0").textContent = "9:43 AM"; }
+  else if (t >= 5.3) { $("pv0").textContent = "Leo: lmaooo it was the toast again"; $("tm0").textContent = "9:42 AM"; }
+  else { $("pv0").textContent = ROWS[0][2]; $("tm0").textContent = "9:41 AM"; }
+
+  // notification, top right of the screen
+  const nin = t < 6.6 ? 0 : spring(t - 6.6, 12, 0.18);
+  const nout = inOut(seg(t, 8.7, 9.1));
+  $("note").style.transform = `translateX(${lerp(420, 0, nin) + 440 * nout}px)`;
+  $("note").style.opacity = t < 6.6 ? 0 : 1;
+
+  // captions
+  let bi = 0; BEATS.forEach((x, i) => { if (t >= x[0]) bi = i; });
+  const since = t - BEATS[bi][0];
+  $("cap").textContent = BEATS[bi][1]; $("sub").textContent = BEATS[bi][2];
+  const co = bi === 0 ? 1 : clamp(since / 0.25);
+  $("cap").style.opacity = co; $("sub").style.opacity = co;
+  $("cap").style.transform = $("sub").style.transform = `translateY(${(1 - out(clamp(since / 0.35))) * (bi ? 10 : 0)}px)`;
+}
+window.render = render; window.DURATION = DURATION;
+if (!location.search.includes("record")) {
+  const t0 = performance.now();
+  (function loop() { render(((performance.now() - t0) / 1000) % (DURATION + 0.6)); requestAnimationFrame(loop); })();
+} else render(0);
+</script>
+</body>
+</html>
