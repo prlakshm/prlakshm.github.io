@@ -6,7 +6,6 @@ import {
   beginConceptJourney,
   opensInNewTab,
 } from "../../components/badges/conceptJourney.js";
-import { ExternalArrow } from "./WtNav.js";
 import { prefersReducedMotion } from "./interactions.js";
 import "./gallery.css";
 
@@ -26,6 +25,8 @@ export type GalleryItem = {
   external?: boolean;
   /** Tooltip line. Defaults to "VIEW CASE STUDY", like the notebooks did. */
   cta?: string;
+  /** Small label pinned to the poster's top-right corner, e.g. "Must read". */
+  flag?: string;
   badge: BadgeId;
   posterAlt: string;
   /** The UV varnish's two inks, from the poster's own palette. */
@@ -274,12 +275,16 @@ export default function PosterGallery({ groups }: { groups: GalleryGroup[] }) {
                       <span className="gl-tex" aria-hidden="true" />
                       <span className="gl-glare" aria-hidden="true" />
                       <span className="gl-rim" aria-hidden="true" />
+                      {item.flag && (
+                        <span className="gl-flag-wrap">
+                          <span className="gl-flag">{item.flag}</span>
+                        </span>
+                      )}
                     </span>
                     <span className="gl-label" aria-hidden="true">
                       <span className="gl-name">{name}</span>
                       <span className="gl-meta">
                         {what.join(" · ")}
-                        {item.external && <ExternalArrow />}
                       </span>
                       <span className="gl-desc">{item.title}</span>
                     </span>

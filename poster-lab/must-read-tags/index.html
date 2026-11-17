@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Must read tag options</title>
+<style>
+:root{--mono:ui-monospace,"SF Mono",Menlo,monospace;--sans:-apple-system,"Helvetica Neue",Arial,sans-serif}
+body{margin:0;padding:40px;background:#fafafa;color:#171717;font-family:var(--sans)}
+h1{font:600 20px var(--sans);margin:0 0 4px}p.sub{margin:0 0 28px;color:#666;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(4,250px);gap:32px 40px}
+.cell .stage{position:relative;aspect-ratio:4/5;border-radius:6px;overflow:hidden;background:#0b0b10 url(poster.webp) center/cover}
+.cell .cap{margin-top:10px;font:12px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.05em;color:#666}
+.cell .cap b{color:#171717;font-weight:600}
+.t{position:absolute;top:12px;right:12px;line-height:1;white-space:nowrap}
+/* A — current: cool white pill */
+.A{padding:6px 10px 5px;border-radius:999px;background:#f6f8fa;color:#555;font:11px var(--mono);letter-spacing:.06em;text-transform:uppercase;box-shadow:0 1px 2px rgba(15,23,42,.12),0 4px 12px rgba(15,23,42,.1)}
+/* B — flush corner tab, like a "Top 10" badge */
+.B{top:0;right:14px;padding:8px 7px 9px;background:#e8e8ea;color:#171717;font:700 9px/1.05 var(--sans);letter-spacing:.04em;text-transform:uppercase;text-align:center;border-radius:0 0 3px 3px;box-shadow:0 4px 10px rgba(0,0,0,.25)}
+.B span{display:block;font-size:15px;letter-spacing:-.01em}
+/* C — dark frosted glass pill, white sans */
+.C{padding:6px 11px;border-radius:999px;background:rgba(20,20,26,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff;font:600 11px var(--sans);letter-spacing:.02em;border:1px solid rgba(255,255,255,.18)}
+/* D — small square-cornered label, bold caps, solid white */
+.D{padding:5px 7px 4px;border-radius:3px;background:#fff;color:#171717;font:700 10px var(--sans);letter-spacing:.08em;text-transform:uppercase;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+/* E — gradient pill (streaming "new episodes" feel), in cool blue to violet */
+.E{padding:6px 11px;border-radius:999px;background:linear-gradient(90deg,#3a6df0,#8a4dff);color:#fff;font:700 10px var(--sans);letter-spacing:.07em;text-transform:uppercase;box-shadow:0 4px 14px rgba(70,80,255,.35)}
+/* F — corner ribbon flush to the right edge */
+.F{top:14px;right:0;padding:6px 10px 6px 12px;background:#f6f8fa;color:#555;font:11px var(--mono);letter-spacing:.06em;text-transform:uppercase;border-radius:999px 0 0 999px;box-shadow:0 2px 10px rgba(0,0,0,.2)}
+/* G — white pill with a small icon dot */
+.G{display:flex;align-items:center;gap:6px;padding:6px 10px 5px 8px;border-radius:999px;background:#f6f8fa;color:#555;font:11px var(--mono);letter-spacing:.06em;text-transform:uppercase;box-shadow:0 1px 2px rgba(15,23,42,.12),0 4px 12px rgba(15,23,42,.1)}
+.G i{width:6px;height:6px;border-radius:50%;background:#3a6df0;box-shadow:0 0 0 3px rgba(58,109,240,.18)}
+/* H — bottom-left title-art style label */
+.H{top:auto;right:auto;left:14px;bottom:12px;padding:0;color:#fff;font:800 12px var(--sans);letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 6px rgba(0,0,0,.6)}
+.H::before{content:"";display:inline-block;width:3px;height:12px;margin-right:7px;vertical-align:-1px;background:#fff;border-radius:1px}
+</style></head><body>
+<h1>"Must read" tag options</h1>
+<p class="sub">On the real HBO Max poster, at card size. Styles are in the spirit of streaming-app badges, not copies of any brand's.</p>
+<div class="grid">
+<div class="cell"><div class="stage"><span class="t A">Must read</span></div><div class="cap"><b>A</b> · cool white pill, gray mono caps (live now)</div></div>
+<div class="cell"><div class="stage"><span class="t B">Must<span>READ</span></span></div><div class="cap"><b>B</b> · flush corner tab, stacked</div></div>
+<div class="cell"><div class="stage"><span class="t C">Must read</span></div><div class="cap"><b>C</b> · dark frosted glass, white</div></div>
+<div class="cell"><div class="stage"><span class="t D">Must read</span></div><div class="cap"><b>D</b> · square label, bold sans caps</div></div>
+<div class="cell"><div class="stage"><span class="t E">Must read</span></div><div class="cap"><b>E</b> · blue to violet gradient pill</div></div>
+<div class="cell"><div class="stage"><span class="t F">Must read</span></div><div class="cap"><b>F</b> · edge ribbon, flush right</div></div>
+<div class="cell"><div class="stage"><span class="t G"><i></i>Must read</span></div><div class="cap"><b>G</b> · white pill with blue dot</div></div>
+<div class="cell"><div class="stage"><span class="t H">Must read</span></div><div class="cap"><b>H</b> · bottom-left, title-art style</div></div>
+</div></body></html>

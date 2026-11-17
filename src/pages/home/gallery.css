@@ -6,6 +6,9 @@
    ========================================================================== */
 
 .gl-wall {
+  /* One type size for the placards, the labels and the "Must read" tag, so
+     they always change together. */
+  --gl-type: 13px;
   --gl-g: clamp(12px, 1.25vw, 20px); /* between prints: the rail's gap */
   --gl-split: clamp(6px, 1vw, 16px); /* plus two gaps = the air between groups */
   --gl-col: minmax(0, 1fr);
@@ -32,7 +35,7 @@
   min-width: 0;
   font-family: var(--font-mono);
   font-weight: 400;
-  font-size: 13px;
+  font-size: var(--gl-type);
   line-height: 1.45;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -191,7 +194,7 @@
   gap: 2px;
   padding-top: 12px;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--gl-type);
   line-height: 1.45;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -279,9 +282,8 @@
     width: calc(100vw - 2 * var(--wk-pad, 16px));
   }
 
-  .gl-label,
-  .gl-placard {
-    font-size: 12px;
+  .gl-wall {
+    --gl-type: 12px;
   }
 }
 
@@ -289,4 +291,49 @@
   .gl-print {
     transition: none;
   }
+}
+
+/* "Must read" flag on a poster's top-right corner: a notched ticket stub. */
+.gl-flag-wrap {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 5;
+  pointer-events: none;
+  /* the mask clips box-shadow, so the shadow lives out here */
+  filter: drop-shadow(0 3px 6px rgba(15, 23, 42, 0.25));
+}
+
+.gl-flag {
+  display: block;
+  padding: 7px 13px 6px;
+  background: #f6f8fa;
+  color: var(--espresso);
+  font-family: var(--font-mono);
+  font-size: var(--gl-type);
+  letter-spacing: 0.05em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  -webkit-text-stroke: 0.3px currentColor;
+  /* Ticket stub, after the nav star card but smaller: a tiny quarter-circle
+     bite out of each corner and a half-circle notch in each side. */
+  --bite: 3px;
+  --notch: 4px;
+  -webkit-mask-image:
+    radial-gradient(circle at 0 0, transparent var(--bite), #000 calc(var(--bite) + 0.6px)),
+    radial-gradient(circle at 100% 0, transparent var(--bite), #000 calc(var(--bite) + 0.6px)),
+    radial-gradient(circle at 0 100%, transparent var(--bite), #000 calc(var(--bite) + 0.6px)),
+    radial-gradient(circle at 100% 100%, transparent var(--bite), #000 calc(var(--bite) + 0.6px)),
+    radial-gradient(circle at 0 50%, transparent var(--notch), #000 calc(var(--notch) + 0.6px)),
+    radial-gradient(circle at 100% 50%, transparent var(--notch), #000 calc(var(--notch) + 0.6px));
+  -webkit-mask-composite: source-in;
+  mask-image:
+    radial-gradient(circle at 0 0, transparent var(--bite), #000 calc(var(--bite) + 0.6px)),
+    radial-gradient(circle at 100% 0, transparent var(--bite), #000 calc(var(--bite) + 0.6px)),
+    radial-gradient(circle at 0 100%, transparent var(--bite), #000 calc(var(--bite) + 0.6px)),
+    radial-gradient(circle at 100% 100%, transparent var(--bite), #000 calc(var(--bite) + 0.6px)),
+    radial-gradient(circle at 0 50%, transparent var(--notch), #000 calc(var(--notch) + 0.6px)),
+    radial-gradient(circle at 100% 50%, transparent var(--notch), #000 calc(var(--notch) + 0.6px));
+  mask-composite: intersect;
 }

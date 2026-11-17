@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Must read: attention options</title>
+<style>
+@font-face{font-family:"Berkeley Mono";src:url("/fonts/berkeley/BerkeleyMonoTrial-Regular.otf") format("opentype")}
+:root{--mono:"Berkeley Mono",ui-monospace,"SF Mono",monospace;--espresso:#171717;--m2:#666;--m3:#737373;--pill:#f6f8fa;
+  --shadow:0 1px 2px rgba(15,23,42,.12),0 4px 12px rgba(15,23,42,.1)}
+*{box-sizing:border-box}
+body{margin:0;padding:40px 40px 80px;background:#fff;color:var(--espresso);font-family:var(--mono)}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:20px;margin-bottom:32px}
+h1{font:400 13px/1.45 var(--mono);letter-spacing:.05em;text-transform:uppercase;margin:0}
+h1 small{display:block;color:var(--m2)}
+button{font:400 12px var(--mono);letter-spacing:.05em;text-transform:uppercase;padding:8px 14px;border:1px solid #ddd;border-radius:999px;background:#fff;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:48px 40px}
+.opt-h{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--m2);margin:0 0 10px;min-height:34px}
+.opt-h b{color:var(--espresso);font-weight:400;-webkit-text-stroke:.4px currentColor}
+.card{display:block;cursor:pointer;text-decoration:none;color:inherit}
+.print{position:relative;display:block;aspect-ratio:4/5;background:#000 url(poster.webp) center/cover;
+  box-shadow:0 1px 0 rgba(0,0,0,.06),0 18px 30px -18px rgba(0,0,0,.45);transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.card:hover .print{transform:translateY(-3px)}
+.label{display:flex;flex-direction:column;margin-top:12px;font-size:13px;line-height:1.45;letter-spacing:.05em;text-transform:uppercase}
+.name{-webkit-text-stroke:.4px currentColor}
+.meta{color:var(--m3);-webkit-text-stroke:.3px currentColor}
+.desc{margin-top:10px;color:var(--m2);-webkit-text-stroke:.3px currentColor}
+
+/* shared tag */
+.tag{position:absolute;top:12px;right:12px;z-index:2;padding:7px 14px 6px;border-radius:999px;background:var(--pill);
+  color:var(--m2);box-shadow:var(--shadow);font:400 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;
+  white-space:nowrap;-webkit-text-stroke:.3px currentColor;overflow:hidden}
+
+/* 1 shine sweep: once when in view, again on hover */
+.shine::after{content:"";position:absolute;inset:-1px;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.95) 48%,rgba(190,205,230,.6) 52%,transparent 70%);
+  transform:translateX(-120%)}
+.go .shine::after,.card:hover .shine::after{animation:sweep 1.1s cubic-bezier(.3,.6,.2,1) .25s both}
+@keyframes sweep{to{transform:translateX(120%)}}
+
+/* 2 dot */
+.dot{display:flex;align-items:center;gap:7px;padding-left:11px}
+.dot i{width:6px;height:6px;border-radius:50%;background:var(--espresso);position:relative}
+.dot i::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--espresso);animation:ping 2.4s ease-out infinite}
+@keyframes ping{0%{transform:scale(1);opacity:.35}70%,100%{transform:scale(2.6);opacity:0}}
+
+/* 3 darker text */
+.dark{color:var(--espresso);-webkit-text-stroke:.4px currentColor}
+
+/* 4 hover lift */
+.lift{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+.card:hover .lift{transform:translateY(-3px);box-shadow:0 2px 4px rgba(15,23,42,.12),0 10px 22px rgba(15,23,42,.18)}
+
+/* 5 tilted sticker */
+.tilt{transform:rotate(-5deg);transition:transform .4s cubic-bezier(.3,1.6,.5,1)}
+.card:hover .tilt{transform:rotate(0) scale(1.04)}
+
+/* 6 museum tag: square card, like a gallery wall label */
+.museum{border-radius:2px;padding:8px 12px 7px;background:#fff;color:var(--espresso);box-shadow:0 1px 1px rgba(0,0,0,.18),0 6px 14px -6px rgba(0,0,0,.35)}
+.museum::before{content:"";position:absolute;left:12px;right:12px;bottom:4px;height:1px;background:rgba(23,23,23,.16)}
+
+/* 7 ticket stub, notched sides (echoes the star ticket in the nav) */
+.ticket{border-radius:3px;padding:7px 16px 6px;background:var(--pill);color:var(--espresso);
+  -webkit-mask:radial-gradient(circle 4px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 4px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;
+  mask:radial-gradient(circle 4px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 4px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;
+  box-shadow:none;filter:drop-shadow(0 3px 6px rgba(15,23,42,.25))}
+.ticket span{border-left:1px dashed rgba(23,23,23,.25);padding-left:9px;margin-left:9px}
+
+/* 8 in the label, no overlay */
+.inline{color:var(--espresso);-webkit-text-stroke:.4px currentColor;background:linear-gradient(currentColor,currentColor) 0 100%/0 1px no-repeat;transition:background-size .5s}
+.go .inline,.card:hover .inline{background-size:100% 1px}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style></head><body>
+<header>
+  <h1>Must read tag<small>Attention options · hover each poster</small></h1>
+  <button id="replay">Replay in-view</button>
+</header>
+<div class="grid" id="grid"></div>
+<script>
+const opts=[
+ ["A","Current","tag",""],
+ ["1","Shine sweep, on view + hover","tag shine",""],
+ ["2","Soft pulsing dot","tag dot","<i></i>"],
+ ["3","Darker text","tag dark",""],
+ ["4","Lifts on hover","tag lift",""],
+ ["5","Tilted sticker, straightens on hover","tag tilt",""],
+ ["6","Museum wall tag, square","tag museum",""],
+ ["7","Ticket stub, notched","tag ticket",""],
+ ["8","No overlay, in the label","",""],
+];
+const g=document.getElementById('grid');
+for(const [k,t,cls,pre,_,post] of opts){
+  const tag=cls?`<span class="${cls}">${pre}Must read${post||""}</span>`:"";
+  const meta=cls?"HBO Max · 2025":`HBO Max · 2025 · <span class="inline">Must read</span>`;
+  g.insertAdjacentHTML('beforeend',`<div><p class="opt-h"><b>${k}</b> · ${t}</p>
+  <a class="card"><span class="print">${tag}</span><span class="label"><span class="name">Personalized descriptions</span>
+  <span class="meta">${meta}</span><span class="desc">Designing AI agents to write personalized descriptions</span></span></a></div>`);
+}
+const io=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('go')),{threshold:.6});
+document.querySelectorAll('.card').forEach(c=>io.observe(c));
+document.getElementById('replay').onclick=()=>document.querySelectorAll('.card').forEach(c=>{c.classList.remove('go');void c.offsetWidth;c.classList.add('go')});
+</script>
+</body></html>

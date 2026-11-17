@@ -36,6 +36,8 @@ type CardVariant = Exclude<Variant, "gallery" | "rail">;
 
 type Work = {
   cta?: string;
+  /** Small label pinned to the poster's top-right corner. */
+  flag?: string;
   id: string;
   title: string;
   tag: string;
@@ -51,14 +53,19 @@ const ASSET = "/home/work/";
 
 const CASE_STUDIES: Work[] = [
   {
+    /* The HBO Max slot. The id stays "surprise-rail" because it names the
+       poster and loop files (/home/work/surprise-rail-*), which are the chrome
+       HBO Max logo and fit either study. It now opens Personalized
+       Descriptions; Surprise Rail is archived — see SURPRISE_RAIL_ARCHIVE. */
     id: "surprise-rail",
-    title: "Designing a themed rail for HBO Max",
-    tag: "Surprise Rail · HBO Max · 2025",
-    href: "/surprise-rail/",
+    title: "Designing AI agents to write personalized descriptions",
+    tag: "Personalized Descriptions · HBO Max · 2025",
+    flag: "Must read",
+    href: "/personalized-descriptions/",
     tint: ["#c9b8ff", "#8fa2ff"],
     loopBg: "#0b0b0f",
     badge: "read",
-    posterAlt: "Surprise Rail poster: a chrome HBO Max logo.",
+    posterAlt: "HBO Max poster: a chrome HBO Max logo.",
   },
   {
     id: "mixr",
@@ -72,7 +79,7 @@ const CASE_STUDIES: Work[] = [
   },
   {
     id: "pinnables",
-    title: "Sending browser annotations to coding agents",
+    title: "Sending annotations from browser to coding agents",
     tag: "Pinnables · Devtool · 2026",
     href: "https://github.com/prlakshm/pinnables",
     external: true,
@@ -83,6 +90,15 @@ const CASE_STUDIES: Work[] = [
     posterAlt: "Pinnables poster: PINNABLES spelled in a dot-matrix of pins.",
   },
 ];
+
+/* Archived, not shown on Home. Kept for the archived case studies link to
+   come; the page itself still lives at /surprise-rail/. */
+export const SURPRISE_RAIL_ARCHIVE = {
+  title: "Designing a themed rail for HBO Max",
+  tag: "Surprise Rail · HBO Max · 2025",
+  href: "/surprise-rail/",
+  posterAlt: "Surprise Rail poster: a chrome HBO Max logo.",
+} as const;
 
 const CONCEPTS: Work[] = [
   {

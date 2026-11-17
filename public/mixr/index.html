@@ -183,6 +183,17 @@ section{margin-top:clamp(16px,calc(9vw - 48px),84px);
 /* meta strip */
 .meta{display:flex;flex-wrap:wrap;gap:0;margin-top:30px}
 .meta div{flex:1 1 150px;padding:14px 18px 14px 0;display:flex;flex-direction:column;gap:4px}
+/* Even space BETWEEN the four items: each column is as wide as its own
+   text (label or value, whichever is wider) and the leftover width is
+   shared equally between them. Values break only where the markup says. */
+.meta{display:grid;grid-template-columns:repeat(4,max-content);justify-content:space-between;column-gap:24px;max-width:88%}
+.meta div{padding-right:0}
+.meta span:last-child{white-space:nowrap}
+main > header{container-type:inline-size}
+/* When the four can't fit with at least ~32px between them, go two by two. */
+/* Short of room for the 88% cap: use the full width, still one row. */
+@container (max-width:690px){.meta{max-width:none}}
+@container (max-width:610px){.meta{grid-template-columns:repeat(2,minmax(0,1fr));justify-content:stretch;column-gap:24px;max-width:none}.meta span:last-child{white-space:normal}}
 .meta span:first-child{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.15em;
   text-transform:uppercase;color:var(--soft)}
 .meta span:last-child{font-family:var(--fm);font-size:var(--fs-body);color:var(--body);line-height:1.6}
@@ -1680,8 +1691,8 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     Building the app was an experiment in designing by building: to see if I could close the design and engineering gap by designing as I go.</p>
   <div class="meta">
     <div><span>Role</span><span>Solo designer &amp; engineer</span></div>
-    <div><span>Scope</span><span>Product, brand, iOS engineering</span></div>
-    <div><span>Built with</span><span>SwiftUI, Claude Code, Cursor</span></div>
+    <div><span>Timeline</span><span>32 days</span></div>
+    <div><span>Built with</span><span>SwiftUI, Claude Code,<br>Cursor</span></div>
     <div><span>Status</span><span>Shipped</span></div>
   </div>
   <p class="links links--head">
@@ -2165,7 +2176,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
             stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"/>
     </svg>
   </a>
-  <a class="case-next" href="/surprise-rail/" aria-label="Next: the Surprise Rail case study">
+  <a class="case-next" href="/personalized-descriptions/" aria-label="Next: the Personalized Descriptions case study">
     NEXT
     <svg class="next-arrow" viewBox="0 0 10 10" aria-hidden="true" focusable="false">
       <path d="M2 5 H8 M5.5 2.5 L8 5 L5.5 7.5" fill="none" stroke="currentColor"
