@@ -241,7 +241,7 @@ figure.proto-match{margin:26px 0;width:75%;max-width:75%}
 figure.proto-match img{width:100%;height:auto;display:block;border:1px solid var(--rule)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:26px 0}
 .two .ph{min-height:170px}
-figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(--rule)}
+figure img,.shot img,.shot video{display:block;width:100%;height:auto;border:1px solid var(--rule)}
 .tile-options img{border:0}
 /* The book is a transparent PNG carrying its own empty alpha — 105px of 1498 on
    top, 152px on the bottom. At the rendered 320px width that is 32.0px and
@@ -280,6 +280,15 @@ figcaption.cap-wide{max-width:calc(var(--measure) + 12px)}
 .dg--framed{border:1px solid var(--rule)}
 /* captions under the boxes: the same grey as the labels above */
 .dg.dg--caps .lb,.dg .lb.cap{fill:var(--soft)}
+.dg .cap-t{fill:var(--soft)}
+.runin{font-weight:600;color:var(--ink)}
+.stats--pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(22px,5vw,64px)}
+/* Tester quotes: a person icon drawn like the diagram boxes, the quote under it */
+.tquotes{list-style:none;margin:26px 0 0;max-width:var(--measure);padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(22px,5vw,64px)}
+.tquotes li{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px}
+.tq-icon{width:80px;height:80px;fill:none;stroke:#737373;stroke-width:1.4}
+.tquotes q{font-family:var(--fm);font-size:var(--fs-body);line-height:1.6;color:var(--ink);quotes:"\201C" "\201D";max-width:28ch}
+@media (max-width:560px){.stats--pair,.tquotes{grid-template-columns:1fr}}
 .dg .bx.pick{stroke:var(--brass);stroke-width:1.5}
 /* ---- the component as its own small design system: anatomy, then tokens ---- */
 .lyr{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0 0;padding:0;list-style:none}
@@ -758,9 +767,9 @@ p.quote{font-family:var(--fd);font-size:var(--fs-h2);line-height:1.2;color:var(-
     <p>Content descriptions were handwritten and tedious to write, so leadership wanted to automate the process with AI. My idea was to take it further and write a personalized reason to watch for every viewer.</p>
   </div>
   <figure class="rv d2">
-    <svg class="dg dgflow dg--framed dg--caps" viewBox="0 -20 760 224" role="img" aria-label="Before: a hand-written description of what the show is about, the same for everyone. After: AI adds a personal reason why you should watch. Expected result: play rate goes up, because more people press play.">
+    <svg class="dg dgflow dg--framed dg--caps" viewBox="0 -20 760 224" role="img" aria-label="Before: a handwritten description of what the show is about, the same for everyone. After: AI adds a personal reason why you should watch. Expected result: play rate goes up, because more people press play.">
 <g class="fx" style="--d:0.0"><text class="mi" x="129" y="34" text-anchor="middle">BEFORE</text></g>
-<g class="fx" style="--d:0.0"><rect class="bx" x="24" y="50" width="210" height="64"/><text class="hd" x="129" y="87" text-anchor="middle">what it&#x27;s about</text><text class="lb" x="129" y="140" text-anchor="middle">hand-written,</text><text class="lb" x="129" y="156" text-anchor="middle">same for everyone</text></g>
+<g class="fx" style="--d:0.0"><rect class="bx" x="24" y="50" width="210" height="64"/><text class="hd" x="129" y="87" text-anchor="middle">what it&#x27;s about</text><text class="lb" x="129" y="140" text-anchor="middle">handwritten,</text><text class="lb" x="129" y="156" text-anchor="middle">same for everyone</text></g>
 <path class="ln fx-line" style="--d:0.4" d="M234 82H267"/><path class="tick fx" style="--d:0.75" d="M275 82 267 78 267 86Z"/>
 <g class="fx" style="--d:0.75"><text class="mi" x="380" y="34" text-anchor="middle">AFTER</text></g>
 <g class="fx" style="--d:0.75"><rect class="bx pick" x="275" y="50" width="210" height="64"/><text class="hd ac" x="380" y="87" text-anchor="middle">+ why you should watch</text><text class="lb" x="380" y="140" text-anchor="middle">AI adds a</text><text class="lb" x="380" y="156" text-anchor="middle">personal reason</text></g>
@@ -886,10 +895,10 @@ p.quote{font-family:var(--fd);font-size:var(--fs-h2);line-height:1.2;color:var(-
   <div class="sechead rv"><p class="lab">04 &mdash; Iteration</p>
     <h2>Six weeks of reviews to perfect the rules.</h2></div>
   <div class="stack rv d1">
-    <p>Every week I wrote agent prompts, generated descriptions, and reviewed them with our UX writer and a senior designer. Then I iterated.</p>
+    <p>Every week I revised agent prompts and generated new descriptions to review with our UX writer and a senior designer. Instead of relying on just my judgment, we aligned on what a good description sounds like.</p>
   </div>
   <figure class="rv d2">
-    <svg class="dg dgflow" viewBox="0 -20 760 324" role="img" aria-label="A weekly loop, repeated for 6 weeks: write agent prompts, generate personalized descriptions, review them with the UX writer and a senior designer, then iterate.">
+    <svg class="dg dgflow dg--framed" viewBox="0 -20 760 324" role="img" aria-label="A weekly loop, repeated for 6 weeks: write agent prompts, generate personalized descriptions, review them with the UX writer and a senior designer, then iterate.">
 <g class="fx" style="--d:0"><rect class="bx" x="24" y="40" width="200" height="70"/><text class="lb" x="124.0" y="79.5" text-anchor="middle">write agent prompts</text></g>
 <path class="ln fx-line" style="--d:0.35" d="M224 75H272"/><path class="tick fx" style="--d:0.7" d="M280 75 272 71 272 79Z"/>
 <g class="fx" style="--d:0.7"><rect class="bx" x="280" y="40" width="200" height="70"/><text class="lb" x="380.0" y="71.5" text-anchor="middle">generate personalized</text><text class="lb" x="380.0" y="87.5" text-anchor="middle">descriptions</text></g>
@@ -902,56 +911,60 @@ p.quote{font-family:var(--fd);font-size:var(--fs-h2);line-height:1.2;color:var(-
 </svg>
   </figure>
   <div class="stack rv">
-    <p>Their feedback became the rules the editor agent checks every draft against: what a description can mention, how it should sound, and what it must never do.</p>
+    <p>I translated what we agreed on into rules every agent follows.</p>
   </div>
   <figure class="rv d1">
-    <svg class="dg dgflow" viewBox="0 -20 760 432" role="img" aria-label="What it mentions: preferred themes and tones; only titles they liked, with a strong connection score; never more than 1 title. How it sounds: a well-watched friend, not an ad; a 10th-grade reading level; no exclamation points. What it never does: feel creepy or invade privacy, like revealing when or how you watch; spoil the story; mention titles not in the HBO Max catalog.">
-<g class="fx" style="--d:2"><rect class="bx" x="24" y="214" width="712" height="154"/><path class="ln" d="M24 262H736"/><text class="hd" x="380.0" y="244" text-anchor="middle">what it never does</text></g>
-<g class="fx" style="--d:1"><rect class="bx" x="388" y="24" width="348" height="172"/><path class="ln" d="M388 72H736"/><text class="hd" x="562.0" y="54" text-anchor="middle">how it sounds</text></g>
-<g class="fx" style="--d:0"><rect class="bx" x="24" y="24" width="348" height="172"/><path class="ln" d="M24 72H372"/><text class="hd" x="198.0" y="54" text-anchor="middle">what it mentions</text></g>
-<g class="fx" style="--d:0.3"><text class="lb ac" x="40" y="102" text-anchor="start">✓</text><text class="lb" x="60" y="102" text-anchor="start">preferred themes and tones</text></g>
-<g class="fx" style="--d:0.55"><text class="lb ac" x="40" y="128" text-anchor="start">✓</text><text class="lb" x="60" y="128" text-anchor="start">only titles they liked</text><text class="lb dim" x="60" y="146" text-anchor="start">(with a strong connection score)</text></g>
-<g class="fx" style="--d:0.8"><text class="lb ac" x="40" y="172" text-anchor="start">✓</text><text class="lb" x="60" y="172" text-anchor="start">never more than 1 title</text></g>
-<g class="fx" style="--d:1.3"><text class="lb ac" x="404" y="102" text-anchor="start">✓</text><text class="lb" x="424" y="102" text-anchor="start">well-watched friend, not an ad</text></g>
-<g class="fx" style="--d:1.55"><text class="lb ac" x="404" y="128" text-anchor="start">✓</text><text class="lb" x="424" y="128" text-anchor="start">10th-grade reading level</text></g>
-<g class="fx" style="--d:1.8"><text class="lb ac" x="404" y="154" text-anchor="start">✓</text><text class="lb" x="424" y="154" text-anchor="start">no exclamation points</text></g>
-<g class="fx" style="--d:2.3"><text class="lb ac" x="40" y="292" text-anchor="start">✗</text><text class="lb" x="60" y="292" text-anchor="start">feel creepy or invade privacy (like revealing when or how you watch)</text></g>
-<g class="fx" style="--d:2.55"><text class="lb ac" x="40" y="318" text-anchor="start">✗</text><text class="lb" x="60" y="318" text-anchor="start">spoil the story</text></g>
-<g class="fx" style="--d:2.8"><text class="lb ac" x="40" y="344" text-anchor="start">✗</text><text class="lb" x="60" y="344" text-anchor="start">mention titles not in the HBO Max catalog</text></g>
+    <svg class="dg dgflow dg--framed" viewBox="0 -20 760 432" role="img" aria-label="What it mentions: preferred themes and tones; only titles they liked, with a strong connection score; never more than 1 title. How it sounds: a well-watched friend, not an ad; a 10th-grade reading level; no exclamation points. What it never does: feel creepy or invade privacy, like revealing when or how you watch; spoil the story; mention titles not in the HBO Max catalog.">
+<g class="fx" style="--d:0"><rect class="bx" x="24" y="24" width="348" height="172"/><path class="ln" d="M24 72H372"/><text class="hd" x="198" y="54" text-anchor="middle">what it mentions</text></g>
+<g class="fx" style="--d:1"><rect class="bx" x="388" y="24" width="348" height="172"/><path class="ln" d="M388 72H736"/><text class="hd" x="562" y="54" text-anchor="middle">how it sounds</text></g>
+<g class="fx" style="--d:2"><rect class="bx" x="24" y="214" width="712" height="154"/><path class="ln" d="M24 262H736"/><text class="hd" x="380" y="244" text-anchor="middle">what it never does</text></g>
+<g class="fx" style="--d:0.3"><text class="lb cap" x="40" y="102" text-anchor="start">✓</text><text class="lb" x="60" y="102" text-anchor="start">preferred themes and tones</text></g>
+<g class="fx" style="--d:0.55"><text class="lb cap" x="40" y="128" text-anchor="start">✓</text><text class="lb" x="60" y="128" text-anchor="start">only titles they liked</text><text class="lb cap" x="60" y="146" text-anchor="start">(with a strong connection score)</text></g>
+<g class="fx" style="--d:0.8"><text class="lb cap" x="40" y="172" text-anchor="start">✓</text><text class="lb" x="60" y="172" text-anchor="start">never more than 1 title</text></g>
+<g class="fx" style="--d:1.3"><text class="lb cap" x="404" y="102" text-anchor="start">✓</text><text class="lb" x="424" y="102" text-anchor="start">well-watched friend, not an ad</text></g>
+<g class="fx" style="--d:1.55"><text class="lb cap" x="404" y="128" text-anchor="start">✓</text><text class="lb" x="424" y="128" text-anchor="start">10th-grade reading level</text></g>
+<g class="fx" style="--d:1.8"><text class="lb cap" x="404" y="154" text-anchor="start">✓</text><text class="lb" x="424" y="154" text-anchor="start">no exclamation points</text></g>
+<g class="fx" style="--d:2.3"><text class="lb cap" x="40" y="292" text-anchor="start">✗</text><text class="lb" x="60" y="292" text-anchor="start">feel creepy or invade privacy <tspan class="cap-t">(like revealing when or how you watch)</tspan></text></g>
+<g class="fx" style="--d:2.55"><text class="lb cap" x="40" y="318" text-anchor="start">✗</text><text class="lb" x="60" y="318" text-anchor="start">spoil the story</text></g>
+<g class="fx" style="--d:2.8"><text class="lb cap" x="40" y="344" text-anchor="start">✗</text><text class="lb" x="60" y="344" text-anchor="start">mention titles not in the HBO Max catalog</text></g>
 </svg>
-    <figcaption>The rules, from weekly feedback.</figcaption>
   </figure>
+  <div class="stack rv">
+    <p>Gemini Pro was the only approved model, and in 2025 it was less capable than today&rsquo;s models. Most gaps in output were because the agents didn&rsquo;t have the data to make the judgment call. So I gave it to them.</p>
+    <p><strong class="runin">Connection scores:</strong> The pattern analyst scored how strongly each liked title connected to the recommended one. A title was only name-dropped if its score passed a threshold I calibrated.</p>
+    <p><strong class="runin">Prompt vocabulary:</strong> A model doesn&rsquo;t understand words the same way a team does. In prompts, I called the descriptions &ldquo;recommendations&rdquo; instead of &ldquo;personalized descriptions,&rdquo; &ldquo;synopses&rdquo; or &ldquo;blurbs.&rdquo; The voice shifted from promotional or dry to a friend telling you what to watch, with a sense of humor.</p>
+    <p>Designing for AI means learning how it understands language, not just using your team&rsquo;s internal vocabulary.</p>
+  </div>
 </section>
 
 <section id="results">
   <div class="sechead rv"><p class="lab">05 &mdash; Results</p>
     <h2>I built a tool to test the descriptions blind.</h2></div>
   <div class="stack rv d1">
-    <p>To compare hand-written descriptions against AI ones fairly, I built a web tool in React and Firebase. Testers pick a show they&rsquo;ve watched, then choose between two unlabeled descriptions. More than 20 teammates used it.</p>
-    <p>Alongside these human preference tests, I also had an AI model judge the drafts.</p>
+    <p>I didn&rsquo;t want AI to be the only judge of itself, so I added human evaluation on top of the critic agent.</p>
+    <p>To compare handwritten descriptions against the AI-generated ones fairly, I built an internal testing tool in React, TypeScript, and Firebase. Testers pick a show they&rsquo;ve watched, then choose between two unlabeled descriptions. I worked with a UX researcher to design the study and word the questions so they wouldn&rsquo;t lead testers. More than 20 teammates tried it.</p>
   </div>
-  <div class="two rv d2">
-    <figure class="shot">
-      <img src="art/tool-pick.webp" width="1648" height="927" alt="The testing tool asks for a recently watched title, Succession, then lists recommendations with descriptions.">
-      <figcaption>Testers start from a show they&rsquo;ve watched.</figcaption>
-    </figure>
-    <figure class="shot">
-      <img src="art/tool-compare.webp" width="1648" height="927" alt="The testing tool shows two unlabeled descriptions of The Gilded Age and asks which helps you decide whether to watch.">
-      <figcaption>Then they pick the description that helps them decide, without knowing which is AI.</figcaption>
-    </figure>
-  </div>
-  <div class="sechead rv" style="margin-top:40px"><h3>What testing showed</h3></div>
+  <figure class="shot rv d2" style="margin:26px 0 51px">
+    <video src="art/testing-tool.mp4" width="1440" height="900" autoplay muted loop playsinline aria-label="The testing tool: testers fill in their watch history, pick which description they prefer, and rate it."></video>
+    <figcaption class="cap-wide">Testers fill in their watch history, pick which descriptions they prefer, and rate them.</figcaption>
+  </figure>
+  <div class="sechead rv"><h3>What testing showed</h3></div>
   <figure class="findings rv d1">
-    <ul class="stats">
-      <li><b>54%</b><span>of test users said AI descriptions helped them decide whether to watch</span></li>
+    <ul class="stats stats--pair">
       <li><b>2</b><span>blind rounds with 16 viewers</span></li>
+      <li><b>54%</b><span>test users said AI descriptions helped them decide whether to watch</span></li>
     </ul>
   </figure>
   <div class="stack rv d2">
-    <p>We hadn&rsquo;t launched yet, so this was our early signal for play rate. What testers said:</p>
-    <p class="quote">&ldquo;Very me.&rdquo;</p>
-    <p class="quote">&ldquo;Hilarious, fun to read, and fairly accurate.&rdquo;</p>
+    <p>We hadn&rsquo;t launched, so this was our early-stage signal for play rate.</p>
+    <p>After round 1, I rebalanced plot and personalized reason to watch. Testers still expected the description to tell them what the show is about, since that was their existing mental model.</p>
+    <p>Earlier research showed 5 of 7 viewers left without pressing play. Here, more than half of testers said the description helped them decide, which is a promising start.</p>
+    <p>What testers told us:</p>
   </div>
+  <ul class="tquotes rv d2">
+    <li><svg class="tq-icon" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="30" r="13"/><path d="M14 72c3-14 13-22 26-22s23 8 26 22"/></svg><q>Hilarious, fun to read, and fairly accurate.</q></li>
+    <li><svg class="tq-icon" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="30" r="13"/><path d="M14 72c3-14 13-22 26-22s23 8 26 22"/></svg><q>Very me.</q></li>
+  </ul>
   <div class="sechead rv" style="margin-top:40px"><h3>Handing off</h3></div>
   <div class="stack rv d1">
     <p>Blind tests also showed that writing for 17 groups of similar viewers did as well as personalizing for each user. So we chose segments: 17 descriptions per title instead of about 128 million, at a fraction of the cost.</p>
