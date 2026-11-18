@@ -282,6 +282,36 @@ figcaption.cap-wide{max-width:calc(var(--measure) + 12px)}
 .dg.dg--caps .lb,.dg .lb.cap{fill:var(--soft)}
 .dg .cap-t{fill:var(--soft)}
 .runin{font-weight:600;color:var(--ink)}
+.findings .stats.stats--arrow{align-items:center;gap:16px}
+.stats--arrow .stats-arrow{gap:0}
+.stats-arrow b{line-height:1}
+@media (max-width:560px){.stats--arrow{flex-direction:column;align-items:flex-start;gap:10px}.stats-arrow b{display:inline-block;transform:rotate(90deg)}}
+/* Fun fact — reads as a sibling of the link next to it, but it goes nowhere,
+   so it is a button. Hover reveals it on a mouse; click pins it, which is the
+   only thing that works on a touch screen where "hover" lasts one frame. */
+.ff-wrap{position:relative;display:inline-flex}
+.links .ff{display:block;background:none;border:0;padding:0;cursor:pointer;
+  font:inherit;color:var(--body);transition:color .18s ease}
+.links .ff:hover,.links .ff:focus-visible,.links .ff[aria-expanded="true"]{color:#262626}
+.links .ff:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+.links .ff:hover .nav-rule,
+.links .ff:focus-visible .nav-rule,
+.links .ff[aria-expanded="true"] .nav-rule{transform:scaleX(1)}
+/* The site's one tooltip, .wt-tip (src/pages/home/chrome.css, which this page
+   loads with the site nav): the plate, the type, no tail. Here only what this
+   tip needs of its own: it rides the pointer (position from JS), and as the
+   one tip that is a whole sentence it wraps, with a little more leading, and
+   keeps its sentence case.
+   It fades like the nav's "Coming soon": in .16s, out .22s. */
+.ff-tip{position:fixed;left:0;top:0;z-index:40;
+  max-width:min(408px,68vw);text-align:left;
+  opacity:0;pointer-events:none;transition:opacity .22s ease}
+.ff-tip.wt-tip{white-space:normal;line-height:1.5;text-transform:none}
+/* Italic only — no colour shift. The emphasis is the slant; recolouring it too
+   makes one word look like a link in the middle of a sentence. */
+.ff-tip em{font-style:italic;color:inherit}
+.ff-tip.on{opacity:1;transition-duration:.16s}
+
 .stats--pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(22px,5vw,64px)}
 /* Tester quotes: a person icon drawn like the diagram boxes, the quote under it */
 .tquotes{list-style:none;margin:26px 0 0;max-width:var(--measure);padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(22px,5vw,64px)}
@@ -386,9 +416,9 @@ figcaption.cap-wide{max-width:calc(var(--measure) + 12px)}
    you are stopped, down to ~0.234 when you are breezing past. */
 .dgflow{--rate:1.3}
 .dgflow .fx{opacity:0;
-  transition:opacity calc(.35s * var(--rate)) ease calc(var(--d,0) * 1s * var(--rate))}
+  transition:opacity .3s ease calc(var(--d,0) * var(--k,1) * 1s)}
 .dgflow .fx-line{stroke-dasharray:var(--len,120);stroke-dashoffset:var(--len,120);
-  transition:stroke-dashoffset calc(.45s * var(--rate)) ease calc(var(--d,0) * 1s * var(--rate))}
+  transition:stroke-dashoffset .4s ease calc(var(--d,0) * var(--k,1) * 1s)}
 .dgflow.go .fx{opacity:1}
 .dgflow.go .fx-line{stroke-dashoffset:0}
 /* Retracting: no stagger and a fixed quick rate — on the way out there is nothing
@@ -712,6 +742,7 @@ p.quote{font-family:var(--fd);font-size:var(--fs-h2);line-height:1.2;color:var(-
     <a href="#design"><span class="n">03</span>Design</a>
     <a href="#iteration"><span class="n">04</span>Iteration</a>
     <a href="#results"><span class="n">05</span>Results</a>
+    <a href="#impact"><span class="n">06</span>Impact</a>
   </nav>
   <div class="prog" id="prog">
     <span>READ</span>
@@ -779,7 +810,7 @@ p.quote{font-family:var(--fd);font-size:var(--fs-h2);line-height:1.2;color:var(-
 </svg>
   </figure>
   <div class="stack rv">
-    <h3>Choosing the right data</h3>
+    <h3>Choosing the right data.</h3>
     <p>When I design systems, the first thing I do is look at the data we have. Most of the time, we don&rsquo;t need all of it, just the strongest signals.</p>
     <p>From just watch history, I could infer a viewer&rsquo;s favorite themes, tone, cast and creators, genres, and whether they like critically acclaimed titles. Titles they liked or hearted weighed more in their preferences.</p>
   </div>
@@ -838,7 +869,7 @@ p.quote{font-family:var(--fd);font-size:var(--fs-h2);line-height:1.2;color:var(-
 </svg>
   </figure>
   <div class="stack rv">
-    <h3>See my agents in action</h3>
+    <h3>See my agents in action!</h3>
     <p>Meet a <em>Friends</em> fan.</p>
   </div>
   <figure class="rv d1">
@@ -865,7 +896,7 @@ p.quote{font-family:var(--fd);font-size:var(--fs-h2);line-height:1.2;color:var(-
 </svg>
   </figure>
   <div class="stack rv">
-    <h3>Same show, a different reason for every viewer</h3>
+    <h3>Same show, a different reason for every viewer.</h3>
     <p>At scale, my system gives millions of viewers their own personalized description.</p>
   </div>
   <figure class="rv d1">
@@ -873,11 +904,11 @@ p.quote{font-family:var(--fd);font-size:var(--fs-h2);line-height:1.2;color:var(-
 <text class="mi" x="129" y="40" text-anchor="middle">WATCH HISTORY</text><text class="mi" x="610" y="40" text-anchor="middle">PERSONALIZED DESCRIPTION</text>
 <g class="fx" style="--d:0"><rect class="bx pick" x="272" y="228" width="172" height="72"/><text class="lb ac" x="358.0" y="260.5" text-anchor="middle">House of the Dragon</text><text class="lb ac" x="358.0" y="276.5" text-anchor="middle">+ my AI system</text></g>
 <g class="fx" style="--d:0.4"><rect class="bx" x="24" y="93" width="210" height="54"/><text class="lb" x="129.0" y="124.5" text-anchor="middle">a Lord of the Rings fan</text></g>
-<g class="fx" style="--d:1.4"><rect class="bx pick" x="484" y="56" width="252" height="128"/><text class="lb ac" x="610" y="90.5" text-anchor="middle">“Love the epic scale of The</text><text class="lb ac" x="610" y="107.5" text-anchor="middle">Lord of the Rings? Swap the</text><text class="lb ac" x="610" y="124.5" text-anchor="middle">fellowship for rival</text><text class="lb ac" x="610" y="141.5" text-anchor="middle">families in a brutal fight</text><text class="lb ac" x="610" y="158.5" text-anchor="middle">for the Iron Throne.”</text></g>
+<g class="fx" style="--d:1.4"><rect class="bx" x="484" y="56" width="252" height="128"/><text class="lb ac" x="610" y="90.5" text-anchor="middle">“Love the epic scale of The</text><text class="lb ac" x="610" y="107.5" text-anchor="middle">Lord of the Rings? Swap the</text><text class="lb ac" x="610" y="124.5" text-anchor="middle">fellowship for rival</text><text class="lb ac" x="610" y="141.5" text-anchor="middle">families in a brutal fight</text><text class="lb ac" x="610" y="158.5" text-anchor="middle">for the Iron Throne.”</text></g>
 <g class="fx" style="--d:1.7"><rect class="bx" x="24" y="237" width="210" height="54"/><text class="lb" x="129.0" y="268.5" text-anchor="middle">a Big Little Lies fan</text></g>
-<g class="fx" style="--d:2.7"><rect class="bx pick" x="484" y="200" width="252" height="128"/><text class="lb ac" x="610" y="234.5" text-anchor="middle">“Another iconic female</text><text class="lb ac" x="610" y="251.5" text-anchor="middle">rivalry. Two childhood</text><text class="lb ac" x="610" y="268.5" text-anchor="middle">friends split over a</text><text class="lb ac" x="610" y="285.5" text-anchor="middle">throne, and their feud sets</text><text class="lb ac" x="610" y="302.5" text-anchor="middle">a kingdom on fire.”</text></g>
+<g class="fx" style="--d:2.7"><rect class="bx" x="484" y="200" width="252" height="128"/><text class="lb ac" x="610" y="234.5" text-anchor="middle">“Another iconic female</text><text class="lb ac" x="610" y="251.5" text-anchor="middle">rivalry. Two childhood</text><text class="lb ac" x="610" y="268.5" text-anchor="middle">friends split over a</text><text class="lb ac" x="610" y="285.5" text-anchor="middle">throne, and their feud sets</text><text class="lb ac" x="610" y="302.5" text-anchor="middle">a kingdom on fire.”</text></g>
 <g class="fx" style="--d:3.0"><rect class="bx" x="24" y="381" width="210" height="54"/><text class="lb" x="129.0" y="412.5" text-anchor="middle">a White Lotus fan</text></g>
-<g class="fx" style="--d:4.0"><rect class="bx pick" x="484" y="344" width="252" height="128"/><text class="lb ac" x="610" y="378.5" text-anchor="middle">“The rich and ruthless, now</text><text class="lb ac" x="610" y="395.5" text-anchor="middle">with dragons. Messy family</text><text class="lb ac" x="610" y="412.5" text-anchor="middle">drama and a fight for the</text><text class="lb ac" x="610" y="429.5" text-anchor="middle">throne that turns into all-</text><text class="lb ac" x="610" y="446.5" text-anchor="middle">out war.”</text></g>
+<g class="fx" style="--d:4.0"><rect class="bx" x="484" y="344" width="252" height="128"/><text class="lb ac" x="610" y="378.5" text-anchor="middle">“The rich and ruthless, now</text><text class="lb ac" x="610" y="395.5" text-anchor="middle">with dragons. Messy family</text><text class="lb ac" x="610" y="412.5" text-anchor="middle">drama and a fight for the</text><text class="lb ac" x="610" y="429.5" text-anchor="middle">throne that turns into all-</text><text class="lb ac" x="610" y="446.5" text-anchor="middle">out war.”</text></g>
 <path class="ln fx-line" style="--d:0.4" d="M234 120H253V408"/>
 <path class="ln fx-line" style="--d:0.4" d="M234 264H253"/>
 <path class="ln fx-line" style="--d:0.4" d="M234 408H253"/>
@@ -948,7 +979,7 @@ p.quote{font-family:var(--fd);font-size:var(--fs-h2);line-height:1.2;color:var(-
     <video src="art/testing-tool.mp4" width="1440" height="900" autoplay muted loop playsinline aria-label="The testing tool: testers fill in their watch history, pick which description they prefer, and rate it."></video>
     <figcaption class="cap-wide">Testers fill in their watch history, pick which descriptions they prefer, and rate them.</figcaption>
   </figure>
-  <div class="sechead rv"><h3>What testing showed</h3></div>
+  <div class="sechead rv"><h3>What testing showed.</h3></div>
   <figure class="findings rv d1">
     <ul class="stats stats--pair">
       <li><b>2</b><span>blind rounds with 16 viewers</span></li>
@@ -965,17 +996,41 @@ p.quote{font-family:var(--fd);font-size:var(--fs-h2);line-height:1.2;color:var(-
     <li><svg class="tq-icon" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="30" r="13"/><path d="M14 72c3-14 13-22 26-22s23 8 26 22"/></svg><q>Hilarious, fun to read, and fairly accurate.</q></li>
     <li><svg class="tq-icon" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="30" r="13"/><path d="M14 72c3-14 13-22 26-22s23 8 26 22"/></svg><q>Very me.</q></li>
   </ul>
-  <div class="sechead rv" style="margin-top:40px"><h3>Handing off</h3></div>
+</section>
+
+<section id="impact">
+  <div class="sechead rv"><p class="lab">06 &mdash; Impact</p>
+    <h2>Segmentation tested just as well and saved us millions of dollars.</h2></div>
   <div class="stack rv d1">
-    <p>Blind tests also showed that writing for 17 groups of similar viewers did as well as personalizing for each user. So we chose segments: 17 descriptions per title instead of about 128 million, at a fraction of the cost.</p>
-    <p>I presented the findings to the CPO and the VP of Design, then handed my work to the design team so they could keep iterating.</p>
+    <p>Blind tests showed that writing for 17 user segments did as well as personalizing for each user. With about 128 million HBO Max users, that meant 17 descriptions per title instead of 128 million, saving the company an estimated millions of dollars in API costs.</p>
   </div>
-  <div class="sechead rv" style="margin-top:40px"><h3>If I did it again today</h3></div>
+  <figure class="findings rv d1">
+    <ul class="stats stats--arrow">
+      <li><b>128M</b><span>user<br>generations</span></li>
+      <li class="stats-arrow" aria-hidden="true"><b>&rarr;</b></li>
+      <li><b>17</b><span>user<br>segments</span></li>
+    </ul>
+  </figure>
+  <div class="stack rv d1" style="margin-top:26px">
+    <p>The trade-off is that segmentation puts each viewer in one bucket, when in reality viewers like multiple themes. My 1:1 system avoided this by selecting 2&ndash;3 preferred themes per viewer, like female-led stories <em>and</em> mystery.</p>
+    <p>I presented the findings to the CPO and the VP of Design, then handed my work to the design team with the 17 recommended user segments so they could keep iterating.</p>
+  </div>
+  <div class="sechead rv" style="margin-top:40px"><h3>If I did it again today.</h3></div>
   <div class="stack rv d1">
-    <p>New AI models come out every few months, and each one reads prompts differently.</p>
+    <p>New AI models come out every few months, and each one reads prompts differently. I&rsquo;d now build an evaluation set first: a fixed list of inputs to run on the old and the new model. I&rsquo;d adjust the prompts where results drop and rerun until the new model matches or beats the old one. This would future-proof the system.</p>
   </div>
   <div class="flag rv d2">
-    <p>Now I&rsquo;d build an eval set first: a fixed list of test inputs to run on the old and the new model. Where results drop, adjust the prompts and rerun until the new model matches or beats the old one.</p>
+    <p>My agents&rsquo; personalized descriptions helped 54% of test users decide whether to watch. I steered the team from 1:1 personalization to segmentation, which tested just as well. That cut generation from &asymp;128M descriptions per title to 17, saving an estimated millions in API costs.</p>
+    <p class="links" style="margin-top:14px">
+      <a href="https://figmashort.link/EYCMRw" target="_blank" rel="noreferrer"><i class="ico">🔗</i><span class="lbl">Figma Slides<span class="nav-rule" aria-hidden="true"></span></span></a>
+      <span class="sep" aria-hidden="true">|</span>
+      <span class="ff-wrap">
+        <button type="button" class="ff" id="ff" aria-expanded="false" aria-controls="ff-tip">
+          <i class="ico">🎉</i><span class="lbl">Fun Fact<span class="nav-rule" aria-hidden="true"></span></span>
+        </button>
+        <span class="ff-tip wt-tip" id="ff-tip" role="tooltip">I&rsquo;d fall into the &ldquo;Prestige Superfans&rdquo; segment, since I watch a lot of Emmy-winning, critically acclaimed content.</span>
+      </span>
+    </p>
   </div>
 </section>
 
@@ -1044,22 +1099,100 @@ p.quote{font-family:var(--fd);font-size:var(--fs-h2);line-height:1.2;color:var(-
   if(reduce){
     flows.forEach(function(sv){ sv.classList.add("go"); });
   } else {
-    var PLAY = 0.95, DROP = 0.35;
+    /* Reveal once, early, fast. Starts at 30% visible; the stagger is squeezed so
+       the last piece starts by 0.8s however many pieces a diagram has (--k), and
+       a diagram that has appeared stays put: skimmers never wait on it twice. */
+    flows.forEach(function(sv){
+      var mx = 0;
+      [].slice.call(sv.querySelectorAll("[style*='--d']")).forEach(function(el){
+        var m = /--d:\s*([\d.]+)/.exec(el.getAttribute("style")); if(m) mx = Math.max(mx, parseFloat(m[1]));
+      });
+      sv.style.setProperty("--k", mx > 0.8 ? (0.8 / mx).toFixed(3) : "1");
+    });
     var flowIO = new IntersectionObserver(function(es){
       es.forEach(function(e){
-        var sv = e.target, vh = window.innerHeight || 1;
-        var enter = e.boundingClientRect.height > vh * 0.9 ? 0.6 : PLAY;
-        var playing = sv.classList.contains("go");
-        if(!playing && e.intersectionRatio >= enter){
-          var k = Math.min(1, scrollVel / FAST_AT);
-          sv.style.setProperty("--rate", (BASE_RATE - k * (BASE_RATE - FAST_RATE)).toFixed(3));
-          sv.classList.remove("rev"); sv.classList.add("go");
-        } else if(playing && e.intersectionRatio < DROP){
-          sv.classList.add("rev"); sv.classList.remove("go");
+        if(e.intersectionRatio >= 0.3 || (e.isIntersecting && e.intersectionRect.height > window.innerHeight * 0.4)){
+          e.target.classList.add("go"); flowIO.unobserve(e.target);
         }
       });
-    }, {threshold:[0, .2, .35, .6, .8, .95, 1]});
+    }, {threshold:[0, .1, .2, .3, .5]});
     flows.forEach(function(sv){ flowIO.observe(sv); });
+  }
+})();
+</script>
+<script>
+(function(){
+  /* Fun fact tooltip. Hover is handled in CSS; this is the click path, which
+     is the one that matters on touch. Escape and an outside tap both close it,
+     so it can never end up pinned open with no way to dismiss it. */
+  var ff = document.getElementById("ff");
+  if(ff){
+    var ffTip = document.getElementById("ff-tip");
+    /* Fixed positioning goes relative to any transformed ancestor, and the box
+       it sits in slides in with a transform: hovered mid-reveal, the tip landed
+       thousands of px off. On <body> nothing can move it. */
+    document.body.appendChild(ffTip);
+
+    /* Same behaviour as the landing page's pronunciation tip: the plate rides
+       the pointer. Placed with fixed coordinates and clamped to the viewport,
+       so it never hangs off an edge no matter where the word wraps to. */
+    function place(x, y){
+      var r = ffTip.getBoundingClientRect();
+      var vw = document.documentElement.clientWidth;
+      var vh = document.documentElement.clientHeight;
+      var L = Math.min(Math.max(8, x + 14), vw - r.width - 8);
+      var T = y + 18;
+      if(T + r.height > vh - 8) T = y - r.height - 14;   // flip above near the fold
+      ffTip.style.left = L + "px";
+      ffTip.style.top  = Math.max(8, T) + "px";
+    }
+    function show(x, y){ ffTip.classList.add("on"); place(x, y); }
+    function hide(){
+      ffTip.classList.remove("on");
+      ff.setAttribute("aria-expanded", "false");
+    }
+
+    var pinned = false;
+    ff.addEventListener("pointerenter", function(e){
+      if(e.pointerType !== "mouse" || pinned) return;
+      show(e.clientX, e.clientY);
+    });
+    ff.addEventListener("pointermove", function(e){
+      if(e.pointerType !== "mouse" || pinned) return;
+      place(e.clientX, e.clientY);
+    });
+    ff.addEventListener("pointerleave", function(e){
+      if(e.pointerType !== "mouse" || pinned) return;
+      ffTip.classList.remove("on");
+    });
+
+    /* Click pins it — the only thing that works on a touch screen, where a
+       hover lasts exactly as long as the finger is down. */
+    ff.addEventListener("click", function(e){
+      e.stopPropagation();
+      pinned = ff.getAttribute("aria-expanded") !== "true";
+      ff.setAttribute("aria-expanded", pinned ? "true" : "false");
+      if(pinned){
+        var b = ff.getBoundingClientRect();
+        show(b.left + b.width / 2 - 14, b.bottom - 4);
+      } else {
+        ffTip.classList.remove("on");
+      }
+    });
+    // Keyboard: focus shows it near the trigger, blur takes it away.
+    ff.addEventListener("focus", function(){
+      var b = ff.getBoundingClientRect();
+      show(b.left - 14, b.bottom - 4);
+    });
+    ff.addEventListener("blur", function(){ if(!pinned) ffTip.classList.remove("on"); });
+
+    document.addEventListener("click", function(e){
+      if(!ff.contains(e.target)){ pinned = false; hide(); }
+    });
+    document.addEventListener("keydown", function(e){
+      if(e.key === "Escape"){ pinned = false; hide(); }
+    });
+    addEventListener("scroll", function(){ if(pinned){ pinned = false; hide(); } }, { passive: true });
   }
 })();
 </script>
