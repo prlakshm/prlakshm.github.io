@@ -57,7 +57,7 @@
      what the app uses. Page chrome stays on GS and the mono; anything that is
      pretending to be Mixr's UI switches to SF so the type is the real type. */
   --fsf:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",system-ui,sans-serif;
-  --page-max:1248px; --gutter:clamp(20px,5vw,96px); --measure:35rem; --side:196px; --nav-height:78px;
+  --page-max:1248px; --gutter:clamp(20px,5vw,96px); --measure:37.5rem; --side:196px; --nav-height:78px;
   --intro-grid-offset:43px;
   --grid-minor:32px;
   --case-link-h:21px;
@@ -187,6 +187,17 @@ section{margin-top:clamp(16px,calc(9vw - 48px),84px);
 /* meta strip */
 .meta{display:flex;flex-wrap:wrap;gap:0;margin-top:30px}
 .meta div{flex:1 1 150px;padding:14px 18px 14px 0;display:flex;flex-direction:column;gap:4px}
+/* Even space BETWEEN the four items: each column is as wide as its own
+   text (label or value, whichever is wider) and the leftover width is
+   shared equally between them. Values break only where the markup says. */
+.meta{display:grid;grid-template-columns:repeat(4,max-content);justify-content:space-between;column-gap:24px;max-width:88%}
+.meta div{padding-right:0}
+.meta span:last-child{white-space:nowrap}
+main > header{container-type:inline-size}
+/* When the four can't fit with at least ~32px between them, go two by two. */
+/* Short of room for the 88% cap: use the full width, still one row. */
+@container (max-width:690px){.meta{max-width:none}}
+@container (max-width:610px){.meta{grid-template-columns:repeat(2,minmax(0,1fr));justify-content:stretch;column-gap:24px;max-width:none}.meta span:last-child{white-space:normal}}
 .meta span:first-child{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.15em;
   text-transform:uppercase;color:var(--soft)}
 .meta span:last-child{font-family:var(--fm);font-size:var(--fs-body);color:var(--body);line-height:1.6}
@@ -780,9 +791,9 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 /* Flow diagrams play once in view; --d is the step's place in the sequence. */
 .dgflow{--rate:1.15}
 .dgflow .fx{opacity:0;
-  transition:opacity calc(.35s * var(--rate)) ease calc(var(--d,0) * 1s * var(--rate))}
+  transition:opacity .3s ease calc(var(--d,0) * var(--k,1) * 1s)}
 .dgflow .fx-line{stroke-dasharray:var(--len,120);stroke-dashoffset:var(--len,120);
-  transition:stroke-dashoffset calc(.45s * var(--rate)) ease calc(var(--d,0) * 1s * var(--rate))}
+  transition:stroke-dashoffset .4s ease calc(var(--d,0) * var(--k,1) * 1s)}
 .dgflow.go .fx{opacity:1}
 .dgflow.go .fx-line{stroke-dashoffset:0}
 .dgflow.rev .fx{transition:opacity .25s ease 0s}
@@ -1684,8 +1695,8 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     Building the app was an experiment in designing by building: to see if I could close the design and engineering gap by designing as I go.</p>
   <div class="meta">
     <div><span>Role</span><span>Solo designer &amp; engineer</span></div>
-    <div><span>Scope</span><span>Product, brand, iOS engineering</span></div>
-    <div><span>Built with</span><span>SwiftUI, Claude Code, Cursor</span></div>
+    <div><span>Timeline</span><span>32 days</span></div>
+    <div><span>Built with</span><span>SwiftUI, Claude Code,<br>Cursor</span></div>
     <div><span>Status</span><span>Shipped</span></div>
   </div>
   <p class="links links--head">
@@ -2169,7 +2180,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
             stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"/>
     </svg>
   </a>
-  <a class="case-next" href="/surprise-rail/" aria-label="Next: the Surprise Rail case study">
+  <a class="case-next" href="/personalized-descriptions/" aria-label="Next: the Personalized Descriptions case study">
     NEXT
     <svg class="next-arrow" viewBox="0 0 10 10" aria-hidden="true" focusable="false">
       <path d="M2 5 H8 M5.5 2.5 L8 5 L5.5 7.5" fill="none" stroke="currentColor"
@@ -2300,25 +2311,23 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   if(reduce){
     flows.forEach(function(sv){ sv.classList.add("go"); });
   } else {
-    var PLAY = 0.95, DROP = 0.35;
+    /* Reveal once, early, fast. Starts at 30% visible; the stagger is squeezed so
+       the last piece starts by 0.8s however many pieces a diagram has (--k), and
+       a diagram that has appeared stays put: skimmers never wait on it twice. */
+    flows.forEach(function(sv){
+      var mx = 0;
+      [].slice.call(sv.querySelectorAll("[style*='--d']")).forEach(function(el){
+        var m = /--d:\s*([\d.]+)/.exec(el.getAttribute("style")); if(m) mx = Math.max(mx, parseFloat(m[1]));
+      });
+      sv.style.setProperty("--k", mx > 0.8 ? (0.8 / mx).toFixed(3) : "1");
+    });
     var flowIO = new IntersectionObserver(function(es){
       es.forEach(function(e){
-        var sv = e.target;
-        var vh = window.innerHeight || 1;
-        var enter = e.boundingClientRect.height > vh * 0.9 ? 0.6 : PLAY;
-        var playing = sv.classList.contains("go");
-        if(!playing && e.intersectionRatio >= enter){
-          var k = Math.min(1, scrollVel / FAST_AT);
-          var rate = BASE_RATE - k * (BASE_RATE - FAST_RATE);
-          sv.style.setProperty("--rate", rate.toFixed(3));
-          sv.classList.remove("rev");
-          sv.classList.add("go");
-        } else if(playing && e.intersectionRatio < DROP){
-          sv.classList.add("rev");
-          sv.classList.remove("go");
+        if(e.intersectionRatio >= 0.3 || (e.isIntersecting && e.intersectionRect.height > window.innerHeight * 0.4)){
+          e.target.classList.add("go"); flowIO.unobserve(e.target);
         }
       });
-    }, {threshold:[0, .2, .35, .6, .8, .95, 1]});
+    }, {threshold:[0, .1, .2, .3, .5]});
     flows.forEach(function(sv){ flowIO.observe(sv); });
   }
 
