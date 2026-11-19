@@ -1083,7 +1083,10 @@ p.quote{font-family:var(--fd);font-size:var(--fs-h2);line-height:1.2;color:var(-
     var y = window.scrollY + window.innerHeight*0.28, cur = -1;
     secs.forEach(function(s,i){ if(s && s.offsetTop <= y) cur = i; });
     links.forEach(function(a,i){ a.classList.toggle("on", i === cur); });
-    var h = document.documentElement.scrollHeight - window.innerHeight;
+    // 100% when the case study ends, not when the site footer is fully scrolled past
+    var foot = document.querySelector("footer");
+    var end = foot ? foot.getBoundingClientRect().top + window.scrollY : document.documentElement.scrollHeight;
+    var h = Math.min(end, document.documentElement.scrollHeight) - window.innerHeight;
     var p = h > 0 ? Math.min(100, Math.max(0, window.scrollY / h * 100)) : 0;
     if(bar) bar.style.inset = "0 " + (100 - p) + "% 0 0";
     if(pct) pct.textContent = Math.round(p) + "%";
