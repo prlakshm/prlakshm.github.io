@@ -1,9 +1,9 @@
 <!doctype html>
 <meta charset="utf-8">
-<link rel="stylesheet" href="/assets/stormHandoff-BcfU556L.css">
+<link rel="stylesheet" href="/assets/stormHandoff-BtopHw-s.css">
 <link rel="stylesheet" href="/assets/SiteFooter-1Izx65pE.css">
-<link rel="modulepreload" href="/assets/stormHandoff-NBoITLWO.js">
-<link rel="modulepreload" href="/assets/SiteFooter-CGVkPrBt.js">
+<link rel="modulepreload" href="/assets/stormHandoff-D_n1_e5p.js">
+<link rel="modulepreload" href="/assets/SiteFooter-B5HiT__p.js">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Surprise Rail | Pranavi Ram</title>
 <link rel="canonical" href="https://pranaviram.com/surprise-rail/">
@@ -73,7 +73,7 @@
      --tile-scrim is 50% on the style; each tile tunes it to its own artwork. */
   --tile-plate:rgba(255,255,255,.75); --tile-plate-blur:1.702cqw; --tile-art-blur:3.191cqw; --tile-scrim:.5;
   --fd:"GS",system-ui,sans-serif; --fm:ui-monospace,"SF Mono",Menlo,monospace;
-  --page-max:1248px; --gutter:clamp(20px,5vw,96px); --measure:37.5rem; --side:196px; --nav-height:78px;
+  --page-max:1248px; --gutter:clamp(20px,5vw,96px); --measure:35rem; --side:196px; --nav-height:78px;
   --intro-grid-offset:43px;
   --grid-minor:32px;
   --case-link-h:21px;
@@ -264,8 +264,8 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
    always aligns — the tie-in is the real grid, not a second one drawn inside. */
 .dg{display:block;width:100%;height:auto;background:transparent;border:1px solid var(--rule)}
 .dg .ax{stroke:var(--rule);stroke-width:1;fill:none}
-.dg .ln{stroke:#d4d4d4;stroke-width:1;fill:none}
-.dg .bx{fill:var(--card);stroke:#d4d4d4;stroke-width:1}
+.dg .ln{stroke:var(--rule);stroke-width:1;fill:none}
+.dg .bx{fill:var(--card);stroke:var(--rule);stroke-width:1}
 .dg .bx.pick{stroke:var(--brass);stroke-width:1.5}
 /* ---- the component as its own small design system: anatomy, then tokens ---- */
 .lyr{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0 0;padding:0;list-style:none}
@@ -353,7 +353,7 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 .dg .mi{font-size:var(--fs-micro);letter-spacing:.14em;fill:var(--soft)}
 .dg .hd{font-size:var(--fs-body);fill:var(--ink)}
 .dg .lb{font-size:var(--fs-micro);fill:var(--body)}
-.dg .ac{fill:var(--ink)}
+.dg .ac{fill:var(--brass)}
 .dg .tick{fill:var(--brass)}
 .dg .fa{fill:var(--brass)}
 .dg .mt{font-size:16px;fill:var(--ink)}
@@ -363,9 +363,9 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
    you are stopped, down to ~0.234 when you are breezing past. */
 .dgflow{--rate:1.3}
 .dgflow .fx{opacity:0;
-  transition:opacity .3s ease calc(var(--d,0) * var(--k,1) * 1s)}
+  transition:opacity calc(.35s * var(--rate)) ease calc(var(--d,0) * 1s * var(--rate))}
 .dgflow .fx-line{stroke-dasharray:var(--len,120);stroke-dashoffset:var(--len,120);
-  transition:stroke-dashoffset .4s ease calc(var(--d,0) * var(--k,1) * 1s)}
+  transition:stroke-dashoffset calc(.45s * var(--rate)) ease calc(var(--d,0) * 1s * var(--rate))}
 .dgflow.go .fx{opacity:1}
 .dgflow.go .fx-line{stroke-dashoffset:0}
 /* Retracting: no stagger and a fixed quick rate — on the way out there is nothing
@@ -1064,23 +1064,25 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
        already drawn. Do not retract until it is mostly gone — a single threshold
        at "fully visible" re-triggers on every small scroll nudge while reading.
        A diagram taller than the viewport can never reach 0.95, so cap it there. */
-    /* Reveal once, early, fast. Starts at 30% visible; the stagger is squeezed so
-       the last piece starts by 0.8s however many pieces a diagram has (--k), and
-       a diagram that has appeared stays put: skimmers never wait on it twice. */
-    flows.forEach(function(sv){
-      var mx = 0;
-      [].slice.call(sv.querySelectorAll("[style*='--d']")).forEach(function(el){
-        var m = /--d:\s*([\d.]+)/.exec(el.getAttribute("style")); if(m) mx = Math.max(mx, parseFloat(m[1]));
-      });
-      sv.style.setProperty("--k", mx > 0.8 ? (0.8 / mx).toFixed(3) : "1");
-    });
+    var PLAY = 0.95, DROP = 0.35;
     var flowIO = new IntersectionObserver(function(es){
       es.forEach(function(e){
-        if(e.intersectionRatio >= 0.3 || (e.isIntersecting && e.intersectionRect.height > window.innerHeight * 0.4)){
-          e.target.classList.add("go"); flowIO.unobserve(e.target);
+        var sv = e.target;
+        var vh = window.innerHeight || 1;
+        var enter = e.boundingClientRect.height > vh * 0.9 ? 0.6 : PLAY;
+        var playing = sv.classList.contains("go");
+        if(!playing && e.intersectionRatio >= enter){
+          var k = Math.min(1, scrollVel / FAST_AT);
+          var rate = BASE_RATE - k * (BASE_RATE - FAST_RATE);
+          sv.style.setProperty("--rate", rate.toFixed(3));
+          sv.classList.remove("rev");
+          sv.classList.add("go");
+        } else if(playing && e.intersectionRatio < DROP){
+          sv.classList.add("rev");
+          sv.classList.remove("go");
         }
       });
-    }, {threshold:[0, .1, .2, .3, .5]});
+    }, {threshold:[0, .2, .35, .6, .8, .95, 1]});
     flows.forEach(function(sv){ flowIO.observe(sv); });
   }
 
@@ -1284,4 +1286,4 @@ figure img,.shot img{display:block;width:100%;height:auto;border:1px solid var(-
 })();
 </script>
 
-<script type="module" src="/assets/static-chrome-6qmSe5A1.js"></script>
+<script type="module" src="/assets/static-chrome-C2RsKxts.js"></script>
