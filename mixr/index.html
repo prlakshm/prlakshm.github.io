@@ -1,9 +1,9 @@
 <!doctype html>
 <meta charset="utf-8">
-<link rel="stylesheet" href="/assets/stormHandoff-BtopHw-s.css">
+<link rel="stylesheet" href="/assets/stormHandoff-BcfU556L.css">
 <link rel="stylesheet" href="/assets/SiteFooter-1Izx65pE.css">
-<link rel="modulepreload" href="/assets/stormHandoff-D_n1_e5p.js">
-<link rel="modulepreload" href="/assets/SiteFooter-B5HiT__p.js">
+<link rel="modulepreload" href="/assets/stormHandoff-NBoITLWO.js">
+<link rel="modulepreload" href="/assets/SiteFooter-CGVkPrBt.js">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Mixr | Pranavi Ram</title>
 <link rel="canonical" href="https://pranaviram.com/mixr/">
@@ -57,7 +57,7 @@
      what the app uses. Page chrome stays on GS and the mono; anything that is
      pretending to be Mixr's UI switches to SF so the type is the real type. */
   --fsf:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",system-ui,sans-serif;
-  --page-max:1248px; --gutter:clamp(20px,5vw,96px); --measure:35rem; --side:196px; --nav-height:78px;
+  --page-max:1248px; --gutter:clamp(20px,5vw,96px); --measure:37.5rem; --side:196px; --nav-height:78px;
   --intro-grid-offset:43px;
   --grid-minor:32px;
   --case-link-h:21px;
@@ -177,6 +177,39 @@ section{margin-top:clamp(16px,calc(9vw - 48px),84px);
    nothing. Scoped to .fx-demo rather than every .demo on purpose: the other
    place this pattern occurs (section 03) is spaced the way it is deliberately. */
 .fx-demo + .stack{margin-top:30px}
+/* Results stat row: same component as the HBO case study (3/6 -> 6/6). */
+.findings{margin:0}
+.stats{display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin:0;padding:0;list-style:none}
+.stats li{display:flex;align-items:center;gap:12px;min-width:0}
+.stats b{font-family:var(--fd);font-size:var(--fs-h2);font-variation-settings:"wght" 640;
+  line-height:1;letter-spacing:-.02em;color:var(--ink);white-space:nowrap}
+.stats span{font-family:var(--fm);font-size:var(--fs-body);line-height:1.5;color:var(--body);max-width:20ch}
+.findings + .stack{margin-top:26px}
+@media (max-width:560px){.stats{flex-direction:column;align-items:flex-start;gap:10px}.stats-arrow b{display:inline-block;transform:rotate(90deg)}}
+/* Before and After: the clip toolbar, rebuilt from ClipEditingUI.swift at 1.2x
+   its point sizes (toolbarScale 11/9.8). Glass #050810 at 90%, a 0.5pt white
+   edge at 9%, a top sheen, two shadows, and the pointer under the label gap
+   nearest the bar's centre (toolbarPointerGapIndex). */
+.tb-demo{display:flex;flex-wrap:wrap;align-items:flex-end;gap:22px 30px}
+.tb-col{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.tb-lab{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.13em;text-transform:uppercase;color:#7a7a88}
+.tb{position:relative;display:inline-flex;height:67.3px;box-sizing:border-box;padding:0 10.8px;border-radius:14.8px;
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,0) 35%),rgba(5,8,16,.9);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.15),0 8px 20px -6px rgba(150,160,200,.10)}
+.tb-act{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  padding:10.8px 15.6px 0;gap:8.6px;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;font-size:13.2px;font-weight:500;
+  line-height:1;color:rgba(255,255,255,.92);white-space:nowrap}
+.tb-act i{display:flex;align-items:flex-end;justify-content:center;height:18.9px}
+.tb-act svg{display:block;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.tb-act.tb-del{color:rgba(255,69,58,.88);font-weight:400}
+/* the tail: centred on the boundary after this action, with the body's
+   hairline edge on its two sides so it reads off the dark panel */
+.tb-tail{position:absolute;right:0;top:calc(100% - 1px);width:9.4px;height:6.4px;transform:translateX(50%);overflow:visible}
+.tb-tail .f{fill:#05080F;stroke:none}
+.tb-tail .e{fill:none;stroke:rgba(255,255,255,.15);stroke-width:2}
+.demo .tb-demo + .foot{margin-top:19.2px}
+@media (max-width:480px){.tb{zoom:.8}}
 
 /* reveals */
 .rv{opacity:0;transform:translateY(16px);
@@ -187,6 +220,17 @@ section{margin-top:clamp(16px,calc(9vw - 48px),84px);
 /* meta strip */
 .meta{display:flex;flex-wrap:wrap;gap:0;margin-top:30px}
 .meta div{flex:1 1 150px;padding:14px 18px 14px 0;display:flex;flex-direction:column;gap:4px}
+/* Even space BETWEEN the four items: each column is as wide as its own
+   text (label or value, whichever is wider) and the leftover width is
+   shared equally between them. Values break only where the markup says. */
+.meta{display:grid;grid-template-columns:repeat(4,max-content);justify-content:space-between;column-gap:24px;max-width:88%}
+.meta div{padding-right:0}
+.meta span:last-child{white-space:nowrap}
+main > header{container-type:inline-size}
+/* When the four can't fit with at least ~32px between them, go two by two. */
+/* Short of room for the 88% cap: use the full width, still one row. */
+@container (max-width:690px){.meta{max-width:none}}
+@container (max-width:610px){.meta{grid-template-columns:repeat(2,minmax(0,1fr));justify-content:stretch;column-gap:24px;max-width:none}.meta span:last-child{white-space:normal}}
 .meta span:first-child{font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.15em;
   text-transform:uppercase;color:var(--soft)}
 .meta span:last-child{font-family:var(--fm);font-size:var(--fs-body);color:var(--body);line-height:1.6}
@@ -267,8 +311,8 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 .dec--lead{border-top:0;padding-top:0;margin-top:0}
 /* p carries margin:0 globally, so consecutive prose inside a decision block
    would otherwise run together as one wall. */
-.dec p + p{margin-top:14px}
-.dec h3 + p{margin-top:12px}
+.dec p + p{margin-top:16px}
+.dec h3 + p{margin-top:16px}
 /* Those two margins space a .dec that lays itself out with margins. A .stack is
    a flex column with its own 16px gap, so on a block that is BOTH they add to
    it rather than replacing it — 16 + 12 gave the run-in under those headings
@@ -290,8 +334,10 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
    is as wide as the heading); captioned
    like the iPad and Mac figures */
 .ship-head{display:grid;width:max-content;max-width:100%}
-.ship{display:flex;flex-direction:column;align-items:center;gap:10px;margin:10px 0 22px;text-decoration:none;
+.ship{display:flex;flex-direction:column;align-items:center;gap:10px;margin:0 0 26px;text-decoration:none;
   font-family:var(--fm);font-size:var(--fs-micro);letter-spacing:.13em;text-transform:uppercase;color:#7f8694}
+.ship-head--after{margin-top:26px}
+.ship-head--after .ship{margin-bottom:0}
 .ship img{width:160px;height:160px;border-radius:36px;display:block}
 .ship .lbl{position:relative}
 .ship:hover .nav-rule,.ship:focus-visible .nav-rule{transform:scaleX(1)}
@@ -780,9 +826,9 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 /* Flow diagrams play once in view; --d is the step's place in the sequence. */
 .dgflow{--rate:1.15}
 .dgflow .fx{opacity:0;
-  transition:opacity calc(.35s * var(--rate)) ease calc(var(--d,0) * 1s * var(--rate))}
+  transition:opacity .3s ease calc(var(--d,0) * var(--k,1) * 1s)}
 .dgflow .fx-line{stroke-dasharray:var(--len,120);stroke-dashoffset:var(--len,120);
-  transition:stroke-dashoffset calc(.45s * var(--rate)) ease calc(var(--d,0) * 1s * var(--rate))}
+  transition:stroke-dashoffset .4s ease calc(var(--d,0) * var(--k,1) * 1s)}
 .dgflow.go .fx{opacity:1}
 .dgflow.go .fx-line{stroke-dashoffset:0}
 .dgflow.rev .fx{transition:opacity .25s ease 0s}
@@ -1662,10 +1708,11 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   <nav class="jump" id="jump" aria-label="Sections">
     <a href="#problem"><span class="n">01</span>Problem</a>
     <a href="#insight"><span class="n">02</span>Ideation</a>
-    <a href="#behavior"><span class="n">03</span>Behavior</a>
-    <a href="#decisions"><span class="n">04</span>Design</a>
+    <a href="#behavior"><span class="n">03</span>Interaction</a>
+    <a href="#decisions"><span class="n">04</span>Visuals</a>
     <a href="#changed"><span class="n">05</span>Coding Agents</a>
-    <a href="#results"><span class="n">06</span>Results</a>
+    <a href="#results"><span class="n">06</span>Testing</a>
+    <a href="#impact"><span class="n">07</span>Launch</a>
   </nav>
   <div class="prog" id="prog">
     <span>READ</span>
@@ -1684,8 +1731,8 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     Building the app was an experiment in designing by building: to see if I could close the design and engineering gap by designing as I go.</p>
   <div class="meta">
     <div><span>Role</span><span>Solo designer &amp; engineer</span></div>
-    <div><span>Scope</span><span>Product, brand, iOS engineering</span></div>
-    <div><span>Built with</span><span>SwiftUI, Claude Code, Cursor</span></div>
+    <div><span>Timeline</span><span>32 days</span></div>
+    <div><span>Built with</span><span>SwiftUI, Claude Code,<br>Cursor</span></div>
     <div><span>Status</span><span>Shipped</span></div>
   </div>
   <p class="links links--head">
@@ -1702,8 +1749,8 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
       <span class="hint">IMPORT &middot; ARRANGE &middot; MIX &middot; PLAY</span>
     </div>
     <figure class="device">
-      <video data-eager src="art/editor-hero.mp4" poster="art/editor-hero-poster.jpg" autoplay muted loop playsinline
-             aria-label="Mixr running on iPhone: an empty project, then the file picker with five songs, then STAY and Heat Waves landing on the timeline as colored waveform lanes and playing back, with the transport and BPM in the nav bar and the effects row along the bottom."></video>
+      <video data-eager src="art/editor-hero.mp4?v=20261119" poster="art/editor-hero-poster.jpg?v=20261119" autoplay muted loop playsinline
+             aria-label="Mixr running on iPhone: an empty project, then the Files picker with six songs, then STAY and Heat Waves selected and landing on the timeline as colored waveform lanes."></video>
     </figure>
     <p class="foot">Recorded on simulator device.</p>
   </div>
@@ -1772,8 +1819,8 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   <div class="demo rv d2">
     <p class="sub">The interface, today&rsquo;s build</p>
     <figure class="device">
-      <video preload="none" data-src="art/build-now.mp4" poster="art/build-now-poster.jpg" autoplay muted loop playsinline
-             aria-label="The Mixr editor in landscape, playing: five colored waveform lanes with the playhead moving, a Tracks panel listing STAY, Heat Waves, good 4 u and Cut To The Feeling, solo, mute and volume down the right, and the Effects drawer along the bottom."></video>
+      <video preload="none" data-src="art/build-now.mp4?v=20261119" poster="art/build-now-poster.jpg?v=20261119" autoplay muted loop playsinline
+             aria-label="The Mixr editor in landscape with six songs loaded: STAY, Heat Waves, good 4 u, Cut To The Feeling and more, each in its own colored waveform lane, with solo, mute and volume down the right and the Effects drawer along the bottom."></video>
     </figure>
     <p class="foot">Recorded on simulator device. Each waveform gets its own color from the brand palette.</p>
   </div>
@@ -1781,7 +1828,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
 <!-- 03 -->
 <section id="behavior">
-  <div class="sechead rv"><p class="lab">03 &mdash; Behavior</p>
+  <div class="sechead rv"><p class="lab">03 &mdash; Interaction</p>
     <h2>Making it feel familiar.</h2></div>
 
   <div class="stack rv d1">
@@ -1798,11 +1845,11 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   <div class="demo rv d2">
     <div class="rowlab">
       <span class="demo-title">Clip Actions</span>
-      <span class="hint">SPLIT &middot; SPEED &middot; DUPLICATE &middot; DELETE</span>
+      <span class="hint">SPLIT &middot; SPEED &middot; DUPLICATE &middot; VOLUME &middot; DELETE</span>
     </div>
     <figure class="device">
-      <video preload="none" data-src="art/clip-menu.mp4" poster="art/clip-menu-poster.jpg" autoplay muted loop playsinline
-             aria-label="A clip on the Mixr timeline: selected, showing the Split, Speed, Duplicate and Delete actions, then split into pieces, then one piece lifted and dragged to a new position on the lane."></video>
+      <video preload="none" data-src="art/clip-menu.mp4?v=20261119b" poster="art/clip-menu-poster.jpg?v=20261119b" autoplay muted loop playsinline
+             aria-label="A Levitating clip on the Mixr timeline: selected, showing the Split, Speed, Duplicate, Volume and Delete actions, then split in two, one piece turned down with its own volume slider, then duplicated."></video>
     </figure>
     <p class="foot">Recorded on simulator device.</p>
   </div>
@@ -1835,7 +1882,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
 <!-- 04 -->
 <section id="decisions">
-  <div class="sechead rv"><p class="lab">04 &mdash; Design</p>
+  <div class="sechead rv"><p class="lab">04 &mdash; Visuals</p>
     <h2>Subtle nuances elevated the design.</h2></div>
 
   <div class="stack rv d1">
@@ -1939,8 +1986,8 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   <div class="demo rv d2">
     <p class="sub">Each effect gets its own slider and/or preset option</p>
     <figure class="device">
-      <video preload="none" data-src="art/effect-tray.mp4" poster="art/effect-tray-poster.jpg" autoplay muted loop playsinline
-             aria-label="Effect cards opening in Mixr, one after another: Reverb with Small Room, Hall and Ambient presets, Echo with Classic, Ping Pong and Reverse, Pitch with Pitch Up and Down, then Flanger and Blur which are slider-only. Each card lights and a tray grows beside it."></video>
+      <video preload="none" data-src="art/effect-tray.mp4?v=20261119" poster="art/effect-tray-poster.jpg?v=20261119" autoplay muted loop playsinline
+             aria-label="Clip-level effects in Mixr: a Levitating clip is selected, Reverb is raised to 70 with its Small Room, Hall and Ambient presets, then Echo, then the tray scrolls and Flanger is raised. Each card shows its level in a ring."></video>
     </figure>
     <p class="foot">Recorded on simulator device.</p>
   </div>
@@ -2133,17 +2180,66 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 
 <!-- 06 -->
 <section id="results">
-  <div class="ship-head">
-    <div class="sechead rv"><p class="lab">06 &mdash; Results</p>
-      <h2>Shipped to App Store.</h2></div>
+  <div class="sechead rv"><p class="lab">06 &mdash; Testing</p>
+    <h2>Every beta tester was satisfied by the final round.</h2></div>
+
+  <figure class="findings rv d1">
+    <ul class="stats">
+      <li><b>3/6</b><span>testers<br>satisfied</span></li>
+      <li class="stats-arrow" aria-hidden="true"><b>&rarr;</b></li>
+      <li><b>6/6</b><span>testers<br>satisfied</span></li>
+    </ul>
+  </figure>
+
+  <div class="stack rv d2">
+    <p>I ran a beta test with six beginners: friends, family, and volunteers from X. In the first round, only 3 of 6 were satisfied with their remix. Based on feedback, I made three changes. I expanded the sound effects library 4x, added clip-level volume in the clip toolbar, and recalibrated the effects so even low levels were noticeable.</p>
+    <p>In the final round, all 6 were satisfied.</p>
+    <p>I learned to test for satisfaction, not just completion. Finding where testers got stuck showed whether they could finish a remix, but I also cared whether they were happy with it. So I asked which features they wanted and built them.</p>
+  </div>
+
+  <div class="demo rv d2">
+    <div class="rowlab">
+      <span class="demo-title">Beta Testing</span>
+    </div>
+    <div class="tb-demo">
+      <div class="tb-col">
+        <span class="tb-lab">Before</span>
+        <div class="tb" role="img" aria-label="The clip toolbar before beta testing: Split, Speed, Duplicate and Delete."><span class="tb-act"><i><svg style="transform:translateY(0.1px)" viewBox="0 0 24 24" width="21.2" height="21.2" aria-hidden="true"><circle cx="6" cy="6" r="2.6"/><circle cx="6" cy="18" r="2.6"/><path d="M8.2 7.4 20 16.6M8.2 16.6 20 7.4"/></svg></i>Split</span><span class="tb-act tb-ptr"><svg class="tb-tail" viewBox="0 0 9.4 6.4" aria-hidden="true"><path class="f" d="M0 0h9.4L4.7 5.9z"/><path class="e" d="M0 .5 4.7 5.9 9.4 .5"/></svg><i><svg style="transform:translateY(1.3px)" viewBox="0 0 24 24" width="24.0" height="24.0" aria-hidden="true"><path d="M3.5 16.5a8.5 8.5 0 1 1 17 0"/><path d="m12 14.5 4.2-4.6"/><circle cx="12" cy="14.5" r="1.1"/></svg></i>Speed</span><span class="tb-act"><i><svg style="transform:translateY(-0.6px)" viewBox="0 0 24 24" width="19.8" height="19.8" aria-hidden="true"><rect x="8.5" y="3.5" width="11" height="13.5" rx="2"/><path d="M5.5 7.5v11a2 2 0 0 0 2 2h8.5"/></svg></i>Duplicate</span><span class="tb-act tb-del"><i><svg style="transform:translateY(-0.2px)" viewBox="0 0 24 24" width="20.8" height="20.8" aria-hidden="true"><path d="M4.5 6.8h15M9.5 6.8V4.4h5v2.4M6.6 6.8l.9 13h9l.9-13M10.2 10.6v5.6M13.8 10.6v5.6"/></svg></i>Delete</span></div>
+      </div>
+      <div class="tb-col">
+        <span class="tb-lab">After</span>
+        <div class="tb" role="img" aria-label="The clip toolbar after beta testing: Split, Speed, Duplicate, Volume and Delete."><span class="tb-act"><i><svg style="transform:translateY(0.1px)" viewBox="0 0 24 24" width="21.2" height="21.2" aria-hidden="true"><circle cx="6" cy="6" r="2.6"/><circle cx="6" cy="18" r="2.6"/><path d="M8.2 7.4 20 16.6M8.2 16.6 20 7.4"/></svg></i>Split</span><span class="tb-act"><i><svg style="transform:translateY(1.3px)" viewBox="0 0 24 24" width="24.0" height="24.0" aria-hidden="true"><path d="M3.5 16.5a8.5 8.5 0 1 1 17 0"/><path d="m12 14.5 4.2-4.6"/><circle cx="12" cy="14.5" r="1.1"/></svg></i>Speed</span><span class="tb-act tb-ptr"><svg class="tb-tail" viewBox="0 0 9.4 6.4" aria-hidden="true"><path class="f" d="M0 0h9.4L4.7 5.9z"/><path class="e" d="M0 .5 4.7 5.9 9.4 .5"/></svg><i><svg style="transform:translateY(-0.6px)" viewBox="0 0 24 24" width="19.8" height="19.8" aria-hidden="true"><rect x="8.5" y="3.5" width="11" height="13.5" rx="2"/><path d="M5.5 7.5v11a2 2 0 0 0 2 2h8.5"/></svg></i>Duplicate</span><span class="tb-act"><i><svg style="transform:translateY(2.6px)" viewBox="0 0 24 24" width="26.2" height="26.2" aria-hidden="true"><path d="M4 9.2h3.2L12 5.2v13.6l-4.8-4H4z"/><path d="M15.4 9.4a3.6 3.6 0 0 1 0 5.2M18.1 6.9a7.3 7.3 0 0 1 0 10.2"/></svg></i>Volume</span><span class="tb-act tb-del"><i><svg style="transform:translateY(-0.2px)" viewBox="0 0 24 24" width="20.8" height="20.8" aria-hidden="true"><path d="M4.5 6.8h15M9.5 6.8V4.4h5v2.4M6.6 6.8l.9 13h9l.9-13M10.2 10.6v5.6M13.8 10.6v5.6"/></svg></i>Delete</span></div>
+      </div>
+    </div>
+    <p class="foot">Rebuilt in CSS from <code>ClipEditingUI.swift</code>.</p>
+  </div>
+
+  <div class="demo rv d2">
+    <div class="rowlab">
+      <span class="demo-title">Sound Effects</span>
+      <span class="hint">RISERS &middot; SWEEPS &middot; CRASHES &middot; MORE</span>
+    </div>
+    <figure class="device">
+      <video preload="none" data-src="art/sfx-menu.mp4?v=20261119" poster="art/sfx-menu-poster.jpg?v=20261119" autoplay muted loop playsinline
+             aria-label="The Mixr sound effects menu: a grid of effects like Riser, Sweep Up and Snare Build, swiped to a second page, then Bass Drop tapped and added to the timeline as its own Sound Effects track."></video>
+    </figure>
+    <p class="foot">Recorded on simulator device.</p>
+  </div>
+</section>
+
+<!-- 07 -->
+<section id="impact">
+  <div class="sechead rv"><p class="lab">07 &mdash; Launch</p>
+    <h2>Shipped to App Store.</h2></div>
+  <div class="stack rv d2">
+    <p>Mixr is now live on the App Store! You can check it out <a href="https://apps.apple.com/us/app/mixr-dj-app/id6803221941" target="_blank" rel="noreferrer">here</a>. Try it and tell me what you think!</p>
+  </div>
+
+  <div class="ship-head ship-head--after">
     <a class="ship rv d2" href="https://apps.apple.com/us/app/mixr-dj-app/id6803221941" target="_blank" rel="noreferrer">
       <img src="art/app-store-icon.webp" width="160" height="160" alt="The Mixr app icon: violet waveform bars on a dark square">
       <span class="lbl">Mixr DJ App<span class="nav-rule" aria-hidden="true"></span></span>
     </a>
-  </div>
-
-  <div class="stack rv d2">
-    <p>Mixr is now live on the App Store! You can check it out <a href="https://apps.apple.com/us/app/mixr-dj-app/id6803221941" target="_blank" rel="noreferrer">here</a>. Try it and tell me what you think!</p>
   </div>
 
   <div class="flag rv d2">
@@ -2169,7 +2265,7 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
             stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"/>
     </svg>
   </a>
-  <a class="case-next" href="/surprise-rail/" aria-label="Next: the Surprise Rail case study">
+  <a class="case-next" href="/personalized-descriptions/" aria-label="Next: the Personalized Descriptions case study">
     NEXT
     <svg class="next-arrow" viewBox="0 0 10 10" aria-hidden="true" focusable="false">
       <path d="M2 5 H8 M5.5 2.5 L8 5 L5.5 7.5" fill="none" stroke="currentColor"
@@ -2241,7 +2337,10 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
     // the last section is too short to reach the line; at the very bottom it's the one being read
     if(window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) cur = secs.length - 1;
     links.forEach(function(a,i){ a.classList.toggle("on", i === cur); });
-    var h = document.documentElement.scrollHeight - window.innerHeight;
+    // 100% when the case study ends, not when the site footer is fully scrolled past
+    var foot = document.querySelector("footer");
+    var end = foot ? foot.getBoundingClientRect().top + window.scrollY : document.documentElement.scrollHeight;
+    var h = Math.min(end, document.documentElement.scrollHeight) - window.innerHeight;
     var p = h > 0 ? Math.min(100, Math.max(0, window.scrollY / h * 100)) : 0;
     if(bar) bar.style.inset = "0 " + (100 - p) + "% 0 0";
     if(pctEl) pctEl.textContent = Math.round(p) + "%";
@@ -2300,25 +2399,23 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
   if(reduce){
     flows.forEach(function(sv){ sv.classList.add("go"); });
   } else {
-    var PLAY = 0.95, DROP = 0.35;
+    /* Reveal once, early, fast. Starts at 30% visible; the stagger is squeezed so
+       the last piece starts by 0.8s however many pieces a diagram has (--k), and
+       a diagram that has appeared stays put: skimmers never wait on it twice. */
+    flows.forEach(function(sv){
+      var mx = 0;
+      [].slice.call(sv.querySelectorAll("[style*='--d']")).forEach(function(el){
+        var m = /--d:\s*([\d.]+)/.exec(el.getAttribute("style")); if(m) mx = Math.max(mx, parseFloat(m[1]));
+      });
+      sv.style.setProperty("--k", mx > 0.8 ? (0.8 / mx).toFixed(3) : "1");
+    });
     var flowIO = new IntersectionObserver(function(es){
       es.forEach(function(e){
-        var sv = e.target;
-        var vh = window.innerHeight || 1;
-        var enter = e.boundingClientRect.height > vh * 0.9 ? 0.6 : PLAY;
-        var playing = sv.classList.contains("go");
-        if(!playing && e.intersectionRatio >= enter){
-          var k = Math.min(1, scrollVel / FAST_AT);
-          var rate = BASE_RATE - k * (BASE_RATE - FAST_RATE);
-          sv.style.setProperty("--rate", rate.toFixed(3));
-          sv.classList.remove("rev");
-          sv.classList.add("go");
-        } else if(playing && e.intersectionRatio < DROP){
-          sv.classList.add("rev");
-          sv.classList.remove("go");
+        if(e.intersectionRatio >= 0.3 || (e.isIntersecting && e.intersectionRect.height > window.innerHeight * 0.4)){
+          e.target.classList.add("go"); flowIO.unobserve(e.target);
         }
       });
-    }, {threshold:[0, .2, .35, .6, .8, .95, 1]});
+    }, {threshold:[0, .1, .2, .3, .5]});
     flows.forEach(function(sv){ flowIO.observe(sv); });
   }
 
@@ -3656,4 +3753,4 @@ section p:not(.links) a:focus-visible,.icons i a:focus-visible{
 })();
 </script>
 
-<script type="module" src="/assets/static-chrome-C2RsKxts.js"></script>
+<script type="module" src="/assets/static-chrome-6qmSe5A1.js"></script>
