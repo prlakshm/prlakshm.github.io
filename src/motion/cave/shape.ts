@@ -67,9 +67,11 @@ export const outAt = (t: number) =>
 /* Tilting in 3D is for desktop Chromium only. iPhone Safari cannot afford
    it: tilting some sixty tiles at once ran it out of memory mid-flight (the
    page was killed and reloaded, then refused: 2026-11-20, as the 3D storm
-   did in October), and no simulator shows that limit. Everywhere else,
-   every phone and tablet and all of Safari, the same paths are drawn flat:
-   slide, shrink, fade. The same test as the storm's (everything/index.html).
+   did in October), and no simulator shows that limit. Desktop Safari and
+   Firefox draw the same paths flat: slide, shrink, fade. Phones and tablets
+   get no cave-in at all for now (caveIn.ts): flat, too, was killed on a
+   real iPhone's first visit (2026-11-21). The same test as the storm's
+   (everything/index.html).
 
    How it is drawn:
      deep    real 3D tilt, the hole in two copies (desktop Chromium);

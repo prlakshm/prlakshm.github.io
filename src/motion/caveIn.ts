@@ -33,6 +33,16 @@ try {
 } catch {
   /* storage is closed to us (private mode): nothing to remember */
 }
+/* Phones and tablets: off, for now. On a real iPhone (2026-11-21) even the
+   lightest way of drawing the way back out got the page killed on a first
+   visit, so anything driven by touch gets Everything's usual entrance until
+   a version has passed on the phone itself (shape.ts; a ?cave= test link
+   still runs there). The same test as everything/index.html. */
+try {
+  if (!testing && !window.matchMedia("(pointer: fine)").matches) off = true;
+} catch {
+  /* no window */
+}
 
 const able = () =>
   !off &&
