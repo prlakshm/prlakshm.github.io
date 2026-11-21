@@ -81,6 +81,23 @@
           && matchMedia("(pointer: fine) and (min-width: 1024px)").matches;
         var nav = performance.getEntriesByType("navigation")[0];
         var storm = able && (!nav || nav.type === "navigate") && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+        // The cave-in: arriving from another page of the site that has just
+        // fallen into its hole (src/motion/cave/). That page left the hole's
+        // place and drawing in sessionStorage; it is drawn again here before
+        // the first frame (see <body>), so the two pages cut together, and
+        // Gallery.tsx (runCave) throws the pieces back out of it. It takes
+        // the storm's place, on every browser and screen. The note is good
+        // for one arrival, a few seconds, in a window of the same size.
+        var cave = null;
+        try {
+          var raw = sessionStorage.getItem("gx-cave-handoff");
+          if (raw) {
+            sessionStorage.removeItem("gx-cave-handoff");
+            var c = JSON.parse(raw);
+            if ((!nav || nav.type === "navigate") && Date.now() - c.at < 8000 && Math.abs(c.w - innerWidth) < 3 && Math.abs(c.h - innerHeight) < 3) cave = c;
+          }
+        } catch (e) {}
+        if (cave) { storm = false; window.__gxCave = cave; d.classList.add("gx-cave", "gx-cave-air"); }
         var chromium = /Chrome\//.test(ua);
         if (able && chromium) { var vt = document.createElement("style"); vt.textContent = "@view-transition { navigation: auto; }"; document.head.appendChild(vt); }
         if (storm) d.classList.add("gx-storm", "gx-storm-air");
@@ -94,19 +111,25 @@
         addEventListener("pagereveal", function (e) {
           if (!e.viewTransition) return;
           var vt = e.viewTransition; [vt.ready, vt.finished, vt.updateCallbackDone].forEach(function (p) { p && p.catch(function () {}); });
-          if (!storm || ripple) { e.viewTransition.skipTransition(); return; }
+          if (cave || !storm || ripple) { e.viewTransition.skipTransition(); return; }
           window.__gxStormVT = e.viewTransition;
         });
       })();
     </script>
-    <script type="module" crossorigin src="/assets/everything-Iq1eexUs.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/stormHandoff-NBoITLWO.js">
-    <link rel="modulepreload" crossorigin href="/assets/home-rSwTLWzo.js">
-    <link rel="stylesheet" crossorigin href="/assets/home-DNw3NDHN.css">
+    <script type="module" crossorigin src="/assets/everything-Dx6PfHLM.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/stormHandoff-BHEt7cPH.js">
+    <link rel="modulepreload" crossorigin href="/assets/home-DXwFlhMU.js">
+    <link rel="modulepreload" crossorigin href="/assets/opening-BMoUX8So.js">
+    <link rel="modulepreload" crossorigin href="/assets/shape-DrEc7B70.js">
     <link rel="stylesheet" crossorigin href="/assets/stormHandoff-BcfU556L.css">
-    <link rel="stylesheet" crossorigin href="/assets/everything-BL_M1gWn.css">
+    <link rel="stylesheet" crossorigin href="/assets/home-DNw3NDHN.css">
+    <link rel="stylesheet" crossorigin href="/assets/everything-C-YVJvUg.css">
   </head>
   <body style="margin:0;background:#f8fafc;min-height:100vh;overflow:hidden;" class="gx-body">
+    <!-- the cave-in's hole, exactly as the page before left it (head script) -->
+    <script>
+      if (window.__gxCave) document.body.insertAdjacentHTML("afterbegin", '<div id="gx-cave-first" aria-hidden="true" style="position:fixed;inset:0;z-index:40;pointer-events:none;overflow:hidden">' + window.__gxCave.svg + "</div>");
+    </script>
     <div id="root"></div>
   </body>
 </html>
