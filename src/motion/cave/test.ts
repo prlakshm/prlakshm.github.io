@@ -5,6 +5,8 @@
      ?cave=flat     no tilt (what phones get by default)
      ?cave=squash   the tilt faked with a flat squash toward the hole
      ?cave=fit      real 3D tilt, the canvas laid out at its on-screen size
+     ?cave=canvas   the pocket-size one: every flying piece drawn into one
+                    canvas (draw.ts)
      ?cave=3d       real 3D tilt, exactly as on desktop (the one that killed
                     an iPhone on 2026-11-20: try it last)
 
@@ -16,12 +18,12 @@
    log is shown in the corner of the page so it can be screenshotted. */
 
 const KEY = "gx-cave-test-log";
-type Row = { v: string; half: string; state: "running" | "done" | "killed"; at: number; frames?: number; worst?: number; fps?: number };
+type Row = { v: string; half: string; state: "running" | "done" | "killed"; at: number; frames?: number; worst?: number; worstAt?: number; fps?: number };
 
 export const variant = (): string | null => {
   try {
     const v = new URLSearchParams(window.location.search).get("cave");
-    return v && /^(flat|squash|fit|3d)$/.test(v) ? v : null;
+    return v && /^(flat|squash|fit|canvas|3d)$/.test(v) ? v : null;
   } catch {
     return null;
   }
@@ -49,14 +51,14 @@ export function begin(half: string): () => void {
   if (!v) return () => {};
   const row: Row = { v, half, state: "running", at: Date.now() };
   write([...read(), row]);
-  let frames = 0, worst = 0, last = performance.now(), on = true;
+  let frames = 0, worst = 0, worstAt = 0, last = performance.now(), on = true;
   const t0 = last;
   const tick = (t: number) => {
     if (!on) return;
     const d = t - last;
     last = t;
     frames++;
-    if (frames > 2 && d > worst) worst = d; // (the first frames are the set-up, before anything moves)
+    if (frames > 2 && d > worst) { worst = d; worstAt = t - t0; } // (the first frames are the set-up, before anything moves)
     requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);
@@ -64,7 +66,7 @@ export function begin(half: string): () => void {
     if (!on) return;
     on = false;
     const rows = read(), i = rows.findIndex((r) => r.at === row.at && r.half === half);
-    const done: Row = { ...row, state: "done", frames, worst: Math.round(worst), fps: Math.round((frames * 1000) / Math.max(1, performance.now() - t0)) };
+    const done: Row = { ...row, state: "done", frames, worst: Math.round(worst), worstAt: Math.round(worstAt), fps: Math.round((frames * 1000) / Math.max(1, performance.now() - t0)) };
     if (i >= 0) rows[i] = done;
     else rows.push(done);
     write(rows);
@@ -93,7 +95,7 @@ export function hud(fresh = false) {
   }
   const head = `cave test: ${v}  |  ${window.innerWidth}x${window.innerHeight} @${window.devicePixelRatio}x`;
   const lines = rows.slice(-7).map((r) =>
-    r.state === "done" ? `${r.v.padEnd(6)} ${r.half.padEnd(10)} ok   ${r.fps}fps  slowest ${r.worst}ms`
+    r.state === "done" ? `${r.v.padEnd(6)} ${r.half.padEnd(10)} ok   ${r.fps}fps  slowest ${r.worst}ms${r.worstAt != null ? ` at ${(r.worstAt / 1000).toFixed(1)}s` : ""}`
     : r.state === "killed" ? `${r.v.padEnd(6)} ${r.half.padEnd(10)} KILLED (page was reloaded)`
     : `${r.v.padEnd(6)} ${r.half.padEnd(10)} running...`,
   );

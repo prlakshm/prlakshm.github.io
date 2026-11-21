@@ -82,9 +82,16 @@ export const outAt = (t: number) =>
      fit     real 3D tilt with the canvas laid out at its on-screen size
              (CSS zoom in place of scale), in case what Safari cannot afford
              is storing each tilted tile at its full laid-out size.
-   squash and fit are candidates, reached only by a test link (test.ts:
-   ?cave=flat|squash|fit|3d) until they have run on a real phone. */
-export type Mode = "deep" | "flat" | "squash" | "fit";
+     canvas  the pocket-size one (draw.ts): on Everything the pieces are not
+             moved at all; they are drawn, from their light copies, into one
+             screen-sized canvas, tilt as a squash, and the real canvas is
+             put back under it once they land. The memory it takes is the
+             one drawing, however many pieces fly. On the other pages (the
+             way in is pictures of the page already) it is squash.
+   squash, fit and canvas are candidates, reached only by a test link
+   (test.ts: ?cave=flat|squash|fit|canvas|3d) until they have run on a real
+   phone. */
+export type Mode = "deep" | "flat" | "squash" | "fit" | "canvas";
 let modeMemo: Mode | null = null;
 export const mode = (): Mode => {
   if (modeMemo) return modeMemo;
@@ -99,7 +106,7 @@ export const mode = (): Mode => {
     /Chrome\//.test(navigator.userAgent) &&
     !/Mobile|Android|CriOS|EdgiOS/.test(navigator.userAgent) &&
     window.matchMedia("(pointer: fine) and (min-width: 1024px)").matches;
-  return (modeMemo = asked === "3d" ? "deep" : asked === "flat" || asked === "squash" || asked === "fit" ? asked : desk ? "deep" : "flat");
+  return (modeMemo = asked === "3d" ? "deep" : asked === "flat" || asked === "squash" || asked === "fit" || asked === "canvas" ? asked : desk ? "deep" : "flat");
 };
 /** real 3D transforms on the pieces */
 export const tilts = (): boolean => mode() === "deep" || mode() === "fit";
@@ -302,18 +309,15 @@ export function buildLid(shape: Shape, lid: Shape["lids"][number]) {
    dx, dy: from the hole's centre to the piece's centre; w, h: its size on
    screen; dur: its whole way in, in clock seconds. `unit` converts screen
    pixels to the element's own (1 on a page, 1/zoom on the canvas). */
-export function fallFrames(
-  dx: number,
-  dy: number,
-  R: number,
-  o: { flat: boolean; w: number; h: number; dur: number; out?: boolean; unit?: number; rock?: number },
-): Keyframe[] {
-  const u = o.unit ?? 1, how = mode(), flat = o.flat || how === "flat", squash = how === "squash";
-  const turn = ((Math.atan2(dy, dx) * 180) / Math.PI).toFixed(2); // the line from the hole through the piece
+export type Pose = { offset: number; easing?: string; tx: number; ty: number; sc: number; tilt: number; opacity: number };
+type FallOpts = { flat: boolean; w: number; h: number; dur: number; out?: boolean; unit?: number; rock?: number };
+
+/* The fall as numbers: where the piece is (tx, ty: screen pixels from its
+   place), its size, its tilt in degrees and its opacity, at each step.
+   fallFrames turns these into keyframes for an element; draw.ts draws them. */
+export function fallPath(dx: number, dy: number, R: number, o: FallOpts): { poses: Pose[]; flat: boolean; turn: number } {
+  const flat = o.flat || mode() === "flat";
   const r0 = Math.hypot(dx, dy) || 1, ux = dx / r0, uy = dy / r0;
-  const g0 = Math.atan2(-dy, -dx), ax = (-Math.sin(g0)).toFixed(3), ay = Math.cos(g0).toFixed(3);
-  // a big piece must not swell as its outer edge tips toward the viewer
-  const persp = Math.max(PERSP, 1.6 * Math.max(o.w, o.h));
   // where its centre is as its leading edge starts over the rim
   const lead = Math.min(1.2 * R, (Math.abs(ux) * o.w + Math.abs(uy) * o.h) / 2);
   const lip = Math.min(r0, R * LIP + lead * 0.5), run = r0 - lip;
@@ -326,15 +330,7 @@ export function fallFrames(
   const v0 = run < 1 ? 0 : Math.min(carry, ((pow * run) / slideT) * dropT);
   const pose = (rho: number, sc: number, tilt: number, opacity: number) => {
     const ff = 1 - rho / r0;
-    const move = `translate(${(-dx * ff * u).toFixed(1)}px, ${(-dy * ff * u).toFixed(1)}px)`;
-    return {
-      opacity: +opacity.toFixed(3),
-      transform: flat
-        ? `${move} scale(${sc.toFixed(4)})`
-        : squash
-        ? `${move} rotate(${turn}deg) scaleX(${Math.max(0.02, Math.cos((tilt * Math.PI) / 180)).toFixed(4)}) rotate(${-turn}deg) scale(${sc.toFixed(4)})`
-        : `${move} perspective(${(persp * u).toFixed(0)}px) rotate3d(${ax}, ${ay}, 0, ${tilt.toFixed(2)}deg) scale(${sc.toFixed(4)})`,
-    };
+    return { tx: -dx * ff, ty: -dy * ff, sc, tilt, opacity };
   };
   // the way in, as [time 0..1, pose]
   const path: [number, ReturnType<typeof pose>][] = [];
@@ -353,17 +349,39 @@ export function fallFrames(
   }
   // share of the timeline the flight takes (the rest is the rock on landing)
   const share = o.out && o.rock ? 1 - o.rock : 1;
-  const frames: Keyframe[] = (o.out ? path.reverse() : path).map(([t, p]) => ({ offset: (o.out ? 1 - t : t) * share, easing: "linear", ...p }));
+  const poses: Pose[] = (o.out ? path.reverse() : path).map(([t, p]) => ({ offset: (o.out ? 1 - t : t) * share, easing: "linear", ...p }));
   if (o.out && o.rock) {
     // thrown out, a tilting piece lands leaning the other way a touch, then settles
     const land = share;
     if (!flat) {
-      frames[frames.length - 1].easing = EASE.out;
-      frames.push({ offset: land + (CLOCK.rock[0] / CLOCK.rock[1]) * (1 - land), easing: EASE.io, ...pose(r0, 1, -0.2 * TILT, 1) });
+      poses[poses.length - 1].easing = EASE.out;
+      poses.push({ offset: land + (CLOCK.rock[0] / CLOCK.rock[1]) * (1 - land), easing: EASE.io, ...pose(r0, 1, -0.2 * TILT, 1) });
     }
-    frames.push({ offset: 1, ...pose(r0, 1, 0, 1) });
+    poses.push({ offset: 1, ...pose(r0, 1, 0, 1) });
   }
-  return frames;
+  return { poses, flat, turn: (Math.atan2(dy, dx) * 180) / Math.PI };
+}
+
+export function fallFrames(dx: number, dy: number, R: number, o: FallOpts): Keyframe[] {
+  const u = o.unit ?? 1, how = mode(), squash = how === "squash" || how === "canvas";
+  const { poses, flat, turn: line } = fallPath(dx, dy, R, o);
+  const turn = line.toFixed(2); // the line from the hole through the piece
+  const g0 = Math.atan2(-dy, -dx), ax = (-Math.sin(g0)).toFixed(3), ay = Math.cos(g0).toFixed(3);
+  // a big piece must not swell as its outer edge tips toward the viewer
+  const persp = Math.max(PERSP, 1.6 * Math.max(o.w, o.h));
+  return poses.map(({ offset, easing, tx, ty, sc, tilt, opacity }) => {
+    const move = `translate(${(tx * u).toFixed(1)}px, ${(ty * u).toFixed(1)}px)`;
+    return {
+      offset,
+      ...(easing ? { easing } : {}),
+      opacity: +opacity.toFixed(3),
+      transform: flat
+        ? `${move} scale(${sc.toFixed(4)})`
+        : squash
+        ? `${move} rotate(${turn}deg) scaleX(${Math.max(0.02, Math.cos((tilt * Math.PI) / 180)).toFixed(4)}) rotate(${-turn}deg) scale(${sc.toFixed(4)})`
+        : `${move} perspective(${(persp * u).toFixed(0)}px) rotate3d(${ax}, ${ay}, 0, ${tilt.toFixed(2)}deg) scale(${sc.toFixed(4)})`,
+    };
+  });
 }
 
 /* When a piece lets go, and how long it falls. d: its farthest corner from

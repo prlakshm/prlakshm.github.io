@@ -10,8 +10,9 @@ import { earn } from "../../components/badges/badgeStore.js";
 import { BAGEL, PIECES, applyLayout, applyPhone, pieceBounds, portraitLayout, thumbOf, type Layout, type Piece } from "./clusters.js";
 import SAVED from "./layout.json";
 import { BAGEL_HOLE, PHONE_QUERY, Z_MAX, Z_MIN, openingCam } from "./opening.js";
-import { CAVE_KEY, CLOCK, EASE, PACE, PACE_REST, PAPER, buildHole, fallFor, fallFrames, farCorner, flightFor, holeRadius, isThin, launchAt, makeShape, markRunning, mode, outAt, releaseAt, type CaveHandoff } from "../../motion/cave/shape.js";
+import { CAVE_KEY, CLOCK, EASE, PACE, PACE_REST, PAPER, buildHole, fallFor, fallFrames, fallPath, farCorner, flightFor, holeRadius, isThin, launchAt, makeShape, markRunning, mode, outAt, releaseAt, type CaveHandoff } from "../../motion/cave/shape.js";
 import { begin as beginTest, hud as testHud } from "../../motion/cave/test.js";
+import { pocket, sprite, stack, type Flyer } from "../../motion/cave/draw.js";
 import Sheet from "./Sheet.js";
 
 /* GALLERY: everything else, laid out on one infinite canvas, Figma-style.
@@ -213,15 +214,37 @@ export default function Gallery() {
        piece is shown big enough to need it, loaded and decoded first so the
        swap can't be seen. They never swap back. */
     const FULL_AT = 260; // device px across (the light copies are 280)
+    /* An original, decoded, is many times its file (the canvas's, all at
+       once, come to some 400MB). A phone has no room for many at a time: on
+       anything driven by touch they are fetched together but decoded and
+       swapped in two at a time. And while the pocket-size cave-in draws the
+       canvas (motion/cave/draw.ts) none are swapped at all: holdFull. */
+    let holdFull = mode() === "canvas" && !!(window as unknown as { __gxCave?: unknown }).__gxCave;
+    const AT_ONCE = window.matchMedia("(pointer: fine)").matches ? Infinity : 2;
+    const toDecode: (() => Promise<void>)[] = [];
+    let decoding = 0;
+    const pump = () => {
+      while (decoding < AT_ONCE && toDecode.length) {
+        decoding++;
+        toDecode.shift()!().then(() => { decoding--; pump(); });
+      }
+    };
     const syncImages = () => {
+      if (holdFull) return;
       world.querySelectorAll<HTMLImageElement>("img[data-full]").forEach((img) => {
         if (img.dataset.swapped) return;
         const across = (img.parentElement?.offsetWidth ?? 0) * cam.z * dpr();
         if (across < FULL_AT) return;
         img.dataset.swapped = "1";
         const full = new Image();
-        full.src = img.dataset.full!;
-        full.decode().then(() => { img.src = full.src; }, () => {});
+        const swap = () => full.decode().then(() => { img.src = full.src; }, () => {});
+        if (AT_ONCE === Infinity) {
+          full.src = img.dataset.full!;
+          swap();
+        } else {
+          full.onload = () => { toDecode.push(swap); pump(); };
+          full.src = img.dataset.full!;
+        }
       });
     };
     const syncVideos = () => {
@@ -695,16 +718,34 @@ export default function Gallery() {
       world.style.transform = `translate3d(${((want.left - a.left) / k).toFixed(2)}px, ${((want.top - a.top) / k).toFixed(2)}px, 0)`;
       return { k, off };
     };
+    /* "canvas" (the pocket-size one, test link only for now; draw.ts): the
+       pieces are drawn into one canvas over the view while the real canvas
+       is hidden, and the real one is put back under it at the end. A film
+       that has no frame yet is drawn from its poster, fetched ahead here. */
+    const pocketOn = mode() === "canvas";
+    const posters = new Map<string, HTMLImageElement>();
+    if (pocketOn)
+      live.current.pieces.forEach((p) => {
+        if (p.kind !== "video" || !p.poster) return;
+        const still = new Image();
+        still.src = thumbOf(p.poster);
+        posters.set(p.id, still);
+      });
+    const flyer = (t: Thrown, vr: DOMRect, z: number, fall: ReturnType<typeof fallPath>, delay: number, dur: number): Flyer & { z: number } => {
+      const w = t.right - t.left, h = t.bottom - t.top;
+      const drawn = sprite(t.el, w, h, z, posters.get(t.piece!.id));
+      return { sprite: drawn?.c ?? null, pad: drawn?.pad ?? 0, cx: (t.left + t.right) / 2 - vr.left, cy: (t.top + t.bottom) / 2 - vr.top, w, h, ...fall, delay, dur, z: t.piece!.z };
+    };
     // everything that falls in or is thrown out: the canvas's pieces, then
     // the nav's (its words are only pulled; an open phone menu goes as one card)
-    type Thrown = { el: HTMLElement; left: number; top: number; right: number; bottom: number; unit: number; flat: boolean };
+    type Thrown = { el: HTMLElement; left: number; top: number; right: number; bottom: number; unit: number; flat: boolean; piece?: Piece };
     const cast = (): Thrown[] => {
       const z = cam.z, vr = view.getBoundingClientRect(), thrown: Thrown[] = [];
       live.current.pieces.forEach((p) => {
         const el = world.querySelector<HTMLElement>(`.gx-piece[data-id="${p.id}"]`);
         if (!el) return;
         const cx = vr.left + cam.x + p.x * z, cy = vr.top + cam.y + p.y * z, hw = (p.w * z) / 2, hh = (p.h * z) / 2;
-        thrown.push({ el, left: cx - hw, top: cy - hh, right: cx + hw, bottom: cy + hh, unit: 1 / z, flat: false });
+        thrown.push({ el, left: cx - hw, top: cy - hh, right: cx + hw, bottom: cy + hh, unit: 1 / z, flat: false, piece: p });
       });
       const menu = window.matchMedia(PHONE_QUERY).matches ? document.querySelector<HTMLElement>(".wt-primary-nav.is-open") : null;
       document.querySelectorAll<HTMLElement>(".wt-nav .bc, .wt-nav-toggle, .wt-primary-nav.is-open, .wt-nav-links li > a, .wt-nav-links li > button").forEach((el) => {
@@ -728,6 +769,7 @@ export default function Gallery() {
       syncVideos();
       const endTest = beginTest("throw out");
       const fit = fitOn();
+      const pk = pocketOn ? pocket(view) : null;
       /* The hole is drawn on the screen, not in the canvas: inside the scaled
          canvas it was drawn at the camera's zoom and stretched back up, a
          touch soft, which showed as a blink at the cut between the pages.
@@ -764,8 +806,9 @@ export default function Gallery() {
       } else {
         world.after(holeEl);
       }
+      if (pk) world.after(pk.el); // the drawing: over the canvas, under the hole
       const bagelEl = world.querySelector<HTMLElement>(".gx-bagel");
-      if (bagelEl) bagelEl.style.transformOrigin = `${BAGEL_HOLE.fx * 100}% ${BAGEL_HOLE.fy * 100}%`;
+      if (bagelEl && !pk) bagelEl.style.transformOrigin = `${BAGEL_HOLE.fx * 100}% ${BAGEL_HOLE.fy * 100}%`;
       // the dots, as their own layer, so they can wash in last
       const ground = document.createElement("div");
       ground.className = "gx-storm-ground";
@@ -800,12 +843,36 @@ export default function Gallery() {
       const thrown = cast();
       if (fit) thrown.forEach((t) => { if (t.unit !== 1) t.unit = 1 / fit.k; });
       const far = Math.max(1, ...thrown.map((t) => farCorner(t, to.x, to.y)));
+      const drawn: (Flyer & { z: number })[] = [];
       thrown.forEach((t) => {
         const d = farCorner(t, to.x, to.y) / far, D = flightFor(d), all = D + CLOCK.rock[1];
-        const frames = fallFrames((t.left + t.right) / 2 - to.x, (t.top + t.bottom) / 2 - to.y, note.R, { flat: t.flat, w: t.right - t.left, h: t.bottom - t.top, dur: D, out: true, unit: t.unit, rock: CLOCK.rock[1] / all });
-        storm.push(t.el.animate(frames, { duration: ms(all), delay: ms(launchAt(d)), easing: "linear", fill: "backwards" }));
+        const dx = (t.left + t.right) / 2 - to.x, dy = (t.top + t.bottom) / 2 - to.y;
+        const how = { flat: t.flat, w: t.right - t.left, h: t.bottom - t.top, dur: D, out: true, unit: t.unit, rock: CLOCK.rock[1] / all };
+        if (pk && t.piece) return void drawn.push(flyer(t, vr, z, fallPath(dx, dy, note.R, how), ms(launchAt(d)), ms(all)));
+        storm.push(t.el.animate(fallFrames(dx, dy, note.R, how), { duration: ms(all), delay: ms(launchAt(d)), easing: "linear", fill: "backwards" }));
       });
-      if (bagelEl) {
+      if (pk) {
+        // the bagel first (it lies under every piece), growing from its own hole
+        if (bagelEl) {
+          const q = bagelEl.getBoundingClientRect();
+          const art = stack(Array.from(bagelEl.querySelectorAll("img")), q.width, q.height);
+          const still = { tx: 0, ty: 0, tilt: 0 };
+          pk.add({
+            sprite: art?.c ?? null, pad: 0, cx: q.left + q.width / 2 - vr.left, cy: q.top + q.height / 2 - vr.top, w: q.width, h: q.height,
+            ox: (BAGEL_HOLE.fx - 0.5) * q.width, oy: (BAGEL_HOLE.fy - 0.5) * q.height, flat: true, turn: 0,
+            poses: [
+              { offset: 0, opacity: 0, sc: 0.01, ...still },
+              { offset: 0.001, opacity: 1, sc: 0.01, easing: EASE.out, ...still },
+              { offset: 1, opacity: 1, sc: 1, ...still },
+            ],
+            delay: ms(CLOCK.bagel[0]), dur: ms(CLOCK.bagel[1] - CLOCK.bagel[0]),
+          });
+        }
+        drawn.sort((a, b) => a.z - b.z).forEach((f) => pk.add(f));
+        world.style.visibility = "hidden"; // the real canvas waits underneath, unpainted
+        storm.push(pk.start());
+      }
+      if (bagelEl && !pk) {
         const grow = bagelEl.animate(
           [
             { offset: 0, opacity: 0, transform: "scale(0.01)" },
@@ -842,11 +909,19 @@ export default function Gallery() {
         ground.remove();
         if (bagelEl) bagelEl.style.transformOrigin = "";
         root.classList.remove("gx-cave-air");
-        markRunning(false); // it ran to the end (shape.ts: the safety switch)
         fit?.off();
-        endTest();
-        storming = false;
-        syncVideos();
+        const settled = () => {
+          markRunning(false); // it ran to the end (shape.ts: the safety switch)
+          endTest();
+          storming = false;
+          holdFull = false; // ...and only now do the originals start to come in
+          syncVideos();
+        };
+        if (!pk) return settled();
+        // every piece has landed in the drawing: the real canvas comes back
+        // under it, exactly where the drawing has it, and the drawing lifts off
+        world.style.visibility = "";
+        pk.lift().then(settled);
       }, () => {});
     };
     /* THE CAVE-IN, first half, from Everything itself (pressing EVERYTHING
@@ -913,6 +988,9 @@ export default function Gallery() {
       } else {
         world.after(holeEl);
       }
+      // (the pocket-size one: the pieces are drawn, over the canvas and under the hole)
+      const pk = pocketOn ? pocket(view) : null;
+      if (pk) world.after(pk.el);
       const OPEN = 0.3, GONE = CLOCK.crack + 0.44; // the pit opens; the bagel is down it
       const opening = [{ offset: 0, opacity: 0, transform: "scale(0.01)" }, { offset: 0.02, opacity: 1, transform: "scale(0.01)", easing: EASE.out }, { offset: 1, opacity: 1, transform: "scale(1)" }];
       (over ? [built.body, over.body] : [holeEl]).forEach((el) =>
@@ -934,7 +1012,20 @@ export default function Gallery() {
         ));
       });
       const bagelEl = world.querySelector<HTMLElement>(".gx-bagel");
-      if (bagelEl && onBagel) {
+      if (bagelEl && pk) {
+        // drawn: down its own hole if that is on screen, else it only fades
+        const q = bagelEl.getBoundingClientRect();
+        const art = stack(Array.from(bagelEl.querySelectorAll("img")), q.width, q.height);
+        const still = { tx: 0, ty: 0, tilt: 0 };
+        pk.add({
+          sprite: art?.c ?? null, pad: 0, cx: q.left + q.width / 2 - vr.left, cy: q.top + q.height / 2 - vr.top, w: q.width, h: q.height,
+          ox: (BAGEL_HOLE.fx - 0.5) * q.width, oy: (BAGEL_HOLE.fy - 0.5) * q.height, flat: true, turn: 0,
+          poses: onBagel
+            ? [{ offset: 0, opacity: 1, sc: 1, easing: EASE.in, ...still }, { offset: 0.98, opacity: 1, sc: 0.02, ...still }, { offset: 1, opacity: 0, sc: 0.01, ...still }]
+            : [{ offset: 0, opacity: 1, sc: 1, ...still }, { offset: 1, opacity: 0, sc: 1, ...still }],
+          delay: ms(CLOCK.crack), dur: onBagel ? ms(GONE - CLOCK.crack - 0.02) : ms(0.3),
+        });
+      } else if (bagelEl && onBagel) {
         bagelEl.style.transformOrigin = `${BAGEL_HOLE.fx * 100}% ${BAGEL_HOLE.fy * 100}%`;
         out.push(bagelEl.animate(
           [{ offset: 0, opacity: 1, transform: "scale(1)", easing: EASE.in }, { offset: 0.98, opacity: 1, transform: "scale(0.02)" }, { offset: 1, opacity: 0, transform: "scale(0.01)" }],
@@ -949,6 +1040,7 @@ export default function Gallery() {
       if (fit) falling.forEach((t) => { if (t.unit !== 1) t.unit = 1 / fit.k; });
       const far = Math.max(1, ...falling.map((t) => farCorner(t, hx, hy)));
       let last = GONE;
+      const drawn: (Flyer & { z: number })[] = [];
       falling.forEach((t) => {
         const cx = (t.left + t.right) / 2, cy = (t.top + t.bottom) / 2;
         const near = Math.hypot(Math.max(t.left - hx, 0, hx - t.right), Math.max(t.top - hy, 0, hy - t.bottom));
@@ -956,9 +1048,16 @@ export default function Gallery() {
         const d = (near < rimMax ? Math.min(farCorner(t, hx, hy), Math.hypot(cx - hx, cy - hy)) : farCorner(t, hx, hy)) / far;
         const t0 = releaseAt(d), D = fallFor(d);
         last = Math.max(last, t0 + D);
-        const frames = fallFrames(cx - hx, cy - hy, R, { flat: t.flat, w: t.right - t.left, h: t.bottom - t.top, dur: D, unit: t.unit });
-        out.push(t.el.animate(frames, { duration: span(t0, D), delay: when(t0), easing: "linear", fill: "both" }));
+        const how = { flat: t.flat, w: t.right - t.left, h: t.bottom - t.top, dur: D, unit: t.unit };
+        if (pk && t.piece) return void drawn.push(flyer(t, vr, z, fallPath(cx - hx, cy - hy, R, how), when(t0), span(t0, D)));
+        out.push(t.el.animate(fallFrames(cx - hx, cy - hy, R, how), { duration: span(t0, D), delay: when(t0), easing: "linear", fill: "both" }));
       });
+      if (pk) {
+        // the drawing takes the canvas's place, piece for piece, before anything moves
+        drawn.sort((a, b) => a.z - b.z).forEach((f) => pk.add(f));
+        out.push(pk.start());
+        world.style.visibility = "hidden";
+      }
       out.push(wash.animate([{ opacity: 0 }, { opacity: 1 }], { duration: span(0.73, Math.max(0.6, last - 0.93)), delay: when(0.73), easing: "ease-in-out", fill: "both" }));
 
       // nothing moves the canvas meanwhile; a second press or Escape goes straight there
@@ -1007,6 +1106,8 @@ export default function Gallery() {
         unlock();
         out.forEach((a) => a.cancel());
         [wash, holeEl, holeTop].forEach((el) => el?.remove());
+        pk?.destroy();
+        world.style.visibility = "";
         fit?.off();
         markRunning(false);
         if (bagelEl) bagelEl.style.transformOrigin = "";
@@ -1050,6 +1151,7 @@ export default function Gallery() {
         runCave(caveNote);
         return;
       }
+      holdFull = false; // (no cave-in after all: nothing to wait for)
       if (!root.classList.contains("gx-storm")) { root.classList.remove("gx-storm-air"); return; }
       const slow = parseFloat(getComputedStyle(root).getPropertyValue("--gx-slow")) || 1;
       /* THE RIPPLE (phones and portrait tablets). On a small screen 60 tiles
@@ -1371,7 +1473,7 @@ export default function Gallery() {
     const imagesReady = () =>
       Promise.race([
         Promise.all(
-          Array.from(world.querySelectorAll<HTMLImageElement>(".gx-piece img")).map((i) => (i.decode ? i.decode().catch(() => {}) : Promise.resolve()))
+          Array.from(world.querySelectorAll<HTMLImageElement>(".gx-piece img")).concat(Array.from(posters.values())).map((i) => (i.decode ? i.decode().catch(() => {}) : Promise.resolve()))
         ),
         new Promise((done) => window.setTimeout(done, 1200)), // a cold, direct arrival: wait a beat, not a long blank pause
       ]);
