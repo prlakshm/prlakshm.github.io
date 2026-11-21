@@ -1,7 +1,7 @@
 import {
   CAVE_KEY, CLOCK, EASE, PAPER, buildHole, buildLid, fallFor, fallFrames, farCorner, holeRadius, isThin, makeShape, releaseAt,
   type CaveHandoff, type Pt,
-  PACE, outAt,
+  PACE, markRunning, outAt, tilts,
 } from "./shape.js";
 
 /* THE CAVE-IN, first half: the page being left falls into the hole.
@@ -188,8 +188,14 @@ export async function caveOut(url: string): Promise<void> {
   };
 
   styleOnce();
-  const pieces = collect();
+  // (a lighter load where the pictures are costlier: phones draw at 3x)
+  let pieces = collect();
+  if (!tilts() && pieces.length > 70) {
+    const keep = new Set([...pieces].sort((a, b) => b.rect.width * b.rect.height - a.rect.width * a.rect.height).slice(0, 70));
+    pieces = pieces.filter((p) => keep.has(p));
+  }
   if (!pieces.length) return go();
+  markRunning(true);
 
   // the layer under the falling pieces: cool white (washes in), cracks, hole, shards
   const layer = document.createElement("div");
@@ -261,6 +267,7 @@ export async function caveOut(url: string): Promise<void> {
   [run.ready, run.finished, run.updateCallbackDone].forEach((p) => p.catch(() => {}));
 
   const handOff = () => {
+    markRunning(false); // this half ran to the end (shape.ts: the safety switch)
     lids.forEach((l) => l.remove());
     const svg =
       `<div style="position:absolute;inset:0;background:${PAPER}"></div>` +
@@ -321,8 +328,11 @@ export async function caveOut(url: string): Promise<void> {
   shape.lids.forEach((lid, k) => {
     const t0 = CLOCK.lidFall + k * CLOCK.lidStep, total = t0 + CLOCK.lidDur, at0 = (t: number) => t / total;
     const g0 = Math.atan2(-lid.c[1], -lid.c[0]), ax = (-Math.sin(g0)).toFixed(3), ay = Math.cos(g0).toFixed(3);
+    const deep = tilts();
     const pose = (share: number, tilt: number, spin: number, scale: number, drop = 0) =>
-      `translate(${(-lid.c[0] * share).toFixed(1)}px, ${(-lid.c[1] * share + drop).toFixed(1)}px) perspective(520px) rotate3d(${ax}, ${ay}, 0, ${tilt}deg) rotate(${spin.toFixed(1)}deg) scale(${scale})`;
+      `translate(${(-lid.c[0] * share).toFixed(1)}px, ${(-lid.c[1] * share + drop).toFixed(1)}px) ` +
+      (deep ? `perspective(520px) rotate3d(${ax}, ${ay}, 0, ${tilt}deg) ` : "") +
+      `rotate(${spin.toFixed(1)}deg) scale(${scale})`;
     /* Once a shard is in, the real one under its picture goes see-through.
        What falls is its picture; the real shard sits under it, flat over
        the hole, and the moment the transition ends the real page is what

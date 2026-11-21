@@ -64,6 +64,37 @@ export const CLOCK = {
 export const outAt = (t: number) =>
   1000 * (t <= CLOCK.release ? t * PACE : CLOCK.release * PACE + (t - CLOCK.release) * PACE_REST);
 
+/* Tilting in 3D is for desktop Chromium only. iPhone Safari cannot afford
+   it: tilting some sixty tiles at once ran it out of memory mid-flight (the
+   page was killed and reloaded, then refused: 2026-11-20, as the 3D storm
+   did in October), and no simulator shows that limit. Everywhere else,
+   every phone and tablet and all of Safari, the same paths are drawn flat:
+   slide, shrink, fade. The same test as the storm's (everything/index.html). */
+let tiltsMemo: boolean | null = null;
+export const tilts = (): boolean =>
+  (tiltsMemo ??=
+    typeof navigator !== "undefined" &&
+    /Chrome\//.test(navigator.userAgent) &&
+    !/Mobile|Android|CriOS|EdgiOS/.test(navigator.userAgent) &&
+    window.matchMedia("(pointer: fine) and (min-width: 1024px)").matches);
+
+/* The safety switch. A cave-in marks itself as running (sessionStorage) and
+   clears the mark when it ends or the page is left in the ordinary way. A
+   page that loads and finds the mark still set was killed mid-animation; it
+   turns the cave-in off on this device for a month (localStorage), and the
+   site goes back to the plain entrance. So at the very worst a device sees
+   one failure, never a second. caveIn.ts and everything/index.html keep
+   their own copies of these few lines (they run before this file loads). */
+export const RUN_KEY = "gx-cave-running", OFF_KEY = "gx-cave-off";
+export const markRunning = (on: boolean) => {
+  try {
+    if (on) sessionStorage.setItem(RUN_KEY, "1");
+    else sessionStorage.removeItem(RUN_KEY);
+  } catch {
+    /* private mode */
+  }
+};
+
 export const TILT = 80; // degrees, once it has tipped over the rim
 const TILT_LIP = 22; // ...and as it reaches the rim, the floor dipping toward the hole
 const SIZE_LIP = 0.82; // its size as it reaches the rim (the floor dips; it never grows)
@@ -251,7 +282,7 @@ export function fallFrames(
   R: number,
   o: { flat: boolean; w: number; h: number; dur: number; out?: boolean; unit?: number; rock?: number },
 ): Keyframe[] {
-  const u = o.unit ?? 1;
+  const u = o.unit ?? 1, flat = o.flat || !tilts();
   const r0 = Math.hypot(dx, dy) || 1, ux = dx / r0, uy = dy / r0;
   const g0 = Math.atan2(-dy, -dx), ax = (-Math.sin(g0)).toFixed(3), ay = Math.cos(g0).toFixed(3);
   // a big piece must not swell as its outer edge tips toward the viewer
@@ -271,7 +302,7 @@ export function fallFrames(
     const move = `translate(${(-dx * ff * u).toFixed(1)}px, ${(-dy * ff * u).toFixed(1)}px)`;
     return {
       opacity: +opacity.toFixed(3),
-      transform: o.flat
+      transform: flat
         ? `${move} scale(${sc.toFixed(4)})`
         : `${move} perspective(${(persp * u).toFixed(0)}px) rotate3d(${ax}, ${ay}, 0, ${tilt.toFixed(2)}deg) scale(${sc.toFixed(4)})`,
     };
@@ -297,7 +328,7 @@ export function fallFrames(
   if (o.out && o.rock) {
     // thrown out, a tilting piece lands leaning the other way a touch, then settles
     const land = share;
-    if (!o.flat) {
+    if (!flat) {
       frames[frames.length - 1].easing = EASE.out;
       frames.push({ offset: land + (CLOCK.rock[0] / CLOCK.rock[1]) * (1 - land), easing: EASE.io, ...pose(r0, 1, -0.2 * TILT, 1) });
     }

@@ -11,7 +11,24 @@
    know where the bagel will be), warmed once the page is idle or the pointer
    reaches a link there, so the click finds it ready. */
 
+/* The safety switch (motion/cave/shape.ts has the whole story): a page that
+   loads and finds a cave-in still marked as running was killed in the middle
+   of one, so the cave-in is turned off on this device for a month. */
+const RUN_KEY = "gx-cave-running", OFF_KEY = "gx-cave-off", OFF_FOR = 30 * 864e5;
+let off = false;
+try {
+  if (sessionStorage.getItem(RUN_KEY)) {
+    sessionStorage.removeItem(RUN_KEY);
+    localStorage.setItem(OFF_KEY, String(Date.now()));
+  }
+  const since = Number(localStorage.getItem(OFF_KEY));
+  off = since > 0 && Date.now() - since < OFF_FOR;
+} catch {
+  /* storage is closed to us (private mode): nothing to remember */
+}
+
 const able = () =>
+  !off &&
   typeof (document as unknown as { startViewTransition?: unknown }).startViewTransition === "function" &&
   !window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
   !window.location.pathname.startsWith("/everything");
@@ -62,6 +79,15 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
   const later = () => window.setTimeout(() => (ric ? ric(idle, { timeout: 4000 }) : idle()), 2500);
   if (document.readyState === "complete") later();
   else window.addEventListener("load", later, { once: true });
+
+  // leaving in the ordinary way (the cut to Everything included) is not a failure
+  window.addEventListener("pagehide", () => {
+    try {
+      sessionStorage.removeItem(RUN_KEY);
+    } catch {
+      /* fine */
+    }
+  });
 
   // Back to this page from Everything: put it back together
   window.addEventListener("pageshow", (e) => {

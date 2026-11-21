@@ -10,7 +10,7 @@ import { earn } from "../../components/badges/badgeStore.js";
 import { BAGEL, PIECES, applyLayout, applyPhone, pieceBounds, portraitLayout, thumbOf, type Layout, type Piece } from "./clusters.js";
 import SAVED from "./layout.json";
 import { BAGEL_HOLE, PHONE_QUERY, Z_MAX, Z_MIN, openingCam } from "./opening.js";
-import { CAVE_KEY, CLOCK, EASE, PACE, PACE_REST, PAPER, buildHole, fallFor, fallFrames, farCorner, flightFor, holeRadius, isThin, launchAt, makeShape, outAt, releaseAt, type CaveHandoff } from "../../motion/cave/shape.js";
+import { CAVE_KEY, CLOCK, EASE, PACE, PACE_REST, PAPER, buildHole, fallFor, fallFrames, farCorner, flightFor, holeRadius, isThin, launchAt, makeShape, markRunning, outAt, releaseAt, tilts, type CaveHandoff } from "../../motion/cave/shape.js";
 import Sheet from "./Sheet.js";
 
 /* GALLERY: everything else, laid out on one infinite canvas, Figma-style.
@@ -714,16 +714,25 @@ export default function Gallery() {
         box.appendChild(svg);
         return box;
       };
-      const built = buildHole(makeShape(note.R, note.seed)), over = buildHole(makeShape(note.R, note.seed));
-      over.cracks.forEach((c) => c.el.remove());
-      const holeEl = holeBox(built.svg), holeTop = holeBox(over.svg);
-      view.insertBefore(holeEl, world);
-      world.after(holeTop);
-      const SWAP = CLOCK.bagel[0] - 0.05;
-      const flip = (el: Element, from: string, to: string) =>
-        storm.push(el.animate([{ visibility: from }, { visibility: to }], { duration: ms(SWAP), easing: "steps(1, end)", fill: "both" }));
-      flip(built.body, "visible", "hidden");
-      flip(holeTop, "hidden", "visible");
+      /* Off desktop Chrome (every phone, all of Safari) it is kept as light
+         as it can be: one hole, over the canvas, moved and shut as a single
+         layer, and the pieces fly flat (shape.ts tilts()). The pieces come
+         out from under its rim and the bagel rises beneath it. */
+      const light = !tilts();
+      const built = buildHole(makeShape(note.R, note.seed)), over = light ? null : buildHole(makeShape(note.R, note.seed));
+      over?.cracks.forEach((c) => c.el.remove());
+      const holeEl = holeBox(built.svg), holeTop = over ? holeBox(over.svg) : null;
+      if (holeTop) {
+        view.insertBefore(holeEl, world);
+        world.after(holeTop);
+        const SWAP = CLOCK.bagel[0] - 0.05;
+        const flip = (el: Element, from: string, to: string) =>
+          storm.push(el.animate([{ visibility: from }, { visibility: to }], { duration: ms(SWAP), easing: "steps(1, end)", fill: "both" }));
+        flip(built.body, "visible", "hidden");
+        flip(holeTop, "hidden", "visible");
+      } else {
+        world.after(holeEl);
+      }
       const bagelEl = world.querySelector<HTMLElement>(".gx-bagel");
       if (bagelEl) bagelEl.style.transformOrigin = `${BAGEL_HOLE.fx * 100}% ${BAGEL_HOLE.fy * 100}%`;
       // the dots, as their own layer, so they can wash in last
@@ -731,16 +740,30 @@ export default function Gallery() {
       ground.className = "gx-storm-ground";
       ground.style.backgroundSize = view.style.backgroundSize;
       ground.style.backgroundPosition = view.style.backgroundPosition;
-      view.insertBefore(ground, holeEl); // under the hole
+      view.insertBefore(ground, holeTop ? holeEl : world); // under the hole and the canvas
       storm.push(ground.animate([{ opacity: 0 }, { opacity: 1 }], { duration: ms(CLOCK.ground[1] - CLOCK.ground[0]), delay: ms(CLOCK.ground[0]), easing: "ease-out", fill: "both" }));
       // the hole slides from where it was predicted onto the bagel's real hole
       const dx0 = Math.round(to.x - note.hx), dy0 = Math.round(to.y - note.hy);
-      [holeEl, holeTop].forEach((box) =>
-        storm.push(box.animate(
-          [{ transform: "translate(0px, 0px)" }, { transform: `translate(${dx0}px, ${dy0}px)` }],
-          { duration: ms(CLOCK.close[0]), easing: EASE.io, fill: "forwards" },
-        )),
-      );
+      if (holeTop) {
+        [holeEl, holeTop].forEach((box) =>
+          storm.push(box.animate(
+            [{ transform: "translate(0px, 0px)" }, { transform: `translate(${dx0}px, ${dy0}px)` }],
+            { duration: ms(CLOCK.close[0]), easing: EASE.io, fill: "forwards" },
+          )),
+        );
+      } else {
+        // the one hole: slides onto the bagel's hole, then shuts, cracks and all
+        const T = CLOCK.close[1], there = `translate(${dx0}px, ${dy0}px)`;
+        storm.push(holeEl.animate(
+          [
+            { offset: 0, opacity: 1, transform: "translate(0px, 0px) scale(1)", easing: EASE.io },
+            { offset: CLOCK.close[0] / T, opacity: 1, transform: `${there} scale(1)`, easing: EASE.io },
+            { offset: 0.985, opacity: 1, transform: `${there} scale(0.02)` },
+            { offset: 1, opacity: 0, transform: `${there} scale(0.01)` },
+          ],
+          { duration: ms(T), fill: "forwards" },
+        ));
+      }
 
       // everything that is thrown out: the canvas's pieces, then the nav's
       const thrown = cast();
@@ -761,16 +784,18 @@ export default function Gallery() {
         );
         storm.push(grow);
       }
-      built.cracks.forEach((c) =>
-        storm.push(c.el.animate(
+      if (over) {
+        built.cracks.forEach((c) =>
+          storm.push(c.el.animate(
+            [{ offset: 0, opacity: 1, transform: "scale(1)" }, { offset: 0.98, opacity: 1 }, { offset: 1, opacity: 0, transform: "scale(0.01)" }],
+            { duration: ms(CLOCK.heal[1] - CLOCK.heal[0]), delay: ms(CLOCK.heal[0]), easing: EASE.in, fill: "forwards" },
+          )),
+        );
+        storm.push(over.body.animate(
           [{ offset: 0, opacity: 1, transform: "scale(1)" }, { offset: 0.98, opacity: 1 }, { offset: 1, opacity: 0, transform: "scale(0.01)" }],
-          { duration: ms(CLOCK.heal[1] - CLOCK.heal[0]), delay: ms(CLOCK.heal[0]), easing: EASE.in, fill: "forwards" },
-        )),
-      );
-      storm.push(over.body.animate(
-        [{ offset: 0, opacity: 1, transform: "scale(1)" }, { offset: 0.98, opacity: 1 }, { offset: 1, opacity: 0, transform: "scale(0.01)" }],
-        { duration: ms(CLOCK.close[1] - CLOCK.close[0]), delay: ms(CLOCK.close[0]), easing: EASE.io, fill: "forwards" },
-      ));
+          { duration: ms(CLOCK.close[1] - CLOCK.close[0]), delay: ms(CLOCK.close[0]), easing: EASE.io, fill: "forwards" },
+        ));
+      }
       // from here each piece is held by its own flight; the still frame the
       // page before left can go (the canvas under it is the same cool white)
       root.classList.remove("gx-cave");
@@ -781,10 +806,11 @@ export default function Gallery() {
       Promise.all(storm.map((a) => a.finished)).then(() => {
         skipOn.forEach((ev) => window.removeEventListener(ev, skip, { capture: true }));
         holeEl.remove();
-        holeTop.remove();
+        holeTop?.remove();
         ground.remove();
         if (bagelEl) bagelEl.style.transformOrigin = "";
         root.classList.remove("gx-cave-air");
+        markRunning(false); // it ran to the end (shape.ts: the safety switch)
         storming = false;
         syncVideos();
       }, () => {});
@@ -820,6 +846,7 @@ export default function Gallery() {
         hy = Math.round(vr.top + o.y + BAGEL_HOLE.y * o.z);
       }
       storming = true;
+      markRunning(true);
       setSelected([]);
       const out: Animation[] = [];
       // the cool white the dots wash out to, under everything
@@ -838,21 +865,26 @@ export default function Gallery() {
         box.appendChild(svg);
         return box;
       };
-      const built = buildHole(shape), over = buildHole(shape);
-      over.cracks.forEach((c) => c.el.remove());
-      const holeEl = holeBox(built.svg), holeTop = holeBox(over.svg);
+      // (off desktop Chrome: one hole over the canvas, opened as a single
+      // layer, the pieces sliding flat in under its rim; see runCave)
+      const light = !tilts();
+      const built = buildHole(shape), over = light ? null : buildHole(shape);
+      over?.cracks.forEach((c) => c.el.remove());
+      const holeEl = holeBox(built.svg), holeTop = over ? holeBox(over.svg) : null;
       view.insertBefore(wash, world);
-      view.insertBefore(holeEl, world);
-      world.after(holeTop);
+      if (holeTop) {
+        view.insertBefore(holeEl, world);
+        world.after(holeTop);
+      } else {
+        world.after(holeEl);
+      }
       const OPEN = 0.3, GONE = CLOCK.crack + 0.44; // the pit opens; the bagel is down it
-      [built.body, over.body].forEach((body) =>
-        out.push(body.animate(
-          [{ offset: 0, opacity: 0, transform: "scale(0.01)" }, { offset: 0.02, opacity: 1, transform: "scale(0.01)", easing: EASE.out }, { offset: 1, opacity: 1, transform: "scale(1)" }],
-          { duration: ms(OPEN), delay: ms(CLOCK.crack), fill: "both" },
-        )),
+      const opening = [{ offset: 0, opacity: 0, transform: "scale(0.01)" }, { offset: 0.02, opacity: 1, transform: "scale(0.01)", easing: EASE.out }, { offset: 1, opacity: 1, transform: "scale(1)" }];
+      (over ? [built.body, over.body] : [holeEl]).forEach((el) =>
+        out.push(el.animate(opening, { duration: ms(OPEN), delay: ms(CLOCK.crack), fill: "both" })),
       );
-      out.push(holeTop.animate([{ visibility: "visible" }, { visibility: "hidden" }], { duration: ms(GONE), easing: "steps(1, end)", fill: "both" }));
-      built.cracks.forEach((c) => {
+      if (holeTop) out.push(holeTop.animate([{ visibility: "visible" }, { visibility: "hidden" }], { duration: ms(GONE), easing: "steps(1, end)", fill: "both" }));
+      if (over) built.cracks.forEach((c) => {
         const at = c.at + 0.14, total = at + 0.15, o = (t: number) => t / total, jump = "steps(1, end)";
         out.push(c.el.animate(
           [
@@ -919,7 +951,8 @@ export default function Gallery() {
         gone = true;
         window.clearTimeout(timer);
         out.forEach((a) => { try { a.finish(); } catch { /* fine */ } });
-        holeTop.remove();
+        holeTop?.remove();
+        markRunning(false); // this half ran to the end (shape.ts: the safety switch)
         const still = buildHole(shape).svg.outerHTML;
         const note: CaveHandoff = {
           at: Date.now(), hx, hy, R, seed, w, h,
@@ -935,7 +968,8 @@ export default function Gallery() {
         window.clearTimeout(timer);
         unlock();
         out.forEach((a) => a.cancel());
-        [wash, holeEl, holeTop].forEach((el) => el.remove());
+        [wash, holeEl, holeTop].forEach((el) => el?.remove());
+        markRunning(false);
         if (bagelEl) bagelEl.style.transformOrigin = "";
         (window as unknown as { __caveGo?: boolean }).__caveGo = false;
         storming = false;
@@ -949,7 +983,9 @@ export default function Gallery() {
       const url = new URL(a.href, window.location.href);
       if (url.origin !== window.location.origin || !url.pathname.startsWith("/everything")) return;
       // (from the keyboard, or with less motion asked for, the page just loads again)
+      // (...and where a cave-in was once cut short, it stays off: shape.ts)
       if (e.detail === 0 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      if ((window as unknown as { __gxCaveOff?: boolean }).__gxCaveOff) return;
       e.preventDefault();
       e.stopPropagation();
       if (storming && !leaving) return void window.location.assign(url.href);
@@ -960,6 +996,9 @@ export default function Gallery() {
     document.addEventListener("click", selfClick, true);
     const selfShow = (e: PageTransitionEvent) => { if (e.persisted) leaving?.(); };
     window.addEventListener("pageshow", selfShow);
+    // leaving the page in the ordinary way, even mid-flight, is not a failure
+    const selfHide = () => markRunning(false);
+    window.addEventListener("pagehide", selfHide);
     const runStorm = () => {
       const root = document.documentElement;
       const caveNote = (window as unknown as { __gxCave?: CaveHandoff }).__gxCave;
@@ -1309,6 +1348,7 @@ export default function Gallery() {
     return () => {
       document.removeEventListener("click", selfClick, true);
       window.removeEventListener("pageshow", selfShow);
+      window.removeEventListener("pagehide", selfHide);
       leaving?.();
       window.clearTimeout(stormTimer);
       stormTimers.forEach((t) => window.clearTimeout(t));
