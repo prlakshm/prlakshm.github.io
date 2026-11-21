@@ -691,6 +691,15 @@ export default function Gallery() {
        Any click, scroll or key lands everything at once. ?slow=4 slows it. */
     let caved = false;
     testHud(true); // (only with a ?cave= test link: the log of what ran, in the corner)
+    // (...and &press=1 on that link presses EVERYTHING by itself once the
+    // entrance is over, for a device nobody can tap: motion/caveIn.ts)
+    const auto = new URLSearchParams(window.location.search);
+    const autoPress = auto.get("cave") && auto.get("press")
+      ? window.setTimeout(() => {
+          const a = Array.from(document.querySelectorAll<HTMLAnchorElement>("a[href]")).find((el) => new URL(el.href, window.location.href).pathname.startsWith("/everything"));
+          a?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, detail: 1, button: 0 }));
+        }, 7000)
+      : 0;
     /* "fit" (a candidate, test link only; shape.ts): while the pieces fly,
        the canvas is laid out at its on-screen size, by CSS zoom in place of
        its scale, so a tilted tile is no bigger than it looks. Measured, not
@@ -1175,6 +1184,7 @@ export default function Gallery() {
         const settle = "cubic-bezier(0.22, 0.61, 0.36, 1)"; // --ease-settle
         storming = true;
         syncVideos();
+        const endTest = beginTest("entrance");
         const sky = document.createElement("div");
         sky.className = "gx-storm-sky";
         view.insertBefore(sky, world);
@@ -1231,6 +1241,7 @@ export default function Gallery() {
             sky.remove();
             storming = false;
             syncVideos();
+            endTest();
           };
           if (!pk) return settled();
           // the real canvas comes back under the drawing, and the drawing lifts off it
@@ -1292,6 +1303,7 @@ export default function Gallery() {
       const pk = pocketOn && FLAT ? pocket(view) : null;
       const drawn: (Flyer & { z: number })[] = [];
       const judged = watchFrames(); // (a desktop that can't keep up gets the lighter one next time)
+      const endTest = beginTest("entrance");
       if (!FLAT) {
         view.style.perspective = "1400px";
         view.style.perspectiveOrigin = `${eye.x}px ${eye.y}px`;
@@ -1527,6 +1539,7 @@ export default function Gallery() {
           storming = false;
           syncVideos();
           judged();
+          endTest();
         };
         if (!pk) return settled();
         // the real canvas comes back under the drawing, and the drawing lifts off it
@@ -1565,6 +1578,7 @@ export default function Gallery() {
     view.addEventListener("pointercancel", up);
     window.addEventListener("keydown", key);
     return () => {
+      window.clearTimeout(autoPress);
       document.removeEventListener("click", selfClick, true);
       window.removeEventListener("pageshow", selfShow);
       window.removeEventListener("pagehide", selfHide);

@@ -120,7 +120,21 @@
           if (raw) {
             sessionStorage.removeItem("gx-cave-handoff");
             var c = JSON.parse(raw);
-            if (!caveOff && (!nav || nav.type === "navigate") && Date.now() - c.at < 8000 && Math.abs(c.w - innerWidth) < 3 && Math.abs(c.h - innerHeight) < 3) cave = c;
+            // The window must be the one the note was written in. A page a
+            // little wider than a phone's screen is shrunk to fit it, though,
+            // so its note is in slightly bigger pixels than this page's: the
+            // same shape of window at another size. Such a note is brought to
+            // this page's size (hole, place and drawing alike).
+            var k = innerWidth / c.w;
+            var same = Math.abs(c.w - innerWidth) < 3 && Math.abs(c.h - innerHeight) < 3;
+            var shrunk = !same && k > 0.8 && k < 1.25 && Math.abs(c.h * k - innerHeight) < 4;
+            if (!caveOff && (!nav || nav.type === "navigate") && Date.now() - c.at < 8000 && (same || shrunk)) {
+              if (shrunk) {
+                c.svg = '<div style="position:absolute;left:0;top:0;width:' + c.w + "px;height:" + c.h + "px;transform-origin:0 0;transform:scale(" + k + ')">' + c.svg + "</div>";
+                c.hx *= k; c.hy *= k; c.R *= k; c.w = innerWidth; c.h = innerHeight;
+              }
+              cave = c;
+            }
           }
           if (cave) sessionStorage.setItem("gx-cave-running", "1");
         } catch (e) {}

@@ -9,6 +9,9 @@
                     canvas (draw.ts)
      ?cave=3d       real 3D tilt, exactly as on desktop (the one that killed
                     an iPhone on 2026-11-20: try it last)
+     ?cave=auto     forces nothing: whatever this device gets by itself
+                    (shape.ts mode()), with the same log, to see which that
+                    is and that it runs
 
    The choice rides along in the address from page to page. While one is set
    the safety switch (shape.ts) is out of the way: a killed page is written
@@ -17,13 +20,15 @@
    half still marked as started when a page next loads was killed, and the
    log is shown in the corner of the page so it can be screenshotted. */
 
+import { mode } from "./shape.js";
+
 const KEY = "gx-cave-test-log";
 type Row = { v: string; half: string; state: "running" | "done" | "killed"; at: number; frames?: number; worst?: number; worstAt?: number; fps?: number };
 
 export const variant = (): string | null => {
   try {
     const v = new URLSearchParams(window.location.search).get("cave");
-    return v && /^(flat|squash|fit|canvas|3d)$/.test(v) ? v : null;
+    return v && /^(flat|squash|fit|canvas|3d|auto)$/.test(v) ? v : null;
   } catch {
     return null;
   }
@@ -49,7 +54,8 @@ const write = (rows: Row[]) => {
 export function begin(half: string): () => void {
   const v = variant();
   if (!v) return () => {};
-  const row: Row = { v, half, state: "running", at: Date.now() };
+  // (with "auto", the row says what the device chose)
+  const row: Row = { v: v === "auto" ? mode() : v, half, state: "running", at: Date.now() };
   write([...read(), row]);
   let frames = 0, worst = 0, worstAt = 0, last = performance.now(), on = true;
   const t0 = last;
@@ -93,7 +99,7 @@ export function hud(fresh = false) {
       "background:rgba(17,17,19,.88);color:#fff;font:11px/1.45 ui-monospace,Menlo,monospace;white-space:pre;pointer-events:none";
     document.body.appendChild(box);
   }
-  const head = `cave test: ${v}  |  ${window.innerWidth}x${window.innerHeight} @${window.devicePixelRatio}x`;
+  const head = `cave test: ${v === "auto" ? `auto (this device gets ${mode()})` : v}  |  ${window.innerWidth}x${window.innerHeight} @${window.devicePixelRatio}x`;
   const lines = rows.slice(-7).map((r) =>
     r.state === "done" ? `${r.v.padEnd(6)} ${r.half.padEnd(10)} ok   ${r.fps}fps  slowest ${r.worst}ms${r.worstAt != null ? ` at ${(r.worstAt / 1000).toFixed(1)}s` : ""}`
     : r.state === "killed" ? `${r.v.padEnd(6)} ${r.half.padEnd(10)} KILLED (page was reloaded)`

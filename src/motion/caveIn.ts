@@ -96,6 +96,18 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
     const show = () => import("./cave/test.js").then((t) => t.hud(true)).catch(() => {});
     if (document.body) show();
     else document.addEventListener("DOMContentLoaded", show, { once: true });
+    /* ...and &press=1 presses EVERYTHING by itself, once, a few seconds after
+       the page has loaded: for checking a device nobody can tap (a simulator
+       driven from a script). It does not ride along to the next page. */
+    if (new URLSearchParams(window.location.search).get("press")) {
+      const press = () =>
+        window.setTimeout(() => {
+          const a = Array.from(document.querySelectorAll<HTMLAnchorElement>("a[href]")).find((el) => new URL(el.href, window.location.href).pathname.startsWith("/everything"));
+          a?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, detail: 1, button: 0 }));
+        }, window.location.pathname.startsWith("/everything") ? 6000 : 3500);
+      if (document.readyState === "complete") press();
+      else window.addEventListener("load", press, { once: true });
+    }
   }
 
   // leaving in the ordinary way (the cut to Everything included) is not a failure

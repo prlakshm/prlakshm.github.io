@@ -107,6 +107,7 @@ export type Mode = "deep" | "flat" | "squash" | "fit" | "canvas";
    everything/index.html decides the same thing before the first frame and
    leaves it in window.__gxLite; keep its copy of these lines in step. */
 export const LITE_KEY = "gx-cave-lite";
+const STRIKE_KEY = "gx-cave-lite-once";
 const LITE_FOR = 30 * 864e5;
 export const lite = (): boolean => {
   const w = window as unknown as { __gxLite?: boolean };
@@ -145,8 +146,11 @@ export const mode = (): Mode => {
 
 /* THE STEP-DOWN. A desktop that is given the full version is watched while
    it plays: if it cannot keep up (under 45 frames a second over the run, or
-   five frames that each took longer than 50ms), it is marked, and from its
-   next page on it gets the lighter drawing, for a month. Call the function
+   five frames that each took longer than 50ms) twice running, it is marked,
+   and from its next page on it gets the lighter drawing, for a month. Twice,
+   because once can be the machine being busy with something else for a
+   moment; the two halves of one press are two runs, so a machine that
+   really can't is marked by its first press. Call the function
    this returns when the run ends. Nothing is judged where the lighter one
    is already in use, with a ?cave= test link, on a run under 0.6s, or if
    the tab was ever hidden meanwhile (a hidden tab draws no frames). */
@@ -172,12 +176,15 @@ export function watchFrames(): () => void {
     document.removeEventListener("visibilitychange", hid);
     const took = last - first;
     if (away || took < 600) return;
-    if ((frames * 1000) / took < 45 || slow >= 5) {
-      try {
+    const poor = (frames * 1000) / took < 45 || slow >= 5;
+    try {
+      if (!poor) localStorage.removeItem(STRIKE_KEY);
+      else if (localStorage.getItem(STRIKE_KEY)) {
+        localStorage.removeItem(STRIKE_KEY);
         localStorage.setItem(LITE_KEY, String(Date.now()));
-      } catch {
-        /* nothing to remember it in */
-      }
+      } else localStorage.setItem(STRIKE_KEY, "1");
+    } catch {
+      /* nothing to remember it in */
     }
   };
 }
