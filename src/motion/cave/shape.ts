@@ -69,28 +69,29 @@ export const outAt = (t: number) =>
    page was killed and reloaded, then refused: 2026-11-20, as the 3D storm
    did in October), and no simulator shows that limit. Desktop Safari and
    Firefox draw the same paths flat: slide, shrink, fade. Phones and tablets
-   get no cave-in at all for now (caveIn.ts): flat, too, was killed on a
-   real iPhone's first visit (2026-11-21). The same test as the storm's
-   (everything/index.html).
+   (anything driven by touch) cannot afford even that: moving the sixty
+   pieces flat was killed on a real iPhone's first visit (2026-11-21). They
+   get "canvas", which moves no pieces at all and passed on that phone. The
+   desktop test is the same as the storm's (everything/index.html).
 
    How it is drawn:
      deep    real 3D tilt, the hole in two copies (desktop Chromium);
-     flat    no tilt, one hole layer (everywhere else, by default);
+     flat    no tilt, one hole layer (desktop Safari and Firefox);
      squash  the tilt faked flat: a piece tipping away mostly just looks
              squashed toward the hole, and a squash is an ordinary 2D
              transform, as cheap as flat;
      fit     real 3D tilt with the canvas laid out at its on-screen size
              (CSS zoom in place of scale), in case what Safari cannot afford
              is storing each tilted tile at its full laid-out size.
-     canvas  the pocket-size one (draw.ts): on Everything the pieces are not
+     canvas  (phones and tablets) the pocket-size one (draw.ts): on Everything the pieces are not
              moved at all; they are drawn, from their light copies, into one
              screen-sized canvas, tilt as a squash, and the real canvas is
              put back under it once they land. The memory it takes is the
              one drawing, however many pieces fly. On the other pages (the
              way in is pictures of the page already) it is squash.
-   squash, fit and canvas are candidates, reached only by a test link
-   (test.ts: ?cave=flat|squash|fit|canvas|3d) until they have run on a real
-   phone. */
+   squash and fit are candidates that were tried on the phone and set aside,
+   reached only by a test link (test.ts: ?cave=flat|squash|fit|canvas|3d),
+   which forces any of these on any device. */
 export type Mode = "deep" | "flat" | "squash" | "fit" | "canvas";
 let modeMemo: Mode | null = null;
 export const mode = (): Mode => {
@@ -106,7 +107,8 @@ export const mode = (): Mode => {
     /Chrome\//.test(navigator.userAgent) &&
     !/Mobile|Android|CriOS|EdgiOS/.test(navigator.userAgent) &&
     window.matchMedia("(pointer: fine) and (min-width: 1024px)").matches;
-  return (modeMemo = asked === "3d" ? "deep" : asked === "flat" || asked === "squash" || asked === "fit" || asked === "canvas" ? asked : desk ? "deep" : "flat");
+  const touch = typeof window !== "undefined" && !window.matchMedia("(pointer: fine)").matches;
+  return (modeMemo = asked === "3d" ? "deep" : asked === "flat" || asked === "squash" || asked === "fit" || asked === "canvas" ? asked : desk ? "deep" : touch ? "canvas" : "flat");
 };
 /** real 3D transforms on the pieces */
 export const tilts = (): boolean => mode() === "deep" || mode() === "fit";

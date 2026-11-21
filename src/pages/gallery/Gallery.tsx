@@ -718,7 +718,7 @@ export default function Gallery() {
       world.style.transform = `translate3d(${((want.left - a.left) / k).toFixed(2)}px, ${((want.top - a.top) / k).toFixed(2)}px, 0)`;
       return { k, off };
     };
-    /* "canvas" (the pocket-size one, test link only for now; draw.ts): the
+    /* "canvas" (the pocket-size one, what phones and tablets get; draw.ts): the
        pieces are drawn into one canvas over the view while the real canvas
        is hidden, and the real one is put back under it at the end. A film
        that has no frame yet is drawn from its poster, fetched ahead here. */
