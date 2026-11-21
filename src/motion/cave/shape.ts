@@ -119,8 +119,10 @@ export const tilts = (): boolean => mode() === "deep" || mode() === "fit";
    turns the cave-in off on this device for a month (localStorage), and the
    site goes back to the plain entrance. So at the very worst a device sees
    one failure, never a second. caveIn.ts and everything/index.html keep
-   their own copies of these few lines (they run before this file loads). */
-export const RUN_KEY = "gx-cave-running", OFF_KEY = "gx-cave-off";
+   their own copies of these few lines (they run before this file loads).
+   (The key is "-2": phones that switched it off while the pieces themselves
+   were being moved, 2026-11-20/21, get the drawn version, draw.ts, afresh.) */
+export const RUN_KEY = "gx-cave-running", OFF_KEY = "gx-cave-off-2";
 export const markRunning = (on: boolean) => {
   try {
     if (on) sessionStorage.setItem(RUN_KEY, "1");

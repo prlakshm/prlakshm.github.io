@@ -1160,7 +1160,13 @@ export default function Gallery() {
          case studies' entrance, told from the bagel: it settles first, the
          dots wash in, then every piece rises into its place (16px, .72s, the
          site's settle curve) in a wave outward from the bagel, by distance.
-         ~1.4s in all. Any tap or key lands it at once. */
+         ~1.4s in all. Any tap or key lands it at once.
+         On anything driven by touch it is drawn, not moved (draw.ts, as the
+         cave-in is): a real iPhone killed the page mid-rise on a first visit
+         (2026-11-21). The canvas is laid out some ten times bigger than a
+         phone shows it, and every piece that fades or moves is kept as a
+         picture of its own at that full size: about 300MB for the 68 pieces
+         and the bagel, against 3MB for what is actually on screen. */
       if (root.classList.contains("gx-storm-ripple")) {
         const settle = "cubic-bezier(0.22, 0.61, 0.36, 1)"; // --ease-settle
         storming = true;
@@ -1176,27 +1182,56 @@ export default function Gallery() {
         const groundIn = ground.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600 * slow, delay: 80 * slow, easing: settle, fill: "both" });
         storm.push(groundIn);
         const bagelEl = world.querySelector<HTMLElement>(".gx-bagel");
-        if (bagelEl) storm.push(bagelEl.animate([{ opacity: 0, transform: "scale(0.96)" }, { opacity: 1, transform: "none" }], { duration: 720 * slow, easing: settle, fill: "backwards" }));
         const ps = live.current.pieces;
         const far = Math.max(1, ...ps.map((q) => Math.hypot(q.x, q.y)));
-        ps.forEach((p) => {
-          const el = world.querySelector<HTMLElement>(`.gx-piece[data-id="${p.id}"]`);
-          if (!el) return;
-          const delay = (120 + 550 * (Math.hypot(p.x, p.y) / far)) * slow;
-          // the rise is in screen pixels; the world is scaled by the camera
-          storm.push(el.animate([{ opacity: 0, transform: `translateY(${(16 / cam.z).toFixed(1)}px)` }, { opacity: 1, transform: "none" }], { duration: 720 * slow, delay, easing: settle, fill: "backwards" }));
-        });
+        const wait = (p: Piece) => (120 + 550 * (Math.hypot(p.x, p.y) / far)) * slow;
+        const pk = pocketOn ? pocket(view) : null;
+        if (pk) {
+          const vr = view.getBoundingClientRect(), still = { tx: 0, tilt: 0 };
+          if (bagelEl) {
+            const q = bagelEl.getBoundingClientRect();
+            const art = stack(Array.from(bagelEl.querySelectorAll("img")), q.width, q.height);
+            pk.add({
+              sprite: art?.c ?? null, pad: 0, cx: q.left + q.width / 2 - vr.left, cy: q.top + q.height / 2 - vr.top, w: q.width, h: q.height, flat: true, turn: 0,
+              poses: [{ offset: 0, opacity: 0, sc: 0.96, ty: 0, easing: settle, ...still }, { offset: 1, opacity: 1, sc: 1, ty: 0, ...still }],
+              delay: 0, dur: 720 * slow,
+            });
+          }
+          const rise = { poses: [{ offset: 0, opacity: 0, sc: 1, ty: 16, easing: settle, ...still }, { offset: 1, opacity: 1, sc: 1, ty: 0, ...still }], flat: true, turn: 0 };
+          cast()
+            .filter((t) => t.piece)
+            .map((t) => flyer(t, vr, cam.z, rise, wait(t.piece!), 720 * slow))
+            .sort((a, b) => a.z - b.z)
+            .forEach((f) => pk.add(f));
+          world.after(pk.el);
+          world.style.visibility = "hidden"; // the real canvas waits underneath, unpainted
+          storm.push(pk.start());
+        } else {
+          if (bagelEl) storm.push(bagelEl.animate([{ opacity: 0, transform: "scale(0.96)" }, { opacity: 1, transform: "none" }], { duration: 720 * slow, easing: settle, fill: "backwards" }));
+          ps.forEach((p) => {
+            const el = world.querySelector<HTMLElement>(`.gx-piece[data-id="${p.id}"]`);
+            if (!el) return;
+            // the rise is in screen pixels; the world is scaled by the camera
+            storm.push(el.animate([{ opacity: 0, transform: `translateY(${(16 / cam.z).toFixed(1)}px)` }, { opacity: 1, transform: "none" }], { duration: 720 * slow, delay: wait(p), easing: settle, fill: "backwards" }));
+          });
+        }
         root.classList.remove("gx-storm");
         const skip = () => storm.forEach((a) => a.finish());
         const skipOn = ["pointerdown", "wheel", "keydown"] as const;
         skipOn.forEach((ev) => window.addEventListener(ev, skip, { capture: true, once: true }));
         Promise.all(storm.map((a) => a.finished)).then(() => {
           skipOn.forEach((ev) => window.removeEventListener(ev, skip, { capture: true }));
-          root.classList.remove("gx-storm-air");
-          ground.remove();
-          sky.remove();
-          storming = false;
-          syncVideos();
+          const settled = () => {
+            root.classList.remove("gx-storm-air");
+            ground.remove();
+            sky.remove();
+            storming = false;
+            syncVideos();
+          };
+          if (!pk) return settled();
+          // the real canvas comes back under the drawing, and the drawing lifts off it
+          world.style.visibility = "";
+          pk.lift().then(settled);
         }, () => {});
         return;
       }

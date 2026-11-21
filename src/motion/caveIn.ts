@@ -14,7 +14,7 @@
 /* The safety switch (motion/cave/shape.ts has the whole story): a page that
    loads and finds a cave-in still marked as running was killed in the middle
    of one, so the cave-in is turned off on this device for a month. */
-const RUN_KEY = "gx-cave-running", OFF_KEY = "gx-cave-off", OFF_FOR = 30 * 864e5;
+const RUN_KEY = "gx-cave-running", OFF_KEY = "gx-cave-off-2", OFF_FOR = 30 * 864e5;
 let off = false;
 // (a ?cave= test link, cave/test.ts, sets the switch aside: a kill is logged there instead)
 let testing: string | null = null;
