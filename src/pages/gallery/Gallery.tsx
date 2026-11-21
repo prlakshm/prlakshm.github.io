@@ -1575,12 +1575,15 @@ export default function Gallery() {
     const firstReady = () => {
       const first = [...live.current.pieces]
         .sort((a, b) => Math.hypot(a.x - BAGEL_HOLE.x, a.y - BAGEL_HOLE.y) - Math.hypot(b.x - BAGEL_HOLE.x, b.y - BAGEL_HOLE.y))
-        .slice(0, 14)
+        .slice(0, 10)
         .map((p) => posters.get(p.id) ?? world.querySelector<HTMLImageElement>(`.gx-piece[data-id="${p.id}"] img`))
         .filter((i): i is HTMLImageElement => !!i);
       return Promise.race([
         Promise.all(first.map((i) => (i.decode ? i.decode().catch(() => {}) : Promise.resolve()))),
-        new Promise((done) => window.setTimeout(done, 700)),
+        // (no longer than this: a piece whose picture is later still flies as
+        // its paper and is filled in when it comes, which reads better than
+        // the hole sitting still)
+        new Promise((done) => window.setTimeout(done, 450)),
       ]);
     };
     const byCave = () => !!(window as unknown as { __gxCave?: unknown }).__gxCave && document.documentElement.classList.contains("gx-cave");
