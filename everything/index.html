@@ -103,8 +103,6 @@
           var since = Number(localStorage.getItem("gx-cave-off"));
           caveOff = !caveTest && since > 0 && Date.now() - since < 30 * 864e5;
         } catch (e) {}
-        // Phones and tablets: off for now (src/motion/caveIn.ts has the story)
-        if (!caveTest && !matchMedia("(pointer: fine)").matches) caveOff = true;
         window.__gxCaveOff = caveOff;
         var cave = null;
         try {
@@ -135,11 +133,11 @@
         });
       })();
     </script>
-    <script type="module" crossorigin src="/assets/everything-CtNy4ZNk.js"></script>
+    <script type="module" crossorigin src="/assets/everything-DOYODtPj.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/stormHandoff-BHEt7cPH.js">
     <link rel="modulepreload" crossorigin href="/assets/home-DXwFlhMU.js">
     <link rel="modulepreload" crossorigin href="/assets/opening-BMoUX8So.js">
-    <link rel="modulepreload" crossorigin href="/assets/shape-DRh3HdnI.js">
+    <link rel="modulepreload" crossorigin href="/assets/shape-d3W3M5pD.js">
     <link rel="modulepreload" crossorigin href="/assets/test-DmkZhI_D.js">
     <link rel="stylesheet" crossorigin href="/assets/stormHandoff-BcfU556L.css">
     <link rel="stylesheet" crossorigin href="/assets/home-DNw3NDHN.css">
