@@ -16,13 +16,20 @@
    of one, so the cave-in is turned off on this device for a month. */
 const RUN_KEY = "gx-cave-running", OFF_KEY = "gx-cave-off", OFF_FOR = 30 * 864e5;
 let off = false;
+// (a ?cave= test link, cave/test.ts, sets the switch aside: a kill is logged there instead)
+let testing: string | null = null;
+try {
+  testing = new URLSearchParams(window.location.search).get("cave");
+} catch {
+  /* no address to read */
+}
 try {
   if (sessionStorage.getItem(RUN_KEY)) {
     sessionStorage.removeItem(RUN_KEY);
-    localStorage.setItem(OFF_KEY, String(Date.now()));
+    if (!testing) localStorage.setItem(OFF_KEY, String(Date.now()));
   }
   const since = Number(localStorage.getItem(OFF_KEY));
-  off = since > 0 && Date.now() - since < OFF_FOR;
+  off = !testing && since > 0 && Date.now() - since < OFF_FOR;
 } catch {
   /* storage is closed to us (private mode): nothing to remember */
 }
@@ -57,8 +64,12 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
       if (busy) return;
       busy = true;
       // ?slow=4 on the page being left carries over, to review both halves
-      const slow = new URLSearchParams(window.location.search).get("slow");
-      if (slow && !url.searchParams.has("slow")) url.searchParams.set("slow", slow);
+      // (and so does a ?cave= test choice)
+      const here = new URLSearchParams(window.location.search);
+      ["slow", "cave"].forEach((key) => {
+        const v = here.get(key);
+        if (v && !url.searchParams.has(key)) url.searchParams.set(key, v);
+      });
       load()
         .then((m) => m.caveOut(url.href))
         .catch(() => window.location.assign(url.href));
@@ -79,6 +90,13 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
   const later = () => window.setTimeout(() => (ric ? ric(idle, { timeout: 4000 }) : idle()), 2500);
   if (document.readyState === "complete") later();
   else window.addEventListener("load", later, { once: true });
+
+  // with a test link, the log of what ran goes in the corner of this page too
+  if (testing) {
+    const show = () => import("./cave/test.js").then((t) => t.hud(true)).catch(() => {});
+    if (document.body) show();
+    else document.addEventListener("DOMContentLoaded", show, { once: true });
+  }
 
   // leaving in the ordinary way (the cut to Everything included) is not a failure
   window.addEventListener("pagehide", () => {

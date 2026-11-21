@@ -10,7 +10,8 @@ import { earn } from "../../components/badges/badgeStore.js";
 import { BAGEL, PIECES, applyLayout, applyPhone, pieceBounds, portraitLayout, thumbOf, type Layout, type Piece } from "./clusters.js";
 import SAVED from "./layout.json";
 import { BAGEL_HOLE, PHONE_QUERY, Z_MAX, Z_MIN, openingCam } from "./opening.js";
-import { CAVE_KEY, CLOCK, EASE, PACE, PACE_REST, PAPER, buildHole, fallFor, fallFrames, farCorner, flightFor, holeRadius, isThin, launchAt, makeShape, markRunning, outAt, releaseAt, tilts, type CaveHandoff } from "../../motion/cave/shape.js";
+import { CAVE_KEY, CLOCK, EASE, PACE, PACE_REST, PAPER, buildHole, fallFor, fallFrames, farCorner, flightFor, holeRadius, isThin, launchAt, makeShape, markRunning, mode, outAt, releaseAt, type CaveHandoff } from "../../motion/cave/shape.js";
+import { begin as beginTest, hud as testHud } from "../../motion/cave/test.js";
 import Sheet from "./Sheet.js";
 
 /* GALLERY: everything else, laid out on one infinite canvas, Figma-style.
@@ -666,6 +667,34 @@ export default function Gallery() {
        it slides the last few pixels onto the real one while the pieces fly.
        Any click, scroll or key lands everything at once. ?slow=4 slows it. */
     let caved = false;
+    testHud(true); // (only with a ?cave= test link: the log of what ran, in the corner)
+    /* "fit" (a candidate, test link only; shape.ts): while the pieces fly,
+       the canvas is laid out at its on-screen size, by CSS zoom in place of
+       its scale, so a tilted tile is no bigger than it looks. Measured, not
+       assumed: where zoom does not behave, it is put back and null returned.
+       Gives the size of one of the canvas's own pixels on screen. */
+    const fitOn = (): { k: number; off: () => void } | null => {
+      if (mode() !== "fit") return null;
+      const probe = world.querySelector<HTMLElement>(".gx-piece");
+      if (!probe) return null;
+      const want = probe.getBoundingClientRect(), was = world.style.transform;
+      const off = () => {
+        world.style.removeProperty("zoom");
+        world.style.transform = was;
+        draw();
+      };
+      world.style.setProperty("zoom", String(cam.z));
+      world.style.transform = "translate3d(0px, 0px, 0)";
+      const a = probe.getBoundingClientRect();
+      world.style.transform = "translate3d(100px, 0px, 0)";
+      const k = (probe.getBoundingClientRect().left - a.left) / 100;
+      if (!(k > 0) || Math.abs(a.width - want.width) > 2) {
+        off();
+        return null;
+      }
+      world.style.transform = `translate3d(${((want.left - a.left) / k).toFixed(2)}px, ${((want.top - a.top) / k).toFixed(2)}px, 0)`;
+      return { k, off };
+    };
     // everything that falls in or is thrown out: the canvas's pieces, then
     // the nav's (its words are only pulled; an open phone menu goes as one card)
     type Thrown = { el: HTMLElement; left: number; top: number; right: number; bottom: number; unit: number; flat: boolean };
@@ -697,6 +726,8 @@ export default function Gallery() {
       const to = { x: vr.left + cam.x + BAGEL_HOLE.x * z, y: vr.top + cam.y + BAGEL_HOLE.y * z };
       storming = true;
       syncVideos();
+      const endTest = beginTest("throw out");
+      const fit = fitOn();
       /* The hole is drawn on the screen, not in the canvas: inside the scaled
          canvas it was drawn at the camera's zoom and stretched back up, a
          touch soft, which showed as a blink at the cut between the pages.
@@ -716,9 +747,9 @@ export default function Gallery() {
       };
       /* Off desktop Chrome (every phone, all of Safari) it is kept as light
          as it can be: one hole, over the canvas, moved and shut as a single
-         layer, and the pieces fly flat (shape.ts tilts()). The pieces come
+         layer, and the pieces fly flat (shape.ts mode()). The pieces come
          out from under its rim and the bagel rises beneath it. */
-      const light = !tilts();
+      const light = mode() !== "deep";
       const built = buildHole(makeShape(note.R, note.seed)), over = light ? null : buildHole(makeShape(note.R, note.seed));
       over?.cracks.forEach((c) => c.el.remove());
       const holeEl = holeBox(built.svg), holeTop = over ? holeBox(over.svg) : null;
@@ -767,6 +798,7 @@ export default function Gallery() {
 
       // everything that is thrown out: the canvas's pieces, then the nav's
       const thrown = cast();
+      if (fit) thrown.forEach((t) => { if (t.unit !== 1) t.unit = 1 / fit.k; });
       const far = Math.max(1, ...thrown.map((t) => farCorner(t, to.x, to.y)));
       thrown.forEach((t) => {
         const d = farCorner(t, to.x, to.y) / far, D = flightFor(d), all = D + CLOCK.rock[1];
@@ -811,6 +843,8 @@ export default function Gallery() {
         if (bagelEl) bagelEl.style.transformOrigin = "";
         root.classList.remove("gx-cave-air");
         markRunning(false); // it ran to the end (shape.ts: the safety switch)
+        fit?.off();
+        endTest();
         storming = false;
         syncVideos();
       }, () => {});
@@ -847,6 +881,7 @@ export default function Gallery() {
       }
       storming = true;
       markRunning(true);
+      const endTest = beginTest("fall (Ev)");
       setSelected([]);
       const out: Animation[] = [];
       // the cool white the dots wash out to, under everything
@@ -867,7 +902,7 @@ export default function Gallery() {
       };
       // (off desktop Chrome: one hole over the canvas, opened as a single
       // layer, the pieces sliding flat in under its rim; see runCave)
-      const light = !tilts();
+      const light = mode() !== "deep";
       const built = buildHole(shape), over = light ? null : buildHole(shape);
       over?.cracks.forEach((c) => c.el.remove());
       const holeEl = holeBox(built.svg), holeTop = over ? holeBox(over.svg) : null;
@@ -910,6 +945,8 @@ export default function Gallery() {
       }
       // the pieces on screen and the nav: let go as the collapse reaches them
       const falling = cast().filter((t) => t.right > 0 && t.bottom > 0 && t.left < w && t.top < h);
+      const fit = fitOn();
+      if (fit) falling.forEach((t) => { if (t.unit !== 1) t.unit = 1 / fit.k; });
       const far = Math.max(1, ...falling.map((t) => farCorner(t, hx, hy)));
       let last = GONE;
       falling.forEach((t) => {
@@ -953,6 +990,7 @@ export default function Gallery() {
         out.forEach((a) => { try { a.finish(); } catch { /* fine */ } });
         holeTop?.remove();
         markRunning(false); // this half ran to the end (shape.ts: the safety switch)
+        endTest();
         const still = buildHole(shape).svg.outerHTML;
         const note: CaveHandoff = {
           at: Date.now(), hx, hy, R, seed, w, h,
@@ -969,6 +1007,7 @@ export default function Gallery() {
         unlock();
         out.forEach((a) => a.cancel());
         [wash, holeEl, holeTop].forEach((el) => el?.remove());
+        fit?.off();
         markRunning(false);
         if (bagelEl) bagelEl.style.transformOrigin = "";
         (window as unknown as { __caveGo?: boolean }).__caveGo = false;
@@ -989,8 +1028,12 @@ export default function Gallery() {
       e.preventDefault();
       e.stopPropagation();
       if (storming && !leaving) return void window.location.assign(url.href);
-      const slow = new URLSearchParams(window.location.search).get("slow");
-      if (slow && !url.searchParams.has("slow")) url.searchParams.set("slow", slow);
+      // (?slow= and a ?cave= test choice ride along)
+      const here = new URLSearchParams(window.location.search);
+      ["slow", "cave"].forEach((key) => {
+        const v = here.get(key);
+        if (v && !url.searchParams.has(key)) url.searchParams.set(key, v);
+      });
       caveSelf(url.href);
     };
     document.addEventListener("click", selfClick, true);

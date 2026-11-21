@@ -69,14 +69,38 @@ export const outAt = (t: number) =>
    page was killed and reloaded, then refused: 2026-11-20, as the 3D storm
    did in October), and no simulator shows that limit. Everywhere else,
    every phone and tablet and all of Safari, the same paths are drawn flat:
-   slide, shrink, fade. The same test as the storm's (everything/index.html). */
-let tiltsMemo: boolean | null = null;
-export const tilts = (): boolean =>
-  (tiltsMemo ??=
+   slide, shrink, fade. The same test as the storm's (everything/index.html).
+
+   How it is drawn:
+     deep    real 3D tilt, the hole in two copies (desktop Chromium);
+     flat    no tilt, one hole layer (everywhere else, by default);
+     squash  the tilt faked flat: a piece tipping away mostly just looks
+             squashed toward the hole, and a squash is an ordinary 2D
+             transform, as cheap as flat;
+     fit     real 3D tilt with the canvas laid out at its on-screen size
+             (CSS zoom in place of scale), in case what Safari cannot afford
+             is storing each tilted tile at its full laid-out size.
+   squash and fit are candidates, reached only by a test link (test.ts:
+   ?cave=flat|squash|fit|3d) until they have run on a real phone. */
+export type Mode = "deep" | "flat" | "squash" | "fit";
+let modeMemo: Mode | null = null;
+export const mode = (): Mode => {
+  if (modeMemo) return modeMemo;
+  let asked: string | null = null;
+  try {
+    asked = new URLSearchParams(window.location.search).get("cave");
+  } catch {
+    /* no address to read */
+  }
+  const desk =
     typeof navigator !== "undefined" &&
     /Chrome\//.test(navigator.userAgent) &&
     !/Mobile|Android|CriOS|EdgiOS/.test(navigator.userAgent) &&
-    window.matchMedia("(pointer: fine) and (min-width: 1024px)").matches);
+    window.matchMedia("(pointer: fine) and (min-width: 1024px)").matches;
+  return (modeMemo = asked === "3d" ? "deep" : asked === "flat" || asked === "squash" || asked === "fit" ? asked : desk ? "deep" : "flat");
+};
+/** real 3D transforms on the pieces */
+export const tilts = (): boolean => mode() === "deep" || mode() === "fit";
 
 /* The safety switch. A cave-in marks itself as running (sessionStorage) and
    clears the mark when it ends or the page is left in the ordinary way. A
@@ -282,7 +306,8 @@ export function fallFrames(
   R: number,
   o: { flat: boolean; w: number; h: number; dur: number; out?: boolean; unit?: number; rock?: number },
 ): Keyframe[] {
-  const u = o.unit ?? 1, flat = o.flat || !tilts();
+  const u = o.unit ?? 1, how = mode(), flat = o.flat || how === "flat", squash = how === "squash";
+  const turn = ((Math.atan2(dy, dx) * 180) / Math.PI).toFixed(2); // the line from the hole through the piece
   const r0 = Math.hypot(dx, dy) || 1, ux = dx / r0, uy = dy / r0;
   const g0 = Math.atan2(-dy, -dx), ax = (-Math.sin(g0)).toFixed(3), ay = Math.cos(g0).toFixed(3);
   // a big piece must not swell as its outer edge tips toward the viewer
@@ -304,6 +329,8 @@ export function fallFrames(
       opacity: +opacity.toFixed(3),
       transform: flat
         ? `${move} scale(${sc.toFixed(4)})`
+        : squash
+        ? `${move} rotate(${turn}deg) scaleX(${Math.max(0.02, Math.cos((tilt * Math.PI) / 180)).toFixed(4)}) rotate(${-turn}deg) scale(${sc.toFixed(4)})`
         : `${move} perspective(${(persp * u).toFixed(0)}px) rotate3d(${ax}, ${ay}, 0, ${tilt.toFixed(2)}deg) scale(${sc.toFixed(4)})`,
     };
   };

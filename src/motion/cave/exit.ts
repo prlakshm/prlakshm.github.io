@@ -1,8 +1,9 @@
 import {
   CAVE_KEY, CLOCK, EASE, PAPER, buildHole, buildLid, fallFor, fallFrames, farCorner, holeRadius, isThin, makeShape, releaseAt,
   type CaveHandoff, type Pt,
-  PACE, markRunning, outAt, tilts,
+  PACE, markRunning, mode, outAt, tilts,
 } from "./shape.js";
+import { begin as beginTest } from "./test.js";
 
 /* THE CAVE-IN, first half: the page being left falls into the hole.
 
@@ -66,7 +67,7 @@ function collect(): Piece[] {
   };
   const walk = (el: Element) => {
     const tag = el.tagName.toUpperCase();
-    if (SKIP.has(tag) || el.classList.contains("cave-layer")) return;
+    if (SKIP.has(tag) || el.classList.contains("cave-layer") || el.id === "gx-cave-test") return;
     const cs = getComputedStyle(el);
     if (cs.display === "none" || cs.visibility === "hidden" || parseFloat(cs.opacity) < 0.03) return;
     const kids = Array.from(el.children);
@@ -190,12 +191,13 @@ export async function caveOut(url: string): Promise<void> {
   styleOnce();
   // (a lighter load where the pictures are costlier: phones draw at 3x)
   let pieces = collect();
-  if (!tilts() && pieces.length > 70) {
+  if (mode() !== "deep" && pieces.length > 70) {
     const keep = new Set([...pieces].sort((a, b) => b.rect.width * b.rect.height - a.rect.width * a.rect.height).slice(0, 70));
     pieces = pieces.filter((p) => keep.has(p));
   }
   if (!pieces.length) return go();
   markRunning(true);
+  const endTest = beginTest("fall in");
 
   // the layer under the falling pieces: cool white (washes in), cracks, hole, shards
   const layer = document.createElement("div");
@@ -268,6 +270,7 @@ export async function caveOut(url: string): Promise<void> {
 
   const handOff = () => {
     markRunning(false); // this half ran to the end (shape.ts: the safety switch)
+    endTest();
     lids.forEach((l) => l.remove());
     const svg =
       `<div style="position:absolute;inset:0;background:${PAPER}"></div>` +
