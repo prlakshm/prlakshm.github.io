@@ -98,9 +98,9 @@
         try {
           if (sessionStorage.getItem("gx-cave-running")) {
             sessionStorage.removeItem("gx-cave-running");
-            if (!caveTest) localStorage.setItem("gx-cave-off", String(Date.now()));
+            if (!caveTest) localStorage.setItem("gx-cave-off-2", String(Date.now()));
           }
-          var since = Number(localStorage.getItem("gx-cave-off"));
+          var since = Number(localStorage.getItem("gx-cave-off-2"));
           caveOff = !caveTest && since > 0 && Date.now() - since < 30 * 864e5;
         } catch (e) {}
         window.__gxCaveOff = caveOff;
@@ -133,7 +133,7 @@
         });
       })();
     </script>
-    <script type="module" crossorigin src="/assets/everything-DOYODtPj.js"></script>
+    <script type="module" crossorigin src="/assets/everything-BLoi5HE-.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/stormHandoff-BHEt7cPH.js">
     <link rel="modulepreload" crossorigin href="/assets/home-DXwFlhMU.js">
     <link rel="modulepreload" crossorigin href="/assets/opening-BMoUX8So.js">
