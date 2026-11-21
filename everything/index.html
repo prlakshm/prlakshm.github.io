@@ -92,14 +92,16 @@
         // marked as running, the page was killed in the middle of one (an
         // iPhone out of memory). It is turned off on this device for a
         // month, here and on every page, and the usual entrance plays.
-        var caveOff = false;
+        // (A ?cave= test link, src/motion/cave/test.ts, sets the switch aside:
+        // a kill is logged there instead.)
+        var caveOff = false, caveTest = new URLSearchParams(location.search).get("cave");
         try {
           if (sessionStorage.getItem("gx-cave-running")) {
             sessionStorage.removeItem("gx-cave-running");
-            localStorage.setItem("gx-cave-off", String(Date.now()));
+            if (!caveTest) localStorage.setItem("gx-cave-off", String(Date.now()));
           }
           var since = Number(localStorage.getItem("gx-cave-off"));
-          caveOff = since > 0 && Date.now() - since < 30 * 864e5;
+          caveOff = !caveTest && since > 0 && Date.now() - since < 30 * 864e5;
         } catch (e) {}
         window.__gxCaveOff = caveOff;
         var cave = null;
@@ -131,11 +133,12 @@
         });
       })();
     </script>
-    <script type="module" crossorigin src="/assets/everything-Bm8l4ei1.js"></script>
+    <script type="module" crossorigin src="/assets/everything-BaofZfw6.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/stormHandoff-BHEt7cPH.js">
     <link rel="modulepreload" crossorigin href="/assets/home-DXwFlhMU.js">
     <link rel="modulepreload" crossorigin href="/assets/opening-BMoUX8So.js">
-    <link rel="modulepreload" crossorigin href="/assets/shape-C0SXkaRl.js">
+    <link rel="modulepreload" crossorigin href="/assets/shape-BKdnQu01.js">
+    <link rel="modulepreload" crossorigin href="/assets/test-lKEvgnYh.js">
     <link rel="stylesheet" crossorigin href="/assets/stormHandoff-BcfU556L.css">
     <link rel="stylesheet" crossorigin href="/assets/home-DNw3NDHN.css">
     <link rel="stylesheet" crossorigin href="/assets/everything-C-YVJvUg.css">
