@@ -740,10 +740,12 @@ export default function Gallery() {
         still.src = thumbOf(p.poster);
         posters.set(p.id, still);
       });
-    const flyer = (t: Thrown, vr: DOMRect, z: number, fall: ReturnType<typeof fallPath>, delay: number, dur: number, loom = 1): Flyer & { z: number } => {
+    // (later: its sprite is drawn just ahead of its launch, not now; draw.ts)
+    const flyer = (t: Thrown, vr: DOMRect, z: number, fall: ReturnType<typeof fallPath>, delay: number, dur: number, loom = 1, later = false): Flyer & { z: number } => {
       const w = t.right - t.left, h = t.bottom - t.top;
-      const drawn = sprite(t.el, w, h, z, posters.get(t.piece!.id), loom);
-      return { sprite: drawn?.c ?? null, pad: drawn?.pad ?? 0, cx: (t.left + t.right) / 2 - vr.left, cy: (t.top + t.bottom) / 2 - vr.top, w, h, ...fall, delay, dur, z: t.piece!.z };
+      const draw = () => sprite(t.el, w, h, z, posters.get(t.piece!.id), loom);
+      const drawn = later ? null : draw();
+      return { sprite: drawn?.c ?? null, pad: drawn?.pad ?? 0, lazy: later ? draw : undefined, cx: (t.left + t.right) / 2 - vr.left, cy: (t.top + t.bottom) / 2 - vr.top, w, h, ...fall, delay, dur, z: t.piece!.z };
     };
     // everything that falls in or is thrown out: the canvas's pieces, then
     // the nav's (its words are only pulled; an open phone menu goes as one card)
@@ -858,17 +860,18 @@ export default function Gallery() {
         const d = farCorner(t, to.x, to.y) / far, D = flightFor(d), all = D + CLOCK.rock[1];
         const dx = (t.left + t.right) / 2 - to.x, dy = (t.top + t.bottom) / 2 - to.y;
         const how = { flat: t.flat, w: t.right - t.left, h: t.bottom - t.top, dur: D, out: true, unit: t.unit, rock: CLOCK.rock[1] / all };
-        if (pk && t.piece) return void drawn.push(flyer(t, vr, z, fallPath(dx, dy, note.R, how), ms(launchAt(d)), ms(all)));
+        if (pk && t.piece) return void drawn.push(flyer(t, vr, z, fallPath(dx, dy, note.R, how), ms(launchAt(d)), ms(all), 1, true));
         storm.push(t.el.animate(fallFrames(dx, dy, note.R, how), { duration: ms(all), delay: ms(launchAt(d)), easing: "linear", fill: "backwards" }));
       });
       if (pk) {
         // the bagel first (it lies under every piece), growing from its own hole
         if (bagelEl) {
           const q = bagelEl.getBoundingClientRect();
-          const art = stack(Array.from(bagelEl.querySelectorAll("img")), q.width, q.height);
           const still = { tx: 0, ty: 0, tilt: 0 };
           pk.add({
-            sprite: art?.c ?? null, pad: 0, cx: q.left + q.width / 2 - vr.left, cy: q.top + q.height / 2 - vr.top, w: q.width, h: q.height,
+            // (drawn once its two pictures are in: it does not rise for a second yet)
+            sprite: null, pad: 0, lazy: () => stack(Array.from(bagelEl.querySelectorAll("img")), q.width, q.height),
+            cx: q.left + q.width / 2 - vr.left, cy: q.top + q.height / 2 - vr.top, w: q.width, h: q.height,
             ox: (BAGEL_HOLE.fx - 0.5) * q.width, oy: (BAGEL_HOLE.fy - 0.5) * q.height, flat: true, turn: 0,
             poses: [
               { offset: 0, opacity: 0, sc: 0.01, ...still },
@@ -1564,7 +1567,24 @@ export default function Gallery() {
         ),
         new Promise((done) => window.setTimeout(done, 1200)), // a cold, direct arrival: wait a beat, not a long blank pause
       ]);
-    stormTimer = window.setTimeout(() => layoutReady.current.then(shown).then(imagesReady).then(() => requestAnimationFrame(runStorm)), 0);
+    /* Arriving by the cave-in, the hole is already on screen and every
+       moment before the first piece flies reads as a stall. The pieces leave
+       nearest first over more than half a second, so only the first to go
+       have to be ready; the rest arrive while those fly (and the page before
+       fetched them all in that order: motion/cave/exit.ts). */
+    const firstReady = () => {
+      const first = [...live.current.pieces]
+        .sort((a, b) => Math.hypot(a.x - BAGEL_HOLE.x, a.y - BAGEL_HOLE.y) - Math.hypot(b.x - BAGEL_HOLE.x, b.y - BAGEL_HOLE.y))
+        .slice(0, 14)
+        .map((p) => posters.get(p.id) ?? world.querySelector<HTMLImageElement>(`.gx-piece[data-id="${p.id}"] img`))
+        .filter((i): i is HTMLImageElement => !!i);
+      return Promise.race([
+        Promise.all(first.map((i) => (i.decode ? i.decode().catch(() => {}) : Promise.resolve()))),
+        new Promise((done) => window.setTimeout(done, 700)),
+      ]);
+    };
+    const byCave = () => !!(window as unknown as { __gxCave?: unknown }).__gxCave && document.documentElement.classList.contains("gx-cave");
+    stormTimer = window.setTimeout(() => layoutReady.current.then(shown).then(() => (byCave() ? firstReady() : imagesReady())).then(() => requestAnimationFrame(runStorm)), 0);
     // Until the visitor moves the canvas, any change in its size (Safari's
     // toolbars settling after a reload, a resized window) re-frames the
     // opening view; after that, it only redraws

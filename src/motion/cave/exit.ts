@@ -152,6 +152,41 @@ export function restore() {
   live = null;
 }
 
+/* THE FALL IS LOADING TIME. The page takes about two seconds to fall into
+   the hole, and Everything can do nothing until its own files are there: on
+   a slow phone or a slow connection that showed as the hole sitting still
+   between the two halves. So the moment the press lands, Everything's page,
+   its scripts and the canvas's light copies are fetched, the copies six at a
+   time in the order the pieces will be thrown (target.ts), so the first to
+   fly are the first to arrive. They land in the browser's cache, where the
+   next page finds them. (Before this they were only fetched quietly when the
+   page was idle: stormHandoff.ts.) */
+let ahead = false;
+function fetchAhead(url: string, pictures: string[]) {
+  if (ahead) return;
+  ahead = true;
+  fetch(url, { credentials: "same-origin" })
+    .then((r) => (r.ok ? r.text() : ""))
+    .then((html) => {
+      for (const m of html.matchAll(/<(?:script|link)\b[^>]*?(?:src|href)="(\/assets\/[^"]+\.(js|css))"/g)) {
+        const link = document.createElement("link");
+        if (m[2] === "js") link.rel = "modulepreload";
+        else { link.rel = "preload"; link.as = "style"; }
+        link.href = m[1];
+        document.head.appendChild(link);
+      }
+    })
+    .catch(() => {});
+  let i = 0;
+  const next = (): void => {
+    const href = pictures[i++];
+    if (!href) return;
+    // (read to the end: a response is only kept once all of it has come)
+    fetch(href, { priority: "high" } as RequestInit).then((r) => r.arrayBuffer()).catch(() => {}).then(next);
+  };
+  for (let k = 0; k < 6; k++) next();
+}
+
 export async function caveOut(url: string): Promise<void> {
   const root = document.documentElement;
   const go = () => {
@@ -169,7 +204,9 @@ export async function caveOut(url: string): Promise<void> {
   const navBottom = Math.max(56, document.querySelector<HTMLElement>(".wt-nav")?.offsetHeight ?? 78);
   let hole = { x: w * 0.46, y: h * 0.53 };
   try {
-    hole = (await import("./target.js")).holeAt(w, h, navBottom);
+    const target = await import("./target.js");
+    hole = target.holeAt(w, h, navBottom);
+    fetchAhead(url, target.picturesInOrder());
   } catch {
     /* the rough middle will do: Everything slides the hole onto the bagel */
   }

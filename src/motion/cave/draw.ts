@@ -36,6 +36,9 @@ export type Flyer = {
   turn: number;
   delay: number;
   dur: number;
+  /** its sprite is not drawn yet: this draws it (see pocket: made just ahead
+      of its launch, and again once if its picture had not arrived) */
+  lazy?: () => { c: HTMLCanvasElement; pad: number; whole: boolean } | null;
 };
 
 // cubic-bezier(x1, y1, x2, y2) as a function of time 0..1
@@ -94,7 +97,7 @@ export const drawScale = () => Math.min(3, Math.max(1, window.devicePixelRatio |
    it will be shown at its closest (the storm brings pieces toward the
    viewer), so it is drawn that much finer, though never finer than the
    picture it is drawn from. */
-export function sprite(fig: HTMLElement, w: number, h: number, k: number, still?: HTMLImageElement | null, loom = 1): { c: HTMLCanvasElement; pad: number } | null {
+export function sprite(fig: HTMLElement, w: number, h: number, k: number, still?: HTMLImageElement | null, loom = 1): { c: HTMLCanvasElement; pad: number; whole: boolean } | null {
   const sticker = fig.classList.contains("gx-piece--sticker");
   const pad = Math.ceil((sticker ? 16 : 30) * k) + 2;
 
@@ -154,11 +157,12 @@ export function sprite(fig: HTMLElement, w: number, h: number, k: number, still?
   } catch {
     /* a picture that can't be drawn (still loading, or broken): the paper alone */
   }
-  return { c, pad };
+  // (whole: its picture was there to draw; if not, it is the paper alone for now)
+  return { c, pad, whole: !!src };
 }
 
 /* Several pictures stacked in one box (the bagel: its line, then itself). */
-export function stack(imgs: HTMLImageElement[], w: number, h: number): { c: HTMLCanvasElement; pad: number } | null {
+export function stack(imgs: HTMLImageElement[], w: number, h: number): { c: HTMLCanvasElement; pad: number; whole: boolean } | null {
   const s = Math.min(drawScale(), 1600 / Math.max(1, w, h));
   const c = document.createElement("canvas");
   c.width = Math.max(1, Math.ceil(w * s));
@@ -166,14 +170,16 @@ export function stack(imgs: HTMLImageElement[], w: number, h: number): { c: HTML
   const g = c.getContext("2d");
   if (!g) return null;
   g.scale(s, s);
+  let whole = true;
   imgs.forEach((img) => {
     try {
       if (img.complete && img.naturalWidth) g.drawImage(img, 0, 0, w, h);
+      else whole = false;
     } catch {
-      /* skipped */
+      whole = false;
     }
   });
-  return { c, pad: 0 };
+  return { c, pad: 0, whole };
 }
 
 export type Pocket = {
@@ -203,7 +209,41 @@ export function pocket(host: HTMLElement): Pocket | null {
   const RAD = Math.PI / 180;
   let raf = 0, clock: Animation | null = null, total = 0, dead = false;
 
+  /* Sprites made as they are needed. Drawing all of them before the first
+     frame held the whole throw back on a slow phone, and they could not be
+     drawn before their pictures had arrived. So a piece's sprite is made
+     just ahead of its launch, a few each frame, nearest first; one whose
+     picture had not come yet flies as its paper and is drawn again when it
+     has. */
+  let queue: Flyer[] = [], frameNo = 0;
+  const make = (f: Flyer) => {
+    const made = f.lazy?.();
+    if (!made) return;
+    if (f.sprite) f.sprite.width = f.sprite.height = 0;
+    f.sprite = made.c;
+    f.pad = made.pad;
+    if (made.whole) f.lazy = undefined;
+  };
+  const prepare = (t: number) => {
+    frameNo++;
+    let spare = 3;
+    for (const f of queue) {
+      if (!f.lazy) continue;
+      if (!f.sprite) {
+        // not drawn at all yet: now if it is about to fly, else while there is time to spare
+        if (t >= f.delay - 80) make(f);
+        else if (spare > 0) { spare--; make(f); }
+      } else if (frameNo % 12 === 0 && spare > 0) {
+        // flying as its paper: look again for its picture, now and then
+        spare--;
+        make(f);
+      }
+    }
+    queue = queue.filter((f) => f.lazy);
+  };
+
   const paint = (t: number) => {
+    if (queue.length) prepare(t);
     g.setTransform(1, 0, 0, 1, 0, 0);
     g.clearRect(0, 0, el.width, el.height);
     for (const f of flyers) {
@@ -261,6 +301,9 @@ export function pocket(host: HTMLElement): Pocket | null {
     add: (f) => flyers.push(f),
     start: () => {
       total = Math.max(1, ...flyers.map((f) => f.delay + f.dur));
+      queue = flyers.filter((f) => f.lazy).sort((a, b) => a.delay - b.delay);
+      // (the first to fly are ready before the first frame)
+      queue.forEach((f) => { if (f.delay < 220) make(f); });
       clock = el.animate([{ opacity: 1 }, { opacity: 1 }], { duration: total, fill: "forwards" });
       // a finish from outside (a tap lands everything) has to reach the drawing too
       clock.finished.then(() => { if (!dead) paint(total); }, () => {});
