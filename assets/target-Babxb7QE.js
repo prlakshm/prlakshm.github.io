@@ -1,1 +1,0 @@
-import{c as i,a as y,P as E,b as h,p as m,o as u,d,f as n,S as l}from"./opening-BMoUX8So.js";function L(e,p,c){const o=window.matchMedia(i).matches,s=l,t=y(E,s),r=o?h(m(t),s.phone):t,a=u(e,p,c,o,d(r));return{x:a.x+n.x*a.z,y:a.y+n.y*a.z}}export{L as holeAt};
