@@ -77,7 +77,17 @@
         var d = document.documentElement;
         var ua = navigator.userAgent;
         var able = !/Firefox\/|FxiOS/.test(ua);
-        var deep = /Chrome\//.test(ua) && !/Mobile|Android|CriOS|EdgiOS/.test(ua)
+        // The lighter devices (src/motion/cave/shape.ts lite(); keep in step):
+        // anything driven by touch, an iPad even with a trackpad, a desktop
+        // with little memory or few processor threads, and a desktop that
+        // dropped frames on the full version (marked for a month). They get
+        // every flight here drawn into one canvas, flat, never in 3D.
+        var lite = !matchMedia("(pointer: fine)").matches
+          || /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)
+          || (navigator.deviceMemory || 8) <= 4 || (navigator.hardwareConcurrency || 8) <= 4;
+        try { var slowSince = Number(localStorage.getItem("gx-cave-lite")); if (slowSince > 0 && Date.now() - slowSince < 30 * 864e5) lite = true; } catch (e) {}
+        window.__gxLite = lite;
+        var deep = !lite && /Chrome\//.test(ua) && !/Mobile|Android|CriOS|EdgiOS/.test(ua)
           && matchMedia("(pointer: fine) and (min-width: 1024px)").matches;
         var nav = performance.getEntriesByType("navigation")[0];
         var storm = able && (!nav || nav.type === "navigate") && !matchMedia("(prefers-reduced-motion: reduce)").matches;

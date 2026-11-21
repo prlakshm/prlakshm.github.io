@@ -63,7 +63,7 @@ const curve = (easing?: string): ((t: number) => number) | null => {
 };
 
 /* Where a flyer is, a share p (0..1) of the way through its own timeline. */
-function sample(poses: Pose[], p: number, out: { tx: number; ty: number; sc: number; tilt: number; opacity: number }) {
+function sample(poses: Pose[], p: number, out: { tx: number; ty: number; sc: number; tilt: number; opacity: number; rot: number; clip: number }) {
   let i = 0;
   const last = poses.length - 1;
   if (p >= poses[last].offset) i = last;
@@ -78,6 +78,8 @@ function sample(poses: Pose[], p: number, out: { tx: number; ty: number; sc: num
   out.sc = a.sc + (b.sc - a.sc) * k;
   out.tilt = a.tilt + (b.tilt - a.tilt) * k;
   out.opacity = a.opacity + (b.opacity - a.opacity) * k;
+  out.rot = (a.rot ?? 0) + ((b.rot ?? 0) - (a.rot ?? 0)) * k;
+  out.clip = a.clip == null || b.clip == null ? -1 : a.clip + (b.clip - a.clip) * k;
 }
 
 /** device pixels per CSS pixel the drawing is made at */
@@ -88,12 +90,24 @@ export const drawScale = () => Math.min(3, Math.max(1, window.devicePixelRatio |
    .gx-piece and .gx-piece--sticker, copied here by hand: keep in step);
    w, h its size on screen; k the canvas's zoom (its shadow is that much
    smaller); `still` a picture to use where the piece is a film that has no
-   frame to show yet (its poster). */
-export function sprite(fig: HTMLElement, w: number, h: number, k: number, still?: HTMLImageElement | null): { c: HTMLCanvasElement; pad: number } | null {
+   frame to show yet (its poster); `loom` how many times bigger than that
+   it will be shown at its closest (the storm brings pieces toward the
+   viewer), so it is drawn that much finer, though never finer than the
+   picture it is drawn from. */
+export function sprite(fig: HTMLElement, w: number, h: number, k: number, still?: HTMLImageElement | null, loom = 1): { c: HTMLCanvasElement; pad: number } | null {
   const sticker = fig.classList.contains("gx-piece--sticker");
   const pad = Math.ceil((sticker ? 16 : 30) * k) + 2;
+
+  let src: CanvasImageSource | null = null, sw = 0, sh = 0;
+  const img = fig.querySelector("img"), film = fig.querySelector("video");
+  if (img && img.complete && img.naturalWidth) [src, sw, sh] = [img, img.naturalWidth, img.naturalHeight];
+  else if (film && film.readyState >= 2 && film.videoWidth) [src, sw, sh] = [film, film.videoWidth, film.videoHeight];
+  else if (still && still.complete && still.naturalWidth) [src, sw, sh] = [still, still.naturalWidth, still.naturalHeight];
+
+  const base = drawScale();
+  const finer = loom > 1 && sw ? Math.max(base, Math.min(base * loom, Math.max(sw / w, sh / h))) : base;
   // (a piece zoomed far past the screen is drawn no bigger than it can be seen)
-  const s = Math.min(drawScale(), 1600 / Math.max(1, w + 2 * pad, h + 2 * pad));
+  const s = Math.min(finer, 1600 / Math.max(1, w + 2 * pad, h + 2 * pad));
   const c = document.createElement("canvas");
   c.width = Math.max(1, Math.ceil((w + 2 * pad) * s));
   c.height = Math.max(1, Math.ceil((h + 2 * pad) * s));
@@ -102,12 +116,6 @@ export function sprite(fig: HTMLElement, w: number, h: number, k: number, still?
   g.scale(s, s);
   g.translate(pad, pad);
   const ink = (a: number) => `rgba(15, 23, 42, ${a})`;
-
-  let src: CanvasImageSource | null = null, sw = 0, sh = 0;
-  const img = fig.querySelector("img"), film = fig.querySelector("video");
-  if (img && img.complete && img.naturalWidth) [src, sw, sh] = [img, img.naturalWidth, img.naturalHeight];
-  else if (film && film.readyState >= 2 && film.videoWidth) [src, sw, sh] = [film, film.videoWidth, film.videoHeight];
-  else if (still && still.complete && still.naturalWidth) [src, sw, sh] = [still, still.naturalWidth, still.naturalHeight];
 
   try {
     if (sticker) {
@@ -191,7 +199,7 @@ export function pocket(host: HTMLElement): Pocket | null {
   const g = el.getContext("2d");
   if (!g) return null;
   const flyers: Flyer[] = [];
-  const q = { tx: 0, ty: 0, sc: 1, tilt: 0, opacity: 1 };
+  const q = { tx: 0, ty: 0, sc: 1, tilt: 0, opacity: 1, rot: 0, clip: -1 };
   const RAD = Math.PI / 180;
   let raf = 0, clock: Animation | null = null, total = 0, dead = false;
 
@@ -201,9 +209,17 @@ export function pocket(host: HTMLElement): Pocket | null {
     for (const f of flyers) {
       if (!f.sprite) continue;
       sample(f.poses, f.dur > 0 ? Math.min(1, Math.max(0, (t - f.delay) / f.dur)) : 1, q);
-      if (q.opacity < 0.004 || q.sc < 0.002) continue;
+      if (q.opacity < 0.004 || q.sc < 0.002 || q.clip === 0) continue;
       const ox = f.ox ?? 0, oy = f.oy ?? 0;
       g.setTransform(s, 0, 0, s, 0, 0);
+      // (shown only inside a circle about its centre: the bagel opening)
+      const clipped = q.clip > 0;
+      if (clipped) {
+        g.save();
+        g.beginPath();
+        g.arc(f.cx, f.cy, q.clip, 0, Math.PI * 2);
+        g.clip();
+      }
       g.translate(f.cx + ox + q.tx, f.cy + oy + q.ty);
       if (!f.flat && q.tilt) {
         const a = f.turn * RAD;
@@ -211,9 +227,11 @@ export function pocket(host: HTMLElement): Pocket | null {
         g.scale(Math.max(0.02, Math.cos(q.tilt * RAD)), 1);
         g.rotate(-a);
       }
+      if (q.rot) g.rotate(q.rot * RAD);
       g.scale(q.sc, q.sc);
       g.globalAlpha = Math.min(1, q.opacity);
       g.drawImage(f.sprite, -(f.w / 2 + f.pad) - ox, -(f.h / 2 + f.pad) - oy, f.w + 2 * f.pad, f.h + 2 * f.pad);
+      if (clipped) g.restore();
     }
     g.globalAlpha = 1;
   };

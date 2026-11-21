@@ -10,7 +10,7 @@ import { earn } from "../../components/badges/badgeStore.js";
 import { BAGEL, PIECES, applyLayout, applyPhone, pieceBounds, portraitLayout, thumbOf, type Layout, type Piece } from "./clusters.js";
 import SAVED from "./layout.json";
 import { BAGEL_HOLE, PHONE_QUERY, Z_MAX, Z_MIN, openingCam } from "./opening.js";
-import { CAVE_KEY, CLOCK, EASE, PACE, PACE_REST, PAPER, buildHole, fallFor, fallFrames, fallPath, farCorner, flightFor, holeRadius, isThin, launchAt, makeShape, markRunning, mode, outAt, releaseAt, type CaveHandoff } from "../../motion/cave/shape.js";
+import { CAVE_KEY, CLOCK, EASE, PACE, PACE_REST, PAPER, buildHole, fallFor, fallFrames, fallPath, farCorner, flightFor, holeRadius, isThin, launchAt, makeShape, markRunning, mode, outAt, releaseAt, watchFrames, type CaveHandoff, type Pose } from "../../motion/cave/shape.js";
 import { begin as beginTest, hud as testHud } from "../../motion/cave/test.js";
 import { pocket, sprite, stack, type Flyer } from "../../motion/cave/draw.js";
 import Sheet from "./Sheet.js";
@@ -718,7 +718,7 @@ export default function Gallery() {
       world.style.transform = `translate3d(${((want.left - a.left) / k).toFixed(2)}px, ${((want.top - a.top) / k).toFixed(2)}px, 0)`;
       return { k, off };
     };
-    /* "canvas" (the pocket-size one, what phones and tablets get; draw.ts): the
+    /* "canvas" (the pocket-size one, what phones, tablets and lighter desktops get; draw.ts): the
        pieces are drawn into one canvas over the view while the real canvas
        is hidden, and the real one is put back under it at the end. A film
        that has no frame yet is drawn from its poster, fetched ahead here. */
@@ -731,9 +731,9 @@ export default function Gallery() {
         still.src = thumbOf(p.poster);
         posters.set(p.id, still);
       });
-    const flyer = (t: Thrown, vr: DOMRect, z: number, fall: ReturnType<typeof fallPath>, delay: number, dur: number): Flyer & { z: number } => {
+    const flyer = (t: Thrown, vr: DOMRect, z: number, fall: ReturnType<typeof fallPath>, delay: number, dur: number, loom = 1): Flyer & { z: number } => {
       const w = t.right - t.left, h = t.bottom - t.top;
-      const drawn = sprite(t.el, w, h, z, posters.get(t.piece!.id));
+      const drawn = sprite(t.el, w, h, z, posters.get(t.piece!.id), loom);
       return { sprite: drawn?.c ?? null, pad: drawn?.pad ?? 0, cx: (t.left + t.right) / 2 - vr.left, cy: (t.top + t.bottom) / 2 - vr.top, w, h, ...fall, delay, dur, z: t.piece!.z };
     };
     // everything that falls in or is thrown out: the canvas's pieces, then
@@ -768,6 +768,7 @@ export default function Gallery() {
       storming = true;
       syncVideos();
       const endTest = beginTest("throw out");
+      const judged = watchFrames(); // (a desktop that can't keep up gets the lighter one next time)
       const fit = fitOn();
       const pk = pocketOn ? pocket(view) : null;
       /* The hole is drawn on the screen, not in the canvas: inside the scaled
@@ -913,6 +914,7 @@ export default function Gallery() {
         const settled = () => {
           markRunning(false); // it ran to the end (shape.ts: the safety switch)
           endTest();
+          judged();
           storming = false;
           holdFull = false; // ...and only now do the originals start to come in
           syncVideos();
@@ -957,6 +959,7 @@ export default function Gallery() {
       storming = true;
       markRunning(true);
       const endTest = beginTest("fall (Ev)");
+      const judged = watchFrames();
       setSelected([]);
       const out: Animation[] = [];
       // the cool white the dots wash out to, under everything
@@ -1090,6 +1093,7 @@ export default function Gallery() {
         holeTop?.remove();
         markRunning(false); // this half ran to the end (shape.ts: the safety switch)
         endTest();
+        judged();
         const still = buildHole(shape).svg.outerHTML;
         const note: CaveHandoff = {
           at: Date.now(), hx, hy, R, seed, w, h,
@@ -1281,6 +1285,13 @@ export default function Gallery() {
          real 3D, WebKit draws every looming tile (and the bagel, pushed back
          and scaled up) as a huge layer, which ran iPhones out of memory. */
       const FLAT = root.classList.contains("gx-storm-flat");
+      /* ...and on tablets and lighter desktops (shape.ts lite()) that flat
+         flight is drawn, not moved (draw.ts, as the cave-in and the ripple
+         are): the pieces loom to 2.6 times their size here, each one a
+         picture of its own at the canvas's full laid-out size. */
+      const pk = pocketOn && FLAT ? pocket(view) : null;
+      const drawn: (Flyer & { z: number })[] = [];
+      const judged = watchFrames(); // (a desktop that can't keep up gets the lighter one next time)
       if (!FLAT) {
         view.style.perspective = "1400px";
         view.style.perspectiveOrigin = `${eye.x}px ${eye.y}px`;
@@ -1362,7 +1373,7 @@ export default function Gallery() {
           inner[k].push(q.rad - q.size);
           outer[k].push(q.rad + q.size);
         }
-        const frames: Keyframe[] = [];
+        const frames: Keyframe[] = [], poses: Pose[] = [];
         const N = 64;
         for (let k = 0; k < N; k++) {
           const t = k / (N - 1), tt = t * end;
@@ -1376,6 +1387,7 @@ export default function Gallery() {
             const ox = (px - sx) / cam.z, oy = (py - sy) / cam.z;
             // the 3D lean, as a slight turn toward its line of travel
             const turn = (tilt * 0.35) * (ux >= 0 ? 1 : -1);
+            if (pk) poses.push({ offset: t, opacity: op, tx: px - sx, ty: py - sy, sc: sc * near, tilt: 0, rot: turn });
             kf = { offset: t, opacity: op, transform: `translate(${ox.toFixed(1)}px, ${oy.toFixed(1)}px) rotate(${turn.toFixed(2)}deg) scale(${(sc * near).toFixed(3)})` };
           } else {
             const radW = (rad * (PERSP - zc)) / PERSP;
@@ -1385,7 +1397,11 @@ export default function Gallery() {
           }
           frames.push(kf);
         }
-        storm.push(el.animate(frames, { duration: Ti, easing: "linear", fill: "backwards" }));
+        if (pk) {
+          const hw = (p.w * cam.z) / 2, hh = (p.h * cam.z) / 2;
+          const t: Thrown = { el, left: r.left + sx - hw, top: r.top + sy - hh, right: r.left + sx + hw, bottom: r.top + sy + hh, unit: 1, flat: true, piece: p };
+          drawn.push(flyer(t, r, cam.z, { poses, flat: true, turn: 0 }, 0, Ti, LOOM_MAX));
+        } else storm.push(el.animate(frames, { duration: Ti, easing: "linear", fill: "backwards" }));
       });
       /* The new page comes in the way the old one went out, mirrored: a
          circle opening from the orb behind the pieces as they fly out,
@@ -1413,7 +1429,8 @@ export default function Gallery() {
         // how far its furthest part (the speech bubble included) reaches from its centre
         const bc = bagelEl.getBoundingClientRect(), bcx = bc.left + bc.width / 2, bcy = bc.top + bc.height / 2;
         const rFull = 1.02 * Math.max(...[bagelEl, ...bagelEl.querySelectorAll<HTMLElement>("*")].map((n) => { const q = n.getBoundingClientRect(); return q.width ? Math.max(Math.hypot(q.left - bcx, q.top - bcy), Math.hypot(q.right - bcx, q.top - bcy), Math.hypot(q.left - bcx, q.bottom - bcy), Math.hypot(q.right - bcx, q.bottom - bcy)) : 0; }));
-        if (FLAT) bagelEl.style.zIndex = "-1"; // under every piece
+        if (pk) { /* drawn first, so it is under every piece already */ }
+        else if (FLAT) bagelEl.style.zIndex = "-1"; // under every piece
         else {
           bagelEl.style.transform = "translateZ(-1600px)";
           const w1 = bagelEl.getBoundingClientRect().width;
@@ -1435,8 +1452,23 @@ export default function Gallery() {
         // with the furthest piece)
         const endM = 0.93 + 0.07 * (rMid / rFar);
         const bStart = MID + from * (endM - MID);
-        const bg = storm.push(bagelEl.animate(grow, { duration: (endM - bStart) * T, delay: bStart * T, easing: "linear", fill: "backwards" }));
-        storm[bg - 1].finished.then(() => { bagelEl.style.transform = ""; bagelEl.style.zIndex = ""; }, () => {});
+        if (pk) {
+          // the same opening circle, drawn: the bagel shown only inside it
+          const art = stack(Array.from(bagelEl.querySelectorAll("img")), bc.width, bc.height);
+          const whole = { tx: 0, ty: 0, sc: 1, tilt: 0, opacity: 1 };
+          const open: Pose[] = [];
+          for (let k = 0; k <= 40; k++) { const s = k / 40; open.push({ offset: s, clip: rFull * (1 - Math.pow(1 - s, 2)), ...whole }); }
+          pk.add({ sprite: art?.c ?? null, pad: 0, cx: bcx - r.left, cy: bcy - r.top, w: bc.width, h: bc.height, poses: open, flat: true, turn: 0, delay: bStart * T, dur: (endM - bStart) * T });
+        } else {
+          const bg = storm.push(bagelEl.animate(grow, { duration: (endM - bStart) * T, delay: bStart * T, easing: "linear", fill: "backwards" }));
+          storm[bg - 1].finished.then(() => { bagelEl.style.transform = ""; bagelEl.style.zIndex = ""; }, () => {});
+        }
+      }
+      if (pk) {
+        drawn.sort((a, b) => a.z - b.z).forEach((f) => pk.add(f));
+        world.after(pk.el);
+        world.style.visibility = "hidden"; // the real canvas waits underneath, unpainted
+        storm.push(pk.start());
       }
       /* The page being left is swept away by the pieces as they come in: it
          stays in place, at full strength, but only what's inside their
@@ -1491,8 +1523,15 @@ export default function Gallery() {
         root.classList.remove("gx-sky-on");
         view.style.perspective = "";
         world.style.transformStyle = "";
-        storming = false;
-        syncVideos();
+        const settled = () => {
+          storming = false;
+          syncVideos();
+          judged();
+        };
+        if (!pk) return settled();
+        // the real canvas comes back under the drawing, and the drawing lifts off it
+        world.style.visibility = "";
+        pk.lift().then(settled);
       }, () => {});
     };
     // started a moment later (and cancelled on cleanup), so a re-run of this

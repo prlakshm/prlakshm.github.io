@@ -71,8 +71,10 @@ export const outAt = (t: number) =>
    Firefox draw the same paths flat: slide, shrink, fade. Phones and tablets
    (anything driven by touch) cannot afford even that: moving the sixty
    pieces flat was killed on a real iPhone's first visit (2026-11-21). They
-   get "canvas", which moves no pieces at all and passed on that phone. The
-   desktop test is the same as the storm's (everything/index.html).
+   get "canvas", which moves no pieces at all and passed on that phone, and
+   so does any desktop that looks short of room or has shown that it is
+   (lite(), below). The desktop test is the same as the storm's
+   (everything/index.html).
 
    How it is drawn:
      deep    real 3D tilt, the hole in two copies (desktop Chromium);
@@ -83,7 +85,7 @@ export const outAt = (t: number) =>
      fit     real 3D tilt with the canvas laid out at its on-screen size
              (CSS zoom in place of scale), in case what Safari cannot afford
              is storing each tilted tile at its full laid-out size.
-     canvas  (phones and tablets) the pocket-size one (draw.ts): on Everything the pieces are not
+     canvas  (phones, tablets, lighter desktops) the pocket-size one (draw.ts): on Everything the pieces are not
              moved at all; they are drawn, from their light copies, into one
              screen-sized canvas, tilt as a squash, and the real canvas is
              put back under it once they land. The memory it takes is the
@@ -93,10 +95,40 @@ export const outAt = (t: number) =>
    reached only by a test link (test.ts: ?cave=flat|squash|fit|canvas|3d),
    which forces any of these on any device. */
 export type Mode = "deep" | "flat" | "squash" | "fit" | "canvas";
+
+/* THE LIGHTER DEVICES: who gets "canvas" in place of moving the pieces.
+     touch   anything whose main pointer is not a mouse or trackpad;
+     iPad    also with a trackpad attached (it calls itself a Mac; the
+             touch screen gives it away);
+     small   a desktop with 4GB of memory or less (Chromium says), or four
+             processor threads or fewer: the older laptops;
+     slow    a desktop that ran the full version and dropped frames doing
+             it (watchFrames, below): for a month it gets this one.
+   everything/index.html decides the same thing before the first frame and
+   leaves it in window.__gxLite; keep its copy of these lines in step. */
+export const LITE_KEY = "gx-cave-lite";
+const LITE_FOR = 30 * 864e5;
+export const lite = (): boolean => {
+  const w = window as unknown as { __gxLite?: boolean };
+  if (typeof w.__gxLite === "boolean") return w.__gxLite;
+  const nav = navigator as Navigator & { deviceMemory?: number };
+  const touch = !window.matchMedia("(pointer: fine)").matches;
+  const pad = /iPad/.test(nav.userAgent) || (/Macintosh/.test(nav.userAgent) && nav.maxTouchPoints > 1);
+  const small = (nav.deviceMemory ?? 8) <= 4 || (nav.hardwareConcurrency ?? 8) <= 4;
+  let slow = false;
+  try {
+    const since = Number(localStorage.getItem(LITE_KEY));
+    slow = since > 0 && Date.now() - since < LITE_FOR;
+  } catch {
+    /* storage closed to us */
+  }
+  return (w.__gxLite = touch || pad || small || slow);
+};
+
 let modeMemo: Mode | null = null;
+let asked: string | null = null;
 export const mode = (): Mode => {
   if (modeMemo) return modeMemo;
-  let asked: string | null = null;
   try {
     asked = new URLSearchParams(window.location.search).get("cave");
   } catch {
@@ -107,9 +139,48 @@ export const mode = (): Mode => {
     /Chrome\//.test(navigator.userAgent) &&
     !/Mobile|Android|CriOS|EdgiOS/.test(navigator.userAgent) &&
     window.matchMedia("(pointer: fine) and (min-width: 1024px)").matches;
-  const touch = typeof window !== "undefined" && !window.matchMedia("(pointer: fine)").matches;
-  return (modeMemo = asked === "3d" ? "deep" : asked === "flat" || asked === "squash" || asked === "fit" || asked === "canvas" ? asked : desk ? "deep" : touch ? "canvas" : "flat");
+  const light = typeof window !== "undefined" && lite();
+  return (modeMemo = asked === "3d" ? "deep" : asked === "flat" || asked === "squash" || asked === "fit" || asked === "canvas" ? asked : light ? "canvas" : desk ? "deep" : "flat");
 };
+
+/* THE STEP-DOWN. A desktop that is given the full version is watched while
+   it plays: if it cannot keep up (under 45 frames a second over the run, or
+   five frames that each took longer than 50ms), it is marked, and from its
+   next page on it gets the lighter drawing, for a month. Call the function
+   this returns when the run ends. Nothing is judged where the lighter one
+   is already in use, with a ?cave= test link, on a run under 0.6s, or if
+   the tab was ever hidden meanwhile (a hidden tab draws no frames). */
+export function watchFrames(): () => void {
+  if (typeof window === "undefined" || mode() === "canvas" || asked) return () => {};
+  let frames = 0, slow = 0, first = 0, last = 0, on = true, away = document.hidden;
+  const hid = () => { away = true; };
+  document.addEventListener("visibilitychange", hid);
+  const tick = (t: number) => {
+    if (!on) return;
+    if (!first) first = t;
+    else {
+      frames++;
+      if (frames > 3 && t - last > 50) slow++; // (the first frames are the set-up)
+    }
+    last = t;
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+  return () => {
+    if (!on) return;
+    on = false;
+    document.removeEventListener("visibilitychange", hid);
+    const took = last - first;
+    if (away || took < 600) return;
+    if ((frames * 1000) / took < 45 || slow >= 5) {
+      try {
+        localStorage.setItem(LITE_KEY, String(Date.now()));
+      } catch {
+        /* nothing to remember it in */
+      }
+    }
+  };
+}
 /** real 3D transforms on the pieces */
 export const tilts = (): boolean => mode() === "deep" || mode() === "fit";
 
@@ -313,7 +384,8 @@ export function buildLid(shape: Shape, lid: Shape["lids"][number]) {
    dx, dy: from the hole's centre to the piece's centre; w, h: its size on
    screen; dur: its whole way in, in clock seconds. `unit` converts screen
    pixels to the element's own (1 on a page, 1/zoom on the canvas). */
-export type Pose = { offset: number; easing?: string; tx: number; ty: number; sc: number; tilt: number; opacity: number };
+/** rot: a turn in the plane, degrees; clip: shown only within this many pixels of its centre (draw.ts) */
+export type Pose = { offset: number; easing?: string; tx: number; ty: number; sc: number; tilt: number; opacity: number; rot?: number; clip?: number };
 type FallOpts = { flat: boolean; w: number; h: number; dur: number; out?: boolean; unit?: number; rock?: number };
 
 /* The fall as numbers: where the piece is (tx, ty: screen pixels from its

@@ -1,7 +1,7 @@
 import {
   CAVE_KEY, CLOCK, EASE, PAPER, buildHole, buildLid, fallFor, fallFrames, farCorner, holeRadius, isThin, makeShape, releaseAt,
   type CaveHandoff, type Pt,
-  PACE, markRunning, mode, outAt, tilts,
+  PACE, markRunning, mode, outAt, tilts, watchFrames,
 } from "./shape.js";
 import { begin as beginTest } from "./test.js";
 
@@ -198,6 +198,7 @@ export async function caveOut(url: string): Promise<void> {
   if (!pieces.length) return go();
   markRunning(true);
   const endTest = beginTest("fall in");
+  const judged = watchFrames(); // (a desktop that can't keep up gets the lighter one next time)
 
   // the layer under the falling pieces: cool white (washes in), cracks, hole, shards
   const layer = document.createElement("div");
@@ -271,6 +272,7 @@ export async function caveOut(url: string): Promise<void> {
   const handOff = () => {
     markRunning(false); // this half ran to the end (shape.ts: the safety switch)
     endTest();
+    judged();
     lids.forEach((l) => l.remove());
     const svg =
       `<div style="position:absolute;inset:0;background:${PAPER}"></div>` +
