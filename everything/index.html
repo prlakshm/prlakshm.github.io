@@ -88,14 +88,29 @@
         // Gallery.tsx (runCave) throws the pieces back out of it. It takes
         // the storm's place, on every browser and screen. The note is good
         // for one arrival, a few seconds, in a window of the same size.
+        // The safety switch (src/motion/cave/shape.ts): if a cave-in is still
+        // marked as running, the page was killed in the middle of one (an
+        // iPhone out of memory). It is turned off on this device for a
+        // month, here and on every page, and the usual entrance plays.
+        var caveOff = false;
+        try {
+          if (sessionStorage.getItem("gx-cave-running")) {
+            sessionStorage.removeItem("gx-cave-running");
+            localStorage.setItem("gx-cave-off", String(Date.now()));
+          }
+          var since = Number(localStorage.getItem("gx-cave-off"));
+          caveOff = since > 0 && Date.now() - since < 30 * 864e5;
+        } catch (e) {}
+        window.__gxCaveOff = caveOff;
         var cave = null;
         try {
           var raw = sessionStorage.getItem("gx-cave-handoff");
           if (raw) {
             sessionStorage.removeItem("gx-cave-handoff");
             var c = JSON.parse(raw);
-            if ((!nav || nav.type === "navigate") && Date.now() - c.at < 8000 && Math.abs(c.w - innerWidth) < 3 && Math.abs(c.h - innerHeight) < 3) cave = c;
+            if (!caveOff && (!nav || nav.type === "navigate") && Date.now() - c.at < 8000 && Math.abs(c.w - innerWidth) < 3 && Math.abs(c.h - innerHeight) < 3) cave = c;
           }
+          if (cave) sessionStorage.setItem("gx-cave-running", "1");
         } catch (e) {}
         if (cave) { storm = false; window.__gxCave = cave; d.classList.add("gx-cave", "gx-cave-air"); }
         var chromium = /Chrome\//.test(ua);
@@ -116,11 +131,11 @@
         });
       })();
     </script>
-    <script type="module" crossorigin src="/assets/everything-Dx6PfHLM.js"></script>
+    <script type="module" crossorigin src="/assets/everything-Bm8l4ei1.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/stormHandoff-BHEt7cPH.js">
     <link rel="modulepreload" crossorigin href="/assets/home-DXwFlhMU.js">
     <link rel="modulepreload" crossorigin href="/assets/opening-BMoUX8So.js">
-    <link rel="modulepreload" crossorigin href="/assets/shape-DrEc7B70.js">
+    <link rel="modulepreload" crossorigin href="/assets/shape-C0SXkaRl.js">
     <link rel="stylesheet" crossorigin href="/assets/stormHandoff-BcfU556L.css">
     <link rel="stylesheet" crossorigin href="/assets/home-DNw3NDHN.css">
     <link rel="stylesheet" crossorigin href="/assets/everything-C-YVJvUg.css">
