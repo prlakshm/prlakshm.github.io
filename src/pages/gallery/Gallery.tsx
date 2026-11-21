@@ -11,7 +11,7 @@ import { BAGEL, PIECES, applyLayout, applyPhone, pieceBounds, portraitLayout, th
 import SAVED from "./layout.json";
 import { BAGEL_HOLE, PHONE_QUERY, Z_MAX, Z_MIN, openingCam } from "./opening.js";
 import { CAVE_KEY, CLOCK, EASE, PACE, PACE_REST, PAPER, buildHole, fallFor, fallFrames, fallPath, farCorner, flightFor, holeRadius, isThin, launchAt, makeShape, markRunning, mode, outAt, releaseAt, watchFrames, type CaveHandoff, type Pose } from "../../motion/cave/shape.js";
-import { begin as beginTest, hud as testHud } from "../../motion/cave/test.js";
+import { begin as beginTest, hud as testHud, say as testSay } from "../../motion/cave/test.js";
 import { pocket, sprite, stack, type Flyer } from "../../motion/cave/draw.js";
 import Sheet from "./Sheet.js";
 
@@ -690,6 +690,8 @@ export default function Gallery() {
        it slides the last few pixels onto the real one while the pieces fly.
        Any click, scroll or key lands everything at once. ?slow=4 slows it. */
     let caved = false;
+    // (how long the hole waits before the throw, and on what: for the test log)
+    const waited = { page: performance.now(), timer: 0, pictures: 0 };
     testHud(true); // (only with a ?cave= test link: the log of what ran, in the corner)
     // (...and &press=1 on that link presses EVERYTHING by itself once the
     // entrance is over, for a device nobody can tap: motion/caveIn.ts)
@@ -732,6 +734,8 @@ export default function Gallery() {
        is hidden, and the real one is put back under it at the end. A film
        that has no frame yet is drawn from its poster, fetched ahead here. */
     const pocketOn = mode() === "canvas";
+    // (pictures whose decoding has finished: drawing one of these costs nothing)
+    const decoded = new WeakSet<HTMLImageElement>();
     const posters = new Map<string, HTMLImageElement>();
     if (pocketOn)
       live.current.pieces.forEach((p) => {
@@ -743,9 +747,14 @@ export default function Gallery() {
     // (later: its sprite is drawn just ahead of its launch, not now; draw.ts)
     const flyer = (t: Thrown, vr: DOMRect, z: number, fall: ReturnType<typeof fallPath>, delay: number, dur: number, loom = 1, later = false): Flyer & { z: number } => {
       const w = t.right - t.left, h = t.bottom - t.top;
-      const draw = () => sprite(t.el, w, h, z, posters.get(t.piece!.id), loom);
+      const still = posters.get(t.piece!.id), pic = still ?? t.el.querySelector("img");
+      const ready = () => !pic || decoded.has(pic);
+      const draw = () => {
+        const ok = !later || ready(), d = sprite(t.el, w, h, z, still, loom, ok);
+        return d && { ...d, whole: ok && d.whole };
+      };
       const drawn = later ? null : draw();
-      return { sprite: drawn?.c ?? null, pad: drawn?.pad ?? 0, lazy: later ? draw : undefined, cx: (t.left + t.right) / 2 - vr.left, cy: (t.top + t.bottom) / 2 - vr.top, w, h, ...fall, delay, dur, z: t.piece!.z };
+      return { sprite: drawn?.c ?? null, pad: drawn?.pad ?? 0, lazy: later ? draw : undefined, ready: later ? ready : undefined, cx: (t.left + t.right) / 2 - vr.left, cy: (t.top + t.bottom) / 2 - vr.top, w, h, ...fall, delay, dur, z: t.piece!.z };
     };
     // everything that falls in or is thrown out: the canvas's pieces, then
     // the nav's (its words are only pulled; an open phone menu goes as one card)
@@ -770,6 +779,7 @@ export default function Gallery() {
       return thrown;
     };
     const runCave = (note: CaveHandoff) => {
+      const runAt = performance.now();
       caved = true;
       const root = document.documentElement;
       const slow = parseFloat(getComputedStyle(root).getPropertyValue("--gx-slow")) || 1;
@@ -912,6 +922,10 @@ export default function Gallery() {
       // page before left can go (the canvas under it is the same cool white)
       root.classList.remove("gx-cave");
       document.getElementById("gx-cave-first")?.remove();
+      {
+        const now = performance.now(), r = Math.round;
+        testSay(`waited ${r(now)}ms: page ${r(waited.page)}, first draw ${r(waited.timer - waited.page)}, pictures ${r(waited.pictures - waited.timer)}, frame ${r(runAt - waited.pictures)}, set-up ${r(now - runAt)}`);
+      }
       const skip = () => storm.forEach((a) => a.finish());
       const skipOn = ["pointerdown", "wheel", "keydown"] as const;
       skipOn.forEach((ev) => window.addEventListener(ev, skip, { capture: true, once: true }));
@@ -1573,21 +1587,42 @@ export default function Gallery() {
        have to be ready; the rest arrive while those fly (and the page before
        fetched them all in that order: motion/cave/exit.ts). */
     const firstReady = () => {
-      const first = [...live.current.pieces]
+      // every picture is set decoding, in the order the pieces will fly
+      const inOrder = [...live.current.pieces]
         .sort((a, b) => Math.hypot(a.x - BAGEL_HOLE.x, a.y - BAGEL_HOLE.y) - Math.hypot(b.x - BAGEL_HOLE.x, b.y - BAGEL_HOLE.y))
-        .slice(0, 10)
         .map((p) => posters.get(p.id) ?? world.querySelector<HTMLImageElement>(`.gx-piece[data-id="${p.id}"] img`))
-        .filter((i): i is HTMLImageElement => !!i);
-      return Promise.race([
-        Promise.all(first.map((i) => (i.decode ? i.decode().catch(() => {}) : Promise.resolve()))),
-        // (no longer than this: a piece whose picture is later still flies as
-        // its paper and is filled in when it comes, which reads better than
-        // the hole sitting still)
-        new Promise((done) => window.setTimeout(done, 450)),
-      ]);
+        .filter((i): i is HTMLImageElement => !!i)
+        .map((i) => {
+          const done = () => { decoded.add(i); };
+          return i.decode ? i.decode().then(done, done) : Promise.resolve(done());
+        });
+      /* The drawn version does not wait at all: each piece is drawn the
+         moment its own picture is decoded, and one that is not ready as it
+         leaves the hole goes as its paper until it is (draw.ts). A piece
+         leaves the hole tiny and faint, so that is not seen; the hole
+         sitting still is. (Measured: waiting even for the first three cost
+         as long as waiting for ten, a third of the whole wait on a slow
+         phone: the page is busy drawing itself for the first time and the
+         answer queues behind that.) Where the pieces themselves are moved
+         (desktops) the first ten are waited for, briefly. */
+      if (pocketOn) return Promise.resolve();
+      return Promise.race([Promise.all(inOrder.slice(0, 10)), new Promise((done) => window.setTimeout(done, 450))]);
     };
     const byCave = () => !!(window as unknown as { __gxCave?: unknown }).__gxCave && document.documentElement.classList.contains("gx-cave");
-    stormTimer = window.setTimeout(() => layoutReady.current.then(shown).then(() => (byCave() ? firstReady() : imagesReady())).then(() => requestAnimationFrame(runStorm)), 0);
+    stormTimer = window.setTimeout(() => { waited.timer = performance.now(); layoutReady.current.then(shown).then(() => (byCave() ? firstReady() : imagesReady())).then(() => {
+        waited.pictures = performance.now();
+        /* Arriving by the cave-in, the throw is set up now, not on the next
+           frame: the page's first frame is its slowest (everything is laid
+           out and drawn for the first time), and waiting for it cost a slow
+           phone a tenth of a second with the hole sitting still. The camera
+           is put on the canvas by hand first, since that also waits for a
+           frame otherwise. */
+        if (byCave()) {
+          if (frame) cancelAnimationFrame(frame);
+          paint();
+          runStorm();
+        } else requestAnimationFrame(runStorm);
+      }); }, 0);
     // Until the visitor moves the canvas, any change in its size (Safari's
     // toolbars settling after a reload, a resized window) re-frames the
     // opening view; after that, it only redraws

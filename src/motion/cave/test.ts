@@ -23,7 +23,7 @@
 import { mode } from "./shape.js";
 
 const KEY = "gx-cave-test-log";
-type Row = { v: string; half: string; state: "running" | "done" | "killed"; at: number; frames?: number; worst?: number; worstAt?: number; fps?: number };
+type Row = { v: string; half: string; state: "running" | "done" | "killed"; at: number; frames?: number; worst?: number; worstAt?: number; fps?: number; text?: string };
 
 export const variant = (): string | null => {
   try {
@@ -80,6 +80,15 @@ export function begin(half: string): () => void {
   };
 }
 
+/* A line of its own in the log (how long the hole waited before the throw,
+   and on what: Gallery.tsx). */
+export function say(text: string) {
+  const v = variant();
+  if (!v) return;
+  write([...read(), { v: v === "auto" ? mode() : v, half: "", state: "done", at: Date.now(), text }]);
+  hud();
+}
+
 /* On a fresh page: whatever is still marked as started was killed. Then the
    log goes in the corner. */
 export function hud(fresh = false) {
@@ -101,7 +110,8 @@ export function hud(fresh = false) {
   }
   const head = `cave test: ${v === "auto" ? `auto (this device gets ${mode()})` : v}  |  ${window.innerWidth}x${window.innerHeight} @${window.devicePixelRatio}x`;
   const lines = rows.slice(-7).map((r) =>
-    r.state === "done" ? `${r.v.padEnd(6)} ${r.half.padEnd(10)} ok   ${r.fps}fps  slowest ${r.worst}ms${r.worstAt != null ? ` at ${(r.worstAt / 1000).toFixed(1)}s` : ""}`
+    r.text ? `${r.v.padEnd(6)} ${r.text}`
+    : r.state === "done" ? `${r.v.padEnd(6)} ${r.half.padEnd(10)} ok   ${r.fps}fps  slowest ${r.worst}ms${r.worstAt != null ? ` at ${(r.worstAt / 1000).toFixed(1)}s` : ""}`
     : r.state === "killed" ? `${r.v.padEnd(6)} ${r.half.padEnd(10)} KILLED (page was reloaded)`
     : `${r.v.padEnd(6)} ${r.half.padEnd(10)} running...`,
   );

@@ -39,6 +39,8 @@ export type Flyer = {
   /** its sprite is not drawn yet: this draws it (see pocket: made just ahead
       of its launch, and again once if its picture had not arrived) */
   lazy?: () => { c: HTMLCanvasElement; pad: number; whole: boolean } | null;
+  /** whether its picture is decoded and can be drawn without a hitch */
+  ready?: () => boolean;
 };
 
 // cubic-bezier(x1, y1, x2, y2) as a function of time 0..1
@@ -97,7 +99,7 @@ export const drawScale = () => Math.min(3, Math.max(1, window.devicePixelRatio |
    it will be shown at its closest (the storm brings pieces toward the
    viewer), so it is drawn that much finer, though never finer than the
    picture it is drawn from. */
-export function sprite(fig: HTMLElement, w: number, h: number, k: number, still?: HTMLImageElement | null, loom = 1): { c: HTMLCanvasElement; pad: number; whole: boolean } | null {
+export function sprite(fig: HTMLElement, w: number, h: number, k: number, still?: HTMLImageElement | null, loom = 1, picture = true): { c: HTMLCanvasElement; pad: number; whole: boolean } | null {
   const sticker = fig.classList.contains("gx-piece--sticker");
   const pad = Math.ceil((sticker ? 16 : 30) * k) + 2;
 
@@ -106,6 +108,9 @@ export function sprite(fig: HTMLElement, w: number, h: number, k: number, still?
   if (img && img.complete && img.naturalWidth) [src, sw, sh] = [img, img.naturalWidth, img.naturalHeight];
   else if (film && film.readyState >= 2 && film.videoWidth) [src, sw, sh] = [film, film.videoWidth, film.videoHeight];
   else if (still && still.complete && still.naturalWidth) [src, sw, sh] = [still, still.naturalWidth, still.naturalHeight];
+  // (picture false: the paper alone, for a picture that is there but not
+  // decoded yet; drawing it now would stop the frame to decode it)
+  if (!picture) src = null;
 
   const base = drawScale();
   const finer = loom > 1 && sw ? Math.max(base, Math.min(base * loom, Math.max(sw / w, sh / h))) : base;
@@ -211,10 +216,10 @@ export function pocket(host: HTMLElement): Pocket | null {
 
   /* Sprites made as they are needed. Drawing all of them before the first
      frame held the whole throw back on a slow phone, and they could not be
-     drawn before their pictures had arrived. So a piece's sprite is made
-     just ahead of its launch, a few each frame, nearest first; one whose
-     picture had not come yet flies as its paper and is drawn again when it
-     has. */
+     drawn before their pictures had arrived and been decoded. So a piece's
+     sprite is made once its picture is ready, a few each frame, nearest
+     first; one whose picture is not ready when it is about to fly goes as
+     its paper and is drawn again when it is. */
   let queue: Flyer[] = [], frameNo = 0;
   const make = (f: Flyer) => {
     const made = f.lazy?.();
@@ -229,12 +234,14 @@ export function pocket(host: HTMLElement): Pocket | null {
     let spare = 3;
     for (const f of queue) {
       if (!f.lazy) continue;
+      const ready = f.ready ? f.ready() : true;
       if (!f.sprite) {
-        // not drawn at all yet: now if it is about to fly, else while there is time to spare
-        if (t >= f.delay - 80) make(f);
-        else if (spare > 0) { spare--; make(f); }
-      } else if (frameNo % 12 === 0 && spare > 0) {
-        // flying as its paper: look again for its picture, now and then
+        // not drawn at all yet: as soon as its picture is ready and there is
+        // time to spare; at the latest as it is about to fly, ready or not
+        if (ready && spare > 0) { spare--; make(f); }
+        else if (t >= f.delay - 40) make(f);
+      } else if (spare > 0 && (f.ready ? ready : frameNo % 12 === 0)) {
+        // flying as its paper: its picture has come
         spare--;
         make(f);
       }
@@ -302,8 +309,8 @@ export function pocket(host: HTMLElement): Pocket | null {
     start: () => {
       total = Math.max(1, ...flyers.map((f) => f.delay + f.dur));
       queue = flyers.filter((f) => f.lazy).sort((a, b) => a.delay - b.delay);
-      // (the first to fly are ready before the first frame)
-      queue.forEach((f) => { if (f.delay < 220) make(f); });
+      // (the very first to fly are drawn before the first frame)
+      queue.forEach((f) => { if (f.delay < 60) make(f); });
       clock = el.animate([{ opacity: 1 }, { opacity: 1 }], { duration: total, fill: "forwards" });
       // a finish from outside (a tap lands everything) has to reach the drawing too
       clock.finished.then(() => { if (!dead) paint(total); }, () => {});
