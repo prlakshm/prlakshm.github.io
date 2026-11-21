@@ -27,6 +27,9 @@ if (typeof document !== "undefined" && !document.getElementById("gx-vt-optin") &
     if (!e.viewTransition) return;
     // a skipped transition rejects its promises; that's expected, not an error
     [e.viewTransition.ready, e.viewTransition.finished, e.viewTransition.updateCallbackDone].forEach((p) => p?.catch(() => {}));
+    // the cave-in (caveIn.ts) has already taken the page apart and hands over
+    // a still frame: no sweep, the two pages are cut together
+    if ((window as unknown as { __caveGo?: boolean }).__caveGo) return e.viewTransition.skipTransition();
     const to = e.activation?.entry?.url;
     if (!to || !new URL(to, location.href).pathname.startsWith("/everything")) e.viewTransition.skipTransition();
   });

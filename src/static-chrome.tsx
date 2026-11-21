@@ -5,6 +5,7 @@ import { awardOnArrival } from "./components/badges/badgeStore.js";
 import { NavBar } from "./pages/home/WtNav.js";
 import SiteFooter from "./pages/home/SiteFooter.js";
 import "./motion/stormHandoff.js"; // the way into EVERYTHING (cross-page storm)
+import "./motion/caveIn.js"; // ...and the cave-in that takes you there
 
 /* The site's nav and footer for the static case studies in public/.
 

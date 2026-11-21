@@ -498,6 +498,37 @@ html.gx-storm .gx-bagel {
   opacity: 0;
 }
 
+/* THE CAVE-IN (arriving from another page that fell into its hole;
+   Gallery.tsx runCave). While html.gx-cave is set, the pieces, the bagel and
+   the nav stay hidden until they are thrown back out of the hole; while
+   html.gx-cave-air is set the ground is plain cool white (the dots wash in
+   last, as the hole shuts). */
+html.gx-cave .gx-piece,
+html.gx-cave .gx-bagel {
+  opacity: 0;
+}
+
+html.gx-cave .wt-nav {
+  visibility: hidden;
+}
+
+html.gx-cave-air .gx-view {
+  background-image: none;
+}
+
+html.gx-cave-air .gx::after {
+  opacity: 0;
+}
+
+/* the hole, drawn on the screen (Gallery.tsx runCave places one copy under
+   the canvas and its body alone over it) */
+.gx-cave-hole {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
 /* the portfolio's cool white behind the storm, once the page you came from
    is gone (the page itself is see-through then) */
 .gx-storm-sky {

@@ -3,6 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.js";
 import "./motion/stormHandoff.js"; // the way into EVERYTHING (cross-page storm)
+import "./motion/caveIn.js"; // ...and the cave-in that takes you there
 
 
 // Use ReactDOM.createRoot to render your app into the root element in "index.html".
