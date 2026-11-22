@@ -42,17 +42,14 @@
          shakes, and the shake builds: nothing to see in the first 0.15s (a
          fast device never shows it), nearly two pixels by 0.6s, with the
          hole swelling a touch, like something about to come out. Plain CSS on two properties the browser can move
-         without this page's scripts, so it keeps going while they load.
-         When the throw is set up the real hole takes the shake over where
-         the still frame left it (Gallery.tsx runCave, .gx-cave-wait), and
-         lets it go once the first pieces are on screen. No turning: the
-         hole never rotates. -->
+         without this page's scripts, so it keeps going while they load. It
+         ends when the still frame is taken away, as the throw begins
+         (Gallery.tsx runCave). No turning: the hole never rotates. -->
     <style>
       @keyframes gx-cave-build { 0% { translate: 0.00px 0.00px; } 6.7% { translate: 0.00px 0.00px; } 13.3% { translate: -0.00px -0.00px; } 20.0% { translate: 0.00px 0.00px; } 26.7% { translate: -0.07px -0.00px; } 33.3% { translate: 0.17px 0.03px; } 40.0% { translate: -0.27px 0.08px; } 46.7% { translate: 0.39px 0.13px; } 53.3% { translate: -0.51px 0.18px; } 60.0% { translate: 0.34px -0.45px; } 66.7% { translate: 0.64px 0.44px; } 73.3% { translate: -0.74px -0.53px; } 80.0% { translate: 1.17px -0.28px; } 86.7% { translate: -1.26px -0.46px; } 93.3% { translate: 1.59px -0.17px; } 100.0% { translate: -0.44px 1.22px; } }
       @keyframes gx-cave-shake { 0% { translate: -0.44px 1.22px; } 10.0% { translate: -1.72px -0.37px; } 20.0% { translate: 1.66px 0.48px; } 30.0% { translate: -0.76px -1.14px; } 40.0% { translate: -1.62px 0.55px; } 50.0% { translate: 0.50px -1.21px; } 60.0% { translate: 0.07px 1.26px; } 70.0% { translate: -1.61px -0.57px; } 80.0% { translate: 1.27px -0.89px; } 90.0% { translate: -0.43px 1.22px; } 100% { translate: -0.44px 1.22px; } }
       @keyframes gx-cave-swell { from { scale: 1; } to { scale: 1.025; } }
-      #gx-cave-first .cave-hole,
-      .cave-hole.gx-cave-wait {
+      #gx-cave-first .cave-hole {
         will-change: transform;
         transform-origin: 50% 50%;
         animation: gx-cave-build 0.6s linear both, gx-cave-shake 0.4s linear 0.6s infinite, gx-cave-swell 0.7s cubic-bezier(0.5, 0, 0.9, 0.6) both;
@@ -184,7 +181,6 @@
   <body style="margin:0;background:#f8fafc;min-height:100vh;overflow:hidden;" class="gx-body">
     <!-- the cave-in's hole, exactly as the page before left it (head script) -->
     <script>
-      if (window.__gxCave) window.__gxCaveAt = performance.now(); // (when the wait began: the shake's clock)
       if (window.__gxCave) document.body.insertAdjacentHTML("afterbegin", '<div id="gx-cave-first" aria-hidden="true" style="position:fixed;inset:0;z-index:40;pointer-events:none;overflow:hidden">' + window.__gxCave.svg + "</div>");
     </script>
     <div id="root"></div>

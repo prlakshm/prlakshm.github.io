@@ -920,25 +920,6 @@ export default function Gallery() {
       }
       // from here each piece is held by its own flight; the still frame the
       // page before left can go (the canvas under it is the same cool white)
-      /* The hole has been shaking while it waited (everything/index.html: the
-         still frame, in CSS). The real hole takes the shake over at the very
-         point the still frame had reached, and keeps it until the first
-         pieces are on screen: on a slow phone the first frames of the throw
-         are slow too, and the hole would sit still again through them. Then
-         it eases to rest. On a fast device the shake has not begun to show
-         by now, and none of this is seen. */
-      const since = performance.now() - ((window as unknown as { __gxCaveAt?: number }).__gxCaveAt ?? performance.now());
-      const shaking: SVGElement[] = over ? [built.svg, over.svg] : [built.svg];
-      shaking.forEach((el) => {
-        el.style.animationDelay = `${(-since).toFixed(0)}ms, ${(600 - since).toFixed(0)}ms, ${(-since).toFixed(0)}ms`;
-        el.classList.add("gx-cave-wait");
-      });
-      requestAnimationFrame(() => requestAnimationFrame(() => shaking.forEach((el) => {
-        const cs = getComputedStyle(el), at = { translate: cs.translate === "none" ? "0px 0px" : cs.translate, scale: cs.scale === "none" ? "1" : cs.scale };
-        el.classList.remove("gx-cave-wait");
-        el.style.animationDelay = "";
-        try { el.animate([at, { translate: "0px 0px", scale: "1" }], { duration: 160, easing: "ease-out" }); } catch { /* an older browser: it just stops */ }
-      })));
       root.classList.remove("gx-cave");
       document.getElementById("gx-cave-first")?.remove();
       {
