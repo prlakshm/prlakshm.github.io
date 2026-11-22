@@ -145,12 +145,16 @@ export const mode = (): Mode => {
 };
 
 /* THE STEP-DOWN. A desktop that is given the full version is watched while
-   it plays: if it cannot keep up (under 45 frames a second over the run, or
-   five frames that each took longer than 50ms) twice running, it is marked,
+   it plays: if it cannot keep up (five frames that each took longer than
+   50ms, or under 24 frames a second over the run) twice running, it is marked,
    and from its next page on it gets the lighter drawing, for a month. Twice,
    because once can be the machine being busy with something else for a
    moment; the two halves of one press are two runs, so a machine that
-   really can't is marked by its first press. Call the function
+   really can't is marked by its first press. (Not simply "under 45 frames
+   a second", as it first was: a laptop saving power, or a browser doing so,
+   draws a steady 30, and that is not failing to keep up. Found when a
+   capable desktop in the Safari engine was marked for exactly that.) Call
+   the function
    this returns when the run ends. Nothing is judged where the lighter one
    is already in use, with a ?cave= test link, on a run under 0.6s, or if
    the tab was ever hidden meanwhile (a hidden tab draws no frames). */
@@ -176,7 +180,7 @@ export function watchFrames(): () => void {
     document.removeEventListener("visibilitychange", hid);
     const took = last - first;
     if (away || took < 600) return;
-    const poor = (frames * 1000) / took < 45 || slow >= 5;
+    const poor = slow >= 5 || (frames * 1000) / took < 24;
     try {
       if (!poor) localStorage.removeItem(STRIKE_KEY);
       else if (localStorage.getItem(STRIKE_KEY)) {
